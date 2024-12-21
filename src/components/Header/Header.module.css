@@ -1,0 +1,10 @@
+.headerContainer {
+	border-style: solid;
+	border-color: var(--mantine-color-gray-4);
+	border-width: 0;
+	border-bottom-width: 1px;
+}
+
+.checkbox {
+	border-color: var(--mantine-color-gray-9);
+}

@@ -1,0 +1,20 @@
+.modalHeader {
+	padding-right: var(--mantine-spacing-md);
+}
+
+.modalTitle {
+	color: var(--mantine-color-text);
+	font-weight: 700;
+	font-size: var(--mantine-font-size-xl);
+}
+
+.modalClose {
+	background-color: var(--mantine-color-gray-1);
+	color: var(--mantine-color-gray-7);
+	border-radius: var(--mantine-radius-md);
+
+	&:hover {
+		background-color: var(--mantine-color-gray-2);
+	}
+}
+

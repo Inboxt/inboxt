@@ -1,0 +1,15 @@
+.content {
+	display: flex;
+	flex-direction: column;
+	width: 600px;
+	border-style: solid;
+	border-width: 1px;
+	border-color: var(--mantine-color-gray-4);
+	border-top-width: 0;
+	background-color: var(--mantine-color-body);
+
+	@media (max-width: $mantine-breakpoint-sm) {
+		width: 100%;
+	}
+}
+
