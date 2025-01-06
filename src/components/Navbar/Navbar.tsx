@@ -1,14 +1,4 @@
-import {
-	Box,
-	Burger,
-	Divider,
-	Group,
-	NavLink,
-	Stack,
-	Transition,
-	Tooltip,
-	Drawer,
-} from '@mantine/core';
+import { Box, Burger, Divider, Group, Stack, Drawer } from '@mantine/core';
 import {
 	IconArchive,
 	IconHighlight,
@@ -19,7 +9,23 @@ import {
 	IconX,
 } from '@tabler/icons-react';
 
+import classes from './Navbar.module.css';
+
 import { useLargeScreen } from '../../hooks/useLargeScreen.tsx';
+import { NavbarLink } from '../NavbarLink';
+import { clsx } from 'clsx';
+
+const NAV_LINKS = [
+	{ id: 'inbox', label: 'Inbox', icon: <IconHome size={21} /> },
+	{ id: 'newsletters', label: 'Newsletters', icon: <IconMail size={21} /> },
+	{
+		id: 'highlights',
+		label: 'Highlights',
+		icon: <IconHighlight size={21} />,
+	},
+	{ id: 'archive', label: 'Archive', icon: <IconArchive size={21} /> },
+	{ id: 'trash', label: 'Trash', icon: <IconTrash size={21} /> },
+];
 
 const BACKEND_LABELS = [
 	{
@@ -59,153 +65,27 @@ export const Navbar = ({ opened, toggle }: NavbarProps) => {
 			c="dark.7"
 			pr={opened ? 'md' : '0'}
 		>
-			<Tooltip label="Inbox" position="right" disabled={opened}>
-				<NavLink
-					label={
-						<Transition
-							mounted={opened}
-							transition="fade"
-							duration={300}
-							timingFunction="ease"
-						>
-							{(styles) => <div style={styles}>Inbox</div>}
-						</Transition>
-					}
-					leftSection={<IconHome size={21} />}
-					variant="light"
-					href="#required-for-focus"
-					styles={{
-						root: { height: 44 },
-						label: { fontSize: 'var(--mantine-font-size-lg)' },
-					}}
+			{NAV_LINKS.map((link) => (
+				<NavbarLink
+					key={link.id}
+					label={link.label}
+					icon={link.icon}
+					opened={opened}
+					href="#required-for-focus" // todo: handle navigation
 				/>
-			</Tooltip>
-
-			<Tooltip label="Newsletters" position="right" disabled={opened}>
-				<NavLink
-					label={
-						<Transition
-							mounted={opened}
-							transition="fade"
-							duration={300}
-							timingFunction="ease"
-						>
-							{(styles) => <div style={styles}>Newsletters</div>}
-						</Transition>
-					}
-					leftSection={<IconMail size={21} />}
-					variant="light"
-					href="#required-for-focus"
-					styles={{
-						root: { height: 44 },
-						label: { fontSize: 'var(--mantine-font-size-lg)' },
-					}}
-				/>
-			</Tooltip>
-
-			<Tooltip label="Highlights" position="right" disabled={opened}>
-				<NavLink
-					label={
-						<Transition
-							mounted={opened}
-							transition="fade"
-							duration={300}
-							timingFunction="ease"
-						>
-							{(styles) => <div style={styles}>Highlights</div>}
-						</Transition>
-					}
-					leftSection={<IconHighlight size={21} />}
-					variant="light"
-					href="#required-for-focus"
-					styles={{
-						root: { height: 44 },
-						label: { fontSize: 'var(--mantine-font-size-lg)' },
-					}}
-				/>
-			</Tooltip>
-
-			<Tooltip label="Archive" position="right" disabled={opened}>
-				<NavLink
-					label={
-						<Transition
-							mounted={opened}
-							transition="fade"
-							duration={300}
-							timingFunction="ease"
-						>
-							{(styles) => <div style={styles}>Archive</div>}
-						</Transition>
-					}
-					leftSection={<IconArchive size={21} />}
-					variant="light"
-					href="#required-for-focus"
-					styles={{
-						root: { height: 44 },
-						label: { fontSize: 'var(--mantine-font-size-lg)' },
-					}}
-				/>
-			</Tooltip>
-
-			<Tooltip label="Trash" position="right" disabled={opened}>
-				<NavLink
-					label={
-						<Transition
-							mounted={opened}
-							transition="fade"
-							duration={300}
-							timingFunction="ease"
-						>
-							{(styles) => <div style={styles}>Trash</div>}
-						</Transition>
-					}
-					leftSection={<IconTrash size={21} />}
-					variant="light"
-					href="#required-for-focus"
-					styles={{
-						root: { height: 44 },
-						label: { fontSize: 'var(--mantine-font-size-lg)' },
-					}}
-				/>
-			</Tooltip>
+			))}
 
 			<Divider m="sm" label={opened ? 'Labels' : undefined} />
+
 			{BACKEND_LABELS.map((label) => (
-				<Tooltip
+				<NavbarLink
 					key={label.id}
 					label={label.name}
-					position="right"
-					disabled={opened}
-				>
-					<NavLink
-						label={
-							<Transition
-								mounted={opened}
-								transition="fade"
-								duration={300}
-								timingFunction="ease"
-							>
-								{(styles) => (
-									<div style={styles}>{label.name}</div>
-								)}
-							</Transition>
-						}
-						leftSection={
-							<IconLabelImportantFilled
-								size={21}
-								style={{
-									color: `var(--mantine-color-${label.color})`,
-								}}
-							/>
-						}
-						variant="light"
-						href="#required-for-focus"
-						styles={{
-							root: { height: 44 },
-							label: { fontSize: 'var(--mantine-font-size-lg)' },
-						}}
-					/>
-				</Tooltip>
+					icon={<IconLabelImportantFilled size={21} />}
+					opened={opened}
+					href="#required-for-focus" // todo: handle navigation
+					color={label.color}
+				/>
 			))}
 		</Stack>
 	);
@@ -236,11 +116,10 @@ export const Navbar = ({ opened, toggle }: NavbarProps) => {
 	return (
 		<>
 			<Box
-				style={{
-					width: opened ? 240 : 60,
-					marginLeft: opened ? 70 : 250,
-					transition: 'width 0.3s, margin 0.3s',
-				}}
+				className={clsx(
+					classes.navbar,
+					opened ? classes.openedNavbar : classes.closedNavbar,
+				)}
 				pt="md"
 			>
 				<Group

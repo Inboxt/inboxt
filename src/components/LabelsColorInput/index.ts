@@ -1,0 +1,1 @@
+export { LabelsColorInput } from './LabelsColorInput';

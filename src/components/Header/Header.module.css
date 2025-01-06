@@ -8,3 +8,16 @@
 .checkbox {
 	border-color: var(--mantine-color-gray-9);
 }
+
+.mobileCheckbox {
+	border-color: var(--mantine-color-gray-9);
+	background-color: var(--mantine-color-gray-2);
+}
+
+.mobileSelection  {
+	border: 0 solid var(--mantine-color-gray-2);
+	border-bottom-width: 1px;
+	background-color: var(--mantine-color-gray-2);
+	height: 117px;
+	display: flex;
+}

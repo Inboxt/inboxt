@@ -48,136 +48,119 @@ const renderSelectOption: SelectProps['renderOption'] = ({
 	</Group>
 );
 
+const InstallOption = ({
+	imageSrc,
+	altText,
+	title,
+	description,
+	children,
+}: {
+	imageSrc: string;
+	altText: string;
+	title: string;
+	description: string;
+	children?: React.ReactNode;
+}) => (
+	<Flex
+		align={{ base: 'flex-start', sm: 'center' }}
+		gap={{ base: 'xs', sm: 'xl' }}
+		wrap="nowrap"
+		direction={{ base: 'column', sm: 'row' }}
+	>
+		<Image src={imageSrc} alt={altText} w="auto" h={116} radius="sm" />
+		<Box>
+			<Title order={5}>{title}</Title>
+			<Text>{description}</Text>
+			{children && <Group mt="sm">{children}</Group>}
+		</Box>
+	</Flex>
+);
+
 export const InstallModal = ({ id, context }: ContextModalProps) => {
 	const installPWA = usePWAInstall();
 
 	return (
 		<Stack gap="lg">
-			<Flex
-				align={{ base: 'flex-start', sm: 'center' }}
-				gap={{ base: 'xs', sm: 'xl' }}
-				wrap="nowrap"
-				direction={{ base: 'column', sm: 'row' }}
+			<InstallOption
+				imageSrc="/app-screenshot.png"
+				altText="Mobile app"
+				title="Install App for iOS and Android"
+				description="Use our mobile app to save any link, access your full library."
 			>
-				<Image
-					src="/app-screenshot.png"
-					alt="mobile app"
-					w="auto"
-					h={116}
-					radius="sm"
-				/>
-				<Box>
-					<Title order={5}>Install App for iOS and Android</Title>
-					<Text>
-						Use our mobile app to save any link, access your full
-						library.
-					</Text>
-
-					<Group mt="sm" gap="xs">
-						<a href="https://www.apple.com/app-store/">
-							<Image w="auto" h={41} src="/app-store-badge.png" />
-						</a>
-
-						<a href="https://play.google.com/store">
-							<Image
-								w="auto"
-								h={40}
-								src="/play-store-badge.png"
-							/>
-						</a>
-					</Group>
-				</Box>
-			</Flex>
+				<a
+					href="https://www.apple.com/app-store/"
+					aria-label="Download on the App Store"
+				>
+					<Image
+						src="/app-store-badge.png"
+						height={41}
+						alt="App Store badge"
+					/>
+				</a>
+				<a
+					href="https://play.google.com/store"
+					aria-label="Get it on Google Play"
+				>
+					<Image
+						src="/play-store-badge.png"
+						height={40}
+						alt="Google Play badge"
+					/>
+				</a>
+			</InstallOption>
 
 			<Divider />
 
 			{installPWA && (
 				<>
-					<Flex
-						align={{ base: 'flex-start', sm: 'center' }}
-						gap={{ base: 'xs', sm: 'xl' }}
-						wrap="nowrap"
-						direction={{ base: 'column', sm: 'row' }}
+					<InstallOption
+						imageSrc="/app-screenshot.png"
+						altText="PWA app"
+						title="Access Anywhere with PWA"
+						description="Install our Progressive Web App on any device to save links and access your full library effortlessly."
 					>
-						<Image
-							src="/app-screenshot.png"
-							alt="pwa app"
-							w="auto"
-							h={116}
-							radius="sm"
-						/>
-						<Stack align="flex-start">
-							<Title order={5}>Access Anywhere with PWA</Title>
-							<Text>
-								Install our Progressive Web App on any device to
-								save links and access your full library
-								effortlessly.
-							</Text>
-
-							<Button
-								leftSection={
-									<IconDeviceDesktopPlus size={16} />
-								}
-								component="a"
-								href="#"
-								onClick={installPWA}
-							>
-								Install PWA
-							</Button>
-						</Stack>
-					</Flex>
+						<Button
+							leftSection={<IconDeviceDesktopPlus size={16} />}
+							onClick={installPWA}
+						>
+							Install PWA
+						</Button>
+					</InstallOption>
 
 					<Divider />
 				</>
 			)}
 
-			<Flex
-				align={{ base: 'flex-start', sm: 'center' }}
-				gap={{ base: 'xs', sm: 'xl' }}
-				wrap="nowrap"
-				direction={{ base: 'column', sm: 'row' }}
+			<InstallOption
+				imageSrc="/app-screenshot.png"
+				altText="Browser extension"
+				title="Install Browser Extensions"
+				description="Installing the browser extension is the best way to save pages directly from your computer to our platform."
 			>
-				<Image
-					src="/app-screenshot.png"
-					alt="web extension"
-					w="auto"
-					h={116}
-					radius="sm"
-				/>
-				<Box>
-					<Title order={5}>Install Browser Extensions</Title>
-					<Text>
-						Installing the browser extension is the best way to save
-						pages directly from your computer to our platform.
-					</Text>
-
-					<Flex mt="sm" wrap="nowrap" gap="xs">
-						<Select
-							placeholder="Select your browser"
-							data={[
-								{ value: 'chrome', label: 'Google Chrome' },
-								{
-									value: 'firefox',
-									label: 'Firefox',
-								},
-								{ value: 'edge', label: 'Microsoft Edge' },
-								{ value: 'safari', label: 'Safari' },
-							]}
-							renderOption={renderSelectOption}
-							leftSection={<BrowserIcon browser="chrome" />} // todo: different icon based on selection
-						/>
-
-						<ActionIcon
-							component="a"
-							href="#"
-							onClick={() => {}}
-							size="lg"
-						>
-							<IconDownload size={16} />
-						</ActionIcon>
-					</Flex>
-				</Box>
-			</Flex>
+				<Flex gap="xs" align="center">
+					<Select
+						placeholder="Select your browser"
+						data={[
+							{ value: 'chrome', label: 'Google Chrome' },
+							{ value: 'firefox', label: 'Firefox' },
+							{ value: 'edge', label: 'Microsoft Edge' },
+							{ value: 'safari', label: 'Safari' },
+						]}
+						renderOption={renderSelectOption}
+						//value={selectedBrowser}
+						//onChange={(value) => setSelectedBrowser(value!)}
+						leftSection={<BrowserIcon browser="chrome" />} // todo: different icon based on selection
+					/>
+					<ActionIcon
+						component="a"
+						href="#"
+						aria-label="Download extension for selected browser"
+						size="lg"
+					>
+						<IconDownload size={16} />
+					</ActionIcon>
+				</Flex>
+			</InstallOption>
 
 			<Button
 				onClick={() => context.closeModal(id)}

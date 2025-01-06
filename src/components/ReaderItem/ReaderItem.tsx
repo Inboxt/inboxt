@@ -1,25 +1,13 @@
-import {
-	ActionIcon,
-	Badge,
-	Box,
-	Checkbox,
-	Group,
-	Stack,
-	Text,
-	Tooltip,
-} from '@mantine/core';
+import { Badge, Box, Checkbox, Group, Stack, Text } from '@mantine/core';
 import { useHover } from '@mantine/hooks';
 import dayjs from 'dayjs';
-import {
-	IconArchive,
-	IconTag,
-	IconTrash,
-	IconWorld,
-} from '@tabler/icons-react';
+
+import classes from './ReaderItem.module.css';
+
 import { useLongPress } from '../../hooks/useLongPress.tsx';
 import { useReaderContext } from '../../context/ReaderContext.tsx';
 import { useLargeScreen } from '../../hooks/useLargeScreen.tsx';
-import { modals } from '@modals/modals.ts';
+import { ItemsOptions } from '../ItemsOptions';
 
 type ItemLabel = {
 	id: number;
@@ -62,13 +50,7 @@ export const ReaderItem = ({
 			key={id}
 			px="md"
 			py="md"
-			style={{
-				borderWidth: 0,
-				borderStyle: 'solid',
-				borderColor: 'var(--mantine-color-gray-4)',
-				borderBottomWidth: 1,
-				cursor: 'pointer',
-			}}
+			className={classes.item}
 			ref={ref}
 			{...longPressHandlers}
 		>
@@ -77,21 +59,19 @@ export const ReaderItem = ({
 					checked={isSelected}
 					variant="outline"
 					color="dark"
-					styles={{
-						input: {
-							borderColor: 'var(--mantine-color-dark-9)',
-						},
-					}} // TODO: Border color should be applied only when not selected
+					classNames={{
+						input: classes.checkbox,
+					}} // todo: create custom variant for this case?
 					onChange={() => toggleItemSelection(id)}
 				/>
 
-				<Stack gap={0} style={{ flex: 1 }}>
+				<Stack gap={0} flex={1}>
 					<Group
 						wrap="nowrap"
 						gap="md"
 						justify="space-between"
 						h={28}
-						style={{ position: 'relative' }}
+						pos="relative"
 					>
 						<Text fw="700" lineClamp={1} maw="70%">
 							{title}
@@ -109,59 +89,7 @@ export const ReaderItem = ({
 								style={{ position: 'absolute', right: 0 }}
 								visibleFrom="lg"
 							>
-								<Tooltip
-									label="Edit labels"
-									openDelay={600}
-									withArrow
-									onClick={modals.openLabelsSelectionModal}
-								>
-									<ActionIcon
-										variant="subtle"
-										color="gray"
-										c="text"
-									>
-										<IconTag size={16} />
-									</ActionIcon>
-								</Tooltip>
-								<Tooltip
-									label="Move to archive"
-									openDelay={600}
-									withArrow
-								>
-									<ActionIcon
-										variant="subtle"
-										color="gray"
-										c="text"
-									>
-										<IconArchive size={16} />
-									</ActionIcon>
-								</Tooltip>
-								<Tooltip
-									label="Move to trash"
-									openDelay={600}
-									withArrow
-								>
-									<ActionIcon
-										variant="subtle"
-										color="gray"
-										c="text"
-									>
-										<IconTrash size={16} />
-									</ActionIcon>
-								</Tooltip>
-								<Tooltip
-									label="Open original"
-									openDelay={600}
-									withArrow
-								>
-									<ActionIcon
-										variant="subtle"
-										color="gray"
-										c="text"
-									>
-										<IconWorld size={16} />
-									</ActionIcon>
-								</Tooltip>
+								<ItemsOptions size="sm" />
 							</Group>
 						)}
 					</Group>
@@ -170,15 +98,9 @@ export const ReaderItem = ({
 						{description ? description : author}
 					</Text>
 
-					<Group wrap="nowrap" gap={4} mt={0} maw="60%">
+					<Group wrap="nowrap" gap="xxxs" maw="60%">
 						{labels?.map(({ id, label, color }) => (
-							<Badge
-								size="xs"
-								radius="sm"
-								//style={{ display: 'flex' }}
-								key={id}
-								color={color}
-							>
+							<Badge size="xs" radius="sm" key={id} color={color}>
 								{label}
 							</Badge>
 						))}

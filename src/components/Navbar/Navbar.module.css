@@ -1,0 +1,13 @@
+.navbar {
+	transition: width 0.3s, margin 0.3s;
+}
+
+.closedNavbar {
+	width: 60px;
+	margin-left: 250px;
+}
+
+.openedNavbar {
+	width: 240px;
+	margin-left: 70px;
+}

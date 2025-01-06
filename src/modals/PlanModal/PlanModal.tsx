@@ -13,7 +13,8 @@ import {
 import { IconCircleCheck } from '@tabler/icons-react';
 import { ContextModalProps } from '@mantine/modals';
 
-// todo: separation of components
+// todo: separation of components and better styling
+// todo: probably I need to re-think this component more (when it comes to style and how to handle pricing model for this app)
 // todo: real list and prices
 export const PlanModal = ({ id, context }: ContextModalProps) => {
 	return (

@@ -90,16 +90,11 @@ export const UserMenu = () => {
 				component={item.href ? 'a' : 'div'}
 				href={item.href}
 				target={item.target}
-				style={{
-					display: 'flex',
-					alignItems: 'center',
-					padding: '8px 16px',
-					textDecoration: 'none',
-					cursor: 'pointer',
-				}}
+				className={classes.drawerItem}
 			>
 				{item.icon}
-				<Text ml="xs" fz={18}>
+
+				<Text ml="xs" fz="lg">
 					{item.label}
 				</Text>
 			</Box>

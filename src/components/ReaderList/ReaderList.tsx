@@ -1,4 +1,4 @@
-import { Box, Stack } from '@mantine/core';
+import { Stack } from '@mantine/core';
 import { ReaderItem } from '../ReaderItem';
 import { useEffect } from 'react';
 import { useReaderContext } from '../../context/ReaderContext.tsx';
@@ -140,6 +140,7 @@ const BACKEND_ARTICLES = [
 	},
 ];
 
+// TODO: This probably should be a HOME page or something, or dynamically handle all possible options?
 export const ReaderList = () => {
 	const { setVisibleItemIds } = useReaderContext();
 	// TODO: Handle data from backend

@@ -1,0 +1,9 @@
+.item {
+	border: 0 solid var(--mantine-color-gray-4);
+	border-bottom-width: 1px;
+	cursor: pointer;
+}
+
+.checkbox {
+	border-color: var(--mantine-color-dark-9);
+}

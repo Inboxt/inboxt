@@ -1,0 +1,7 @@
+.navLinkRoot {
+	height: 44px;
+}
+
+.navLinkLabel {
+	font-size: var(--mantine-font-size-lg);
+}

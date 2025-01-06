@@ -2,6 +2,7 @@ import { Anchor, Box, Breadcrumbs, Text, BoxProps } from '@mantine/core';
 
 import classes from './Footer.module.css';
 import { AppName } from '../AppName';
+import { modals } from '@modals/modals.ts';
 
 export const Footer = (props: BoxProps) => {
 	return (
@@ -21,10 +22,12 @@ export const Footer = (props: BoxProps) => {
 				}}
 				mt="lg"
 			>
-				<Anchor fz="sm">Send Feedback</Anchor>
+				<Anchor fz="sm">Hep</Anchor>
 				<Anchor fz="sm">Privacy</Anchor>
 				<Anchor fz="sm">Terms</Anchor>
-				<Anchor fz="sm">Help</Anchor>
+				<Anchor fz="sm" onClick={modals.openPlanModal}>
+					Pricing
+				</Anchor>
 			</Breadcrumbs>
 		</Box>
 	);
