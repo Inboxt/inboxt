@@ -14,10 +14,16 @@ export function useLongPress(
 
 	const timerId = useRef<number | null>(null);
 	const isLongPress = useRef(false);
+	const targetElement = useRef<HTMLElement | null>(null);
 
 	const start = (event: LongPressEvent) => {
 		if (typeof callback !== 'function') {
 			return;
+		}
+
+		if (event.target instanceof HTMLElement) {
+			targetElement.current = event.target;
+			targetElement.current.style.userSelect = 'none';
 		}
 
 		timerId.current = window.setTimeout(() => {
@@ -32,6 +38,11 @@ export function useLongPress(
 			timerId.current = null;
 		}
 		isLongPress.current = false;
+
+		if (targetElement.current) {
+			targetElement.current.style.userSelect = '';
+			targetElement.current = null;
+		}
 	};
 
 	return useMemo(
