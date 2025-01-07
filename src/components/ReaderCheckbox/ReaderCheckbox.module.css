@@ -1,0 +1,7 @@
+.checkbox {
+	border-color: var(--mantine-color-dark-1);
+
+	@mixin dark {
+		border-color: var(--mantine-color-dark-2);
+	}
+}

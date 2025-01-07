@@ -12,6 +12,7 @@ interface ReaderContextProps {
 	isPartiallySelected: boolean;
 	toggleItemSelection: (id: number) => void;
 	isSelected: boolean;
+	deselectAll: () => void;
 }
 
 const ReaderContext = createContext<ReaderContextProps | undefined>(undefined);
@@ -31,6 +32,10 @@ export const ReaderProvider: React.FC<{ children: React.ReactNode }> = ({
 			}
 		});
 	}, 10);
+
+	const deselectAll = () => {
+		setSelectedItemIds([]);
+	};
 
 	const toggleItemSelection = useDebouncedCallback((id: number) => {
 		setSelectedItemIds((prev) =>
@@ -61,6 +66,7 @@ export const ReaderProvider: React.FC<{ children: React.ReactNode }> = ({
 				isPartiallySelected,
 				toggleItemSelection,
 				isSelected: isAllSelected || isPartiallySelected,
+				deselectAll,
 			}}
 		>
 			{children}

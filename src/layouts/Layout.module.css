@@ -10,6 +10,11 @@
 
 	@media (max-width: $mantine-breakpoint-sm) {
 		width: 100%;
+		border-width: 0;
+	}
+
+	@mixin dark {
+		border-color: var(--mantine-color-dark-4);
 	}
 }
 

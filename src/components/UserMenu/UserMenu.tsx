@@ -138,7 +138,12 @@ export const UserMenu = () => {
 					opacity: 0.6,
 				}}
 				closeButtonProps={{
-					icon: <IconX size={24} color="black" />,
+					icon: (
+						<IconX
+							size={24}
+							style={{ color: 'var(--mantine-color-text)' }}
+						/>
+					),
 				}}
 				title={<Title order={4}>Quick Actions</Title>}
 			>

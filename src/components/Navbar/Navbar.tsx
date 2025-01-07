@@ -14,6 +14,7 @@ import classes from './Navbar.module.css';
 import { useLargeScreen } from '../../hooks/useLargeScreen.tsx';
 import { NavbarLink } from '../NavbarLink';
 import { clsx } from 'clsx';
+import { FooterLinks } from '../FooterLinks';
 
 const NAV_LINKS = [
 	{ id: 'inbox', label: 'Inbox', icon: <IconHome size={21} /> },
@@ -58,13 +59,9 @@ type NavbarProps = {
 export const Navbar = ({ opened, toggle }: NavbarProps) => {
 	const isLargeScreen = useLargeScreen();
 
+	// todo: scrollable correctly
 	const navLinks = (
-		<Stack
-			mt={isLargeScreen ? 'md' : 0}
-			gap={0}
-			c="dark.7"
-			pr={opened ? 'md' : '0'}
-		>
+		<Stack mt={isLargeScreen ? 'md' : 0} gap={0} pr={opened ? 'md' : '0'}>
 			{NAV_LINKS.map((link) => (
 				<NavbarLink
 					key={link.id}
@@ -96,19 +93,32 @@ export const Navbar = ({ opened, toggle }: NavbarProps) => {
 				opened={opened}
 				onClose={toggle}
 				title="Feeds"
-				styles={{
-					title: {
-						fontSize: 'var(--mantine-font-size-xxl)',
-						fontWeight: 700,
-					},
-				}}
 				size="xs"
 				closeButtonProps={{
-					icon: <IconX size={34} color="black" />,
+					icon: (
+						<IconX
+							size={34}
+							style={{ color: 'var(--mantine-color-text)' }}
+						/>
+					),
 				}}
 				overlayProps={{ opacity: 0.6 }}
+				classNames={{
+					title: classes.mobileDrawerTitle,
+					content: classes.mobileDrawerContent,
+					body: classes.mobileDrawerBody,
+				}}
 			>
 				{navLinks}
+
+				<Box
+					py="sm"
+					pos="sticky"
+					bottom={0}
+					style={{ backgroundColor: 'var(--mantine-color-body)' }}
+				>
+					<FooterLinks justify="center" />
+				</Box>
 			</Drawer>
 		);
 	}

@@ -1,4 +1,4 @@
-import { createTheme, Modal, virtualColor } from '@mantine/core';
+import { createTheme, Modal } from '@mantine/core';
 
 import classes from './theme.module.css';
 
@@ -7,25 +7,20 @@ import { spacing } from './spacing.ts';
 
 export const theme = createTheme({
 	//fontFamily: '"Poppins", sans-serif',
-	// colors: {
-	// 	grayDark: [
-	// 		'#1212',
-	// 		'#f1f3f5',
-	// 		'#e9ecef',
-	// 		'#dee2e6',
-	// 		'#ced4da',
-	// 		'#adb5bd',
-	// 		'#868e96',
-	// 		'#495057',
-	// 		'#343a40',
-	// 		'#212529',
-	// 	],
-	// 	gray: virtualColor({
-	// 		name: 'gray',
-	// 		dark: 'grayDark',
-	// 		light: 'gray',
-	// 	}),
-	// },
+	colors: {
+		dark: [
+			'#C1C2C5',
+			'#A6A7AB',
+			'#909296',
+			'#5c5f66',
+			'#373A40',
+			'#2C2E33',
+			'#25262b',
+			'#1A1B1E',
+			'#141517',
+			'#101113',
+		],
+	},
 	fontSizes,
 	spacing,
 	// headings,

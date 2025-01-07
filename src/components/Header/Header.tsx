@@ -2,7 +2,6 @@ import {
 	ActionIcon,
 	Box,
 	Burger,
-	Checkbox,
 	Flex,
 	Group,
 	Stack,
@@ -16,6 +15,7 @@ import classes from './Header.module.css';
 import { IconSearch, IconArrowLeft } from '@tabler/icons-react';
 import { useReaderContext } from '../../context/ReaderContext.tsx';
 import { ItemsOptions } from '../ItemsOptions';
+import { ReaderCheckbox } from '../ReaderCheckbox';
 
 type HeaderProps = {
 	opened: boolean;
@@ -30,6 +30,7 @@ export const Header = ({ opened, toggle }: HeaderProps) => {
 		isPartiallySelected,
 		selectedItemIds,
 		isSelected,
+		deselectAll,
 	} = useReaderContext();
 
 	if (isSelected && !isLargeScreen) {
@@ -41,9 +42,9 @@ export const Header = ({ opened, toggle }: HeaderProps) => {
 							size="lg"
 							variant="subtle"
 							radius="xl"
-							color="dark"
+							color="text"
 							ml="-6"
-							onClick={toggleSelectAll}
+							onClick={deselectAll}
 						>
 							<IconArrowLeft />
 						</ActionIcon>
@@ -57,11 +58,8 @@ export const Header = ({ opened, toggle }: HeaderProps) => {
 						</Group>
 					</Group>
 
-					<Checkbox
+					<ReaderCheckbox
 						label="Select all"
-						variant="outline"
-						color="dark"
-						classNames={{ input: classes.mobileCheckbox }}
 						onChange={toggleSelectAll}
 						checked={isAllSelected}
 						indeterminate={isPartiallySelected}
@@ -82,12 +80,7 @@ export const Header = ({ opened, toggle }: HeaderProps) => {
 			)}
 
 			<Flex gap="xs" align="center">
-				<Checkbox
-					variant="outline"
-					color="dark"
-					classNames={{
-						input: classes.checkbox,
-					}}
+				<ReaderCheckbox
 					onChange={toggleSelectAll}
 					checked={isAllSelected}
 					indeterminate={isPartiallySelected}

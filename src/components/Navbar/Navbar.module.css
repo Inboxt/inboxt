@@ -11,3 +11,17 @@
 	width: 240px;
 	margin-left: 70px;
 }
+
+.mobileDrawerTitle {
+	font-size: var(--mantine-font-size-xxl);
+	font-weight: 700;
+}
+
+.mobileDrawerContent {
+	display: flex;
+	flex-direction: column;
+}
+
+.mobileDrawerBody {
+	height: 100%;
+}

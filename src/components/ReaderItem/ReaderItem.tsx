@@ -1,4 +1,4 @@
-import { Badge, Box, Checkbox, Group, Stack, Text } from '@mantine/core';
+import { Badge, Box, Group, Stack, Text } from '@mantine/core';
 import { useHover } from '@mantine/hooks';
 import dayjs from 'dayjs';
 
@@ -8,6 +8,7 @@ import { useLongPress } from '../../hooks/useLongPress.tsx';
 import { useReaderContext } from '../../context/ReaderContext.tsx';
 import { useLargeScreen } from '../../hooks/useLargeScreen.tsx';
 import { ItemsOptions } from '../ItemsOptions';
+import { ReaderCheckbox } from '../ReaderCheckbox';
 
 type ItemLabel = {
 	id: number;
@@ -55,13 +56,8 @@ export const ReaderItem = ({
 			{...longPressHandlers}
 		>
 			<Group wrap="nowrap" maw="100%">
-				<Checkbox
+				<ReaderCheckbox
 					checked={isSelected}
-					variant="outline"
-					color="dark"
-					classNames={{
-						input: classes.checkbox,
-					}} // todo: create custom variant for this case?
 					onChange={() => toggleItemSelection(id)}
 				/>
 
@@ -70,7 +66,6 @@ export const ReaderItem = ({
 						wrap="nowrap"
 						gap="md"
 						justify="space-between"
-						h={28}
 						pos="relative"
 					>
 						<Text fw="700" lineClamp={1} maw="70%">
@@ -78,7 +73,7 @@ export const ReaderItem = ({
 						</Text>
 
 						{!hovered || !isLargeScreen ? (
-							<Text fz="sm" c="gray.7">
+							<Text fz="sm" className={classes.text}>
 								{dayjs(receivedAt).isSame(new Date(), 'year')
 									? dayjs(receivedAt).format('MMM D')
 									: dayjs(receivedAt).format('DD/MM/YYYY')}
@@ -94,11 +89,11 @@ export const ReaderItem = ({
 						)}
 					</Group>
 
-					<Text lineClamp={1} fz="sm" c="gray.7" h={28}>
+					<Text lineClamp={2} fz="sm" className={classes.text}>
 						{description ? description : author}
 					</Text>
 
-					<Group wrap="nowrap" gap="xxxs" maw="60%">
+					<Group wrap="nowrap" gap="xxxs" maw="60%" mt={6}>
 						{labels?.map(({ id, label, color }) => (
 							<Badge size="xs" radius="sm" key={id} color={color}>
 								{label}

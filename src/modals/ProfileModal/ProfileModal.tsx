@@ -11,6 +11,7 @@ import {
 	Title,
 	Divider,
 	useMantineColorScheme,
+	useComputedColorScheme,
 } from '@mantine/core';
 import { useState } from 'react';
 import {
@@ -23,6 +24,7 @@ import { ContextModalProps } from '@mantine/modals';
 
 export const ProfileModal = ({ id, context }: ContextModalProps) => {
 	const { setColorScheme, colorScheme } = useMantineColorScheme();
+	const computedColorScheme = useComputedColorScheme();
 
 	const usedStorage = 3;
 	const totalStorage = 10;
@@ -65,7 +67,7 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 							padding: 0,
 						},
 					}}
-					color="dark"
+					color={computedColorScheme === 'dark' ? undefined : 'dark'}
 					value={colorScheme}
 					onChange={setColorScheme}
 					data={[

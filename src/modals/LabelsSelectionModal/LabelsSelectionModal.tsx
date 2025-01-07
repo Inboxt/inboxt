@@ -32,7 +32,7 @@ export const LabelsSelectionModal = ({ id, context }: ContextModalProps) => {
 
 	return (
 		<Stack>
-			<Checkbox.Group value={value} onChange={setValue}>
+			<Checkbox.Group value={value} onChange={setValue} mr={3}>
 				<Stack gap="xs">
 					{BACKEND_LABELS.map((label) => (
 						<SelectableLabel label={label} />
@@ -43,7 +43,7 @@ export const LabelsSelectionModal = ({ id, context }: ContextModalProps) => {
 			<Group justify="flex-end" gap={0}>
 				<Button
 					variant="transparent"
-					color="black"
+					color="text"
 					onClick={() => context.closeModal(id)}
 				>
 					Cancel
