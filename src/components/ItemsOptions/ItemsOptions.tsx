@@ -1,4 +1,4 @@
-import { ActionIcon, Tooltip } from '@mantine/core';
+import { ActionIcon, Button, Tooltip } from '@mantine/core';
 import {
 	IconArchive,
 	IconTag,
@@ -6,6 +6,9 @@ import {
 	IconWorld,
 } from '@tabler/icons-react';
 import { modals } from '@modals/modals.ts';
+import { useSearch } from '@tanstack/react-router';
+import { Route } from '../../routes';
+import { AppViews } from '../../constants';
 
 const OPTIONS = [
 	{
@@ -30,17 +33,42 @@ const OPTIONS = [
 	},
 ];
 
+const TRASH_OPTIONS = [
+	{
+		label: 'Delete permanently',
+		icon: IconTrash,
+		onClick: () => console.log('Delete permanently'),
+	},
+];
+
 type ItemsOptionsProps = {
 	size?: 'sm' | 'md';
 };
 
 export const ItemsOptions = ({ size = 'md' }: ItemsOptionsProps) => {
 	const isSmallSize = size === 'sm';
+	const { view } = useSearch({ from: Route.fullPath });
+	const optionsToRender = view === AppViews.TRASH ? TRASH_OPTIONS : OPTIONS;
 
 	return (
 		<>
-			{OPTIONS.map((option) => {
+			{optionsToRender.map((option) => {
 				const IconComponent = option.icon;
+
+				if (!isSmallSize && view === AppViews.TRASH) {
+					return (
+						<Button
+							onClick={option.onClick}
+							p={0}
+							variant="transparent"
+							color="text"
+							size="compact-md"
+						>
+							{option.label}
+						</Button>
+					);
+				}
+
 				return (
 					<Tooltip
 						key={option.label}

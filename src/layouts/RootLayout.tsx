@@ -1,19 +1,16 @@
 import { Box, Center, Flex } from '@mantine/core';
+import { Outlet } from '@tanstack/react-router';
 
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
 import { Header } from '../components/Header';
 import { useDisclosure } from '@mantine/hooks';
 
-import classes from './Layout.module.css';
+import classes from './RootLayout.module.css';
 import { useReaderContext } from '../context/ReaderContext.tsx';
 import { useLargeScreen } from '../hooks/useLargeScreen.tsx';
 
-type LayoutProps = {
-	children: React.ReactNode;
-};
-
-export const Layout = ({ children }: LayoutProps) => {
+export const RootLayout = () => {
 	const isLargeScreen = useLargeScreen();
 	const [opened, { toggle }] = useDisclosure(isLargeScreen);
 
@@ -21,7 +18,7 @@ export const Layout = ({ children }: LayoutProps) => {
 
 	return (
 		<Center>
-			<Flex mih="100vh">
+			<Flex className={classes.container}>
 				<Navbar opened={opened} toggle={toggle} />
 
 				<Box
@@ -30,7 +27,7 @@ export const Layout = ({ children }: LayoutProps) => {
 				>
 					<Header opened={opened} toggle={toggle} />
 
-					{children}
+					<Outlet />
 				</Box>
 
 				<Footer visibleFrom="lg" />

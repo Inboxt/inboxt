@@ -1,0 +1,21 @@
+.trashAlert {
+	flex-shrink: 0;
+	border-bottom: 1px solid var(--mantine-color-gray-4);
+
+	@mixin dark {
+		border-color: var(--mantine-color-dark-4);
+	}
+}
+
+.items {
+	overflow-y: auto;
+}
+
+.trashButton {
+	cursor: pointer;
+	transition: transform 50ms ease-in-out;
+
+	&:active {
+		transform: scale(0.97);
+	}
+}

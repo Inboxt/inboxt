@@ -1,7 +1,12 @@
-import { Stack } from '@mantine/core';
-import { ReaderItem } from '../ReaderItem';
+import { Alert, Button, Group, Stack, Text } from '@mantine/core';
 import { useEffect } from 'react';
+import { useSearch } from '@tanstack/react-router';
+import classes from './ItemsList.module.css';
+
 import { useReaderContext } from '../../context/ReaderContext.tsx';
+import { ReaderItem } from '../ReaderItem';
+import { Route } from '../../routes';
+import { AppViews } from '../../constants';
 
 const BACKEND_ARTICLES = [
 	{
@@ -140,8 +145,9 @@ const BACKEND_ARTICLES = [
 	},
 ];
 
-// TODO: This probably should be a HOME page or something, or dynamically handle all possible options?
-export const ReaderList = () => {
+export const ItemsList = () => {
+	const { view } = useSearch({ from: Route.fullPath });
+
 	const { setVisibleItemIds } = useReaderContext();
 	// TODO: Handle data from backend
 	// TODO: This also probably doesn't handle well or at all infinite scrolling
@@ -153,7 +159,28 @@ export const ReaderList = () => {
 	}, [BACKEND_ARTICLES]);
 
 	return (
-		<Stack gap={0}>
+		<Stack gap={0} className={classes.items}>
+			{view === AppViews.TRASH && (
+				<Alert
+					variant="light"
+					color="blue"
+					fz="xxs"
+					radius={0}
+					className={classes.trashAlert}
+				>
+					<Group gap={0} justify="center">
+						<Text ta="center">
+							Items in Trash will be automatically deleted after
+							30 days.
+						</Text>
+
+						<Button variant="transparent" size="compact-sm">
+							Empty Trash Now
+						</Button>
+					</Group>
+				</Alert>
+			)}
+
 			{BACKEND_ARTICLES.map((article) => (
 				<ReaderItem
 					id={article.id}
