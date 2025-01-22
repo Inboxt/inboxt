@@ -1,5 +1,5 @@
 import { Box, Center, Flex } from '@mantine/core';
-import { Outlet } from '@tanstack/react-router';
+import { Outlet, useMatchRoute } from '@tanstack/react-router';
 
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
@@ -13,8 +13,13 @@ import { useLargeScreen } from '../hooks/useLargeScreen.tsx';
 export const RootLayout = () => {
 	const isLargeScreen = useLargeScreen();
 	const [opened, { toggle }] = useDisclosure(isLargeScreen);
-
 	const { isSelected } = useReaderContext();
+	const matchRoute = useMatchRoute();
+
+	const matchedLoginRoute = matchRoute({ to: '/login' }) as boolean;
+	if (matchedLoginRoute) {
+		return <Outlet />;
+	}
 
 	return (
 		<Center>

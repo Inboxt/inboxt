@@ -16,15 +16,23 @@ import { ContextModalProps } from '@mantine/modals';
 // todo: separation of components and better styling
 // todo: probably I need to re-think this component more (when it comes to style and how to handle pricing model for this app)
 // todo: real list and prices
-export const PlanModal = ({ id, context }: ContextModalProps) => {
+export const PlanModal = ({
+	id,
+	context,
+	innerProps,
+}: ContextModalProps<{ fullMode?: boolean }>) => {
+	const withFullMode = innerProps.fullMode;
+
 	return (
 		<Stack gap="lg">
-			<Group gap="xs">
-				<Switch label="Annual pricing" />
-				<Badge variant="outline" radius="sm" size="sm">
-					Save 20%
-				</Badge>
-			</Group>
+			{withFullMode && (
+				<Group gap="xs">
+					<Switch label="Annual pricing" />
+					<Badge variant="outline" radius="sm" size="sm">
+						Save 20%
+					</Badge>
+				</Group>
+			)}
 
 			<Radio.Group>
 				<Flex gap="lg" direction={{ base: 'column', lg: 'row' }}>
@@ -33,13 +41,16 @@ export const PlanModal = ({ id, context }: ContextModalProps) => {
 						p="lg"
 						style={{
 							position: 'relative',
+							cursor: withFullMode ? undefined : 'default',
 						}}
 						value="FREE"
 					>
-						<Radio.Indicator
-							style={{ position: 'absolute', right: 20 }}
-							icon={CheckIcon}
-						/>
+						{withFullMode && (
+							<Radio.Indicator
+								style={{ position: 'absolute', right: 20 }}
+								icon={CheckIcon}
+							/>
+						)}
 
 						<Text fw={600} size="xs" c="dimmed">
 							FREE account
@@ -68,13 +79,16 @@ export const PlanModal = ({ id, context }: ContextModalProps) => {
 						p="lg"
 						style={{
 							position: 'relative',
+							cursor: withFullMode ? undefined : 'default',
 						}}
 						value="PRO"
 					>
-						<Radio.Indicator
-							style={{ position: 'absolute', right: 20 }}
-							icon={CheckIcon}
-						/>
+						{withFullMode && (
+							<Radio.Indicator
+								style={{ position: 'absolute', right: 20 }}
+								icon={CheckIcon}
+							/>
+						)}
 
 						<Text fw={600} size="xs" c="dimmed">
 							PRO account
@@ -103,13 +117,17 @@ export const PlanModal = ({ id, context }: ContextModalProps) => {
 						p="lg"
 						style={{
 							position: 'relative',
+							cursor: withFullMode ? undefined : 'default',
 						}} // todo: better styling, light blue background + blue border on active, some hover styling? or just also the same stuff used for active?
 						value="LIFETIME"
 					>
-						<Radio.Indicator
-							style={{ position: 'absolute', right: 20 }}
-							icon={CheckIcon}
-						/>
+						{withFullMode && (
+							<Radio.Indicator
+								style={{ position: 'absolute', right: 20 }}
+								icon={CheckIcon}
+							/>
+						)}
+
 						<Text fw={600} size="xs" c="dimmed">
 							LIFETIME account
 						</Text>
@@ -134,15 +152,17 @@ export const PlanModal = ({ id, context }: ContextModalProps) => {
 				</Flex>
 			</Radio.Group>
 
-			<Group ml="auto" gap="md">
-				<Button
-					variant="default"
-					onClick={() => context.closeModal(id)}
-				>
-					Cancel
-				</Button>
-				<Button>Continue to payment</Button>
-			</Group>
+			{withFullMode && (
+				<Group ml="auto" gap="md">
+					<Button
+						variant="default"
+						onClick={() => context.closeModal(id)}
+					>
+						Cancel
+					</Button>
+					<Button>Continue to payment</Button>
+				</Group>
+			)}
 		</Stack>
 	);
 };

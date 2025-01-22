@@ -31,13 +31,15 @@ export const modals = {
 		});
 	},
 
-	openPlanModal: () => {
+	openPlanModal: (fullMode = true) => {
 		return mantineModals.openContextModal({
 			modal: 'plan',
 			size: 840,
 			centered: true,
-			title: 'Manage Plan',
-			innerProps: {},
+			title: fullMode ? 'Manage Plan' : 'Pricing',
+			innerProps: {
+				fullMode,
+			},
 		});
 	},
 

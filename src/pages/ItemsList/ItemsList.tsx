@@ -4,7 +4,7 @@ import { useSearch } from '@tanstack/react-router';
 import classes from './ItemsList.module.css';
 
 import { useReaderContext } from '../../context/ReaderContext.tsx';
-import { ReaderItem } from '../ReaderItem';
+import { ReaderItem } from '../../components/ReaderItem';
 import { Route } from '../../routes';
 import { AppViews } from '../../constants';
 

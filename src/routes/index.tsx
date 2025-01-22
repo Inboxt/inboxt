@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { ItemsList } from '../components/ItemsList';
+import { ItemsList } from '../pages/ItemsList';
 import { AppViews } from '../constants';
 
 export type AppSearch = {
