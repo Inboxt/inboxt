@@ -17,14 +17,13 @@ import classes from './ReaderView.module.css';
 import { useScreenQuery } from '../../hooks/useScreenQuery.tsx';
 import { ReaderSettingsOptions } from '../../components/ReaderSettingsOptions';
 import { useNavigate } from '@tanstack/react-router';
-import { Route } from '../../routes/$id.tsx';
+import { Route } from '../../routes/r.$id.tsx';
 import { AppViews } from '../../constants';
 
 import {
 	ARTICLE_FROM_BACKEND,
 	BACKEND_LABELS,
 } from '../../constants/fake-backend';
-import { SelectableLabel } from '../../components/SelectableLabel';
 
 // todo: from backend :)
 

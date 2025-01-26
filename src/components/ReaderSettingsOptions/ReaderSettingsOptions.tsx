@@ -14,7 +14,7 @@ import { FormReadingThemeSettings } from '../../forms/FormReadingThemeSettings';
 import { ActionIcon, Divider, Flex } from '@mantine/core';
 import { modals } from '@modals/modals.ts';
 import { useNavigate } from '@tanstack/react-router';
-import { Route } from '../../routes/$id.tsx';
+import { Route } from '../../routes/r.$id.tsx';
 import { MenuDrawer } from '../MenuDrawer';
 import { useScreenQuery } from '../../hooks/useScreenQuery.tsx';
 
