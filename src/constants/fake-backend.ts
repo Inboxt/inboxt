@@ -2,22 +2,32 @@ export const BACKEND_LABELS = [
 	{
 		id: 1,
 		name: 'Reddit',
-		color: 'gray-6',
+		color: 'gray',
 	},
 	{
 		id: 2,
 		name: 'Work Stuff',
-		color: 'red-6',
+		color: 'red',
 	},
 	{
 		id: 3,
 		name: 'Electronics',
-		color: 'blue-6',
+		color: 'blue',
 	},
 	{
 		id: 4,
 		name: 'Listen',
-		color: 'pink-6',
+		color: 'pink',
+	},
+	{
+		id: 5,
+		name: 'JavaScript',
+		color: 'orange',
+	},
+	{
+		id: 6,
+		name: 'Restaurant',
+		color: 'cyan',
 	},
 ];
 

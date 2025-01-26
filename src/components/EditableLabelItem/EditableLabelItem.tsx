@@ -49,7 +49,7 @@ export const EditableLabelItem = ({
 				<IconLabelImportantFilled
 					size={21}
 					style={{
-						color: `var(--mantine-color-${label.color})`,
+						color: `var(--mantine-color-${label.color}-6)`,
 					}}
 				/>
 			)}

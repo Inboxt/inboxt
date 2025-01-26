@@ -40,7 +40,11 @@ export const NavbarLink = ({
 				}
 				leftSection={
 					<Box
-						c={color ? `var(--mantine-color-${color})` : undefined}
+						c={
+							color
+								? `var(--mantine-color-${color}-6)`
+								: undefined
+						}
 						display="flex"
 					>
 						{icon}

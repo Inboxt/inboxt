@@ -1,5 +1,6 @@
 import {
 	Anchor,
+	Badge,
 	Box,
 	Center,
 	Divider,
@@ -19,7 +20,11 @@ import { useNavigate } from '@tanstack/react-router';
 import { Route } from '../../routes/$id.tsx';
 import { AppViews } from '../../constants';
 
-import { ARTICLE_FROM_BACKEND } from '../../constants/fake-backend';
+import {
+	ARTICLE_FROM_BACKEND,
+	BACKEND_LABELS,
+} from '../../constants/fake-backend';
+import { SelectableLabel } from '../../components/SelectableLabel';
 
 // todo: from backend :)
 
@@ -74,6 +79,18 @@ export const ReaderView = () => {
 								<Anchor href={ARTICLE_FROM_BACKEND.url}>
 									See original
 								</Anchor>
+							</Group>
+
+							<Group gap={6}>
+								{BACKEND_LABELS.map((label) => (
+									<Badge
+										size="sm"
+										radius="sm"
+										color={label.color}
+									>
+										{label.name}
+									</Badge>
+								))}
 							</Group>
 						</Stack>
 

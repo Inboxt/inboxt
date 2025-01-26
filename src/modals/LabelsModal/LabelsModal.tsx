@@ -6,6 +6,7 @@ import { EditableLabelItem } from '../../components/EditableLabelItem';
 
 import { BACKEND_LABELS } from '../../constants/fake-backend';
 
+// todo: option to create new label :)
 export const LabelsModal = ({ id, context }: ContextModalProps) => {
 	const [editingLabel, setEditingLabel] = useState<number | null>(null); // Tracks which label is being edited
 

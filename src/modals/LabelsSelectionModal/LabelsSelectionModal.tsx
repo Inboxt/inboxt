@@ -6,6 +6,7 @@ import { ContextModalProps } from '@mantine/modals';
 
 import { BACKEND_LABELS } from '../../constants/fake-backend';
 
+// todo: option to create new label :)
 export const LabelsSelectionModal = ({ id, context }: ContextModalProps) => {
 	const [value, setValue] = useState<string[]>(['3']);
 
