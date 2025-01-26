@@ -82,7 +82,7 @@ export const FormReadingSettings = () => {
 					{ value: 50 },
 					{ value: 55 },
 					{ value: 60 },
-				]}
+				]} // todo: better way to list it? an enum or something?
 			/>
 
 			<Group gap="xs">
@@ -107,7 +107,7 @@ export const FormReadingSettings = () => {
 					{ value: 2.2 },
 					{ value: 2.4 },
 					{ value: 2.6 },
-				]}
+				]} // todo: better way to list it? an enum or something?
 			/>
 
 			<Accordion
@@ -144,7 +144,7 @@ export const FormReadingSettings = () => {
 									{ value: 0.18 },
 									{ value: 0.21 },
 									{ value: 0.24 },
-								]}
+								]} // todo: better way to list it? an enum or something?
 								step={0.03}
 								mb="md"
 							/>
@@ -170,7 +170,7 @@ export const FormReadingSettings = () => {
 									{ value: 0.18 },
 									{ value: 0.21 },
 									{ value: 0.24 },
-								]}
+								]} // todo: better way to list it? an enum or something?
 								step={0.03}
 								mb="md"
 							/>

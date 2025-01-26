@@ -17,6 +17,8 @@ import { FooterLinks } from '../FooterLinks';
 import { AppViews } from '../../constants';
 import { useScreenQuery } from '../../hooks/useScreenQuery.tsx';
 
+import { BACKEND_LABELS } from '../../constants/fake-backend.tsx';
+
 const NAV_LINKS = [
 	{
 		id: 'inbox',
@@ -43,30 +45,7 @@ const NAV_LINKS = [
 		label: 'Trash',
 		icon: <IconTrash size={21} />,
 	},
-];
-
-const BACKEND_LABELS = [
-	{
-		id: 1,
-		name: 'Reddit',
-		color: 'gray-6',
-	},
-	{
-		id: 2,
-		name: 'Work Stuff',
-		color: 'red-6',
-	},
-	{
-		id: 3,
-		name: 'Electronics',
-		color: 'blue-6',
-	},
-	{
-		id: 4,
-		name: 'Listen',
-		color: 'pink-6',
-	},
-];
+]; // todo: enum
 
 type NavbarProps = {
 	opened: boolean;

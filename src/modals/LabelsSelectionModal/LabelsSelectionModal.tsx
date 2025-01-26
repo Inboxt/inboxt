@@ -4,28 +4,7 @@ import { useState } from 'react';
 import { SelectableLabel } from '../../components/SelectableLabel';
 import { ContextModalProps } from '@mantine/modals';
 
-const BACKEND_LABELS = [
-	{
-		id: 1,
-		name: 'Reddit',
-		color: 'gray-6',
-	},
-	{
-		id: 2,
-		name: 'Work Stuff',
-		color: 'red-6',
-	},
-	{
-		id: 3,
-		name: 'Electronics',
-		color: 'blue-6',
-	},
-	{
-		id: 4,
-		name: 'Listen',
-		color: 'pink-6',
-	},
-];
+import { BACKEND_LABELS } from '../../constants/fake-backend.tsx';
 
 export const LabelsSelectionModal = ({ id, context }: ContextModalProps) => {
 	const [value, setValue] = useState<string[]>(['3']);

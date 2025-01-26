@@ -10,6 +10,7 @@ import {
 
 import classes from './FormReadingThemeSettings.module.css';
 
+// todo: move to an enum?
 const readerThemes = [
 	{
 		name: 'Auto',
