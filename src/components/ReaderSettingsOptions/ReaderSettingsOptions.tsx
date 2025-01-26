@@ -49,7 +49,7 @@ export const ReaderSettingsOptions = ({
 	];
 
 	return (
-		<Flex direction={direction} gap="xxxs">
+		<Flex direction={direction} gap={isBelowXsScreen ? 'xxxs' : 'sm'}>
 			<ReaderSettingsPopover
 				onClick={() =>
 					void navigate({
