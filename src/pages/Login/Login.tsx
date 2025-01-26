@@ -44,7 +44,7 @@ export const Login = () => {
 		return (
 			<Center mih="100vh" miw="100vw" pos="relative">
 				<Flex direction="column" gap="lg" align="center">
-					<AppName size="md" />
+					<AppName size="lg" />
 
 					<Stack>
 						<Button

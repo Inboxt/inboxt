@@ -5,7 +5,7 @@
 .drawerItem {
 	display: flex;
 	align-items: center;
-	padding: 8px 16px;
+	padding: var(--mantine-spacing-xxs) var(--mantine-spacing-md);
 	text-decoration: none;
 	cursor: pointer;
 }

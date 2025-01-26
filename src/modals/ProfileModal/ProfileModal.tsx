@@ -62,11 +62,6 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 				<Title order={5}>Theme</Title>
 				<SegmentedControl
 					fullWidth
-					styles={{
-						root: {
-							padding: 0,
-						},
-					}}
 					color={computedColorScheme === 'dark' ? undefined : 'dark'}
 					value={colorScheme}
 					onChange={setColorScheme}

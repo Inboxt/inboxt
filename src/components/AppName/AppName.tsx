@@ -1,17 +1,40 @@
 import { IconInbox } from '@tabler/icons-react';
-import { Group, Title } from '@mantine/core';
+import { Group, Title, TitleOrder } from '@mantine/core';
 
 type AppNameProps = {
-	size?: 'sm' | 'md';
+	size?: 'sm' | 'md' | 'lg';
+	variant?: 'full' | 'short';
 };
 
-export const AppName = ({ size = 'sm' }: AppNameProps) => {
+export const AppName = ({ size = 'sm', variant = 'full' }: AppNameProps) => {
+	let iconSize;
+	let titleSize: TitleOrder;
+
+	switch (size) {
+		case 'sm':
+			iconSize = 24;
+			titleSize = 3;
+			break;
+
+		case 'md':
+			iconSize = 30;
+			titleSize = 3;
+			break;
+
+		case 'lg':
+			iconSize = 36;
+			titleSize = 1;
+			break;
+	}
+
 	return (
 		<Group gap="xs">
-			<IconInbox size={size === 'md' ? 36 : 24} />
-			<Title order={size === 'md' ? 1 : 3} c="blue.6">
-				Inbox Reader
-			</Title>
+			<IconInbox size={iconSize} />
+			{variant === 'full' && (
+				<Title order={titleSize} c="blue.6">
+					Inbox Reader
+				</Title>
+			)}
 		</Group>
 	);
 };

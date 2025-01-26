@@ -11,10 +11,17 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as IdImport } from './routes/$id'
 import { Route as LoginRouteImport } from './routes/login.route'
 import { Route as IndexImport } from './routes/index'
 
 // Create/Update Routes
+
+const IdRoute = IdImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const LoginRouteRoute = LoginRouteImport.update({
   id: '/login',
@@ -46,6 +53,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRoute
     }
+    '/$id': {
+      id: '/$id'
+      path: '/$id'
+      fullPath: '/$id'
+      preLoaderRoute: typeof IdImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -54,36 +68,41 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRouteRoute
+  '/$id': typeof IdRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRouteRoute
+  '/$id': typeof IdRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/login': typeof LoginRouteRoute
+  '/$id': typeof IdRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login'
+  fullPaths: '/' | '/login' | '/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login'
-  id: '__root__' | '/' | '/login'
+  to: '/' | '/login' | '/$id'
+  id: '__root__' | '/' | '/login' | '/$id'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LoginRouteRoute: typeof LoginRouteRoute
+  IdRoute: typeof IdRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LoginRouteRoute: LoginRouteRoute,
+  IdRoute: IdRoute,
 }
 
 export const routeTree = rootRoute
@@ -97,7 +116,8 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/login"
+        "/login",
+        "/$id"
       ]
     },
     "/": {
@@ -105,6 +125,9 @@ export const routeTree = rootRoute
     },
     "/login": {
       "filePath": "login.route.tsx"
+    },
+    "/$id": {
+      "filePath": "$id.tsx"
     }
   }
 }

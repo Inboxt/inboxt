@@ -7,6 +7,7 @@ import { useReaderContext } from '../../context/ReaderContext.tsx';
 import { ReaderItem } from '../../components/ReaderItem';
 import { Route } from '../../routes';
 import { AppViews } from '../../constants';
+import { AppLayout } from '../../layouts/AppLayout.tsx';
 
 const BACKEND_ARTICLES = [
 	{
@@ -159,38 +160,40 @@ export const ItemsList = () => {
 	}, [BACKEND_ARTICLES]);
 
 	return (
-		<Stack gap={0} className={classes.items}>
-			{view === AppViews.TRASH && (
-				<Alert
-					variant="light"
-					color="blue"
-					fz="xxs"
-					radius={0}
-					className={classes.trashAlert}
-				>
-					<Group gap={0} justify="center">
-						<Text ta="center">
-							Items in Trash will be automatically deleted after
-							30 days.
-						</Text>
+		<AppLayout>
+			<Stack gap={0} className={classes.items}>
+				{view === AppViews.TRASH && (
+					<Alert
+						variant="light"
+						color="blue"
+						fz="xxs"
+						radius={0}
+						className={classes.trashAlert}
+					>
+						<Group gap={0} justify="center">
+							<Text ta="center">
+								Items in Trash will be automatically deleted
+								after 30 days.
+							</Text>
 
-						<Button variant="transparent" size="compact-sm">
-							Empty Trash Now
-						</Button>
-					</Group>
-				</Alert>
-			)}
+							<Button variant="transparent" size="compact-sm">
+								Empty Trash Now
+							</Button>
+						</Group>
+					</Alert>
+				)}
 
-			{BACKEND_ARTICLES.map((article) => (
-				<ReaderItem
-					id={article.id}
-					title={article.title}
-					receivedAt={article.receivedAt}
-					description={article?.description}
-					labels={article?.labels}
-					author={article.author}
-				/>
-			))}
-		</Stack>
+				{BACKEND_ARTICLES.map((article) => (
+					<ReaderItem
+						id={article.id}
+						title={article.title}
+						receivedAt={article.receivedAt}
+						description={article?.description}
+						labels={article?.labels}
+						author={article.author}
+					/>
+				))}
+			</Stack>
+		</AppLayout>
 	);
 };

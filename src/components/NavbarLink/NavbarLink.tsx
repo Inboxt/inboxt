@@ -5,14 +5,14 @@ import { Link } from '@tanstack/react-router';
 import { Route } from '../../routes';
 import { AppViews } from '../../constants';
 import { kebabCase } from '../../utils/kebabCase.ts';
-import { useLargeScreen } from '../../hooks/useLargeScreen.tsx';
+import { useScreenQuery } from '../../hooks/useScreenQuery.tsx';
 
 type NavbarLinkProps = {
 	label: string;
 	icon: ReactNode;
 	opened: boolean;
 	view: AppViews;
-	toggle: () => void;
+	toggleDrawer: () => void;
 	color?: string;
 };
 
@@ -21,10 +21,10 @@ export const NavbarLink = ({
 	icon,
 	opened,
 	view,
-	toggle,
+	toggleDrawer,
 	color,
 }: NavbarLinkProps) => {
-	const isLargeScreen = useLargeScreen();
+	const isBelowMdScreen = useScreenQuery('md', 'below');
 	return (
 		<Tooltip label={label} position="right" disabled={opened}>
 			<NavLink
@@ -52,8 +52,8 @@ export const NavbarLink = ({
 					label: classes.navLinkLabel,
 				}}
 				onClick={() => {
-					if (!isLargeScreen) {
-						toggle();
+					if (isBelowMdScreen) {
+						toggleDrawer();
 					}
 				}}
 				renderRoot={(

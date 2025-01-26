@@ -1,0 +1,17 @@
+.headerContainer {
+	cursor: pointer;
+	position: fixed;
+
+	@media (max-width: $mantine-breakpoint-lg) {
+		position: relative;
+		display: flex;
+		justify-content: space-between;
+	}
+}
+
+.readerSettingsContainer {
+	position: fixed;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	padding-left: var(--mantine-spacing-xl);
+}

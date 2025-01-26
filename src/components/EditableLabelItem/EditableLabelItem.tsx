@@ -12,8 +12,8 @@ import {
 	IconEdit,
 	IconTrash,
 } from '@tabler/icons-react';
-import { useLargeScreen } from '../../hooks/useLargeScreen.tsx';
 import { LabelsColorInput } from '../LabelsColorInput';
+import { useScreenQuery } from '../../hooks/useScreenQuery.tsx';
 
 type EditableLabelItemProps = {
 	label: { id: number; name: string; color: string };
@@ -33,7 +33,7 @@ export const EditableLabelItem = ({
 	onEditSave,
 	onEditCancel,
 }: EditableLabelItemProps) => {
-	const isLargeScreen = useLargeScreen();
+	const isAboveLgScreen = useScreenQuery('lg', 'above');
 	const [editedLabel, setEditedLabel] = useState({
 		name: label.name,
 		color: label.color,
@@ -78,9 +78,9 @@ export const EditableLabelItem = ({
 						}
 					/>
 					<Group
-						ml={isLargeScreen ? 'auto' : 0}
+						ml={isAboveLgScreen ? 'auto' : 0}
 						gap="xs"
-						grow={!isLargeScreen}
+						grow={!isAboveLgScreen}
 					>
 						<Button onClick={onEditCancel} variant="default">
 							Cancel

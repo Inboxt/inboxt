@@ -11,11 +11,11 @@ import {
 
 import classes from './Navbar.module.css';
 
-import { useLargeScreen } from '../../hooks/useLargeScreen.tsx';
 import { NavbarLink } from '../NavbarLink';
 import { clsx } from 'clsx';
 import { FooterLinks } from '../FooterLinks';
 import { AppViews } from '../../constants';
+import { useScreenQuery } from '../../hooks/useScreenQuery.tsx';
 
 const NAV_LINKS = [
 	{
@@ -74,18 +74,18 @@ type NavbarProps = {
 };
 
 export const Navbar = ({ opened, toggle }: NavbarProps) => {
-	const isLargeScreen = useLargeScreen();
+	const isAboveLgScreen = useScreenQuery('lg', 'above');
 
 	// todo: scrollable correctly
 	const navLinks = (
-		<Stack mt={isLargeScreen ? 18 : 0} gap={0}>
+		<Stack mt={isAboveLgScreen ? 18 : 0} gap={0}>
 			{NAV_LINKS.map((link) => (
 				<NavbarLink
 					key={link.id}
 					label={link.label}
 					icon={link.icon}
 					opened={opened}
-					toggle={toggle}
+					toggleDrawer={toggle}
 					view={link.id}
 				/>
 			))}
@@ -104,69 +104,64 @@ export const Navbar = ({ opened, toggle }: NavbarProps) => {
 					opened={opened}
 					view={AppViews.LABEL}
 					color={label.color}
-					toggle={toggle}
+					toggleDrawer={toggle}
 				/>
 			))}
 		</Stack>
 	);
 
-	if (!isLargeScreen) {
+	if (isAboveLgScreen) {
 		return (
-			<Drawer
-				opened={opened}
-				onClose={toggle}
-				title="Feeds"
-				size="xs"
-				closeButtonProps={{
-					icon: (
-						<IconX
-							size={34}
-							style={{ color: 'var(--mantine-color-text)' }}
-						/>
-					),
-				}}
-				overlayProps={{ opacity: 0.6 }}
-				classNames={{
-					title: classes.mobileDrawerTitle,
-					content: classes.mobileDrawerContent,
-					body: classes.mobileDrawerBody,
-				}}
-			>
-				{navLinks}
-
+			<>
 				<Box
-					py="sm"
-					pos="sticky"
-					bottom={0}
-					style={{ backgroundColor: 'var(--mantine-color-body)' }}
+					className={clsx(
+						classes.navbar,
+						opened ? classes.openedNavbar : classes.closedNavbar,
+					)}
+					pt="md"
 				>
-					<FooterLinks justify="center" />
+					<Group
+						justify="flex-end"
+						px="md"
+						pr={opened ? 'md' : 'lg'}
+						visibleFrom="lg"
+						mt={2}
+					>
+						<Burger opened={opened} onClick={toggle} />
+					</Group>
+
+					{navLinks}
 				</Box>
-			</Drawer>
+			</>
 		);
 	}
 
 	return (
-		<>
-			<Box
-				className={clsx(
-					classes.navbar,
-					opened ? classes.openedNavbar : classes.closedNavbar,
-				)}
-				pt="md"
-			>
-				<Group
-					justify="flex-end"
-					px="md"
-					pr={opened ? 'md' : 21}
-					visibleFrom="lg"
-					mt={2}
-				>
-					<Burger opened={opened} onClick={toggle} />
-				</Group>
+		<Drawer
+			opened={opened}
+			onClose={toggle}
+			title="Feeds"
+			size="xs"
+			closeButtonProps={{
+				icon: <IconX size={34} color="var(--mantine-color-text)" />,
+			}}
+			overlayProps={{ opacity: 0.6 }}
+			classNames={{
+				title: classes.mobileDrawerTitle,
+				content: classes.mobileDrawerContent,
+				body: classes.mobileDrawerBody,
+			}}
+		>
+			{navLinks}
 
-				{navLinks}
+			<Box
+				py="sm"
+				pos="sticky"
+				bottom={0}
+				style={{ backgroundColor: 'var(--mantine-color-body)' }}
+			>
+				<FooterLinks justify="center" />
 			</Box>
-		</>
+		</Drawer>
 	);
 };

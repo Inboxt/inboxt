@@ -13,11 +13,11 @@ import classes from './Header.module.css';
 
 import { AppName } from '../AppName';
 import { UserMenu } from '../UserMenu';
-import { useLargeScreen } from '../../hooks/useLargeScreen.tsx';
 import { useReaderContext } from '../../context/ReaderContext.tsx';
 import { ItemsOptions } from '../ItemsOptions';
 import { ReaderCheckbox } from '../ReaderCheckbox';
 import { AppSearch } from '../AppSearch';
+import { useScreenQuery } from '../../hooks/useScreenQuery.tsx';
 
 type HeaderProps = {
 	opened: boolean;
@@ -25,7 +25,7 @@ type HeaderProps = {
 };
 
 export const Header = ({ opened, toggle }: HeaderProps) => {
-	const isLargeScreen = useLargeScreen();
+	const isBelowLgScreen = useScreenQuery('lg', 'below');
 	const {
 		toggleSelectAll,
 		isAllSelected,
@@ -35,7 +35,7 @@ export const Header = ({ opened, toggle }: HeaderProps) => {
 		deselectAll,
 	} = useReaderContext();
 
-	if (isSelected && !isLargeScreen) {
+	if (isSelected && isBelowLgScreen) {
 		return (
 			<Box px="md" pb="md" pt="md" className={classes.mobileSelection}>
 				<Stack w="100%">
@@ -73,7 +73,7 @@ export const Header = ({ opened, toggle }: HeaderProps) => {
 
 	return (
 		<Stack px="md" pb="md" gap="xs" className={classes.headerContainer}>
-			{!isLargeScreen && (
+			{isBelowLgScreen && (
 				<Group gap={0} justify="space-between">
 					<Burger opened={opened} onClick={toggle} />
 					<AppName />
@@ -103,7 +103,7 @@ export const Header = ({ opened, toggle }: HeaderProps) => {
 					<AppSearch />
 				)}
 
-				{!isSelected && isLargeScreen && <UserMenu />}
+				{!isSelected && !isBelowLgScreen && <UserMenu />}
 			</Flex>
 		</Stack>
 	);

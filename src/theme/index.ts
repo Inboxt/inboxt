@@ -1,4 +1,4 @@
-import { createTheme, Modal } from '@mantine/core';
+import { createTheme, Modal, SegmentedControl } from '@mantine/core';
 
 import classes from './theme.module.css';
 
@@ -30,6 +30,11 @@ export const theme = createTheme({
 				header: classes.modalHeader,
 				title: classes.modalTitle,
 				close: classes.modalClose,
+			},
+		}),
+		SegmentedControl: SegmentedControl.extend({
+			classNames: {
+				root: classes.segmentedControlRoot,
 			},
 		}),
 	},

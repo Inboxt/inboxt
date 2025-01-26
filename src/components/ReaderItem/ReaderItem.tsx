@@ -6,9 +6,9 @@ import classes from './ReaderItem.module.css';
 
 import { useLongPress } from '../../hooks/useLongPress.tsx';
 import { useReaderContext } from '../../context/ReaderContext.tsx';
-import { useLargeScreen } from '../../hooks/useLargeScreen.tsx';
 import { ItemsOptions } from '../ItemsOptions';
 import { ReaderCheckbox } from '../ReaderCheckbox';
+import { useScreenQuery } from '../../hooks/useScreenQuery.tsx';
 
 type ItemLabel = {
 	id: number;
@@ -36,10 +36,9 @@ export const ReaderItem = ({
 }: ReaderItemProps) => {
 	const { hovered, ref } = useHover();
 	const { selectedItemIds, toggleItemSelection } = useReaderContext();
-	const isLargeScreen = useLargeScreen();
+	const isBelowLgScreen = useScreenQuery('lg', 'below');
 
 	const isSelected = selectedItemIds.includes(id);
-
 	const handleLongPress = () => {
 		toggleItemSelection(id);
 	};
@@ -72,7 +71,7 @@ export const ReaderItem = ({
 							{title}
 						</Text>
 
-						{!hovered || !isLargeScreen ? (
+						{!hovered || isBelowLgScreen ? (
 							<Text fz="sm" className={classes.text}>
 								{dayjs(receivedAt).isSame(new Date(), 'year')
 									? dayjs(receivedAt).format('MMM D')

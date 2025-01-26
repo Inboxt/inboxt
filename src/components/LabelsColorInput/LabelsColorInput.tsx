@@ -1,5 +1,5 @@
 import { ColorInput } from '@mantine/core';
-import { useLargeScreen } from '../../hooks/useLargeScreen.tsx';
+import { useScreenQuery } from '../../hooks/useScreenQuery.tsx';
 
 type LabelsColorInputProps = {
 	value: string;
@@ -10,14 +10,13 @@ export const LabelsColorInput = ({
 	value,
 	onChange,
 }: LabelsColorInputProps) => {
-	const isLargeScreen = useLargeScreen();
-
+	const isAboveLgScreen = useScreenQuery('lg', 'above');
 	return (
 		<ColorInput
 			value={value}
 			onChange={onChange}
 			defaultValue="#868e96"
-			maw={isLargeScreen ? 110 : undefined}
+			maw={isAboveLgScreen ? 110 : undefined}
 			swatches={[
 				'#2e2e2e',
 				'#868e96',
