@@ -1,4 +1,11 @@
-import { ActionIcon, Box, Drawer, Popover, Tooltip } from '@mantine/core';
+import {
+	ActionIcon,
+	Box,
+	Drawer,
+	Popover,
+	Title,
+	Tooltip,
+} from '@mantine/core';
 import { forwardRef, ReactNode } from 'react';
 import { useScreenQuery } from '../../hooks/useScreenQuery.tsx';
 import classes from '../MenuDrawer/MenuDrawer.module.css';
@@ -84,15 +91,16 @@ export const ReaderSettingsPopover = ({
 				classNames={{
 					header: classes.drawerHeader,
 				}}
-				size={label === 'Theme' ? 250 : 520}
+				size={label === 'Theme' ? 210 : 480}
 				overlayProps={{
 					opacity: 0.6,
 				}}
 				closeButtonProps={{
 					icon: <IconX size={24} color="var(--mantine-color-text)" />,
 				}}
+				title={<Title order={4}>{label}</Title>}
 			>
-				{children}
+				<Box pt={8}>{children}</Box>
 			</Drawer>
 		</>
 	);

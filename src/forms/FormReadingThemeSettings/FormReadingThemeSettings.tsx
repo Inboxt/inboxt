@@ -70,7 +70,9 @@ export const FormReadingThemeSettings = () => {
 
 	return (
 		<Stack>
-			<Title order={4}>Theme</Title>
+			<Title order={4} visibleFrom="xs">
+				Theme
+			</Title>
 
 			<Radio.Group>
 				<SimpleGrid cols={2} spacing="xxs">

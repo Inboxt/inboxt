@@ -9,13 +9,14 @@ import {
 	IconTrash,
 	IconX,
 } from '@tabler/icons-react';
-import { FormReadingSettings } from '../../forms/FormReadingSettings/FormReadingSettings.tsx';
+import { FormReadingSettings } from '../../forms/FormReadingSettings';
 import { FormReadingThemeSettings } from '../../forms/FormReadingThemeSettings';
 import { ActionIcon, Divider, Flex } from '@mantine/core';
 import { modals } from '@modals/modals.ts';
 import { useNavigate } from '@tanstack/react-router';
 import { Route } from '../../routes/$id.tsx';
 import { MenuDrawer } from '../MenuDrawer';
+import { useScreenQuery } from '../../hooks/useScreenQuery.tsx';
 
 type ReaderSettingsOptionsProps = {
 	direction?: 'column' | 'row';
@@ -27,6 +28,7 @@ export const ReaderSettingsOptions = ({
 	variant = 'full',
 }: ReaderSettingsOptionsProps) => {
 	const navigate = useNavigate({ from: Route.fullPath });
+	const isBelowXsScreen = useScreenQuery('xs', 'below');
 
 	const READER_EXTRA_OPTIONS = [
 		{
@@ -60,7 +62,7 @@ export const ReaderSettingsOptions = ({
 			/>
 
 			<ReaderSettingsPopover
-				label="Text and layout"
+				label={isBelowXsScreen ? 'Text' : 'Text and layout'}
 				icon={<IconLetterCase />}
 			>
 				<FormReadingSettings />
@@ -93,7 +95,7 @@ export const ReaderSettingsOptions = ({
 				<MenuDrawer
 					items={READER_EXTRA_OPTIONS}
 					label="More options"
-					height={230}
+					height={220}
 				>
 					<ActionIcon variant="subtle" color="text" size="lg">
 						<IconDots />

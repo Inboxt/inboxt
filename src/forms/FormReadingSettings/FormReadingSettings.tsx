@@ -29,7 +29,9 @@ import classes from './FormReadingSettings.module.css';
 export const FormReadingSettings = () => {
 	return (
 		<Stack>
-			<Title order={4}>Text</Title>
+			<Title order={4} visibleFrom="xs">
+				Text
+			</Title>
 			<Group justify="space-between">
 				<Text>Text size</Text>
 				<Group gap={4}>
