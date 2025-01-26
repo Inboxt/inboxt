@@ -19,7 +19,7 @@ import { useNavigate } from '@tanstack/react-router';
 import { Route } from '../../routes/$id.tsx';
 import { AppViews } from '../../constants';
 
-import { ARTICLE_FROM_BACKEND } from '../../constants/fake-backend.ts';
+import { ARTICLE_FROM_BACKEND } from '../../constants/fake-backend';
 
 // todo: from backend :)
 

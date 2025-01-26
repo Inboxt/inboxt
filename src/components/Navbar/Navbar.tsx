@@ -17,7 +17,7 @@ import { FooterLinks } from '../FooterLinks';
 import { AppViews } from '../../constants';
 import { useScreenQuery } from '../../hooks/useScreenQuery.tsx';
 
-import { BACKEND_LABELS } from '../../constants/fake-backend.tsx';
+import { BACKEND_LABELS } from '../../constants/fake-backend';
 
 const NAV_LINKS = [
 	{

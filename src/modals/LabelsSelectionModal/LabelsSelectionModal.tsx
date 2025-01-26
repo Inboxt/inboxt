@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { SelectableLabel } from '../../components/SelectableLabel';
 import { ContextModalProps } from '@mantine/modals';
 
-import { BACKEND_LABELS } from '../../constants/fake-backend.tsx';
+import { BACKEND_LABELS } from '../../constants/fake-backend';
 
 export const LabelsSelectionModal = ({ id, context }: ContextModalProps) => {
 	const [value, setValue] = useState<string[]>(['3']);

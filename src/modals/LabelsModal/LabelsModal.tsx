@@ -4,7 +4,7 @@ import { ContextModalProps } from '@mantine/modals';
 
 import { EditableLabelItem } from '../../components/EditableLabelItem';
 
-import { BACKEND_LABELS } from '../../constants/fake-backend.tsx';
+import { BACKEND_LABELS } from '../../constants/fake-backend';
 
 export const LabelsModal = ({ id, context }: ContextModalProps) => {
 	const [editingLabel, setEditingLabel] = useState<number | null>(null); // Tracks which label is being edited

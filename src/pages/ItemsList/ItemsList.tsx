@@ -9,7 +9,7 @@ import { Route } from '../../routes';
 import { AppViews } from '../../constants';
 import { AppLayout } from '../../layouts/AppLayout.tsx';
 
-import { BACKEND_ARTICLES } from '../../constants/fake-backend.ts';
+import { BACKEND_ARTICLES } from '../../constants/fake-backend';
 
 export const ItemsList = () => {
 	const { view } = useSearch({ from: Route.fullPath });
