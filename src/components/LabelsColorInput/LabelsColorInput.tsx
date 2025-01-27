@@ -4,11 +4,13 @@ import { useScreenQuery } from '../../hooks/useScreenQuery.tsx';
 type LabelsColorInputProps = {
 	value: string;
 	onChange: (value: string) => void;
+	label?: string;
 };
 
 export const LabelsColorInput = ({
 	value,
 	onChange,
+	label,
 }: LabelsColorInputProps) => {
 	const isAboveLgScreen = useScreenQuery('lg', 'above');
 	return (
@@ -35,6 +37,7 @@ export const LabelsColorInput = ({
 			]} // todo: adjust swatches for values from theme
 			withPicker={false}
 			disallowInput
+			label={label}
 		/>
 	);
 };

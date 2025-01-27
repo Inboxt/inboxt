@@ -1,12 +1,12 @@
-import { Button, Stack } from '@mantine/core';
+import { Button, Group, Stack } from '@mantine/core';
 import { useState } from 'react';
 import { ContextModalProps } from '@mantine/modals';
 
 import { EditableLabelItem } from '../../components/EditableLabelItem';
 
 import { BACKEND_LABELS } from '../../constants/fake-backend';
+import { modals } from '@modals/modals.ts';
 
-// todo: option to create new label :)
 export const LabelsModal = ({ id, context }: ContextModalProps) => {
 	const [editingLabel, setEditingLabel] = useState<number | null>(null); // Tracks which label is being edited
 
@@ -42,9 +42,19 @@ export const LabelsModal = ({ id, context }: ContextModalProps) => {
 				))}
 			</Stack>
 
-			<Button onClick={() => context.closeModal(id)} ml="auto">
-				Save & Close
-			</Button>
+			<Group justify="flex-end">
+				<Button
+					variant="light"
+					color="text"
+					onClick={modals.openCreateLabelModal}
+				>
+					Create new
+				</Button>
+
+				<Button onClick={() => context.closeModal(id)}>
+					Save & Close
+				</Button>
+			</Group>
 		</Stack>
 	);
 };

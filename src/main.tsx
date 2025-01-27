@@ -14,6 +14,7 @@ import { LabelsSelectionModal } from '@modals/LabelsSelectionModal';
 import { PlanModal } from '@modals/PlanModal';
 import { ProfileModal } from '@modals/ProfileModal';
 import { MantineProvider } from '@mantine/core';
+import { CreateLabelModal } from '@modals/CreateLabelModal';
 
 const router = createRouter({
 	routeTree,
@@ -39,6 +40,7 @@ if (!rootElement.innerHTML) {
 							labelsSelection: LabelsSelectionModal,
 							plan: PlanModal,
 							profile: ProfileModal,
+							createLabel: CreateLabelModal,
 						}}
 					>
 						<RouterProvider router={router} />

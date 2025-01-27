@@ -53,6 +53,16 @@ export const modals = {
 		});
 	},
 
+	openCreateLabelModal: () => {
+		return mantineModals.openContextModal({
+			modal: 'createLabel',
+			size: 540,
+			centered: true,
+			title: 'Create Label',
+			innerProps: {},
+		});
+	},
+
 	closeAll: () => {
 		mantineModals.closeAll();
 	},

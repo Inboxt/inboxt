@@ -5,10 +5,15 @@ import { SelectableLabel } from '../../components/SelectableLabel';
 import { ContextModalProps } from '@mantine/modals';
 
 import { BACKEND_LABELS } from '../../constants/fake-backend';
+import { modals } from '@modals/modals.ts';
 
-// todo: option to create new label :)
 export const LabelsSelectionModal = ({ id, context }: ContextModalProps) => {
 	const [value, setValue] = useState<string[]>(['3']);
+
+	const handleSelection = () => {
+		// todo: call backend and save selected labels
+		context.closeModal(id);
+	};
 
 	return (
 		<Stack>
@@ -20,15 +25,16 @@ export const LabelsSelectionModal = ({ id, context }: ContextModalProps) => {
 				</Stack>
 			</Checkbox.Group>
 
-			<Group justify="flex-end" gap={0}>
+			<Group justify="flex-end">
 				<Button
-					variant="transparent"
+					variant="light"
 					color="text"
-					onClick={() => context.closeModal(id)}
+					onClick={modals.openCreateLabelModal}
 				>
-					Cancel
+					Create new
 				</Button>
-				<Button variant="transparent">OK</Button>
+
+				<Button onClick={handleSelection}>Save & Close</Button>
 			</Group>
 		</Stack>
 	);
