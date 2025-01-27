@@ -10,13 +10,15 @@ import {
 	Title,
 	TypographyStylesProvider,
 } from '@mantine/core';
-import { AppName } from '../../components/AppName';
+import { useWindowScroll, useLocalStorage } from '@mantine/hooks';
+import { useNavigate } from '@tanstack/react-router';
+import { useEffect } from 'react';
 
 import classes from './ReaderView.module.css';
+import { AppName } from '../../components/AppName';
 
 import { useScreenQuery } from '../../hooks/useScreenQuery.tsx';
 import { ReaderSettingsOptions } from '../../components/ReaderSettingsOptions';
-import { useNavigate } from '@tanstack/react-router';
 import { Route } from '../../routes/r.$id.tsx';
 import { AppViews } from '../../constants';
 
@@ -30,6 +32,25 @@ import {
 export const ReaderView = () => {
 	const isAboveXsScreen = useScreenQuery('xs', 'above');
 	const navigate = useNavigate({ from: Route.fullPath });
+
+	const [scroll, scrollTo] = useWindowScroll();
+	const [savedScrollPosition, setSavedScrollPosition] = useLocalStorage({
+		key: `last-reading-position-${ARTICLE_FROM_BACKEND.id}`,
+		defaultValue: 0,
+	});
+
+	// todo: possibly more edge-cases, for example: don't save new position when the article was already fully read?
+	useEffect(() => {
+		scrollTo({ y: savedScrollPosition });
+	}, [savedScrollPosition, scrollTo]);
+
+	useEffect(() => {
+		const savePosition = () => setSavedScrollPosition(scroll.y);
+		window.addEventListener('beforeunload', savePosition);
+		return () => {
+			window.removeEventListener('beforeunload', savePosition);
+		};
+	}, [scroll.y, setSavedScrollPosition]);
 
 	return (
 		<Box py="md" px={isAboveXsScreen ? 24 : 'md'} pb="xxl">
@@ -64,7 +85,7 @@ export const ReaderView = () => {
 							<Group gap={6}>
 								<Text>August 30, 2024</Text>
 								<Text>•</Text>
-								<Text>7 min read</Text>
+								<Text>{`${Math.ceil(ARTICLE_FROM_BACKEND.word_count / 240).toString()} min read`}</Text>
 							</Group>
 
 							<Title order={2}>
