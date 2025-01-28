@@ -38,7 +38,7 @@ export const Header = ({ opened, toggle }: HeaderProps) => {
 	if (isSelected && isBelowLgScreen) {
 		return (
 			<Box px="md" pb="md" pt="md" className={classes.mobileSelection}>
-				<Stack w="100%">
+				<Stack w="100%" justify="space-between">
 					<Group align="center">
 						<ActionIcon
 							size="lg"

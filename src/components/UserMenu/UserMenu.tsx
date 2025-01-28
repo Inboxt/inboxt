@@ -47,14 +47,14 @@ const USER_MENU_ITEMS = [
 export const UserMenu = () => {
 	return (
 		<MenuDrawer items={USER_MENU_ITEMS} label="Quick Actions" height={360}>
-			<UnstyledButton className="mantine-active">
-				<Avatar
-					name="Datguyducky"
-					color="initials"
-					allowedInitialsColors={['blue']}
-					radius={4}
-				/>
-			</UnstyledButton>
+			<Avatar
+				name="Datguyducky"
+				color="initials"
+				allowedInitialsColors={['blue']}
+				radius={4}
+				className="mantine-active"
+				style={{ cursor: 'pointer' }}
+			/>
 		</MenuDrawer>
 	);
 };

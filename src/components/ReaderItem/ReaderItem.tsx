@@ -9,6 +9,8 @@ import { useReaderContext } from '../../context/ReaderContext.tsx';
 import { ItemsOptions } from '../ItemsOptions';
 import { ReaderCheckbox } from '../ReaderCheckbox';
 import { useScreenQuery } from '../../hooks/useScreenQuery.tsx';
+import { useNavigate } from '@tanstack/react-router';
+import { Route } from '../../routes/r.$id.tsx';
 
 type ItemLabel = {
 	id: number;
@@ -37,6 +39,7 @@ export const ReaderItem = ({
 	const { hovered, ref } = useHover();
 	const { selectedItemIds, toggleItemSelection } = useReaderContext();
 	const isBelowLgScreen = useScreenQuery('lg', 'below');
+	const navigate = useNavigate({ from: Route.fullPath });
 
 	const isSelected = selectedItemIds.includes(id);
 	const handleLongPress = () => {
@@ -52,12 +55,23 @@ export const ReaderItem = ({
 			py="md"
 			className={classes.item}
 			ref={ref}
+			onClick={() => {
+				if (selectedItemIds.length > 0) {
+					toggleItemSelection(id);
+
+					return;
+				}
+				void navigate({ to: `/r/${id.toString()}`, search: {} });
+			}}
 			{...longPressHandlers}
 		>
 			<Group wrap="nowrap" maw="100%">
 				<ReaderCheckbox
 					checked={isSelected}
 					onChange={() => toggleItemSelection(id)}
+					onClick={(e) => {
+						e.stopPropagation();
+					}}
 				/>
 
 				<Stack gap={0} flex={1}>
