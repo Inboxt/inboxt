@@ -20,6 +20,8 @@ import { AppName } from '../../components/AppName';
 import { FormForgotPassword } from '../../forms/FormForgotPassword.tsx';
 import { DemoLogin } from '../../components/DemoLogin';
 import { modals } from '@modals/modals.ts';
+import { Header } from '../../components/Header';
+import { IconArrowRight } from '@tabler/icons-react';
 
 type LoginView =
 	| 'login'
@@ -42,9 +44,16 @@ export const Login = () => {
 
 	if (!loginView) {
 		return (
-			<Center mih="100vh" miw="100vw" pos="relative">
-				<Flex direction="column" gap="lg" align="center">
-					<AppName size="lg" />
+			<Center mih="100vh" miw="100vw" pos="relative" px="md">
+				<Flex direction="column" gap={32} align="center" ta="center">
+					<Stack align="center" gap={4}>
+						<AppName size="lg" />
+
+						<Title order={4}>
+							Your inbox for articles and newsletters — simple,
+							clean, yours.
+						</Title>
+					</Stack>
 
 					<Stack>
 						<Button
@@ -61,15 +70,16 @@ export const Login = () => {
 							Sign In
 						</Button>
 
-						<Button
+						<Anchor
 							variant="transparent"
 							size="compact-md"
-							color="dark"
+							c="dark"
 							mt="xs"
 							onClick={() => setLoginView('start-demo')}
+							component="button"
 						>
 							Try the app in demo mode!
-						</Button>
+						</Anchor>
 					</Stack>
 
 					<Box
