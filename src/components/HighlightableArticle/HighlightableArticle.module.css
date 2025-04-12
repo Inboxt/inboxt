@@ -1,0 +1,19 @@
+.popoverDropdown {
+	background-color: var(--mantine-color-black);
+	color: var(--mantine-color-white);
+	border-radius: 6px;
+	padding: var(--mantine-spacing-xxxs);
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+	font-size: var(--mantine-font-size-sm);
+	border: 1px solid var(--mantine-color-black);
+}
+
+.popoverArrow {
+	background-color: var(--mantine-color-black);
+}
+
+.popoverContent {
+	position: absolute;
+	z-index: 9999;
+	pointer-events: none;
+}

@@ -1,0 +1,1 @@
+export { HighlightableArticle } from './HighlightableArticle';

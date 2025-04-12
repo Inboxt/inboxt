@@ -2,10 +2,25 @@
 	cursor: pointer;
 	position: fixed;
 
-	@media (max-width: $mantine-breakpoint-lg) {
-		position: relative;
+	@media (max-width: $mantine-breakpoint-md) {
+		position: sticky;
+		top: 0;
+		left: 0;
+		right: 0;
+		transition: top 0.3s;
 		display: flex;
 		justify-content: space-between;
+		background-color: #fff;
+		border-bottom: 1px solid var(--mantine-color-gray-4);
+		margin: -16px -24px;
+		padding: 14px 24px 16px;
+		box-sizing: border-box;
+	}
+
+	@media (max-width: $mantine-breakpoint-xs) {
+		padding: 8px 16px;
+		margin: -16px;
+		min-height: 55px;
 	}
 }
 
@@ -14,4 +29,4 @@
 	top: 50%;
 	transform: translate(-50%, -50%);
 	padding-left: var(--mantine-spacing-xl);
-}
+} 

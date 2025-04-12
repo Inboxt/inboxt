@@ -1,18 +1,23 @@
 import {
+	ActionIcon,
 	Anchor,
 	Badge,
 	Box,
 	Center,
 	Divider,
+	Flex,
 	Group,
 	Stack,
 	Text,
 	Title,
 	TypographyStylesProvider,
 } from '@mantine/core';
-import { useWindowScroll, useLocalStorage } from '@mantine/hooks';
 import { useNavigate } from '@tanstack/react-router';
-import { useEffect } from 'react';
+import {
+	IconArrowLeft,
+	IconHighlight,
+	IconHighlightOff,
+} from '@tabler/icons-react';
 
 import classes from './ReaderView.module.css';
 import { AppName } from '../../components/AppName';
@@ -26,6 +31,8 @@ import {
 	ARTICLE_FROM_BACKEND,
 	BACKEND_LABELS,
 } from '../../constants/fake-backend';
+import { useTextHighlighting } from '../../hooks/useTextSelection.tsx';
+import { HighlightableArticle } from '../../components/HighlightableArticle';
 
 // todo: from backend :)
 
@@ -33,52 +40,86 @@ export const ReaderView = () => {
 	const isAboveXsScreen = useScreenQuery('xs', 'above');
 	const navigate = useNavigate({ from: Route.fullPath });
 
-	const [scroll, scrollTo] = useWindowScroll();
-	const [savedScrollPosition, setSavedScrollPosition] = useLocalStorage({
-		key: `last-reading-position-${ARTICLE_FROM_BACKEND.id}`,
-		defaultValue: 0,
-	});
+	const { selectedText, highlightSelection, isFullyHighlighted } =
+		useTextHighlighting();
+	const hasSelection = Boolean(selectedText);
 
 	// todo: possibly more edge-cases, for example: don't save new position when the article was already fully read?
-	useEffect(() => {
-		scrollTo({ y: savedScrollPosition });
-	}, [savedScrollPosition, scrollTo]);
+	// todo: looks like possible perfomance issue... test it more, as it re-render i think on each scroll
+	// const [scroll, scrollTo] = useWindowScroll();
+	// const [savedScrollPosition, setSavedScrollPosition] = useLocalStorage({
+	// 	key: `last-reading-position-${ARTICLE_FROM_BACKEND.id}`,
+	// 	defaultValue: 0,
+	// });
 
-	useEffect(() => {
-		const savePosition = () => setSavedScrollPosition(scroll.y);
-		window.addEventListener('beforeunload', savePosition);
-		return () => {
-			window.removeEventListener('beforeunload', savePosition);
-		};
-	}, [scroll.y, setSavedScrollPosition]);
+	// useEffect(() => {
+	// 	scrollTo({ y: savedScrollPosition });
+	// }, [savedScrollPosition]);
+	//
+	// useEffect(() => {
+	// 	const savePosition = () => setSavedScrollPosition(scroll.y);
+	// 	window.addEventListener('beforeunload', savePosition);
+	// 	return () => {
+	// 		window.removeEventListener('beforeunload', savePosition);
+	// 	};
+	// }, [scroll.y, setSavedScrollPosition]);
 
 	return (
 		<Box py="md" px={isAboveXsScreen ? 24 : 'md'} pb="xxl">
 			<Box className={classes.headerContainer}>
-				<Box
+				<Group
 					onClick={() =>
 						void navigate({
 							to: '/',
 							search: { view: AppViews.INBOX },
 						})
 					}
+					align="center"
+					justify="center"
 				>
+					<Flex hiddenFrom="md">
+						<IconArrowLeft />
+					</Flex>
+
 					<AppName
 						size="md"
 						variant={isAboveXsScreen ? 'full' : 'short'}
 					/>
-				</Box>
+				</Group>
 
-				<Box hiddenFrom="md">
-					<ReaderSettingsOptions direction="row" variant="menu" />
-				</Box>
+				{hasSelection ? (
+					<ActionIcon
+						variant="subtle"
+						color="text"
+						size="lg"
+						onClick={(e) => {
+							e.preventDefault();
+							highlightSelection();
+						}}
+						onTouchEnd={(e) => {
+							e.preventDefault();
+							highlightSelection();
+						}}
+						hiddenFrom="md"
+					>
+						{isFullyHighlighted() ? (
+							<IconHighlightOff />
+						) : (
+							<IconHighlight />
+						)}
+					</ActionIcon>
+				) : (
+					<Box hiddenFrom="md">
+						<ReaderSettingsOptions direction="row" variant="menu" />
+					</Box>
+				)}
 			</Box>
 
 			<Box visibleFrom="md" className={classes.readerSettingsContainer}>
 				<ReaderSettingsOptions />
 			</Box>
 
-			<Center py="md">
+			<Center py="xxl">
 				<Box w={isAboveXsScreen ? '45em' : '100%'}>
 					<Stack gap="xl">
 						<Stack gap="xxs">
@@ -121,10 +162,8 @@ export const ReaderView = () => {
 								wordBreak: 'break-word',
 							}}
 						>
-							<div
-								dangerouslySetInnerHTML={{
-									__html: ARTICLE_FROM_BACKEND.content,
-								}}
+							<HighlightableArticle
+								content={ARTICLE_FROM_BACKEND.content}
 							/>
 						</TypographyStylesProvider>
 					</Stack>

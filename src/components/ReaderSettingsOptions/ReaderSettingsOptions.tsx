@@ -11,7 +11,7 @@ import {
 } from '@tabler/icons-react';
 import { FormReadingSettings } from '../../forms/FormReadingSettings';
 import { FormReadingThemeSettings } from '../../forms/FormReadingThemeSettings';
-import { ActionIcon, Divider, Flex } from '@mantine/core';
+import { ActionIcon, Box, Divider, Flex } from '@mantine/core';
 import { modals } from '@modals/modals.ts';
 import { useNavigate } from '@tanstack/react-router';
 import { Route } from '../../routes/r.$id.tsx';
@@ -50,16 +50,18 @@ export const ReaderSettingsOptions = ({
 
 	return (
 		<Flex direction={direction} gap={isBelowXsScreen ? 'xxxs' : 'sm'}>
-			<ReaderSettingsPopover
-				onClick={() =>
-					void navigate({
-						to: '/',
-						search: { view: AppViews.INBOX },
-					})
-				}
-				label="Close reader view"
-				icon={<IconX />}
-			/>
+			<Box visibleFrom="md">
+				<ReaderSettingsPopover
+					onClick={() =>
+						void navigate({
+							to: '/',
+							search: { view: AppViews.INBOX },
+						})
+					}
+					label="Close reader view"
+					icon={<IconX />}
+				/>
+			</Box>
 
 			<ReaderSettingsPopover
 				label={isBelowXsScreen ? 'Text' : 'Text and layout'}
