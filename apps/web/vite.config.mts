@@ -1,0 +1,25 @@
+import { defineConfig, loadEnv } from 'vite';
+import react from '@vitejs/plugin-react-swc';
+import tsconfigPaths from 'vite-tsconfig-paths';
+import { TanStackRouterVite } from '@tanstack/router-plugin/vite';
+
+export default defineConfig(({ mode }) => {
+	const env = {
+		...process.env,
+		...loadEnv(mode, '../../', ''),
+	};
+
+	return {
+		server: {
+			host: '0.0.0.0',
+			port: Number(env.WEB_PORT),
+		},
+		plugins: [TanStackRouterVite(), react(), tsconfigPaths()],
+		resolve: {
+			alias: {
+				'@tabler/icons-react':
+					'@tabler/icons-react/dist/esm/icons/index.mjs',
+			},
+		},
+	};
+});

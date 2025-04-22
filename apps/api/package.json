@@ -1,0 +1,39 @@
+{
+  "name": "api",
+  "version": "0.0.0",
+  "description": "",
+  "author": "",
+  "private": true,
+  "license": "UNLICENSED",
+  "scripts": {
+    "build": "nest build",
+    "db:seed": "cd dist/src && node seed.js",
+    "prisma:generate": "npx prisma generate --schema ./prisma/schema.prisma",
+    "prisma:introspect": "npx prisma db pull",
+    "start": "nest start",
+    "start:dev": "npm run prisma:generate && nest start --watch --preserveWatchOutput",
+    "migrate": "node-pg-migrate --tsconfig=tsconfig.json",
+    "migrate:create": "node-pg-migrate create --templateFileName ../../node_modules/node-pg-migrate/templates/migration-template.ts --tsconfig=tsconfig.json"
+  },
+  "dependencies": {
+    "@apollo/server": "^4.12.0",
+    "@nestjs/apollo": "^13.1.0",
+    "@nestjs/common": "^11.0.1",
+    "@nestjs/config": "^4.0.2",
+    "@nestjs/core": "^11.0.1",
+    "@nestjs/graphql": "^13.1.0",
+    "@prisma/client": "^6.6.0",
+    "dotenv": "^16.5.0",
+    "graphql": "^16.10.0",
+    "@nestjs/platform-express": "^11.0.1",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1",
+    "prisma": "^6.6.0"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^11.0.0",
+    "node-pg-migrate": "^7.9.1",
+    "pg": "^8.14.1",
+    "ts-node": "10.9.2"
+  }
+}

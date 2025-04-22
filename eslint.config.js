@@ -6,24 +6,41 @@ import tseslint from 'typescript-eslint';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 
 export default tseslint.config(
-	{ ignores: ['dist'] },
+	{ ignores: ['dist', '**/node_modules'] },
+	eslintPluginPrettierRecommended,
+
+	// base config
 	{
+		files: ['**/*.{ts,tsx}'],
 		extends: [
 			js.configs.recommended,
 			...tseslint.configs.strictTypeChecked,
 		],
-		files: ['**/*.{ts,tsx}'],
 		languageOptions: {
 			ecmaVersion: 2020,
 			globals: globals.browser,
-			parserOptions: {
-				project: ['./tsconfig.node.json', './tsconfig.app.json'],
-				tsconfigRootDir: import.meta.dirname,
-			},
 		},
+		rules: {
+			'@typescript-eslint/no-non-null-assertion': 'off',
+			'@typescript-eslint/no-confusing-void-expression': [
+				'error',
+				{ ignoreArrowShorthand: true },
+			],
+		},
+	},
+
+	// web config
+	{
+		files: ['apps/web/**/*.{ts,tsx}'],
 		plugins: {
 			'react-hooks': reactHooks,
 			'react-refresh': reactRefresh,
+		},
+		languageOptions: {
+			parserOptions: {
+				project: ['./tsconfig.app.json', './tsconfig.node.json'],
+				tsconfigRootDir: new URL('.', import.meta.url),
+			},
 		},
 		rules: {
 			...reactHooks.configs.recommended.rules,
@@ -31,14 +48,26 @@ export default tseslint.config(
 				'warn',
 				{ allowConstantExport: true },
 			],
-			'@typescript-eslint/no-non-null-assertion': ['off'],
-			'@typescript-eslint/no-confusing-void-expression': [
-				'error',
-				{
-					ignoreArrowShorthand: true,
-				},
-			],
 		},
 	},
-	eslintPluginPrettierRecommended,
+
+	// api config
+	{
+		files: ['apps/api/**/*.{ts,tsx}'],
+		languageOptions: {
+			globals: {
+				...globals.node,
+				...globals.jest,
+			},
+			parserOptions: {
+				project: ['./tsconfig.json'],
+				tsconfigRootDir: new URL('.', import.meta.url),
+			},
+		},
+		rules: {
+			'@typescript-eslint/no-explicit-any': 'off',
+			'@typescript-eslint/no-floating-promises': 'warn',
+			'@typescript-eslint/no-unsafe-argument': 'warn',
+		},
+	},
 );
