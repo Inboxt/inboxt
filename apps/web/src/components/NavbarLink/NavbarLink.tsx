@@ -2,7 +2,7 @@ import { Box, NavLink, NavLinkProps, Tooltip, Transition } from '@mantine/core';
 import { ReactNode } from 'react';
 import classes from './NavbarLink.module.css';
 import { Link } from '@tanstack/react-router';
-import { Route } from '../../routes';
+import { Route } from '../../routes/_auth.index';
 import { AppViews } from '../../constants';
 import { kebabCase } from '../../utils/kebabCase.ts';
 import { useScreenQuery } from '../../hooks/useScreenQuery.tsx';

@@ -10,6 +10,16 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 			notNull: true,
 			default: pgm.func('current_timestamp'),
 		},
+		logins: { type: 'integer', notNull: true, default: 0 },
+		lastLogin: 'timestamp',
+		emailAddress: { type: 'text', notNull: true, unique: true },
+		password: 'text',
+		username: 'text',
+		isEmailVerified: { type: 'boolean', notNull: true, default: false },
+		emailVerifyCode: 'text',
+		emailVerifyExpiry: 'timestamp',
+		resetPasswordCode: 'text',
+		resetPasswordExpiry: 'timestamp',
 	});
 }
 

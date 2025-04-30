@@ -3,11 +3,11 @@ import { ItemsList } from '../pages/ItemsList';
 import { AppViews } from '../constants';
 
 export type AppSearch = {
-	view: AppViews | `label:${string}`;
+	view?: AppViews | `label:${string}`;
 	search?: string;
 };
 
-export const Route = createFileRoute('/')({
+export const Route = createFileRoute('/_auth/')({
 	component: ItemsList,
 	validateSearch: (search: Record<string, unknown>): AppSearch => {
 		return {

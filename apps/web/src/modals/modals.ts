@@ -63,6 +63,15 @@ export const modals = {
 		});
 	},
 
+	openVerifyEmailModal: () => {
+		return mantineModals.openContextModal({
+			modal: 'verifyEmail',
+			size: 540,
+			title: 'Verify Email',
+			innerProps: {},
+		});
+	},
+
 	closeAll: () => {
 		mantineModals.closeAll();
 	},

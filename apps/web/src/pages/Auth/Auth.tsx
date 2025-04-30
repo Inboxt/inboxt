@@ -10,9 +10,9 @@ import {
 	Text,
 	Title,
 } from '@mantine/core';
-import { useState } from 'react';
+import { useNavigate, useSearch } from '@tanstack/react-router';
 
-import classes from './Login.module.css';
+import classes from './Auth.module.css';
 
 import { FormCreateAccount } from '../../forms/FormCreateAccount.tsx';
 import { FormLogin } from '../../forms/FormLogin.tsx';
@@ -20,33 +20,25 @@ import { AppName } from '../../components/AppName';
 import { FormForgotPassword } from '../../forms/FormForgotPassword.tsx';
 import { DemoLogin } from '../../components/DemoLogin';
 import { modals } from '@modals/modals.ts';
-import { Header } from '../../components/Header';
-import { IconArrowRight } from '@tabler/icons-react';
+import { AuthMode, Route } from '../../routes/auth.route.tsx';
 
-type LoginView =
-	| 'login'
-	| 'create-account'
-	| 'start-demo'
-	| 'forgot-password'
-	| null;
-
-export type LoginViewProps = {
-	handleLoginViewChange: (view: LoginView) => void;
+export type AuthViewProps = {
+	handleChangeAuthMode: (mode: AuthMode) => void;
 };
 
-// todo: include "Page" in name of a component that is part of the /pages directory?
-export const Login = () => {
-	const [loginView, setLoginView] = useState<LoginView>();
+export const Auth = () => {
+	const { mode } = useSearch({ from: Route.fullPath });
+	const navigate = useNavigate({ from: Route.fullPath });
 
-	const handleLoginViewChange = (view: LoginView) => {
-		setLoginView(view);
+	const handleChangeAuthMode = async (mode: AuthMode) => {
+		await navigate({ search: { mode } });
 	};
 
-	if (!loginView) {
+	if (!mode) {
 		return (
 			<Center mih="100vh" miw="100vw" pos="relative" px="md">
-				<Flex direction="column" gap={32} align="center" ta="center">
-					<Stack align="center" gap={4}>
+				<Flex direction="column" gap="xxl" align="center" ta="center">
+					<Stack align="center" gap="xxxs">
 						<AppName size="lg" />
 
 						<Title order={4}>
@@ -58,14 +50,14 @@ export const Login = () => {
 					<Stack>
 						<Button
 							size="md"
-							onClick={() => setLoginView('create-account')}
+							onClick={() => handleChangeAuthMode('signup')}
 						>
 							Create account
 						</Button>
 						<Button
 							size="md"
 							variant="light"
-							onClick={() => setLoginView('login')}
+							onClick={() => handleChangeAuthMode('login')}
 						>
 							Sign In
 						</Button>
@@ -75,7 +67,7 @@ export const Login = () => {
 							size="compact-md"
 							c="dark"
 							mt="xs"
-							onClick={() => setLoginView('start-demo')}
+							onClick={() => handleChangeAuthMode('demo')}
 							component="button"
 						>
 							Try the app in demo mode!
@@ -112,13 +104,13 @@ export const Login = () => {
 
 	let title = '';
 	let description = '';
-	switch (loginView) {
+	switch (mode) {
 		case 'login':
 			title = 'Sign In';
 			description = 'Enter your username and password';
 			break;
 
-		case 'create-account':
+		case 'signup':
 			title = 'Create Account';
 			description =
 				'Start saving and reading your favorite content today';
@@ -129,7 +121,7 @@ export const Login = () => {
 			description = "Let's get your password reset!";
 			break;
 
-		case 'start-demo':
+		case 'demo':
 			title = 'Demo Account';
 			description = 'Not sure if you will like it? Try it now!';
 			break;
@@ -138,7 +130,6 @@ export const Login = () => {
 	return (
 		<Flex mih="100vh">
 			<Box
-				bg="gray.1"
 				p={42}
 				pb={160}
 				className={classes.headerContainer}
@@ -160,24 +151,24 @@ export const Login = () => {
 						{title}
 					</Title>
 
-					{loginView === 'create-account' && (
+					{mode === 'signup' && (
 						<FormCreateAccount
-							handleLoginViewChange={handleLoginViewChange}
+							handleChangeAuthMode={handleChangeAuthMode}
 						/>
 					)}
-					{loginView === 'login' && (
+					{mode === 'login' && (
 						<FormLogin
-							handleLoginViewChange={handleLoginViewChange}
+							handleChangeAuthMode={handleChangeAuthMode}
 						/>
 					)}
-					{loginView === 'forgot-password' && (
+					{mode === 'forgot-password' && (
 						<FormForgotPassword
-							handleLoginViewChange={handleLoginViewChange}
+							handleChangeAuthMode={handleChangeAuthMode}
 						/>
 					)}
-					{loginView === 'start-demo' && (
+					{mode === 'demo' && (
 						<DemoLogin
-							handleLoginViewChange={handleLoginViewChange}
+							handleChangeAuthMode={handleChangeAuthMode}
 						/>
 					)}
 				</Stack>

@@ -7,7 +7,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
-    "db:seed": "cd dist/src && node seed.js",
+    "db:seed": "cd dist && node seed.js",
     "prisma:generate": "npx prisma generate --schema ./prisma/schema.prisma",
     "prisma:introspect": "npx prisma db pull",
     "start": "nest start",
@@ -17,23 +17,35 @@
   },
   "dependencies": {
     "@apollo/server": "^4.12.0",
+    "@nestjs-modules/mailer": "^2.0.2",
     "@nestjs/apollo": "^13.1.0",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.1",
     "@nestjs/graphql": "^13.1.0",
-    "@prisma/client": "^6.6.0",
-    "dotenv": "^16.5.0",
-    "graphql": "^16.10.0",
+    "@nestjs/jwt": "^11.0.0",
+    "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.1",
+    "@prisma/client": "^6.6.0",
+    "argon2": "^0.41.1",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^16.5.0",
+    "nodemailer": "^6.10.1",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
+    "passport-local": "^1.0.0",
+    "prisma": "^6.6.0",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1",
-    "prisma": "^6.6.0"
+    "rxjs": "^7.8.1"
   },
   "devDependencies": {
     "@nestjs/cli": "^11.0.0",
+    "@types/cookie-parser": "^1.4.8",
+    "@types/nodemailer": "^6.4.17",
+    "@types/passport-jwt": "^4.0.1",
+    "@types/passport-local": "^1.0.38",
     "node-pg-migrate": "^7.9.1",
-    "pg": "^8.14.1",
+    "pg": "8.14.1",
     "ts-node": "10.9.2"
   }
 }

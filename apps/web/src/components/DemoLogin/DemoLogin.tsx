@@ -4,86 +4,130 @@ import {
 	Divider,
 	Group,
 	List,
+	Stack,
 	Switch,
 	Text,
 } from '@mantine/core';
-import { LoginViewProps } from '../../pages/Login/Login.tsx';
+import { useForm } from '@mantine/form';
+import { useMutation } from '@apollo/client';
+import { useNavigate } from '@tanstack/react-router';
 
-// todo: disable "next" button unless switch is not checked
-// todo: proper, behind the scenes "login" with demo account
-export const DemoLogin = ({ handleLoginViewChange }: LoginViewProps) => {
+import { AuthViewProps } from '../../pages/Auth/Auth.tsx';
+import { SIGN_IN } from '../../lib/graphql.ts';
+import { Route } from '../../routes/auth.route.tsx';
+import { Form } from '../Form';
+
+export const DemoLogin = ({ handleChangeAuthMode }: AuthViewProps) => {
+	const [signIn, { loading, error }] = useMutation(SIGN_IN);
+	const navigate = useNavigate({ from: Route.id });
+
+	const form = useForm({
+		mode: 'uncontrolled',
+		initialValues: {
+			hasAgreedToDemoLimitations: false,
+		},
+	});
+
+	const handleLoginToDemoAccount = async () => {
+		await signIn({
+			variables: {
+				data: {
+					emailAddress: 'demo@inbox-reader.com',
+					password: 'demo',
+				},
+			},
+		});
+
+		await navigate({ to: '/' });
+	};
+
 	return (
-		<>
-			<Text>
-				Explore the app with a fully accessible demo account! Please
-				keep the following in mind:
-			</Text>
+		<Form onSubmit={form.onSubmit(handleLoginToDemoAccount)} error={error}>
+			{({ error }) => (
+				<Stack>
+					{error}
 
-			<List type="ordered">
-				<List.Item>
-					<b>Shared Access</b>: The demo account is public, meaning
-					it’s accessible to other users. We strongly advise against
-					sharing or saving any personal or sensitive information
-					while using it.
-				</List.Item>
+					<Text>
+						Explore the app with a fully accessible demo account!
+						Please keep the following in mind:
+					</Text>
 
-				<List.Item>
-					<b>Data Limitations</b>: The account is limited to storing a
-					maximum of XX items. If the limit has already been reached,
-					you may encounter restrictions on saving new items. In this
-					case, feel free to check back later.
-				</List.Item>
-
-				<List.Item>
-					<b>Daily Reset</b>: To ensure a fresh start for all users,
-					the demo account is cleared daily at 1:00 AM. During this
-					time, the account may be temporarily unavailable as we clean
-					up old data and reload default content.
-				</List.Item>
-
-				<List.Item>
-					<b>Unavailable Features</b>: Some features are disabled in
-					the demo version to ensure the app remains accessible and
-					usable for all users. These include:
-					<List withPadding listStyleType="disc">
+					<List type="ordered">
 						<List.Item>
-							<b>Newsletters</b>: Creating special email
-							newsletters, retrieving email addresses from the
-							app, or accessing them via the app.
+							<b>Shared Access</b>: The demo account is public,
+							meaning it’s accessible to other users. We strongly
+							advise against sharing or saving any personal or
+							sensitive information while using it.
 						</List.Item>
 
 						<List.Item>
-							<b>Data Import/Export</b>: The ability to upload or
-							download any data to/from the app.
+							<b>Data Limitations</b>: The account is limited to
+							storing a maximum of XX items. If the limit has
+							already been reached, you may encounter restrictions
+							on saving new items. In this case, feel free to
+							check back later.
+						</List.Item>
+
+						<List.Item>
+							<b>Daily Reset</b>: To ensure a fresh start for all
+							users, the demo account is cleared daily at 1:00 AM.
+							During this time, the account may be temporarily
+							unavailable as we clean up old data and reload
+							default content.
+						</List.Item>
+
+						<List.Item>
+							<b>Unavailable Features</b>: Some features are
+							disabled in the demo version to ensure the app
+							remains accessible and usable for all users. These
+							include:
+							<List withPadding listStyleType="disc">
+								<List.Item>
+									<b>Newsletters</b>: Creating special email
+									newsletters, retrieving email addresses from
+									the app, or accessing them via the app.
+								</List.Item>
+
+								<List.Item>
+									<b>Data Import/Export</b>: The ability to
+									upload or download any data to/from the app.
+								</List.Item>
+							</List>
 						</List.Item>
 					</List>
-				</List.Item>
-			</List>
 
-			<Switch
-				label="I understand and agree to the demo account limitations."
-				size="md"
-				mt="xxl"
-			/>
+					<Switch
+						label="I understand and agree to the demo account limitations."
+						size="md"
+						mt="xxl"
+						{...form.getInputProps('hasAgreedToDemoLimitations', {
+							type: 'checkbox',
+						})}
+					/>
 
-			<Group justify="space-between">
-				<Button
-					variant="default"
-					size="md"
-					mt="md"
-					onClick={() => handleLoginViewChange(null)}
-				>
-					Back
-				</Button>
+					<Group justify="space-between">
+						<Button
+							variant="default"
+							size="md"
+							mt="md"
+							onClick={() => handleChangeAuthMode(undefined)}
+						>
+							Back
+						</Button>
 
-				<Button size="md">Next</Button>
-			</Group>
+						<Button size="md" type="submit" loading={loading}>
+							Continue
+						</Button>
+					</Group>
 
-			<Divider my="xxs" />
+					<Divider my="xxs" />
 
-			<Text fz="sm">
-				Have more questions? <Anchor fz="sm">Contact support</Anchor>
-			</Text>
-		</>
+					<Text fz="sm">
+						Have more questions?{' '}
+						<Anchor fz="sm">Contact support</Anchor>
+					</Text>
+				</Stack>
+			)}
+		</Form>
 	);
 };

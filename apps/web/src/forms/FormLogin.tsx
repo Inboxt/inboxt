@@ -1,52 +1,92 @@
-import { Button, Group, TextInput } from '@mantine/core';
+import { Button, Group, Stack, TextInput } from '@mantine/core';
 import { IconAt, IconLock } from '@tabler/icons-react';
+import { useForm } from '@mantine/form';
+import { useMutation } from '@apollo/client';
+import { useNavigate, useRouterState } from '@tanstack/react-router';
 
-import { LoginViewProps } from '../pages/Login/Login.tsx';
+import { AuthViewProps } from '../pages/Auth/Auth.tsx';
+import { SIGN_IN } from '../lib/graphql.ts';
+import { Route } from '../routes/auth.route.tsx';
+import { Form } from '../components/Form';
 
-// todo: real form with Mantine :)
-export const FormLogin = ({ handleLoginViewChange }: LoginViewProps) => {
+export const FormLogin = ({ handleChangeAuthMode }: AuthViewProps) => {
+	const [signIn, { loading, error }] = useMutation(SIGN_IN);
+	const state = useRouterState({ select: (s) => s.location.state });
+	const navigate = useNavigate({ from: Route.id });
+
+	const form = useForm({
+		mode: 'uncontrolled',
+		initialValues: {
+			emailAddress: state?.emailAddress || '',
+			password: '',
+		},
+	});
+
+	const handleSubmit = async (values: typeof form.values) => {
+		await signIn({
+			variables: {
+				data: values,
+			},
+		});
+
+		await navigate({ to: '/' });
+	};
+
 	return (
-		<>
-			<TextInput
-				label="Email"
-				placeholder="Email address"
-				leftSectionPointerEvents="none"
-				leftSection={<IconAt size={16} />}
-				size="md"
-			/>
+		<Form onSubmit={form.onSubmit(handleSubmit)} error={error}>
+			{({ error }) => (
+				<Stack>
+					<TextInput
+						label="Email"
+						placeholder="Email address"
+						leftSectionPointerEvents="none"
+						leftSection={<IconAt size={16} />}
+						size="md"
+						{...form.getInputProps('emailAddress')}
+					/>
 
-			<TextInput
-				type="password"
-				label="Password"
-				placeholder="Password"
-				leftSectionPointerEvents="none"
-				leftSection={<IconLock size={16} />}
-				rightSectionPointerEvents="auto"
-				rightSectionWidth="auto"
-				rightSection={
-					<Button
-						variant="subtle"
-						color="gray"
-						size="compact-xs"
-						mr="xs"
-						onClick={() => handleLoginViewChange('forgot-password')}
-					>
-						Forgot?
-					</Button>
-				}
-				size="md"
-			/>
+					<TextInput
+						type="password"
+						label="Password"
+						placeholder="Password"
+						leftSectionPointerEvents="none"
+						leftSection={<IconLock size={16} />}
+						rightSectionPointerEvents="auto"
+						rightSectionWidth="auto"
+						rightSection={
+							<Button
+								variant="subtle"
+								color="gray"
+								size="compact-xs"
+								mr="xs"
+								onClick={() =>
+									handleChangeAuthMode('forgot-password')
+								}
+							>
+								Forgot?
+							</Button>
+						}
+						{...form.getInputProps('password')}
+						size="md"
+					/>
 
-			<Group mt="xl" justify="space-between">
-				<Button
-					variant="default"
-					size="md"
-					onClick={() => handleLoginViewChange(null)}
-				>
-					Back
-				</Button>
-				<Button size="md">Sign in</Button>
-			</Group>
-		</>
+					{error}
+
+					<Group mt="xl" justify="space-between">
+						<Button
+							variant="default"
+							size="md"
+							onClick={() => handleChangeAuthMode(undefined)}
+							loading={loading}
+						>
+							Back
+						</Button>
+						<Button size="md" type="submit" loading={loading}>
+							Sign in
+						</Button>
+					</Group>
+				</Stack>
+			)}
+		</Form>
 	);
 };

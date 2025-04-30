@@ -1,3 +1,5 @@
+import { hash } from 'argon2';
+
 import { PrismaClient } from '../prisma/client';
 
 const prisma = new PrismaClient();
@@ -37,7 +39,12 @@ async function resetDatabase() {
 async function seedUsers() {
 	logStep('Seeding users...');
 	await prisma.user.create({
-		data: {},
+		data: {
+			emailAddress: 'demo@inbox-reader.com',
+			password: await hash('demo'),
+			isEmailVerified: true,
+			username: 'demo',
+		},
 	});
 	logSuccess('Users seeded');
 }

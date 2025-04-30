@@ -1,14 +1,14 @@
 import { IconSearch } from '@tabler/icons-react';
 import { TextInput } from '@mantine/core';
 import { useSearch } from '@tanstack/react-router';
-import { Route } from '../../routes';
+import { Route } from '../../routes/_auth.index';
 import { AppViews } from '../../constants';
 import { useEffect, useState } from 'react';
 import { extractLabelName } from '../../utils/extractLabelName.ts';
 import { useDebouncedValue } from '@mantine/hooks';
 
 export const AppSearch = () => {
-	const { view } = useSearch({ from: Route.fullPath });
+	const { view } = useSearch({ from: Route.id });
 
 	const [search, setSearch] = useState('');
 	const [debounced] = useDebouncedValue(search, 600); // todo: test with backend :)
@@ -23,7 +23,7 @@ export const AppSearch = () => {
 			searchValue = 'is:newsletter';
 		}
 
-		if (view.includes(AppViews.LABEL)) {
+		if (view?.includes(AppViews.LABEL)) {
 			const labelName = extractLabelName(view);
 
 			if (labelName) {

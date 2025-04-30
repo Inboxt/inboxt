@@ -17,11 +17,11 @@
     "@tabler/icons-react": "3.28.1",
     "@tanstack/react-router": "1.97.0",
     "clsx": "2.1.1",
-    "dayjs": "1.11.13",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-markdown": "^9.0.3",
-    "react-use-pwa-install": "1.0.3"
+    "react-use-pwa-install": "1.0.3",
+    "@apollo/client": "^3.13.8" 
   },
   "devDependencies": {
     "@tanstack/router-devtools": "1.97.0",

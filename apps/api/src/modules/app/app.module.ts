@@ -1,24 +1,72 @@
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver } from '@nestjs/apollo';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-
 import { PrismaService } from '../../services/prisma.service';
 import { UserModule } from '../user/user.module';
+import { GqlAuthGuard } from '../../guards/auth.guard';
+import { AuthModule } from '../auth/auth.module';
+import { ActiveUserModule } from '../active-user/active-user.module';
+import { MailModule } from '../mail/mail.module';
+import { GlobalExceptionFilter } from '../../exception-filters/global-exception.filter';
+import { config } from '../../config/config';
+import { GraphqlConfig } from '../../config/config.interface';
+import { MailerModule } from '@nestjs-modules/mailer';
+import * as process from 'node:process';
 
 @Module({
 	imports: [
-		GraphQLModule.forRoot({
+		ConfigModule.forRoot({
+			isGlobal: true,
+			load: [config],
+			envFilePath: ['../../.env'],
+		}),
+		GraphQLModule.forRootAsync({
 			driver: ApolloDriver,
-			autoSchemaFile: true,
-			sortSchema: true,
-			graphiql: true,
+			useFactory: async (configService: ConfigService) => {
+				const graphqlConfig =
+					configService.get<GraphqlConfig>('graphql');
+
+				return {
+					autoSchemaFile: graphqlConfig!.autoSchemaFile,
+					sortSchema: graphqlConfig!.sortSchema,
+					graphiql: graphqlConfig!.graphiql,
+					context: ({ req, res }) => ({ req, res }),
+					cors: {
+						credentials: true,
+						origin: true,
+					},
+				};
+			},
+			inject: [ConfigService],
+		}),
+		MailerModule.forRoot({
+			transport: {
+				host: process.env.MAIL_HOST,
+				port: parseInt(process.env.MAIL_PORT as string, 10),
+			},
 		}),
 		UserModule,
+		AuthModule,
+		ActiveUserModule,
+		MailModule,
 	],
-	providers: [PrismaService, AppService],
+	providers: [
+		PrismaService,
+		AppService,
+		{
+			provide: APP_GUARD,
+			useClass: GqlAuthGuard,
+		},
+		{
+			provide: APP_FILTER,
+			useClass: GlobalExceptionFilter,
+		},
+	],
 	controllers: [AppController],
 })
 export class AppModule {}

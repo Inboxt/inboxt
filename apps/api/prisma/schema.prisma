@@ -15,6 +15,16 @@ model pgmigrations {
 }
 
 model user {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now()) @db.Timestamp(6)
+  id                  Int       @id @default(autoincrement())
+  createdAt           DateTime  @default(now()) @db.Timestamp(6)
+  logins              Int       @default(0)
+  lastLogin           DateTime? @db.Timestamp(6)
+  emailAddress        String    @unique
+  password            String?
+  username            String?
+  isEmailVerified     Boolean   @default(false)
+  emailVerifyCode     String?
+  emailVerifyExpiry   DateTime? @db.Timestamp(6)
+  resetPasswordCode   String?
+  resetPasswordExpiry DateTime? @db.Timestamp(6)
 }

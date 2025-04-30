@@ -21,8 +21,6 @@ services:
   api:
     container_name: "api"
     restart: always
-    dns: 
-      - 8.8.8.8
     build:
       context: .
       dockerfile: ./apps/api/Dockerfile
@@ -55,6 +53,18 @@ services:
       - ./.env:/usr/src/app/.env:cached
     depends_on:
       - database
+        
+  mailpit:
+    image: axllent/mailpit
+    container_name: 'mailpit'
+    restart: always
+    ports:
+      - ${MAIL_PORT}:${MAIL_PORT}
+      - ${MAIL_WEB_PORT}:${MAIL_WEB_PORT}
+    environment:
+      MP_MAX_MESSAGES: 5000
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
 
 volumes:
   db-data:

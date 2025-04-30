@@ -3,6 +3,12 @@
 	display: flex;
 	align-items: center;
 	justify-content: flex-end;
+	background-color: var(--mantine-color-gray-1);
+	
+	@mixin dark {
+		background-color: var(--mantine-color-dark-9);
+		
+	}
 }
 
 .formContainer {

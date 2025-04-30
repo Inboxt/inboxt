@@ -7,7 +7,7 @@ import {
 } from '@tabler/icons-react';
 import { modals } from '@modals/modals.ts';
 import { useSearch } from '@tanstack/react-router';
-import { Route } from '../../routes';
+import { Route } from '../../routes/_auth.index';
 import { AppViews } from '../../constants';
 
 const OPTIONS = [
@@ -47,7 +47,7 @@ type ItemsOptionsProps = {
 
 export const ItemsOptions = ({ size = 'md' }: ItemsOptionsProps) => {
 	const isSmallSize = size === 'sm';
-	const { view } = useSearch({ from: Route.fullPath });
+	const { view } = useSearch({ from: Route.id });
 	const optionsToRender = view === AppViews.TRASH ? TRASH_OPTIONS : OPTIONS;
 
 	return (

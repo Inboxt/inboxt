@@ -1,18 +1,18 @@
 import { Alert, Button, Group, Stack, Text } from '@mantine/core';
 import { useEffect } from 'react';
 import { useSearch } from '@tanstack/react-router';
+
 import classes from './ItemsList.module.css';
 
 import { useReaderContext } from '../../context/ReaderContext.tsx';
 import { ReaderItem } from '../../components/ReaderItem';
-import { Route } from '../../routes';
+import { Route } from '../../routes/_auth.index.tsx';
 import { AppViews } from '../../constants';
 import { AppLayout } from '../../layouts/AppLayout.tsx';
-
 import { BACKEND_ARTICLES } from '../../constants/fake-backend';
 
 export const ItemsList = () => {
-	const { view } = useSearch({ from: Route.fullPath });
+	const { view } = useSearch({ from: Route.id });
 
 	const { setVisibleItemIds } = useReaderContext();
 	// TODO: This also probably doesn't handle well or at all infinite scrolling
@@ -29,10 +29,11 @@ export const ItemsList = () => {
 				{view === AppViews.TRASH && (
 					<Alert
 						variant="light"
-						color="blue"
+						color="yellow"
 						fz="xxs"
 						radius={0}
 						className={classes.trashAlert}
+						p="xxs"
 					>
 						<Group gap={0} justify="center">
 							<Text ta="center">

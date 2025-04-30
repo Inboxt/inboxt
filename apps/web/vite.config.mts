@@ -14,6 +14,9 @@ export default defineConfig(({ mode }) => {
 			host: '0.0.0.0',
 			port: Number(env.WEB_PORT),
 		},
+		define: {
+			'process.env': env,
+		},
 		plugins: [TanStackRouterVite(), react(), tsconfigPaths()],
 		resolve: {
 			alias: {
