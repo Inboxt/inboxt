@@ -83,3 +83,11 @@ export const UPDATE_ACCOUNT = gql`
 	}
 	${USER_FRAGMENT}
 `;
+
+export const DELETE_ACCOUNT = gql`
+	mutation deleteAccount($data: DeleteAccountInput!) {
+		deleteAccount(data: $data) {
+			success
+		}
+	}
+`;

@@ -81,6 +81,16 @@ export const modals = {
 		});
 	},
 
+	openDeleteAccountModal: () => {
+		return mantineModals.openContextModal({
+			modal: 'deleteAccount',
+			size: 540,
+			title: 'Delete Account',
+			centered: true,
+			innerProps: {},
+		});
+	},
+
 	closeAll: () => {
 		mantineModals.closeAll();
 	},

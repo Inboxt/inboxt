@@ -6,6 +6,7 @@ import { User } from './user.model';
 import { ActiveUserMeta } from '../../decorators/active-user-meta.decorator';
 import { Void } from '../../models/void.model';
 import { VOID_RESPONSE } from '../../constants/void';
+import { DeleteAccountInput } from './dto/delete-account.input';
 
 @Resolver(() => User)
 export class UserResolver {
@@ -17,6 +18,15 @@ export class UserResolver {
 		@Args('data') data: UpdateAccountInput,
 	) {
 		return this.userService.update(activeUser.userId, data);
+	}
+
+	@Mutation(() => Void)
+	async deleteAccount(
+		@ActiveUserMeta() activeUser: ActiveUserMeta,
+		@Args('data') data: DeleteAccountInput,
+	) {
+		await this.userService.delete(activeUser.userId, data);
+		return VOID_RESPONSE;
 	}
 
 	@Mutation(() => Void)

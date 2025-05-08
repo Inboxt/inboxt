@@ -2,7 +2,10 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import dayjs from 'dayjs';
 import { hash } from 'argon2';
 
-import { updateAccountSchema } from '@inbox-reader/schemas';
+import {
+	updateAccountSchema,
+	deleteAccountSchema,
+} from '@inbox-reader/schemas';
 
 import { PrismaService } from '../../services/prisma.service';
 import { Prisma } from '../../../prisma/client';
@@ -11,6 +14,7 @@ import { UpdateAccountInput } from './dto/update-account.input';
 import { AppException } from '../../utils/app-exception';
 import { generateCode } from '../../utils/generate-code';
 import { MailService } from '../mail/mail.service';
+import { DeleteAccountInput } from './dto/delete-account.input';
 
 @Injectable()
 export class UserService {
@@ -164,5 +168,25 @@ export class UserService {
 			'Confirm your email address',
 			`Use this code to verify your email address: ${code}`,
 		);
+	}
+
+	async delete(id: number, data: DeleteAccountInput) {
+		/*----------  Validation  ----------*/
+		await deleteAccountSchema.parseAsync(data);
+		const user = await this.get({
+			where: { id, emailAddress: data.emailAddress },
+		});
+
+		if (!user) {
+			throw new AppException(
+				'The email address does not match this account',
+				HttpStatus.NOT_FOUND,
+			);
+		}
+
+		/*----------  Processing  ----------*/
+		return this.prisma.user.delete({
+			where: { id },
+		});
 	}
 }

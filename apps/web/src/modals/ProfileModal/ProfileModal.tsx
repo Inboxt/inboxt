@@ -17,8 +17,10 @@ import { IconBell, IconDatabase, IconHighlight } from '@tabler/icons-react';
 import { ContextModalProps } from '@mantine/modals';
 import { useMutation, useQuery } from '@apollo/client';
 import { useForm, zodResolver } from '@mantine/form';
+
 import { updateAccountSchema } from '@inbox-reader/schemas';
 
+import { modals } from '@modals/modals.ts';
 import { ACTIVE_USER, UPDATE_ACCOUNT } from '../../lib/graphql.ts';
 import { Form } from '../../components/Form';
 import { router } from '../../main.tsx';
@@ -174,7 +176,11 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 					</Stack>
 
 					<Group justify="space-between">
-						<Button variant="outline" color="red">
+						<Button
+							variant="outline"
+							color="red"
+							onClick={modals.openDeleteAccountModal}
+						>
 							Delete Account
 						</Button>
 						<Group>
