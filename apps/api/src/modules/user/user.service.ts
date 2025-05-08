@@ -27,6 +27,10 @@ export class UserService {
 		return this.prisma.user.findUnique(query);
 	}
 
+	async getMany(query: Prisma.userFindManyArgs) {
+		return this.prisma.user.findMany(query);
+	}
+
 	async initiateEmailVerification(id: number) {
 		const code = generateCode();
 		const hashedCode = await hash(code);

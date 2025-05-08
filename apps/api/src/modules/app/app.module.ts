@@ -3,6 +3,9 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver } from '@nestjs/apollo';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
+import { MailerModule } from '@nestjs-modules/mailer';
+import * as process from 'node:process';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -15,8 +18,7 @@ import { MailModule } from '../mail/mail.module';
 import { GlobalExceptionFilter } from '../../exception-filters/global-exception.filter';
 import { config } from '../../config/config';
 import { GraphqlConfig } from '../../config/config.interface';
-import { MailerModule } from '@nestjs-modules/mailer';
-import * as process from 'node:process';
+import { TaskScheduleModule } from '../tasks-schedule/tasks-schedule.module';
 
 @Module({
 	imports: [
@@ -50,10 +52,12 @@ import * as process from 'node:process';
 				port: parseInt(process.env.MAIL_PORT as string, 10),
 			},
 		}),
+		ScheduleModule.forRoot(),
 		UserModule,
 		AuthModule,
 		ActiveUserModule,
 		MailModule,
+		TaskScheduleModule,
 	],
 	providers: [
 		PrismaService,
