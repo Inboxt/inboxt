@@ -24,5 +24,8 @@ export default defineConfig(({ mode }) => {
 					'@tabler/icons-react/dist/esm/icons/index.mjs',
 			},
 		},
+		optimizeDeps: {
+			include: ['@inbox-reader/schemas'],
+		},
 	};
 });

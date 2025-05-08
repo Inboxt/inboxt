@@ -3,14 +3,16 @@ import {
 	Button,
 	Divider,
 	Group,
+	PasswordInput,
 	Stack,
 	Text,
 	TextInput,
 } from '@mantine/core';
 import { IconAt, IconLock, IconMail } from '@tabler/icons-react';
 import { useNavigate } from '@tanstack/react-router';
-import { useForm } from '@mantine/form';
+import { useForm, zodResolver } from '@mantine/form';
 import { useMutation } from '@apollo/client';
+import { createAccountSchema } from '@inbox-reader/schemas';
 
 import { AuthViewProps } from '../pages/Auth/Auth.tsx';
 import { CREATE_ACCOUNT } from '../lib/graphql.ts';
@@ -28,6 +30,7 @@ export const FormCreateAccount = ({ handleChangeAuthMode }: AuthViewProps) => {
 			username: '',
 			password: '',
 		},
+		validate: zodResolver(createAccountSchema),
 	});
 
 	const handleSubmit = async (values: typeof form.values) => {
@@ -57,7 +60,7 @@ export const FormCreateAccount = ({ handleChangeAuthMode }: AuthViewProps) => {
 						{...form.getInputProps('username')}
 					/>
 
-					<TextInput
+					<PasswordInput
 						type="password"
 						label="Password"
 						placeholder="Choose your password"

@@ -48,7 +48,7 @@ services:
     volumes:
       - ./apps/web/src:/usr/src/app/apps/web/src:cached
       - ./apps/web/vite.config.mts:/usr/src/app/apps/web/vite.config.mts:cached
-      - ./apps/web/index.html:/usr/src/app/apps/web/i ndex.html:cached
+      - ./apps/web/index.html:/usr/src/app/apps/web/index.html:cached
       - ./apps/web/public:/usr/src/app/apps/web/public:cached
       - ./.env:/usr/src/app/.env:cached
     depends_on:

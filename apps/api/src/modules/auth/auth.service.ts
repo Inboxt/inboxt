@@ -1,8 +1,14 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
+import {
+	signInSchema,
+	createAccountSchema,
+	requestPasswordRecoverySchema,
+	resetPasswordSchema,
+	verifyEmailSchema,
+} from '@inbox-reader/schemas';
 
 import { UserService } from '../user/user.service';
-import { PrismaService } from '../../services/prisma.service';
 import { GqlContext } from '../../types/graphql-context';
 import { AppException } from '../../utils/app-exception';
 import { PasswordService } from './services/password.service';
@@ -18,7 +24,6 @@ export class AuthService {
 	constructor(
 		private jwtService: JwtService,
 		private userService: UserService,
-		private prisma: PrismaService,
 		private passwordService: PasswordService,
 		private mailService: MailService,
 		private verificationService: VerificationService,
@@ -51,6 +56,10 @@ export class AuthService {
 	}
 
 	async verifyEmail(userId: number, data: VerifyEmailInput) {
+		/*----------  Validation  ----------*/
+		await verifyEmailSchema.parseAsync(data);
+
+		/*----------  Processing  ----------*/
 		return this.verificationService.verifyEmailCode(userId, data.code);
 	}
 
@@ -84,6 +93,7 @@ export class AuthService {
 	}
 
 	async signIn(emailAddress: string, password: string, context: any) {
+		/*----------  Validation  ----------*/
 		if (!emailAddress.length || !password.length) {
 			throw new AppException(
 				'No email and/or password provided',
@@ -91,6 +101,7 @@ export class AuthService {
 			);
 		}
 
+		await signInSchema.parseAsync({ emailAddress, password });
 		const user = await this.userService.get({
 			where: { emailAddress },
 		});
@@ -110,10 +121,12 @@ export class AuthService {
 			);
 		}
 
+		/*----------  Processing  ----------*/
 		await this.createTokens(emailAddress, context);
 	}
 
 	async sendVerificationEmail(userId: number) {
+		/*----------  Validation  ----------*/
 		const existingUser = await this.userService.get({
 			where: { id: userId },
 		});
@@ -125,6 +138,7 @@ export class AuthService {
 			);
 		}
 
+		/*----------  Processing  ----------*/
 		const verifyEmailCode =
 			await this.verificationService.createEmailVerification(userId);
 
@@ -136,27 +150,35 @@ export class AuthService {
 	}
 
 	async createUser(data: CreateAccountInput, context: any) {
+		/*----------  Processing  ----------*/
+		await createAccountSchema.parseAsync(data);
+		const emailAddress = data.emailAddress.toLowerCase();
 		const existingUser = await this.userService.get({
-			where: { emailAddress: data.emailAddress },
+			where: { emailAddress },
 		});
 
 		if (existingUser) {
 			return;
 		}
 
+		/*----------  Processing  ----------*/
 		const hashedPassword = await this.passwordService.hashPassword(
 			data.password,
 		);
 
-		const user = await this.prisma.user.create({
-			data: { ...data, password: hashedPassword },
+		const user = await this.userService.create({
+			...data,
+			emailAddress,
+			password: hashedPassword,
 		});
 
 		await this.sendVerificationEmail(user.id);
-		await this.createTokens(data.emailAddress, context);
+		await this.createTokens(user.emailAddress, context);
 	}
 
 	async requestPasswordRecovery(data: RequestPasswordRecoveryInput) {
+		/*----------  Validation  ----------*/
+		await requestPasswordRecoverySchema.parseAsync(data);
 		const existingUser = await this.userService.get({
 			where: { emailAddress: data.emailAddress },
 		});
@@ -165,6 +187,7 @@ export class AuthService {
 			return;
 		}
 
+		/*----------  Processing  ----------*/
 		const passwordRecoveryCode =
 			await this.passwordService.createPasswordRecovery(existingUser.id);
 
@@ -176,6 +199,8 @@ export class AuthService {
 	}
 
 	async resetPassword(data: ResetPasswordInput) {
+		/*----------  Validation  ----------*/
+		await resetPasswordSchema.parseAsync(data);
 		const existingUser = await this.userService.get({
 			where: { emailAddress: data.emailAddress },
 		});
@@ -192,17 +217,13 @@ export class AuthService {
 			data.code,
 		);
 
+		/*----------  Processing  ----------*/
 		const updatedHashedPassword = await this.passwordService.hashPassword(
 			data.password,
 		);
 
-		await this.prisma.user.update({
-			where: {
-				id: existingUser.id,
-			},
-			data: {
-				password: updatedHashedPassword,
-			},
+		await this.userService.update(existingUser.id, {
+			password: updatedHashedPassword,
 		});
 	}
 }

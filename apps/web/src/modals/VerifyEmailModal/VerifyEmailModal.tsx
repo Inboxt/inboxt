@@ -1,9 +1,11 @@
 import { Button, Group, Stack, Text, TextInput } from '@mantine/core';
 import { ContextModalProps } from '@mantine/modals';
-import { useForm } from '@mantine/form';
+import { useForm, zodResolver } from '@mantine/form';
 import { useMutation } from '@apollo/client';
 import { useInterval } from '@mantine/hooks';
 import { useState } from 'react';
+
+import { verifyEmailSchema } from '@inbox-reader/schemas';
 
 import {
 	ACTIVE_USER,
@@ -30,6 +32,7 @@ export const VerifyEmailModal = ({ id, context }: ContextModalProps) => {
 		initialValues: {
 			code: '',
 		},
+		validate: zodResolver(verifyEmailSchema),
 	});
 
 	const interval = useInterval(() => {

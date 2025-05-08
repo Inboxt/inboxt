@@ -34,6 +34,7 @@ export class PasswordService {
 	}
 
 	async verifyPasswordRecoveryCode(userId: number, code: string) {
+		/*----------  Validation  ----------*/
 		const user = await this.userService.get({
 			where: { id: userId },
 		});
@@ -52,6 +53,7 @@ export class PasswordService {
 			);
 		}
 
+		/*----------  Processing  ----------*/
 		return this.userService.resetPasswordRecovery(userId);
 	}
 }

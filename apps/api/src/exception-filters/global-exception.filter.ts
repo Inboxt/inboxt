@@ -7,12 +7,31 @@ import {
 } from '@nestjs/common';
 import { GqlExceptionFilter, GqlContextType } from '@nestjs/graphql';
 import { GraphQLError } from 'graphql';
+import { ZodError } from 'zod';
 
 @Catch()
 export class GlobalExceptionFilter
 	implements ExceptionFilter, GqlExceptionFilter
 {
 	private handleException(exception: unknown) {
+		if (exception instanceof ZodError) {
+			const errors = exception.errors.map((error) => ({
+				path: error.path.join('.'),
+				message: error.message,
+			}));
+
+			return {
+				status: HttpStatus.BAD_REQUEST,
+				message: 'Invalid input provided',
+				code: 'BAD_USER_INPUT',
+				response: {
+					statusCode: HttpStatus.BAD_REQUEST,
+					message: errors,
+					error: 'Bad Request',
+				},
+			};
+		}
+
 		if (exception instanceof HttpException) {
 			const status = exception.getStatus();
 			const response = exception.getResponse();
@@ -38,26 +57,29 @@ export class GlobalExceptionFilter
 
 	catch(exception: unknown, host: ArgumentsHost) {
 		const contextType = host.getType<GqlContextType>();
-		const { status, message, code } = this.handleException(exception);
+		const { status, message, code, response } =
+			this.handleException(exception);
 
 		if (contextType === 'graphql') {
 			return new GraphQLError(message, {
 				extensions: {
 					code,
 					status,
+					response,
 				},
 			});
 		}
 
 		const ctx = host.switchToHttp();
-		const response = ctx.getResponse();
-		const request = ctx.getRequest();
+		const res = ctx.getResponse();
+		const req = ctx.getRequest();
 
-		response.status(status).json({
-			status, // 'status' field now contains the status code
+		res.status(status).json({
+			status,
 			message,
 			code,
-			path: request.url,
+			path: req.url,
+			...(response ? { response } : {}),
 		});
 	}
 }

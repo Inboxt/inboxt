@@ -26,6 +26,12 @@ export const DemoLogin = ({ handleChangeAuthMode }: AuthViewProps) => {
 		initialValues: {
 			hasAgreedToDemoLimitations: false,
 		},
+		validate: {
+			hasAgreedToDemoLimitations: (value) =>
+				!value
+					? 'Please agree to the demo account rules and limitations to proceed'
+					: null,
+		},
 	});
 
 	const handleLoginToDemoAccount = async () => {
@@ -33,7 +39,7 @@ export const DemoLogin = ({ handleChangeAuthMode }: AuthViewProps) => {
 			variables: {
 				data: {
 					emailAddress: 'demo@inbox-reader.com',
-					password: 'demo',
+					password: 'Password1@',
 				},
 			},
 		});

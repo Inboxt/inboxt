@@ -1,8 +1,9 @@
-import { Button, Group, Stack, TextInput } from '@mantine/core';
+import { Button, Group, PasswordInput, Stack, TextInput } from '@mantine/core';
 import { IconAt, IconLock } from '@tabler/icons-react';
-import { useForm } from '@mantine/form';
+import { useForm, zodResolver } from '@mantine/form';
 import { useMutation } from '@apollo/client';
 import { useNavigate, useRouterState } from '@tanstack/react-router';
+import { signInSchema } from '@inbox-reader/schemas';
 
 import { AuthViewProps } from '../pages/Auth/Auth.tsx';
 import { SIGN_IN } from '../lib/graphql.ts';
@@ -20,6 +21,7 @@ export const FormLogin = ({ handleChangeAuthMode }: AuthViewProps) => {
 			emailAddress: state?.emailAddress || '',
 			password: '',
 		},
+		validate: zodResolver(signInSchema),
 	});
 
 	const handleSubmit = async (values: typeof form.values) => {
@@ -33,7 +35,11 @@ export const FormLogin = ({ handleChangeAuthMode }: AuthViewProps) => {
 	};
 
 	return (
-		<Form onSubmit={form.onSubmit(handleSubmit)} error={error}>
+		<Form
+			onSubmit={form.onSubmit(handleSubmit)}
+			error={error}
+			setErrors={form.setErrors}
+		>
 			{({ error }) => (
 				<Stack>
 					<TextInput
@@ -45,7 +51,7 @@ export const FormLogin = ({ handleChangeAuthMode }: AuthViewProps) => {
 						{...form.getInputProps('emailAddress')}
 					/>
 
-					<TextInput
+					<PasswordInput
 						type="password"
 						label="Password"
 						placeholder="Password"

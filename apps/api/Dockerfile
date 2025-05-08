@@ -1,18 +1,26 @@
-FROM node:20
+# Base image
+FROM node:22
 
 WORKDIR /usr/src/app
 
+# Copy package.json and other necessary files
 COPY package.json .
+COPY tsconfig*.json .
+COPY .env .
+
+# Copy the apps and libs folders
 COPY apps/api ./apps/api
+COPY libs/schemas ./libs/schemas
 
 # Making sure that prisma (with client) is copied over to dist directory, probably this part should be improved, but for now it is needed, as the app breaks without it
 COPY apps/api/prisma ./apps/api/dist/prisma
 
-COPY tsconfig*.json .
-COPY .env .
+# Install dependencies
+RUN npm install --workspace=apps/api --workspace=libs/schemas --include-workspace-root=true
+#RUN npm install
 
-# Install workspace dependencies
-RUN npm install --workspace=apps/api --include-workspace-root=true
+# Build the schemas
+RUN npm run build --workspace=libs/schemas
 
-# Start
+# Start the API
 CMD [ "npm", "run", "start:dev", "--workspace=apps/api" ]

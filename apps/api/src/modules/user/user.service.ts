@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import dayjs from 'dayjs';
 
 import { PrismaService } from '../../services/prisma.service';
 import { Prisma } from '../../../prisma/client';
-import dayjs from 'dayjs';
+import { CreateAccountInput } from './dto/create-account.input';
+import { UpdateAccountInput } from './dto/update-account.input';
 
 @Injectable()
 export class UserService {
@@ -72,6 +74,19 @@ export class UserService {
 				resetPasswordCode: null,
 				resetPasswordExpiry: null,
 			},
+		});
+	}
+
+	async create(data: CreateAccountInput) {
+		return this.prisma.user.create({
+			data,
+		});
+	}
+
+	async update(id: number, data: UpdateAccountInput) {
+		return this.prisma.user.update({
+			where: { id },
+			data,
 		});
 	}
 }

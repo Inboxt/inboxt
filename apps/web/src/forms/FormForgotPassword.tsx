@@ -2,6 +2,7 @@ import {
 	Button,
 	Divider,
 	Group,
+	PasswordInput,
 	Stack,
 	Text,
 	TextInput,
@@ -9,9 +10,13 @@ import {
 } from '@mantine/core';
 import { IconAt, IconLock } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
-import { useForm } from '@mantine/form';
+import { useForm, zodResolver } from '@mantine/form';
 import { useNavigate } from '@tanstack/react-router';
 import { useMutation } from '@apollo/client';
+import {
+	resetPasswordSchema,
+	requestPasswordRecoverySchema,
+} from '@inbox-reader/schemas';
 
 import { AuthViewProps } from '../pages/Auth/Auth.tsx';
 import { REQUEST_PASSWORD_RECOVERY, RESET_PASSWORD } from '../lib/graphql.ts';
@@ -39,6 +44,7 @@ export const FormForgotPassword = ({ handleChangeAuthMode }: AuthViewProps) => {
 		initialValues: {
 			emailAddress: '',
 		},
+		validate: zodResolver(requestPasswordRecoverySchema),
 	});
 
 	const resetPasswordForm = useForm({
@@ -48,6 +54,7 @@ export const FormForgotPassword = ({ handleChangeAuthMode }: AuthViewProps) => {
 			code: '',
 			password: '',
 		},
+		validate: zodResolver(resetPasswordSchema),
 	});
 
 	const handleBack = () => {
@@ -167,7 +174,7 @@ export const FormForgotPassword = ({ handleChangeAuthMode }: AuthViewProps) => {
 								{...resetPasswordForm.getInputProps('code')}
 							/>
 
-							<TextInput
+							<PasswordInput
 								type="password"
 								label="New password"
 								placeholder="Choose your new password"

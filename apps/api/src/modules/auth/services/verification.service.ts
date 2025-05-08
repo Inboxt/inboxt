@@ -23,6 +23,7 @@ export class VerificationService {
 	}
 
 	async verifyEmailCode(userId: number, code: string) {
+		/*----------  Validation  ----------*/
 		const user = await this.userService.get({
 			where: { id: userId },
 		});
@@ -41,6 +42,7 @@ export class VerificationService {
 			);
 		}
 
+		/*----------  Processing  ----------*/
 		await this.userService.markEmailAsVerified(userId);
 	}
 }
