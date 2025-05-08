@@ -20,8 +20,7 @@ import { Form } from '../components/Form';
 
 export const FormCreateAccount = ({ handleChangeAuthMode }: AuthViewProps) => {
 	const navigate = useNavigate();
-	const [createAccount, { loading: loadingCreateAccount, error }] =
-		useMutation(CREATE_ACCOUNT);
+	const [createAccount, { loading: loadingCreateAccount, error }] = useMutation(CREATE_ACCOUNT);
 
 	const form = useForm({
 		mode: 'uncontrolled',
@@ -87,11 +86,7 @@ export const FormCreateAccount = ({ handleChangeAuthMode }: AuthViewProps) => {
 						>
 							Back
 						</Button>
-						<Button
-							size="md"
-							type="submit"
-							loading={loadingCreateAccount}
-						>
+						<Button size="md" type="submit" loading={loadingCreateAccount}>
 							Create account
 						</Button>
 					</Group>

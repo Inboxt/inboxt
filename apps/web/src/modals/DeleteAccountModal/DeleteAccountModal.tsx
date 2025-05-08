@@ -40,8 +40,8 @@ export const DeleteAccountModal = ({ id, context }: ContextModalProps) => {
 						<Text span fw={700} td="underline">
 							instantly and permanently delete
 						</Text>{' '}
-						all your data. You will not be able to recover your
-						account once this is done.
+						all your data. You will not be able to recover your account once this is
+						done.
 					</Text>
 
 					<Text>To confirm, please enter your email address:</Text>

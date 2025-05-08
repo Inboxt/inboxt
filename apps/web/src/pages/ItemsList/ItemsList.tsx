@@ -37,8 +37,7 @@ export const ItemsList = () => {
 					>
 						<Group gap={0} justify="center">
 							<Text ta="center">
-								Items in Trash will be automatically deleted
-								after 30 days.
+								Items in Trash will be automatically deleted after 30 days.
 							</Text>
 
 							<Button variant="transparent" size="compact-sm">

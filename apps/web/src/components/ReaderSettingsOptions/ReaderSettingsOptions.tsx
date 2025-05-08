@@ -78,9 +78,7 @@ export const ReaderSettingsOptions = ({
 				<>
 					<Divider
 						color="black"
-						orientation={
-							direction === 'column' ? 'horizontal' : 'vertical'
-						}
+						orientation={direction === 'column' ? 'horizontal' : 'vertical'}
 					/>
 
 					{READER_EXTRA_OPTIONS.map((option) => (
@@ -94,11 +92,7 @@ export const ReaderSettingsOptions = ({
 			)}
 
 			{variant === 'menu' && (
-				<MenuDrawer
-					items={READER_EXTRA_OPTIONS}
-					label="More options"
-					height={220}
-				>
+				<MenuDrawer items={READER_EXTRA_OPTIONS} label="More options" height={220}>
 					<ActionIcon variant="subtle" color="text" size="lg">
 						<IconDots />
 					</ActionIcon>

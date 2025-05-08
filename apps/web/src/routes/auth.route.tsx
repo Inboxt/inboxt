@@ -5,12 +5,7 @@ import { client } from '../lib/apolloClient.ts';
 import { ACTIVE_USER } from '../lib/graphql.ts';
 import { AppViews } from '../constants';
 
-export type AuthMode =
-	| 'login'
-	| 'signup'
-	| 'demo'
-	| 'forgot-password'
-	| undefined;
+export type AuthMode = 'login' | 'signup' | 'demo' | 'forgot-password' | undefined;
 
 export type AuthSearch = {
 	mode?: AuthMode;

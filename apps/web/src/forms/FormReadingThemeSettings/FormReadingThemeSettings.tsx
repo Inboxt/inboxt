@@ -1,12 +1,4 @@
-import {
-	Group,
-	Stack,
-	Text,
-	Title,
-	Radio,
-	SimpleGrid,
-	Box,
-} from '@mantine/core';
+import { Group, Stack, Text, Title, Radio, SimpleGrid, Box } from '@mantine/core';
 
 import classes from './FormReadingThemeSettings.module.css';
 
@@ -48,12 +40,7 @@ const readerThemes = [
 
 export const FormReadingThemeSettings = () => {
 	const cards = readerThemes.map((item) => (
-		<Radio.Card
-			className={classes.root}
-			radius="sm"
-			value={item.name}
-			key={item.name}
-		>
+		<Radio.Card className={classes.root} radius="sm" value={item.name} key={item.name}>
 			<Group wrap="nowrap" align="flex-start">
 				<Box
 					style={{

@@ -7,25 +7,17 @@ import { useState } from 'react';
 
 import { verifyEmailSchema } from '@inbox-reader/schemas';
 
-import {
-	ACTIVE_USER,
-	RESEND_VERIFICATION_EMAIL,
-	VERIFY_EMAIL,
-} from '../../lib/graphql.ts';
+import { ACTIVE_USER, RESEND_VERIFICATION_EMAIL, VERIFY_EMAIL } from '../../lib/graphql.ts';
 import { router } from '../../main.tsx';
 import { Form } from '../../components/Form';
 
 export const VerifyEmailModal = ({ id, context }: ContextModalProps) => {
 	const [resendCooldown, setResendCooldown] = useState(0);
-	const [
-		verifyEmail,
-		{ loading: verifyEmailLoading, error: verifyEmailError },
-	] = useMutation(VERIFY_EMAIL);
+	const [verifyEmail, { loading: verifyEmailLoading, error: verifyEmailError }] =
+		useMutation(VERIFY_EMAIL);
 
-	const [
-		resendVerificationEmail,
-		{ loading: resendVerificationEmailLoading },
-	] = useMutation(RESEND_VERIFICATION_EMAIL);
+	const [resendVerificationEmail, { loading: resendVerificationEmailLoading }] =
+		useMutation(RESEND_VERIFICATION_EMAIL);
 
 	const form = useForm({
 		mode: 'uncontrolled',
@@ -65,17 +57,14 @@ export const VerifyEmailModal = ({ id, context }: ContextModalProps) => {
 	const isCooldownActive = resendCooldown > 0;
 
 	return (
-		<Form
-			onSubmit={form.onSubmit(handleVerifyEmail)}
-			error={verifyEmailError}
-		>
+		<Form onSubmit={form.onSubmit(handleVerifyEmail)} error={verifyEmailError}>
 			{({ error }) => (
 				<Stack>
 					<Stack gap="xs">
 						<Text>
-							We’ve sent you an email with a confirmation code.
-							Please check your inbox and spam folder. Enter the
-							code below to verify your email address.
+							We’ve sent you an email with a confirmation code. Please check your
+							inbox and spam folder. Enter the code below to verify your email
+							address.
 						</Text>
 
 						<TextInput
@@ -92,23 +81,15 @@ export const VerifyEmailModal = ({ id, context }: ContextModalProps) => {
 							variant="light"
 							color="text"
 							onClick={handleResendEmail}
-							loading={
-								resendVerificationEmailLoading ||
-								verifyEmailLoading
-							}
+							loading={resendVerificationEmailLoading || verifyEmailLoading}
 							disabled={isCooldownActive}
 						>
-							{isCooldownActive
-								? `Send again in ${resendCooldown}s`
-								: 'Resend Email'}
+							{isCooldownActive ? `Send again in ${resendCooldown}s` : 'Resend Email'}
 						</Button>
 
 						<Button
 							type="submit"
-							loading={
-								resendVerificationEmailLoading ||
-								verifyEmailLoading
-							}
+							loading={resendVerificationEmailLoading || verifyEmailLoading}
 						>
 							Confirm
 						</Button>

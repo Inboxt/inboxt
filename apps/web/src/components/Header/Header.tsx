@@ -1,12 +1,4 @@
-import {
-	ActionIcon,
-	Box,
-	Burger,
-	Flex,
-	Group,
-	Stack,
-	Text,
-} from '@mantine/core';
+import { ActionIcon, Box, Burger, Flex, Group, Stack, Text } from '@mantine/core';
 import { IconArrowLeft } from '@tabler/icons-react';
 
 import classes from './Header.module.css';

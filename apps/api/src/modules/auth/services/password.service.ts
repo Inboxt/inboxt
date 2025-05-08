@@ -10,10 +10,7 @@ import { UserService } from '../../user/user.service';
 export class PasswordService {
 	constructor(private userService: UserService) {}
 
-	async validatePassword(
-		password: string,
-		hashedPassword: string,
-	): Promise<boolean> {
+	async validatePassword(password: string, hashedPassword: string): Promise<boolean> {
 		return verify(hashedPassword, password);
 	}
 

@@ -13,11 +13,7 @@ import {
 	ActionIcon,
 } from '@mantine/core';
 import { usePWAInstall } from 'react-use-pwa-install';
-import {
-	IconCheck,
-	IconDeviceDesktopPlus,
-	IconDownload,
-} from '@tabler/icons-react';
+import { IconCheck, IconDeviceDesktopPlus, IconDownload } from '@tabler/icons-react';
 import { ContextModalProps } from '@mantine/modals';
 
 const icons = {
@@ -31,20 +27,11 @@ const BrowserIcon = ({ browser }: { browser: string }) => {
 	return <Image src={icons[browser]} h={20} w="auto" />;
 };
 
-const renderSelectOption: SelectProps['renderOption'] = ({
-	option,
-	checked,
-}) => (
+const renderSelectOption: SelectProps['renderOption'] = ({ option, checked }) => (
 	<Group flex="1" gap="xs">
 		<BrowserIcon browser={option.value} />
 		{option.label}
-		{checked && (
-			<IconCheck
-				style={{ marginInlineStart: 'auto' }}
-				size={18}
-				opacity={0.6}
-			/>
-		)}
+		{checked && <IconCheck style={{ marginInlineStart: 'auto' }} size={18} opacity={0.6} />}
 	</Group>
 );
 
@@ -87,25 +74,11 @@ export const InstallModal = ({ id, context }: ContextModalProps) => {
 				title="Install App for iOS and Android"
 				description="Use our mobile app to save any link, access your full library."
 			>
-				<a
-					href="https://www.apple.com/app-store/"
-					aria-label="Download on the App Store"
-				>
-					<Image
-						src="/app-store-badge.png"
-						height={41}
-						alt="App Store badge"
-					/>
+				<a href="https://www.apple.com/app-store/" aria-label="Download on the App Store">
+					<Image src="/app-store-badge.png" height={41} alt="App Store badge" />
 				</a>
-				<a
-					href="https://play.google.com/store"
-					aria-label="Get it on Google Play"
-				>
-					<Image
-						src="/play-store-badge.png"
-						height={40}
-						alt="Google Play badge"
-					/>
+				<a href="https://play.google.com/store" aria-label="Get it on Google Play">
+					<Image src="/play-store-badge.png" height={40} alt="Google Play badge" />
 				</a>
 			</InstallOption>
 
@@ -162,11 +135,7 @@ export const InstallModal = ({ id, context }: ContextModalProps) => {
 				</Flex>
 			</InstallOption>
 
-			<Button
-				onClick={() => context.closeModal(id)}
-				ml="auto"
-				variant="default"
-			>
+			<Button onClick={() => context.closeModal(id)} ml="auto" variant="default">
 				Close
 			</Button>
 		</Stack>

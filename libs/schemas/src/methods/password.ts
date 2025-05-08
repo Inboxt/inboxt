@@ -8,15 +8,13 @@ export const password = () => {
 			if (!/[A-Z]/.test(val)) {
 				ctx.addIssue({
 					code: z.ZodIssueCode.custom,
-					message:
-						'Password must contain at least one uppercase letter.',
+					message: 'Password must contain at least one uppercase letter.',
 				});
 			}
 			if (!/[a-z]/.test(val)) {
 				ctx.addIssue({
 					code: z.ZodIssueCode.custom,
-					message:
-						'Password must contain at least one lowercase letter.',
+					message: 'Password must contain at least one lowercase letter.',
 				});
 			}
 			if (!/[0-9]/.test(val)) {
@@ -28,8 +26,7 @@ export const password = () => {
 			if (!/[!@#$%^&*]/.test(val)) {
 				ctx.addIssue({
 					code: z.ZodIssueCode.custom,
-					message:
-						'Password must contain at least one special character (!@#$%^&*).',
+					message: 'Password must contain at least one special character (!@#$%^&*).',
 				});
 			}
 		});

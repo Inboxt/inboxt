@@ -14,10 +14,7 @@ export const LabelsModal = ({ id, context }: ContextModalProps) => {
 		setEditingLabel(labelId);
 	};
 
-	const handleEditSave = (
-		labelId: number,
-		updatedLabel: { name: string; color: string },
-	) => {
+	const handleEditSave = (labelId: number, updatedLabel: { name: string; color: string }) => {
 		// TODO: Add save logic here
 		console.log('Saved label:', labelId, updatedLabel);
 		setEditingLabel(null);
@@ -43,17 +40,11 @@ export const LabelsModal = ({ id, context }: ContextModalProps) => {
 			</Stack>
 
 			<Group justify="flex-end">
-				<Button
-					variant="light"
-					color="text"
-					onClick={modals.openCreateLabelModal}
-				>
+				<Button variant="light" color="text" onClick={modals.openCreateLabelModal}>
 					Create new
 				</Button>
 
-				<Button onClick={() => context.closeModal(id)}>
-					Save & Close
-				</Button>
+				<Button onClick={() => context.closeModal(id)}>Save & Close</Button>
 			</Group>
 		</Stack>
 	);

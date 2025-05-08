@@ -32,9 +32,7 @@ export const UnverifiedEmailAlert = ({ user }: UnverifiedEmailAlertProps) => {
 	return (
 		<Alert radius={0} p="xxs" color={color}>
 			<Flex justify="center" gap="sm" wrap="wrap">
-				<Text ta="center">
-					{daysLeft <= 10 ? countdownMessage : baseMessage}
-				</Text>
+				<Text ta="center">{daysLeft <= 10 ? countdownMessage : baseMessage}</Text>
 				<Button
 					variant="light"
 					size="compact-sm"

@@ -12,10 +12,7 @@ export default tseslint.config(
 	// base config
 	{
 		files: ['**/*.{ts,tsx}'],
-		extends: [
-			js.configs.recommended,
-			...tseslint.configs.strictTypeChecked,
-		],
+		extends: [js.configs.recommended, ...tseslint.configs.strictTypeChecked],
 		languageOptions: {
 			ecmaVersion: 2020,
 			globals: globals.browser,
@@ -44,10 +41,7 @@ export default tseslint.config(
 		},
 		rules: {
 			...reactHooks.configs.recommended.rules,
-			'react-refresh/only-export-components': [
-				'warn',
-				{ allowConstantExport: true },
-			],
+			'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
 		},
 	},
 

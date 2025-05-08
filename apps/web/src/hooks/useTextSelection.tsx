@@ -1,34 +1,21 @@
 import { RefObject, useEffect, useMemo } from 'react';
 import { useTextSelection } from '@mantine/hooks';
-import {
-	getSafeTextRanges,
-	getXPath,
-	wrapSafeRangeWithSpan,
-} from '../utils/highlightsDOM.ts';
+import { getSafeTextRanges, getXPath, wrapSafeRangeWithSpan } from '../utils/highlightsDOM.ts';
 
-export function useTextHighlighting(
-	containerRef?: RefObject<HTMLDivElement | null>,
-) {
+export function useTextHighlighting(containerRef?: RefObject<HTMLDivElement | null>) {
 	const selection = useTextSelection();
 	const selectedText = selection?.toString();
 
-	const currentRange =
-		selection && selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
-	const rangeRect = currentRange
-		? currentRange.getBoundingClientRect()
-		: null;
+	const currentRange = selection && selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+	const rangeRect = currentRange ? currentRange.getBoundingClientRect() : null;
 
 	const hasValidSelection = useMemo(() => {
 		if (!currentRange) return false;
 
 		const startInFigcaption =
 			currentRange.startContainer.nodeType === Node.TEXT_NODE
-				? currentRange.startContainer.parentElement?.closest(
-						'figcaption',
-					)
-				: (currentRange.startContainer as Element).closest(
-						'figcaption',
-					);
+				? currentRange.startContainer.parentElement?.closest('figcaption')
+				: (currentRange.startContainer as Element).closest('figcaption');
 		const endInFigcaption =
 			currentRange.endContainer.nodeType === Node.TEXT_NODE
 				? currentRange.endContainer.parentElement?.closest('figcaption')
@@ -39,14 +26,7 @@ export function useTextHighlighting(
 		const fragment = currentRange.cloneContents();
 		if (fragment.querySelector('img')) return false;
 
-		const invalidSelectors = [
-			'button',
-			'input',
-			'select',
-			'textarea',
-			'video',
-			'audio',
-		];
+		const invalidSelectors = ['button', 'input', 'select', 'textarea', 'video', 'audio'];
 		if (fragment.querySelector(invalidSelectors.join(','))) return false;
 
 		return true;
@@ -103,8 +83,7 @@ export function useTextHighlighting(
 
 		// Remove existing highlights inside selection
 		if (containerRef?.current && range) {
-			const highlights =
-				containerRef.current.querySelectorAll('.highlight');
+			const highlights = containerRef.current.querySelectorAll('.highlight');
 
 			highlights.forEach((highlight) => {
 				const highlightRange = document.createRange();
@@ -116,24 +95,15 @@ export function useTextHighlighting(
 
 				// Check for overlap between the highlight and the current range
 				const overlaps =
-					range.compareBoundaryPoints(
-						Range.END_TO_START,
-						highlightRange,
-					) < 0 &&
-					range.compareBoundaryPoints(
-						Range.START_TO_END,
-						highlightRange,
-					) > 0;
+					range.compareBoundaryPoints(Range.END_TO_START, highlightRange) < 0 &&
+					range.compareBoundaryPoints(Range.START_TO_END, highlightRange) > 0;
 
 				if (overlaps) {
 					// Fully unwrap the highlight
 					const parent = highlight.parentNode;
 					if (parent) {
 						while (highlight.firstChild) {
-							parent.insertBefore(
-								highlight.firstChild,
-								highlight,
-							);
+							parent.insertBefore(highlight.firstChild, highlight);
 						}
 						parent.removeChild(highlight);
 					}
@@ -150,10 +120,7 @@ export function useTextHighlighting(
 			wrapSafeRangeWithSpan(safeRange);
 
 			const textContent =
-				safeRange.node.textContent?.slice(
-					safeRange.start,
-					safeRange.end,
-				) || '';
+				safeRange.node.textContent?.slice(safeRange.start, safeRange.end) || '';
 
 			const tempDiv = document.createElement('div');
 			const span = document.createElement('span');

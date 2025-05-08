@@ -30,19 +30,11 @@ export class AuthService {
 		private mailService: MailService,
 	) {}
 
-	createJwtToken(
-		payload: Record<string, unknown>,
-		options: JwtSignOptions,
-	): string {
+	createJwtToken(payload: Record<string, unknown>, options: JwtSignOptions): string {
 		return this.jwtService.sign(payload, options);
 	}
 
-	attachJwtToken(
-		name: string,
-		contents: string,
-		context: any,
-		httpOnly = true,
-	) {
+	attachJwtToken(name: string, contents: string, context: any, httpOnly = true) {
 		context.res.cookie(name, contents, {
 			// secure,
 			// domain,
@@ -70,10 +62,7 @@ export class AuthService {
 			!(await verify(user.emailVerifyCode, code));
 
 		if (isInvalid) {
-			throw new AppException(
-				'Invalid or expired verification code',
-				HttpStatus.BAD_REQUEST,
-			);
+			throw new AppException('Invalid or expired verification code', HttpStatus.BAD_REQUEST);
 		}
 
 		if (user.pendingEmailAddress) {
@@ -133,10 +122,7 @@ export class AuthService {
 	async signIn(emailAddress: string, password: string, context: any) {
 		/*----------  Validation  ----------*/
 		if (!emailAddress.length || !password.length) {
-			throw new AppException(
-				'No email and/or password provided',
-				HttpStatus.BAD_REQUEST,
-			);
+			throw new AppException('No email and/or password provided', HttpStatus.BAD_REQUEST);
 		}
 
 		await signInSchema.parseAsync({ emailAddress, password });
@@ -147,16 +133,10 @@ export class AuthService {
 		const isInvalid =
 			!user ||
 			!user.password ||
-			!(await this.passwordService.validatePassword(
-				password,
-				user.password,
-			));
+			!(await this.passwordService.validatePassword(password, user.password));
 
 		if (isInvalid) {
-			throw new AppException(
-				'Invalid email address or password',
-				HttpStatus.BAD_REQUEST,
-			);
+			throw new AppException('Invalid email address or password', HttpStatus.BAD_REQUEST);
 		}
 
 		/*----------  Processing  ----------*/
@@ -176,9 +156,7 @@ export class AuthService {
 		}
 
 		/*----------  Processing  ----------*/
-		const hashedPassword = await this.passwordService.hashPassword(
-			data.password,
-		);
+		const hashedPassword = await this.passwordService.hashPassword(data.password);
 
 		const user = await this.userService.create({
 			...data,
@@ -202,8 +180,9 @@ export class AuthService {
 		}
 
 		/*----------  Processing  ----------*/
-		const passwordRecoveryCode =
-			await this.passwordService.createPasswordRecovery(existingUser.id);
+		const passwordRecoveryCode = await this.passwordService.createPasswordRecovery(
+			existingUser.id,
+		);
 
 		return this.mailService.sendEmail(
 			data.emailAddress,
@@ -226,15 +205,10 @@ export class AuthService {
 			);
 		}
 
-		await this.passwordService.verifyPasswordRecoveryCode(
-			existingUser.id,
-			data.code,
-		);
+		await this.passwordService.verifyPasswordRecoveryCode(existingUser.id, data.code);
 
 		/*----------  Processing  ----------*/
-		const updatedHashedPassword = await this.passwordService.hashPassword(
-			data.password,
-		);
+		const updatedHashedPassword = await this.passwordService.hashPassword(data.password);
 
 		await this.userService.update(existingUser.id, {
 			password: updatedHashedPassword,

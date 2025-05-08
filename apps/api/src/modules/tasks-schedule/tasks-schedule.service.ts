@@ -30,8 +30,6 @@ export class TaskSchedulerService {
 			}),
 		);
 
-		this.logger.log(
-			`Deleted ${users.length} unverified users older than 45 days`,
-		);
+		this.logger.log(`Deleted ${users.length} unverified users older than 45 days`);
 	}
 }

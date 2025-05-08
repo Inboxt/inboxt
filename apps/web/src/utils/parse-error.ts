@@ -20,17 +20,13 @@ export const parseError = (
 		if (gqlError) {
 			const extensions = gqlError.extensions as Record<string, any>;
 
-			if (
-				extensions?.response?.message &&
-				Array.isArray(extensions.response.message)
-			) {
-				const fieldErrors: FormFieldError[] =
-					extensions.response.message.map(
-						(item: Record<string, any>) => ({
-							path: item.path || 'unknown',
-							message: item.message || 'Invalid value',
-						}),
-					);
+			if (extensions?.response?.message && Array.isArray(extensions.response.message)) {
+				const fieldErrors: FormFieldError[] = extensions.response.message.map(
+					(item: Record<string, any>) => ({
+						path: item.path || 'unknown',
+						message: item.message || 'Invalid value',
+					}),
+				);
 
 				return {
 					message: gqlError.message || 'Invalid input provided',

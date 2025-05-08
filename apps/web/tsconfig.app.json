@@ -1,18 +1,18 @@
 {
-  "extends": "../../tsconfig.base.json",
-  "compilerOptions": {
-    "jsx": "react-jsx",
-    "moduleResolution": "Bundler",
-    "allowImportingTsExtensions": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "moduleDetection": "force",
-    "useDefineForClassFields": true,
-    "noUncheckedSideEffectImports": true,
-    "paths": {
-      "@modals/*": ["./src/modals/*"]
-    },
-    "tsBuildInfoFile": "../../node_modules/.tmp/web.tsbuildinfo"
-  },
-  "include": ["src"]
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"jsx": "react-jsx",
+		"moduleResolution": "Bundler",
+		"allowImportingTsExtensions": true,
+		"isolatedModules": true,
+		"noEmit": true,
+		"moduleDetection": "force",
+		"useDefineForClassFields": true,
+		"noUncheckedSideEffectImports": true,
+		"paths": {
+			"@modals/*": ["./src/modals/*"]
+		},
+		"tsBuildInfoFile": "../../node_modules/.tmp/web.tsbuildinfo"
+	},
+	"include": ["src"]
 }

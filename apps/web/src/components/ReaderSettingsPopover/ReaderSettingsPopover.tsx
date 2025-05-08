@@ -1,11 +1,4 @@
-import {
-	ActionIcon,
-	Box,
-	Drawer,
-	Popover,
-	Title,
-	Tooltip,
-} from '@mantine/core';
+import { ActionIcon, Box, Drawer, Popover, Title, Tooltip } from '@mantine/core';
 import { forwardRef, ReactNode } from 'react';
 import { useScreenQuery } from '../../hooks/useScreenQuery.tsx';
 import classes from '../MenuDrawer/MenuDrawer.module.css';
@@ -18,26 +11,19 @@ type ReaderSettingsOptionProps = {
 	icon: ReactNode;
 };
 
-const ReaderSettingsOption = forwardRef<
-	HTMLButtonElement,
-	ReaderSettingsOptionProps
->(({ onClick, label, icon }, ref) => {
-	return (
-		<Tooltip label={label} position="right" offset={16}>
-			<Box>
-				<ActionIcon
-					variant="subtle"
-					color="text"
-					onClick={onClick}
-					size="lg"
-					ref={ref}
-				>
-					{icon}
-				</ActionIcon>
-			</Box>
-		</Tooltip>
-	);
-});
+const ReaderSettingsOption = forwardRef<HTMLButtonElement, ReaderSettingsOptionProps>(
+	({ onClick, label, icon }, ref) => {
+		return (
+			<Tooltip label={label} position="right" offset={16}>
+				<Box>
+					<ActionIcon variant="subtle" color="text" onClick={onClick} size="lg" ref={ref}>
+						{icon}
+					</ActionIcon>
+				</Box>
+			</Tooltip>
+		);
+	},
+);
 
 interface ReaderSettingsPopoverProps extends ReaderSettingsOptionProps {
 	children?: ReactNode;
@@ -50,13 +36,10 @@ export const ReaderSettingsPopover = ({
 	icon,
 }: ReaderSettingsPopoverProps) => {
 	const isAboveXsScreen = useScreenQuery('xs', 'above');
-	const [drawerOpened, { open: openDrawer, close: closeDrawer }] =
-		useDisclosure(false);
+	const [drawerOpened, { open: openDrawer, close: closeDrawer }] = useDisclosure(false);
 
 	if (onClick) {
-		return (
-			<ReaderSettingsOption onClick={onClick} icon={icon} label={label} />
-		);
+		return <ReaderSettingsOption onClick={onClick} icon={icon} label={label} />;
 	}
 
 	if (isAboveXsScreen) {
@@ -78,11 +61,7 @@ export const ReaderSettingsPopover = ({
 
 	return (
 		<>
-			<ReaderSettingsOption
-				icon={icon}
-				label={label}
-				onClick={openDrawer}
-			/>
+			<ReaderSettingsOption icon={icon} label={label} onClick={openDrawer} />
 
 			<Drawer
 				opened={drawerOpened}

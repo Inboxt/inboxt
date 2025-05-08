@@ -30,9 +30,7 @@ export class UserResolver {
 	}
 
 	@Mutation(() => Void)
-	async resendVerificationEmail(
-		@ActiveUserMeta() activeUser: ActiveUserMeta,
-	) {
+	async resendVerificationEmail(@ActiveUserMeta() activeUser: ActiveUserMeta) {
 		await this.userService.sendVerificationEmail(activeUser.userId);
 		return VOID_RESPONSE;
 	}

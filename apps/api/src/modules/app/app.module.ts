@@ -30,8 +30,7 @@ import { TaskScheduleModule } from '../tasks-schedule/tasks-schedule.module';
 		GraphQLModule.forRootAsync({
 			driver: ApolloDriver,
 			useFactory: async (configService: ConfigService) => {
-				const graphqlConfig =
-					configService.get<GraphqlConfig>('graphql');
+				const graphqlConfig = configService.get<GraphqlConfig>('graphql');
 
 				return {
 					autoSchemaFile: graphqlConfig!.autoSchemaFile,

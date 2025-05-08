@@ -63,8 +63,7 @@ export const BACKEND_ARTICLES = [
 		id: 3,
 		title: 'CSS Grid Layouts',
 		receivedAt: '2023-11-13T14:45:00Z',
-		description:
-			'A comprehensive guide to building responsive layouts with CSS Grid.',
+		description: 'A comprehensive guide to building responsive layouts with CSS Grid.',
 		labels: [
 			{ id: 8, label: 'CSS', color: 'cyan' },
 			{ id: 9, label: 'Grid', color: 'red' },
@@ -88,8 +87,7 @@ export const BACKEND_ARTICLES = [
 		id: 5,
 		title: 'Node.js Event Loop Explained',
 		receivedAt: '2023-11-11T16:30:00Z',
-		description:
-			'An in-depth explanation of how the event loop works in Node.js.',
+		description: 'An in-depth explanation of how the event loop works in Node.js.',
 		labels: [
 			{ id: 14, label: 'Node.js', color: 'lime' },
 			{ id: 15, label: 'Event Loop', color: 'cyan' },
@@ -100,8 +98,7 @@ export const BACKEND_ARTICLES = [
 		id: 6,
 		title: 'Building Accessible Websites',
 		receivedAt: '2023-11-10T11:20:00Z',
-		description:
-			'Tips and guidelines for making your website accessible to all users.',
+		description: 'Tips and guidelines for making your website accessible to all users.',
 		labels: [
 			{ id: 16, label: 'Accessibility', color: 'pink' },
 			{ id: 17, label: 'Web Development', color: 'yellow' },

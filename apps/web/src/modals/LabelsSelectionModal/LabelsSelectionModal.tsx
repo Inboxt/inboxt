@@ -26,11 +26,7 @@ export const LabelsSelectionModal = ({ id, context }: ContextModalProps) => {
 			</Checkbox.Group>
 
 			<Group justify="flex-end">
-				<Button
-					variant="light"
-					color="text"
-					onClick={modals.openCreateLabelModal}
-				>
+				<Button variant="light" color="text" onClick={modals.openCreateLabelModal}>
 					Create new
 				</Button>
 

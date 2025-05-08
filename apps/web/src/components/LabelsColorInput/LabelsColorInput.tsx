@@ -7,11 +7,7 @@ type LabelsColorInputProps = {
 	label?: string;
 };
 
-export const LabelsColorInput = ({
-	value,
-	onChange,
-	label,
-}: LabelsColorInputProps) => {
+export const LabelsColorInput = ({ value, onChange, label }: LabelsColorInputProps) => {
 	const isAboveLgScreen = useScreenQuery('lg', 'above');
 	return (
 		<ColorInput

@@ -1,10 +1,5 @@
 import { ActionIcon, Button, Tooltip } from '@mantine/core';
-import {
-	IconArchive,
-	IconTag,
-	IconTrash,
-	IconWorld,
-} from '@tabler/icons-react';
+import { IconArchive, IconTag, IconTrash, IconWorld } from '@tabler/icons-react';
 import { modals } from '@modals/modals.ts';
 import { useSearch } from '@tanstack/react-router';
 import { Route } from '../../routes/_auth.index';
@@ -70,12 +65,7 @@ export const ItemsOptions = ({ size = 'md' }: ItemsOptionsProps) => {
 				}
 
 				return (
-					<Tooltip
-						key={option.label}
-						label={option.label}
-						openDelay={600}
-						withArrow
-					>
+					<Tooltip key={option.label} label={option.label} openDelay={600} withArrow>
 						<ActionIcon
 							variant="subtle"
 							color="text"
@@ -83,9 +73,7 @@ export const ItemsOptions = ({ size = 'md' }: ItemsOptionsProps) => {
 							radius="xl"
 							onClick={option.onClick}
 						>
-							<IconComponent
-								size={isSmallSize ? 16 : undefined}
-							/>
+							<IconComponent size={isSmallSize ? 16 : undefined} />
 						</ActionIcon>
 					</Tooltip>
 				);

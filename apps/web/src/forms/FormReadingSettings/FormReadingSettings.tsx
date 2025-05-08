@@ -46,16 +46,8 @@ export const FormReadingSettings = () => {
 			</Group>
 
 			<Group w="100%">
-				<NativeSelect
-					label="Font"
-					data={['React', 'Angular', 'Vue']}
-					flex={1}
-				/>
-				<NativeSelect
-					label="Font weight"
-					data={['Regular', 'Light', 'Bold']}
-					flex={1}
-				/>
+				<NativeSelect label="Font" data={['React', 'Angular', 'Vue']} flex={1} />
+				<NativeSelect label="Font weight" data={['Regular', 'Light', 'Bold']} flex={1} />
 			</Group>
 
 			<Divider w="100%" />
@@ -184,9 +176,7 @@ export const FormReadingSettings = () => {
 										label: (
 											<>
 												<IconAlignLeft />
-												<VisuallyHidden>
-													Preview
-												</VisuallyHidden>
+												<VisuallyHidden>Preview</VisuallyHidden>
 											</>
 										),
 									},
@@ -195,9 +185,7 @@ export const FormReadingSettings = () => {
 										label: (
 											<>
 												<IconAlignCenter />
-												<VisuallyHidden>
-													Code
-												</VisuallyHidden>
+												<VisuallyHidden>Code</VisuallyHidden>
 											</>
 										),
 									},
@@ -206,20 +194,14 @@ export const FormReadingSettings = () => {
 										label: (
 											<>
 												<IconAlignRight />
-												<VisuallyHidden>
-													Export
-												</VisuallyHidden>
+												<VisuallyHidden>Export</VisuallyHidden>
 											</>
 										),
 									},
 								]}
 							/>
 
-							<Button
-								variant="transparent"
-								color="blue"
-								ml="auto"
-							>
+							<Button variant="transparent" color="blue" ml="auto">
 								Reset to defaults
 							</Button>
 						</Stack>

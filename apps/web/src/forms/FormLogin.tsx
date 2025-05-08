@@ -35,11 +35,7 @@ export const FormLogin = ({ handleChangeAuthMode }: AuthViewProps) => {
 	};
 
 	return (
-		<Form
-			onSubmit={form.onSubmit(handleSubmit)}
-			error={error}
-			setErrors={form.setErrors}
-		>
+		<Form onSubmit={form.onSubmit(handleSubmit)} error={error} setErrors={form.setErrors}>
 			{({ error }) => (
 				<Stack>
 					<TextInput
@@ -65,9 +61,7 @@ export const FormLogin = ({ handleChangeAuthMode }: AuthViewProps) => {
 								color="gray"
 								size="compact-xs"
 								mr="xs"
-								onClick={() =>
-									handleChangeAuthMode('forgot-password')
-								}
+								onClick={() => handleChangeAuthMode('forgot-password')}
 							>
 								Forgot?
 							</Button>

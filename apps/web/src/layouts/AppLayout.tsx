@@ -32,10 +32,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
 				<Flex className={classes.container}>
 					<Navbar opened={opened} toggle={toggle} />
 
-					<Box
-						className={classes.content}
-						pt={isSelected && !isAboveLgScreen ? 0 : 'md'}
-					>
+					<Box className={classes.content} pt={isSelected && !isAboveLgScreen ? 0 : 'md'}>
 						<Header opened={opened} toggle={toggle} />
 
 						{children}

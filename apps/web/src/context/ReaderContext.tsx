@@ -17,9 +17,7 @@ interface ReaderContextProps {
 
 const ReaderContext = createContext<ReaderContextProps | undefined>(undefined);
 
-export const ReaderProvider: React.FC<{ children: React.ReactNode }> = ({
-	children,
-}) => {
+export const ReaderProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 	const [selectedItemIds, setSelectedItemIds] = useState<number[]>([]);
 	const [visibleItemIds, setVisibleItemIds] = useState<number[]>([]);
 
@@ -39,18 +37,13 @@ export const ReaderProvider: React.FC<{ children: React.ReactNode }> = ({
 
 	const toggleItemSelection = useDebouncedCallback((id: number) => {
 		setSelectedItemIds((prev) =>
-			prev.includes(id)
-				? prev.filter((itemId) => itemId !== id)
-				: [...prev, id],
+			prev.includes(id) ? prev.filter((itemId) => itemId !== id) : [...prev, id],
 		);
 	}, 10);
 
 	const isAllSelected =
-		visibleItemIds.length > 0 &&
-		visibleItemIds.every((id) => selectedItemIds.includes(id));
-	const isNoneSelected = visibleItemIds.every(
-		(id) => !selectedItemIds.includes(id),
-	);
+		visibleItemIds.length > 0 && visibleItemIds.every((id) => selectedItemIds.includes(id));
+	const isNoneSelected = visibleItemIds.every((id) => !selectedItemIds.includes(id));
 	const isPartiallySelected = !isAllSelected && !isNoneSelected;
 
 	return (
@@ -77,9 +70,7 @@ export const ReaderProvider: React.FC<{ children: React.ReactNode }> = ({
 export const useReaderContext = () => {
 	const context = useContext(ReaderContext);
 	if (!context) {
-		throw new Error(
-			'useReaderContext must be used within a ReaderProvider',
-		);
+		throw new Error('useReaderContext must be used within a ReaderProvider');
 	}
 	return context;
 };

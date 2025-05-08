@@ -2,10 +2,7 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import dayjs from 'dayjs';
 import { hash } from 'argon2';
 
-import {
-	updateAccountSchema,
-	deleteAccountSchema,
-} from '@inbox-reader/schemas';
+import { updateAccountSchema, deleteAccountSchema } from '@inbox-reader/schemas';
 
 import { PrismaService } from '../../services/prisma.service';
 import { Prisma } from '../../../prisma/client';
@@ -48,10 +45,7 @@ export class UserService {
 
 	async initiatePasswordRecovery(
 		id: number,
-		data: Pick<
-			Prisma.userUpdateInput,
-			'resetPasswordCode' | 'resetPasswordExpiry'
-		>,
+		data: Pick<Prisma.userUpdateInput, 'resetPasswordCode' | 'resetPasswordExpiry'>,
 	) {
 		return this.prisma.user.update({
 			where: { id },
@@ -125,8 +119,7 @@ export class UserService {
 		}
 
 		await updateAccountSchema.parseAsync({ ...input, parsedEmailAddress });
-		const withEmailAddressChange =
-			existingUser.emailAddress !== parsedEmailAddress;
+		const withEmailAddressChange = existingUser.emailAddress !== parsedEmailAddress;
 
 		/*----------  Processing  ----------*/
 		if (withEmailAddressChange) {

@@ -22,11 +22,7 @@ export class AuthResolver {
 		@Args('data') { emailAddress, password }: SignInInput,
 		@Context() context: GqlContext,
 	) {
-		await this.authService.signIn(
-			emailAddress.toLowerCase(),
-			password,
-			context.req,
-		);
+		await this.authService.signIn(emailAddress.toLowerCase(), password, context.req);
 
 		return VOID_RESPONSE;
 	}
@@ -39,10 +35,7 @@ export class AuthResolver {
 
 	@Public()
 	@Mutation(() => Void)
-	async createAccount(
-		@Args('data') data: CreateAccountInput,
-		@Context() context: GqlContext,
-	) {
+	async createAccount(@Args('data') data: CreateAccountInput, @Context() context: GqlContext) {
 		await this.authService.createUser(data, context.req);
 		return VOID_RESPONSE;
 	}
@@ -58,9 +51,7 @@ export class AuthResolver {
 
 	@Public()
 	@Mutation(() => Void)
-	async requestPasswordRecovery(
-		@Args('data') data: RequestPasswordRecoveryInput,
-	) {
+	async requestPasswordRecovery(@Args('data') data: RequestPasswordRecoveryInput) {
 		await this.authService.requestPasswordRecovery(data);
 		return VOID_RESPONSE;
 	}

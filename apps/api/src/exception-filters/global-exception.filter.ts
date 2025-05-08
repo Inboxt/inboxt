@@ -1,18 +1,10 @@
-import {
-	ArgumentsHost,
-	Catch,
-	ExceptionFilter,
-	HttpException,
-	HttpStatus,
-} from '@nestjs/common';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
 import { GqlExceptionFilter, GqlContextType } from '@nestjs/graphql';
 import { GraphQLError } from 'graphql';
 import { ZodError } from 'zod';
 
 @Catch()
-export class GlobalExceptionFilter
-	implements ExceptionFilter, GqlExceptionFilter
-{
+export class GlobalExceptionFilter implements ExceptionFilter, GqlExceptionFilter {
 	private handleException(exception: unknown) {
 		if (exception instanceof ZodError) {
 			const errors = exception.errors.map((error) => ({
@@ -57,8 +49,7 @@ export class GlobalExceptionFilter
 
 	catch(exception: unknown, host: ArgumentsHost) {
 		const contextType = host.getType<GqlContextType>();
-		const { status, message, code, response } =
-			this.handleException(exception);
+		const { status, message, code, response } = this.handleException(exception);
 
 		if (contextType === 'graphql') {
 			return new GraphQLError(message, {

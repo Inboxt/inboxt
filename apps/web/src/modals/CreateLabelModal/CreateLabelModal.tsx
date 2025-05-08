@@ -16,11 +16,7 @@ export const CreateLabelModal = ({ id, context }: ContextModalProps) => {
 			</Group>
 
 			<Group justify="flex-end">
-				<Button
-					variant="light"
-					color="text"
-					onClick={() => context.closeModal(id)}
-				>
+				<Button variant="light" color="text" onClick={() => context.closeModal(id)}>
 					Cancel
 				</Button>
 

@@ -16,14 +16,7 @@ type NavbarLinkProps = {
 	color?: string;
 };
 
-export const NavbarLink = ({
-	label,
-	icon,
-	opened,
-	view,
-	toggleDrawer,
-	color,
-}: NavbarLinkProps) => {
+export const NavbarLink = ({ label, icon, opened, view, toggleDrawer, color }: NavbarLinkProps) => {
 	const isBelowMdScreen = useScreenQuery('md', 'below');
 	return (
 		<Tooltip label={label} position="right" disabled={opened}>
@@ -39,14 +32,7 @@ export const NavbarLink = ({
 					</Transition>
 				}
 				leftSection={
-					<Box
-						c={
-							color
-								? `var(--mantine-color-${color}-6)`
-								: undefined
-						}
-						display="flex"
-					>
+					<Box c={color ? `var(--mantine-color-${color}-6)` : undefined} display="flex">
 						{icon}
 					</Box>
 				}
@@ -60,17 +46,13 @@ export const NavbarLink = ({
 						toggleDrawer();
 					}
 				}}
-				renderRoot={(
-					props: Omit<NavLinkProps, 'style' | 'onChange'>,
-				) => {
+				renderRoot={(props: Omit<NavLinkProps, 'style' | 'onChange'>) => {
 					return (
 						<Link
 							from={Route.fullPath}
 							search={{
 								view:
-									view === AppViews.LABEL
-										? `${view}:${kebabCase(label)}`
-										: view,
+									view === AppViews.LABEL ? `${view}:${kebabCase(label)}` : view,
 							}}
 							{...props}
 						/>

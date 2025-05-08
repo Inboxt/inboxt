@@ -30,10 +30,8 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 	const computedColorScheme = useComputedColorScheme();
 
 	const { data, loading } = useQuery(ACTIVE_USER);
-	const [
-		updateProfile,
-		{ loading: updateProfileLoading, error: updateProfileError },
-	] = useMutation(UPDATE_ACCOUNT);
+	const [updateProfile, { loading: updateProfileLoading, error: updateProfileError }] =
+		useMutation(UPDATE_ACCOUNT);
 
 	const form = useForm({
 		mode: 'uncontrolled',
@@ -67,10 +65,7 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 	const storagePercentage = (usedStorage / totalStorage) * 100;
 
 	return (
-		<Form
-			onSubmit={form.onSubmit(handleUpdateProfile)}
-			error={updateProfileError}
-		>
+		<Form onSubmit={form.onSubmit(handleUpdateProfile)} error={updateProfileError}>
 			{({ error }) => (
 				<Stack gap="xl">
 					<Stack>
@@ -91,11 +86,7 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 								/>
 
 								{data?.me?.pendingEmailAddress && (
-									<Alert
-										color="yellow"
-										icon={<IconBell />}
-										p="xxs"
-									>
+									<Alert color="yellow" icon={<IconBell />} p="xxs">
 										{`Verification email sent to ${data.me.pendingEmailAddress}. Your email will be
 										updated once verified.`}
 									</Alert>
@@ -112,11 +103,7 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 						<Title order={5}>Theme</Title>
 						<SegmentedControl
 							fullWidth
-							color={
-								computedColorScheme === 'dark'
-									? undefined
-									: 'dark'
-							}
+							color={computedColorScheme === 'dark' ? undefined : 'dark'}
 							value={colorScheme}
 							onChange={setColorScheme}
 							data={[
@@ -152,24 +139,17 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 						<Title order={5}>Export Data</Title>
 
 						<Text>
-							You can request data export once per day. The export
-							will be sent to your registered email address, and
-							you should receive it within an hour. The download
-							link will remain valid for 24 hours.
+							You can request data export once per day. The export will be sent to
+							your registered email address, and you should receive it within an hour.
+							The download link will remain valid for 24 hours.
 						</Text>
 
 						<Group grow>
-							<Button
-								leftSection={<IconDatabase size={16} />}
-								variant="default"
-							>
+							<Button leftSection={<IconDatabase size={16} />} variant="default">
 								Export Full Account Data
 							</Button>
 
-							<Button
-								leftSection={<IconHighlight size={16} />}
-								variant="default"
-							>
+							<Button leftSection={<IconHighlight size={16} />} variant="default">
 								Export Highlights
 							</Button>
 						</Group>
@@ -191,10 +171,7 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 							>
 								Cancel
 							</Button>
-							<Button
-								type="submit"
-								loading={updateProfileLoading}
-							>
+							<Button type="submit" loading={updateProfileLoading}>
 								Save
 							</Button>
 						</Group>

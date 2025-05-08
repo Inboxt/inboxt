@@ -11,8 +11,7 @@ import { SecurityConfig } from '../../config/config.interface';
 		PassportModule.register({ defaultStrategy: 'jwt' }),
 		NestJwtModule.registerAsync({
 			useFactory: async (configService: ConfigService) => {
-				const securityConfig =
-					configService.get<SecurityConfig>('security');
+				const securityConfig = configService.get<SecurityConfig>('security');
 
 				return {
 					secret: securityConfig!.jwtSecret,

@@ -13,10 +13,7 @@ import { useEffect, useState } from 'react';
 import { useForm, zodResolver } from '@mantine/form';
 import { useNavigate } from '@tanstack/react-router';
 import { useMutation } from '@apollo/client';
-import {
-	resetPasswordSchema,
-	requestPasswordRecoverySchema,
-} from '@inbox-reader/schemas';
+import { resetPasswordSchema, requestPasswordRecoverySchema } from '@inbox-reader/schemas';
 
 import { AuthViewProps } from '../pages/Auth/Auth.tsx';
 import { REQUEST_PASSWORD_RECOVERY, RESET_PASSWORD } from '../lib/graphql.ts';
@@ -26,16 +23,11 @@ export const FormForgotPassword = ({ handleChangeAuthMode }: AuthViewProps) => {
 	const navigate = useNavigate();
 	const [
 		requestPasswordRecovery,
-		{
-			loading: requestPasswordRecoveryLoading,
-			error: requestPasswordRecoveryError,
-		},
+		{ loading: requestPasswordRecoveryLoading, error: requestPasswordRecoveryError },
 	] = useMutation(REQUEST_PASSWORD_RECOVERY);
 
-	const [
-		resetPassword,
-		{ loading: resetPasswordLoading, error: resetPasswordError },
-	] = useMutation(RESET_PASSWORD);
+	const [resetPassword, { loading: resetPasswordLoading, error: resetPasswordError }] =
+		useMutation(RESET_PASSWORD);
 
 	const [isPasswordReset, setIsPasswordReset] = useState(false);
 	const [forgotPasswordStep, setForgotPasswordStep] = useState(0);
@@ -77,9 +69,7 @@ export const FormForgotPassword = ({ handleChangeAuthMode }: AuthViewProps) => {
 		);
 	};
 
-	const handleResetPassword = async (
-		values: typeof resetPasswordForm.values,
-	) => {
+	const handleResetPassword = async (values: typeof resetPasswordForm.values) => {
 		await resetPassword({ variables: { data: values } });
 		setIsPasswordReset(true);
 	};
@@ -100,8 +90,7 @@ export const FormForgotPassword = ({ handleChangeAuthMode }: AuthViewProps) => {
 							to: '/auth',
 							search: { mode: 'login' },
 							state: {
-								emailAddress:
-									resetPasswordForm.getValues().emailAddress,
+								emailAddress: resetPasswordForm.getValues().emailAddress,
 							},
 						})
 					}
@@ -116,9 +105,7 @@ export const FormForgotPassword = ({ handleChangeAuthMode }: AuthViewProps) => {
 		<Form
 			onSubmit={
 				forgotPasswordStep === 0
-					? requestPasswordRecoveryForm.onSubmit(
-							handleRequestPasswordRecovery,
-						)
+					? requestPasswordRecoveryForm.onSubmit(handleRequestPasswordRecovery)
 					: resetPasswordForm.onSubmit(handleResetPassword)
 			}
 			error={requestPasswordRecoveryError || resetPasswordError}
@@ -133,15 +120,12 @@ export const FormForgotPassword = ({ handleChangeAuthMode }: AuthViewProps) => {
 								leftSectionPointerEvents="none"
 								leftSection={<IconAt size={16} />}
 								size="md"
-								{...requestPasswordRecoveryForm.getInputProps(
-									'emailAddress',
-								)}
+								{...requestPasswordRecoveryForm.getInputProps('emailAddress')}
 							/>
 
 							<Text fz="sm">
-								Enter the email you used to create your account.
-								We'll send you a "reset code" so you can set a
-								new password.
+								Enter the email you used to create your account. We'll send you a
+								"reset code" so you can set a new password.
 							</Text>
 						</>
 					)}
@@ -149,9 +133,8 @@ export const FormForgotPassword = ({ handleChangeAuthMode }: AuthViewProps) => {
 					{forgotPasswordStep === 1 && (
 						<>
 							<Text fz="sm">
-								You will receive an email with a "reset code."
-								Enter that code here, then enter your new
-								password.
+								You will receive an email with a "reset code." Enter that code here,
+								then enter your new password.
 							</Text>
 
 							<TextInput
@@ -160,9 +143,7 @@ export const FormForgotPassword = ({ handleChangeAuthMode }: AuthViewProps) => {
 								leftSectionPointerEvents="none"
 								leftSection={<IconAt size={16} />}
 								size="md"
-								{...resetPasswordForm.getInputProps(
-									'emailAddress',
-								)}
+								{...resetPasswordForm.getInputProps('emailAddress')}
 							/>
 
 							<TextInput
@@ -189,20 +170,13 @@ export const FormForgotPassword = ({ handleChangeAuthMode }: AuthViewProps) => {
 					{error}
 
 					<Group mt="xl" justify="space-between">
-						<Button
-							variant="default"
-							size="md"
-							onClick={handleBack}
-						>
+						<Button variant="default" size="md" onClick={handleBack}>
 							Back
 						</Button>
 						<Button
 							size="md"
 							type="submit"
-							loading={
-								requestPasswordRecoveryLoading ||
-								resetPasswordLoading
-							}
+							loading={requestPasswordRecoveryLoading || resetPasswordLoading}
 						>
 							{forgotPasswordStep === 0 ? 'Next' : 'Reset'}
 						</Button>

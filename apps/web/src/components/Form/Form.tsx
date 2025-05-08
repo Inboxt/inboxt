@@ -33,16 +33,10 @@ export const Form = ({ children, onSubmit, error, setErrors }: FormProps) => {
 		if (!error) return null;
 
 		const parsed = parseError(error);
-		if (!parsed?.message || parsed.message === 'Invalid input provided')
-			return null;
+		if (!parsed?.message || parsed.message === 'Invalid input provided') return null;
 
 		return (
-			<Alert
-				icon={<IconAlertTriangleFilled />}
-				color="red"
-				variant="filled"
-				p="xs"
-			>
+			<Alert icon={<IconAlertTriangleFilled />} color="red" variant="filled" p="xs">
 				{parsed.message}
 			</Alert>
 		);

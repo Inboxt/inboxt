@@ -1,14 +1,13 @@
 {
-  "extends": "../../tsconfig.base.json",
-  "compilerOptions": {
-    "lib": ["ES2023"],
-    "moduleResolution": "Bundler",
-    "allowImportingTsExtensions": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "moduleDetection": "force",
-    "tsBuildInfoFile": "../../node_modules/.tmp/vite-node.tsbuildinfo"
-  },
-  "include": ["vite.config.mts"]
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"lib": ["ES2023"],
+		"moduleResolution": "Bundler",
+		"allowImportingTsExtensions": true,
+		"isolatedModules": true,
+		"noEmit": true,
+		"moduleDetection": "force",
+		"tsBuildInfoFile": "../../node_modules/.tmp/vite-node.tsbuildinfo"
+	},
+	"include": ["vite.config.mts"]
 }
-

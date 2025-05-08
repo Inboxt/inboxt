@@ -13,8 +13,7 @@ export const getSafeTextRanges = (range: Range): SageRange[] => {
 	let endOffset = range.endOffset;
 
 	if (startContainer.nodeType !== Node.TEXT_NODE) {
-		const candidate =
-			startContainer.childNodes[startOffset] || startContainer.firstChild;
+		const candidate = startContainer.childNodes[startOffset] || startContainer.firstChild;
 		const textNode =
 			candidate && candidate.nodeType === Node.TEXT_NODE
 				? candidate
@@ -27,9 +26,7 @@ export const getSafeTextRanges = (range: Range): SageRange[] => {
 
 	if (endContainer.nodeType !== Node.TEXT_NODE) {
 		const candidate =
-			endOffset > 0
-				? endContainer.childNodes[endOffset - 1]
-				: endContainer.lastChild;
+			endOffset > 0 ? endContainer.childNodes[endOffset - 1] : endContainer.lastChild;
 
 		if (candidate) {
 			if (candidate.nodeType !== Node.TEXT_NODE) {
@@ -54,10 +51,7 @@ export const getSafeTextRanges = (range: Range): SageRange[] => {
 			safeRanges.push({
 				node: currentNode,
 				start: currentNode === startContainer ? startOffset : 0,
-				end:
-					currentNode === endContainer
-						? endOffset
-						: currentNode.textContent.length,
+				end: currentNode === endContainer ? endOffset : currentNode.textContent.length,
 			});
 		}
 

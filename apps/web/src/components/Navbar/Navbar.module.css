@@ -1,5 +1,7 @@
 .navbar {
-	transition: width 0.3s, margin 0.3s;
+	transition:
+		width 0.3s,
+		margin 0.3s;
 }
 
 .closedNavbar {

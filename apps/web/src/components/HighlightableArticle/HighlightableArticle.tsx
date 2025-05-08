@@ -13,20 +13,13 @@ type ArticleWithHighlightsProps = {
 	content: string;
 };
 
-export const HighlightableArticle = ({
-	content,
-}: ArticleWithHighlightsProps) => {
+export const HighlightableArticle = ({ content }: ArticleWithHighlightsProps) => {
 	const { format } = Route.useSearch();
 
 	const isAboveMdScreen = useScreenQuery('md', 'above');
 	const containerRef = useRef(null);
-	const {
-		selectedText,
-		hasValidSelection,
-		highlightSelection,
-		rangeRect,
-		isFullyHighlighted,
-	} = useTextHighlighting(containerRef);
+	const { selectedText, hasValidSelection, highlightSelection, rangeRect, isFullyHighlighted } =
+		useTextHighlighting(containerRef);
 
 	const sanitizedContent = useMemo(
 		() => ({
@@ -40,65 +33,51 @@ export const HighlightableArticle = ({
 			{format === 'markdown' ? (
 				<Markdown>{content}</Markdown>
 			) : (
-				<Box
-					ref={containerRef}
-					dangerouslySetInnerHTML={sanitizedContent}
-				></Box>
+				<Box ref={containerRef} dangerouslySetInnerHTML={sanitizedContent}></Box>
 			)}
 
-			{selectedText &&
-				rangeRect &&
-				hasValidSelection &&
-				isAboveMdScreen && (
-					<Popover
-						opened
-						withArrow
-						position="top"
-						withinPortal
-						styles={{
-							dropdown: {
-								left:
-									rangeRect.left +
-									window.scrollX +
-									rangeRect.width / 2,
+			{selectedText && rangeRect && hasValidSelection && isAboveMdScreen && (
+				<Popover
+					opened
+					withArrow
+					position="top"
+					withinPortal
+					styles={{
+						dropdown: {
+							left: rangeRect.left + window.scrollX + rangeRect.width / 2,
+							transform: 'translateX(-50%)',
+						},
+					}}
+					classNames={{
+						arrow: classes.popoverArrow,
+						dropdown: classes.popoverDropdown,
+					}}
+					arrowSize={12}
+					radius={6}
+				>
+					<Popover.Target>
+						<Box
+							style={{
+								top: rangeRect.top + window.scrollY,
+								left: rangeRect.left + window.scrollX + rangeRect.width / 2,
 								transform: 'translateX(-50%)',
-							},
-						}}
-						classNames={{
-							arrow: classes.popoverArrow,
-							dropdown: classes.popoverDropdown,
-						}}
-						arrowSize={12}
-						radius={6}
-					>
-						<Popover.Target>
-							<Box
-								style={{
-									top: rangeRect.top + window.scrollY,
-									left:
-										rangeRect.left +
-										window.scrollX +
-										rangeRect.width / 2,
-									transform: 'translateX(-50%)',
-								}}
-								className={classes.popoverContent}
-							/>
-						</Popover.Target>
-						<Popover.Dropdown>
-							<Button
-								variant="transparent"
-								color="white"
-								size="compact-sm"
-								leftSection={<IconHighlight size={21} />}
-								onClick={highlightSelection}
-							>
-								{isFullyHighlighted()
-									? 'Unhighlight'
-									: 'Highlight'}
-							</Button>
-						</Popover.Dropdown>
-					</Popover>
-				)}
+							}}
+							className={classes.popoverContent}
+						/>
+					</Popover.Target>
+					<Popover.Dropdown>
+						<Button
+							variant="transparent"
+							color="white"
+							size="compact-sm"
+							leftSection={<IconHighlight size={21} />}
+							onClick={highlightSelection}
+						>
+							{isFullyHighlighted() ? 'Unhighlight' : 'Highlight'}
+						</Button>
+					</Popover.Dropdown>
+				</Popover>
+			)}
 		</>
 	);
 };

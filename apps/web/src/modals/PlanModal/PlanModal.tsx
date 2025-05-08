@@ -154,10 +154,7 @@ export const PlanModal = ({
 
 			{withFullMode && (
 				<Group ml="auto" gap="md">
-					<Button
-						variant="default"
-						onClick={() => context.closeModal(id)}
-					>
+					<Button variant="default" onClick={() => context.closeModal(id)}>
 						Cancel
 					</Button>
 					<Button>Continue to payment</Button>

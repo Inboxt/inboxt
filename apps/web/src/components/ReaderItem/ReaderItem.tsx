@@ -75,12 +75,7 @@ export const ReaderItem = ({
 				/>
 
 				<Stack gap={0} flex={1}>
-					<Group
-						wrap="nowrap"
-						gap="md"
-						justify="space-between"
-						pos="relative"
-					>
+					<Group wrap="nowrap" gap="md" justify="space-between" pos="relative">
 						<Text fw="700" lineClamp={1} maw="70%">
 							{title}
 						</Text>

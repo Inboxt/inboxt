@@ -42,16 +42,12 @@ export const Auth = () => {
 						<AppName size="lg" />
 
 						<Title order={4}>
-							Your inbox for articles and newsletters — simple,
-							clean, yours.
+							Your inbox for articles and newsletters — simple, clean, yours.
 						</Title>
 					</Stack>
 
 					<Stack>
-						<Button
-							size="md"
-							onClick={() => handleChangeAuthMode('signup')}
-						>
+						<Button size="md" onClick={() => handleChangeAuthMode('signup')}>
 							Create account
 						</Button>
 						<Button
@@ -89,10 +85,7 @@ export const Auth = () => {
 							<Anchor fz="sm">Docs</Anchor>
 							<Anchor fz="sm">Privacy</Anchor>
 							<Anchor fz="sm">Terms</Anchor>
-							<Anchor
-								fz="sm"
-								onClick={() => modals.openPlanModal(false)}
-							>
+							<Anchor fz="sm" onClick={() => modals.openPlanModal(false)}>
 								Pricing
 							</Anchor>
 						</Group>
@@ -112,8 +105,7 @@ export const Auth = () => {
 
 		case 'signup':
 			title = 'Create Account';
-			description =
-				'Start saving and reading your favorite content today';
+			description = 'Start saving and reading your favorite content today';
 			break;
 
 		case 'forgot-password':
@@ -129,12 +121,7 @@ export const Auth = () => {
 
 	return (
 		<Flex mih="100vh">
-			<Box
-				p={42}
-				pb={160}
-				className={classes.headerContainer}
-				visibleFrom="sm"
-			>
+			<Box p={42} pb={160} className={classes.headerContainer} visibleFrom="sm">
 				<Stack justify="flex-end" align="flex-end" ta="end" gap="xs">
 					<Title size={54} c="blue" fw={800}>
 						{title}
@@ -152,25 +139,13 @@ export const Auth = () => {
 					</Title>
 
 					{mode === 'signup' && (
-						<FormCreateAccount
-							handleChangeAuthMode={handleChangeAuthMode}
-						/>
+						<FormCreateAccount handleChangeAuthMode={handleChangeAuthMode} />
 					)}
-					{mode === 'login' && (
-						<FormLogin
-							handleChangeAuthMode={handleChangeAuthMode}
-						/>
-					)}
+					{mode === 'login' && <FormLogin handleChangeAuthMode={handleChangeAuthMode} />}
 					{mode === 'forgot-password' && (
-						<FormForgotPassword
-							handleChangeAuthMode={handleChangeAuthMode}
-						/>
+						<FormForgotPassword handleChangeAuthMode={handleChangeAuthMode} />
 					)}
-					{mode === 'demo' && (
-						<DemoLogin
-							handleChangeAuthMode={handleChangeAuthMode}
-						/>
-					)}
+					{mode === 'demo' && <DemoLogin handleChangeAuthMode={handleChangeAuthMode} />}
 				</Stack>
 			</Box>
 		</Flex>

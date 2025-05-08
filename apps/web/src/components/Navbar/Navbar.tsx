@@ -69,11 +69,7 @@ export const Navbar = ({ opened, toggle }: NavbarProps) => {
 				/>
 			))}
 
-			<Divider
-				m="sm"
-				label={opened ? 'Labels' : undefined}
-				my={opened ? 0 : 'xxs'}
-			/>
+			<Divider m="sm" label={opened ? 'Labels' : undefined} my={opened ? 0 : 'xxs'} />
 
 			{BACKEND_LABELS.map((label) => (
 				<NavbarLink

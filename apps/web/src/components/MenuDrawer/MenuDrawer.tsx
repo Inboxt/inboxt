@@ -21,17 +21,11 @@ type MenuDrawerProps = {
 };
 
 // todo: handle links?
-export const MenuDrawer = ({
-	items,
-	children,
-	label,
-	height = 300,
-}: MenuDrawerProps) => {
+export const MenuDrawer = ({ items, children, label, height = 300 }: MenuDrawerProps) => {
 	const isAboveXsScreen = useScreenQuery('xs', 'above');
 	const iconSize = isAboveXsScreen ? 16 : 21;
 
-	const [drawerOpened, { open: openDrawer, close: closeDrawer }] =
-		useDisclosure(false);
+	const [drawerOpened, { open: openDrawer, close: closeDrawer }] = useDisclosure(false);
 
 	const adjustIconSize = (icon: ReactElement<{ size?: number }>) => {
 		return cloneElement(icon, { size: iconSize });

@@ -1,17 +1,6 @@
 import { useState } from 'react';
-import {
-	Group,
-	Text,
-	TextInput,
-	Button,
-	ActionIcon,
-	Flex,
-} from '@mantine/core';
-import {
-	IconLabelImportantFilled,
-	IconEdit,
-	IconTrash,
-} from '@tabler/icons-react';
+import { Group, Text, TextInput, Button, ActionIcon, Flex } from '@mantine/core';
+import { IconLabelImportantFilled, IconEdit, IconTrash } from '@tabler/icons-react';
 import { LabelsColorInput } from '../LabelsColorInput';
 import { useScreenQuery } from '../../hooks/useScreenQuery.tsx';
 
@@ -19,10 +8,7 @@ type EditableLabelItemProps = {
 	label: { id: number; name: string; color: string };
 	isEditing: boolean;
 	onEditStart: () => void;
-	onEditSave: (
-		id: number,
-		editedLabel: { name: string; color: string },
-	) => void;
+	onEditSave: (id: number, editedLabel: { name: string; color: string }) => void;
 	onEditCancel: () => void;
 };
 
@@ -55,11 +41,7 @@ export const EditableLabelItem = ({
 			)}
 
 			{isEditing ? (
-				<Flex
-					gap="xs"
-					flex={1}
-					direction={{ base: 'column', lg: 'row' }}
-				>
+				<Flex gap="xs" flex={1} direction={{ base: 'column', lg: 'row' }}>
 					<TextInput
 						value={editedLabel.name}
 						onChange={(e) =>
@@ -73,15 +55,9 @@ export const EditableLabelItem = ({
 					/>
 					<LabelsColorInput
 						value={editedLabel.color}
-						onChange={(color) =>
-							setEditedLabel((prev) => ({ ...prev, color }))
-						}
+						onChange={(color) => setEditedLabel((prev) => ({ ...prev, color }))}
 					/>
-					<Group
-						ml={isAboveLgScreen ? 'auto' : 0}
-						gap="xs"
-						grow={!isAboveLgScreen}
-					>
+					<Group ml={isAboveLgScreen ? 'auto' : 0} gap="xs" grow={!isAboveLgScreen}>
 						<Button onClick={onEditCancel} variant="default">
 							Cancel
 						</Button>
