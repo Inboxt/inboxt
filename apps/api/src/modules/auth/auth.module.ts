@@ -6,16 +6,10 @@ import { UserModule } from '../user/user.module';
 import { PasswordService } from './services/password.service';
 import { JwtModule } from '../jwt/jwt.module';
 import { MailModule } from '../mail/mail.module';
-import { VerificationService } from './services/verification.service';
 
 @Module({
 	imports: [JwtModule, UserModule, MailModule],
-	providers: [
-		AuthService,
-		AuthResolver,
-		PasswordService,
-		VerificationService,
-	],
+	providers: [AuthService, AuthResolver, PasswordService],
 	exports: [AuthService],
 })
 export class AuthModule {}

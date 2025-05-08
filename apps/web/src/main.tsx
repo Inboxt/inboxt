@@ -6,19 +6,22 @@ import ReactDOM from 'react-dom/client';
 import { RouterProvider, createRouter } from '@tanstack/react-router';
 import { ModalsProvider } from '@mantine/modals';
 import { ApolloProvider } from '@apollo/client';
+import { MantineProvider } from '@mantine/core';
 
-import { routeTree } from './routeTree.gen';
-import { theme } from './theme';
-import { ReaderProvider } from './context/ReaderContext.tsx';
 import { InstallModal } from '@modals/InstallModal';
 import { LabelsModal } from '@modals/LabelsModal';
 import { LabelsSelectionModal } from '@modals/LabelsSelectionModal';
 import { PlanModal } from '@modals/PlanModal';
 import { ProfileModal } from '@modals/ProfileModal';
-import { MantineProvider } from '@mantine/core';
 import { CreateLabelModal } from '@modals/CreateLabelModal';
-import { client } from './lib/apolloClient.ts';
 import { VerifyEmailModal } from '@modals/VerifyEmailModal';
+import { NewslettersModal } from '@modals/NewslettersModal';
+
+import { routeTree } from './routeTree.gen';
+import { theme } from './theme';
+import { ReaderProvider } from './context/ReaderContext.tsx';
+
+import { client } from './lib/apolloClient.ts';
 
 export const router = createRouter({
 	routeTree,
@@ -50,6 +53,7 @@ if (!rootElement.innerHTML) {
 								profile: ProfileModal,
 								createLabel: CreateLabelModal,
 								verifyEmail: VerifyEmailModal,
+								newsletters: NewslettersModal,
 							}}
 						>
 							<RouterProvider router={router} />

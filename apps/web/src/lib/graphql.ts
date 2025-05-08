@@ -1,13 +1,22 @@
 import { gql } from '@apollo/client';
 
+export const USER_FRAGMENT = gql`
+	fragment UserFragment on User {
+		id
+		emailAddress
+		isEmailVerified
+		username
+		pendingEmailAddress
+	}
+`;
+
 export const ACTIVE_USER = gql`
 	query me {
 		me {
-			id
-			emailAddress
-			isEmailVerified
+			...UserFragment
 		}
 	}
+	${USER_FRAGMENT}
 `;
 
 export const SIGN_IN = gql`
@@ -64,4 +73,13 @@ export const RESET_PASSWORD = gql`
 			success
 		}
 	}
+`;
+
+export const UPDATE_ACCOUNT = gql`
+	mutation updateAccount($data: UpdateAccountInput!) {
+		updateAccount(data: $data) {
+			...UserFragment
+		}
+	}
+	${USER_FRAGMENT}
 `;

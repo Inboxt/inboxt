@@ -1,5 +1,8 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
+import dayjs from 'dayjs';
+import { verify } from 'argon2';
+
 import {
 	signInSchema,
 	createAccountSchema,
@@ -15,7 +18,6 @@ import { PasswordService } from './services/password.service';
 import { VerifyEmailInput } from './dto/verify-email.input';
 import { CreateAccountInput } from '../user/dto/create-account.input';
 import { MailService } from '../mail/mail.service';
-import { VerificationService } from './services/verification.service';
 import { RequestPasswordRecoveryInput } from './dto/request-password-recovery.input';
 import { ResetPasswordInput } from './dto/reset-password.input';
 
@@ -26,7 +28,6 @@ export class AuthService {
 		private userService: UserService,
 		private passwordService: PasswordService,
 		private mailService: MailService,
-		private verificationService: VerificationService,
 	) {}
 
 	createJwtToken(
@@ -55,12 +56,49 @@ export class AuthService {
 		return this.jwtService.decode(token);
 	}
 
+	async verifyEmailCode(userId: number, code: string) {
+		/*----------  Validation  ----------*/
+		const user = await this.userService.get({
+			where: { id: userId },
+		});
+
+		const isInvalid =
+			!user ||
+			!user.emailVerifyCode ||
+			!user.emailVerifyExpiry ||
+			dayjs().isAfter(dayjs(user.resetPasswordExpiry)) ||
+			!(await verify(user.emailVerifyCode, code));
+
+		if (isInvalid) {
+			throw new AppException(
+				'Invalid or expired verification code',
+				HttpStatus.BAD_REQUEST,
+			);
+		}
+
+		if (user.pendingEmailAddress) {
+			const isDuplicatedEmail = await this.userService.get({
+				where: { emailAddress: user.pendingEmailAddress },
+			});
+
+			if (isDuplicatedEmail) {
+				throw new AppException(
+					'Invalid or expired verification code',
+					HttpStatus.BAD_REQUEST,
+				);
+			}
+		}
+
+		/*----------  Processing  ----------*/
+		await this.userService.markEmailAsVerified(userId);
+	}
+
 	async verifyEmail(userId: number, data: VerifyEmailInput) {
 		/*----------  Validation  ----------*/
 		await verifyEmailSchema.parseAsync(data);
 
 		/*----------  Processing  ----------*/
-		return this.verificationService.verifyEmailCode(userId, data.code);
+		return this.verifyEmailCode(userId, data.code);
 	}
 
 	signOut(context: GqlContext) {
@@ -125,30 +163,6 @@ export class AuthService {
 		await this.createTokens(emailAddress, context);
 	}
 
-	async sendVerificationEmail(userId: number) {
-		/*----------  Validation  ----------*/
-		const existingUser = await this.userService.get({
-			where: { id: userId },
-		});
-
-		if (!existingUser || existingUser?.isEmailVerified) {
-			throw new AppException(
-				'There was an issue with your email verification request',
-				HttpStatus.BAD_REQUEST,
-			);
-		}
-
-		/*----------  Processing  ----------*/
-		const verifyEmailCode =
-			await this.verificationService.createEmailVerification(userId);
-
-		return this.mailService.sendEmail(
-			existingUser.emailAddress,
-			'Confirm your email address',
-			`Use this code to verify your email address: ${verifyEmailCode}`,
-		);
-	}
-
 	async createUser(data: CreateAccountInput, context: any) {
 		/*----------  Processing  ----------*/
 		await createAccountSchema.parseAsync(data);
@@ -172,7 +186,7 @@ export class AuthService {
 			password: hashedPassword,
 		});
 
-		await this.sendVerificationEmail(user.id);
+		await this.userService.sendVerificationEmail(user.id);
 		await this.createTokens(user.emailAddress, context);
 	}
 

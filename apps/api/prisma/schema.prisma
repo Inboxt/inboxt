@@ -20,6 +20,7 @@ model user {
   logins              Int       @default(0)
   lastLogin           DateTime? @db.Timestamp(6)
   emailAddress        String    @unique
+  pendingEmailAddress String?
   password            String?
   username            String?
   isEmailVerified     Boolean   @default(false)

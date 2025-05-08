@@ -72,6 +72,15 @@ export const modals = {
 		});
 	},
 
+	openNewslettersModal: () => {
+		return mantineModals.openContextModal({
+			modal: 'newsletters',
+			size: 540,
+			title: 'Newsletters',
+			innerProps: {},
+		});
+	},
+
 	closeAll: () => {
 		mantineModals.closeAll();
 	},

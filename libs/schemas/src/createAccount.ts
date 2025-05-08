@@ -1,6 +1,6 @@
 import { z } from './zod';
 
-export const createAccountSchema = z.object({
+export const rules = {
 	password: z.string().password(),
 	emailAddress: z.string().email(),
 	username: z
@@ -9,4 +9,8 @@ export const createAccountSchema = z.object({
 			message:
 				'Invalid username. Must be 3-20 characters, alphanumeric, and can include ".", "_", or "-".',
 		}),
+};
+
+export const createAccountSchema = z.object({
+	...rules,
 });

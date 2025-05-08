@@ -56,14 +56,6 @@ export class AuthResolver {
 		return VOID_RESPONSE;
 	}
 
-	@Mutation(() => Void)
-	async resendVerificationEmail(
-		@ActiveUserMeta() activeUser: ActiveUserMeta,
-	) {
-		await this.authService.sendVerificationEmail(activeUser.userId);
-		return VOID_RESPONSE;
-	}
-
 	@Public()
 	@Mutation(() => Void)
 	async requestPasswordRecovery(

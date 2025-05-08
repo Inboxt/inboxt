@@ -4,11 +4,12 @@ import {
 	IconDownload,
 	IconExternalLink,
 	IconLogout,
+	IconMail,
 	IconSettings,
 	IconTags,
 	IconWallet,
 } from '@tabler/icons-react';
-import { useMutation } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { useMemo } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 
@@ -19,6 +20,7 @@ import { client } from '../../lib/apolloClient.ts';
 
 export const UserMenu = () => {
 	const navigate = useNavigate();
+	const { data } = useQuery(ACTIVE_USER);
 	const [signOut] = useMutation(SIGN_OUT, {
 		refetchQueries: [ACTIVE_USER],
 	});
@@ -53,6 +55,11 @@ export const UserMenu = () => {
 				action: modals.openLabelsModal,
 			},
 			{
+				label: 'Newsletter',
+				icon: <IconMail />,
+				action: modals.openNewslettersModal,
+			},
+			{
 				label: 'Import Data',
 				icon: <IconCloudUpload />,
 				action: () => console.log('Roadmap'),
@@ -74,7 +81,7 @@ export const UserMenu = () => {
 	return (
 		<MenuDrawer items={USER_MENU_ITEMS} label="Quick Actions" height={390}>
 			<Avatar
-				name="Datguyducky"
+				name={data?.me?.username || 'User'}
 				color="initials"
 				allowedInitialsColors={['primary']}
 				radius={4}

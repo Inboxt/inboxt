@@ -13,6 +13,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 		logins: { type: 'integer', notNull: true, default: 0 },
 		lastLogin: 'timestamp',
 		emailAddress: { type: 'text', notNull: true, unique: true },
+		pendingEmailAddress: 'text',
 		password: 'text',
 		username: 'text',
 		isEmailVerified: { type: 'boolean', notNull: true, default: false },
