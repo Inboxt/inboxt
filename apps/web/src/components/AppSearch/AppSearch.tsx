@@ -39,7 +39,7 @@ export const AppSearch = () => {
 			variant="filled"
 			placeholder="Search for keywords or labels..."
 			leftSection={<IconSearch size={18} />}
-			w="100%"
+			flex="1"
 			value={search}
 			onChange={(e) => setSearch(e.currentTarget.value)}
 		/>

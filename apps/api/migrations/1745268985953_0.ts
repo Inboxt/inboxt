@@ -3,6 +3,8 @@ import { ColumnDefinitions, MigrationBuilder } from 'node-pg-migrate';
 export const shorthands: ColumnDefinitions | undefined = undefined;
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
+	pgm.createType('inbox_item_type', ['NEWSLETTER', 'ARTICLE']);
+
 	pgm.createTable('user', {
 		id: 'id',
 		createdAt: {
@@ -22,6 +24,31 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 		resetPasswordCode: 'text',
 		resetPasswordExpiry: 'timestamp',
 	});
+
+	pgm.createTable('inbox_item', {
+		id: 'id',
+		createdAt: {
+			type: 'timestamp',
+			notNull: true,
+			default: pgm.func('current_timestamp'),
+		},
+		userId: {
+			type: 'integer',
+			notNull: true,
+			references: 'user',
+			onDelete: 'CASCADE',
+		},
+		originalUrl: 'text',
+		type: {
+			type: 'inbox_item_type',
+			notNull: true,
+		},
+	});
 }
 
-export async function down(pgm: MigrationBuilder): Promise<void> {}
+export async function down(pgm: MigrationBuilder): Promise<void> {
+	pgm.dropType('inbox_item_type');
+
+	pgm.dropTable('user');
+	pgm.dropTable('inbox-item');
+}

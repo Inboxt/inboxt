@@ -1,5 +1,7 @@
-import { ActionIcon, Box, Burger, Flex, Group, Stack, Text } from '@mantine/core';
+import { ActionIcon, Box, Burger, Button, Flex, Group, Stack, Text } from '@mantine/core';
 import { IconArrowLeft } from '@tabler/icons-react';
+
+import { modals } from '@modals/modals.ts';
 
 import classes from './Header.module.css';
 
@@ -93,6 +95,12 @@ export const Header = ({ opened, toggle }: HeaderProps) => {
 					</>
 				) : (
 					<AppSearch />
+				)}
+
+				{!isSelected && (
+					<Button variant="light" onClick={modals.openAddContentModal}>
+						Add Link
+					</Button>
 				)}
 
 				{!isSelected && !isBelowLgScreen && <UserMenu />}

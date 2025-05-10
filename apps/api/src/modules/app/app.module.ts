@@ -19,6 +19,7 @@ import { GlobalExceptionFilter } from '../../exception-filters/global-exception.
 import { config } from '../../config/config';
 import { GraphqlConfig } from '../../config/config.interface';
 import { TaskScheduleModule } from '../tasks-schedule/tasks-schedule.module';
+import { InboxItemModule } from '../inbox-item/inbox-item.module';
 
 @Module({
 	imports: [
@@ -57,6 +58,7 @@ import { TaskScheduleModule } from '../tasks-schedule/tasks-schedule.module';
 		ActiveUserModule,
 		MailModule,
 		TaskScheduleModule,
+		InboxItemModule,
 	],
 	providers: [
 		PrismaService,

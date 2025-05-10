@@ -17,6 +17,7 @@ import { CreateLabelModal } from '@modals/CreateLabelModal';
 import { VerifyEmailModal } from '@modals/VerifyEmailModal';
 import { NewslettersModal } from '@modals/NewslettersModal';
 import { DeleteAccountModal } from '@modals/DeleteAccountModal';
+import { AddContentModal } from '@modals/AddContentModal';
 
 import { routeTree } from './routeTree.gen';
 import { theme } from './theme';
@@ -56,6 +57,7 @@ if (!rootElement.innerHTML) {
 								verifyEmail: VerifyEmailModal,
 								newsletters: NewslettersModal,
 								deleteAccount: DeleteAccountModal,
+								addContent: AddContentModal,
 							}}
 						>
 							<RouterProvider router={router} />

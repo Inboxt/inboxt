@@ -91,6 +91,15 @@ export const modals = {
 		});
 	},
 
+	openAddContentModal: () => {
+		return mantineModals.openContextModal({
+			modal: 'addContent',
+			size: 540,
+			title: 'Add',
+			innerProps: {},
+		});
+	},
+
 	closeAll: () => {
 		mantineModals.closeAll();
 	},
