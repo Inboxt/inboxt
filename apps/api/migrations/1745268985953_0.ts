@@ -4,6 +4,7 @@ export const shorthands: ColumnDefinitions | undefined = undefined;
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
 	pgm.createType('inbox_item_type', ['NEWSLETTER', 'ARTICLE']);
+	pgm.createType('user_plan', ['DEMO', 'FREE']);
 
 	pgm.createTable('user', {
 		id: 'id',
@@ -23,6 +24,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 		emailVerifyExpiry: 'timestamp',
 		resetPasswordCode: 'text',
 		resetPasswordExpiry: 'timestamp',
+		plan: { type: 'user_plan', notNull: true, default: 'FREE' },
 	});
 
 	pgm.createTable('inbox_item', {
@@ -48,6 +50,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
 	pgm.dropType('inbox_item_type');
+	pgm.dropType('user_plan');
 
 	pgm.dropTable('user');
 	pgm.dropTable('inbox-item');

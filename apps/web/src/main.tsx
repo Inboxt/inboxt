@@ -11,7 +11,6 @@ import { MantineProvider } from '@mantine/core';
 import { InstallModal } from '@modals/InstallModal';
 import { LabelsModal } from '@modals/LabelsModal';
 import { LabelsSelectionModal } from '@modals/LabelsSelectionModal';
-import { PlanModal } from '@modals/PlanModal';
 import { ProfileModal } from '@modals/ProfileModal';
 import { CreateLabelModal } from '@modals/CreateLabelModal';
 import { VerifyEmailModal } from '@modals/VerifyEmailModal';
@@ -51,7 +50,6 @@ if (!rootElement.innerHTML) {
 								install: InstallModal,
 								labels: LabelsModal,
 								labelsSelection: LabelsSelectionModal,
-								plan: PlanModal,
 								profile: ProfileModal,
 								createLabel: CreateLabelModal,
 								verifyEmail: VerifyEmailModal,

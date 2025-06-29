@@ -1,4 +1,5 @@
 import {
+	Card,
 	Stack,
 	TextInput,
 	Button,
@@ -7,16 +8,18 @@ import {
 	Text,
 	SegmentedControl,
 	Title,
-	Divider,
+	Accordion,
+	Alert,
+	SimpleGrid,
 	Skeleton,
 	useMantineColorScheme,
 	useComputedColorScheme,
-	Alert,
 } from '@mantine/core';
 import { IconBell, IconDatabase, IconHighlight } from '@tabler/icons-react';
 import { ContextModalProps } from '@mantine/modals';
 import { useMutation, useQuery } from '@apollo/client';
 import { useForm, zodResolver } from '@mantine/form';
+import { useEffect } from 'react';
 
 import { updateAccountSchema } from '@inbox-reader/schemas';
 
@@ -36,11 +39,20 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 	const form = useForm({
 		mode: 'uncontrolled',
 		initialValues: {
-			username: data?.me?.username ?? '',
-			emailAddress: data?.me?.emailAddress ?? '',
+			username: '',
+			emailAddress: '',
 		},
 		validate: zodResolver(updateAccountSchema),
 	});
+
+	useEffect(() => {
+		if (data?.me) {
+			form.initialize({
+				username: data.me.username,
+				emailAddress: data.me.emailAddress,
+			});
+		}
+	}, [data?.me]);
 
 	const handleUpdateProfile = async (values: typeof form.values) => {
 		await updateProfile({
@@ -68,41 +80,27 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 		<Form onSubmit={form.onSubmit(handleUpdateProfile)} error={updateProfileError}>
 			{({ error }) => (
 				<Stack gap="xl">
-					<Stack>
+					<Card withBorder radius="md">
 						<Skeleton visible={loading}>
-							<TextInput
-								label="Name"
-								placeholder="Enter your name"
-								{...form.getInputProps('username')}
-							/>
+							<SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+								<TextInput label="Name" {...form.getInputProps('username')} />
+								<TextInput label="Email" {...form.getInputProps('emailAddress')} />
+							</SimpleGrid>
+							{data?.me?.pendingEmailAddress && (
+								<Alert color="yellow" icon={<IconBell />} mt="sm">
+									Verification email sent to <b>{data.me.pendingEmailAddress}</b>.
+									Your email will be updated once verified.
+								</Alert>
+							)}
 						</Skeleton>
-
-						<Skeleton visible={loading}>
-							<Stack gap="xxs">
-								<TextInput
-									label="Email address"
-									placeholder="Enter your email address"
-									{...form.getInputProps('emailAddress')}
-								/>
-
-								{data?.me?.pendingEmailAddress && (
-									<Alert color="yellow" icon={<IconBell />} p="xxs">
-										{`Verification email sent to ${data.me.pendingEmailAddress}. Your email will be
-										updated once verified.`}
-									</Alert>
-								)}
-							</Stack>
-						</Skeleton>
-
 						{error}
-					</Stack>
+					</Card>
 
-					<Divider />
-
-					<Stack gap="md">
+					<Card withBorder radius="md">
 						<Title order={5}>Theme</Title>
 						<SegmentedControl
 							fullWidth
+							mt="sm"
 							color={computedColorScheme === 'dark' ? undefined : 'dark'}
 							value={colorScheme}
 							onChange={setColorScheme}
@@ -112,48 +110,79 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 								{ label: 'Dark', value: 'dark' },
 							]}
 						/>
-					</Stack>
+					</Card>
 
-					<Divider />
+					<Card withBorder radius="md">
+						<Group justify="space-between">
+							<Stack gap="xxxs">
+								<Title order={5}>Newsletters</Title>
 
-					<Stack gap="md">
+								<Text size="xs" c="dimmed">
+									2 of 5 newsletter addresses used
+								</Text>
+
+								<Text size="xs" c="dimmed">
+									Create private email addresses to receive newsletters inside
+									Inbox-Reader.
+								</Text>
+							</Stack>
+
+							<Button size="xs" variant="light" onClick={modals.openNewslettersModal}>
+								Manage
+							</Button>
+						</Group>
+					</Card>
+
+					<Card withBorder radius="md">
 						<Title order={5}>Storage Usage</Title>
 						<Skeleton visible={loading}>
-							<Stack gap="xs">
+							<Stack gap="xs" mt="sm">
 								<Progress
 									value={storagePercentage}
 									size="sm"
-									color="blue"
 									radius="md"
+									color="blue"
 								/>
 								<Text size="xs" c="dimmed">
 									{usedStorage}GB of {totalStorage}GB used
 								</Text>
 							</Stack>
 						</Skeleton>
-					</Stack>
+					</Card>
 
-					<Divider />
+					<Accordion variant="separated" radius="md">
+						<Accordion.Item value="export">
+							<Accordion.Control>Export Your Data</Accordion.Control>
+							<Accordion.Panel>
+								<Stack gap="xs">
+									<Text size="sm">
+										You can request data export once per day. The export will be
+										sent to your registered email address and should arrive
+										within an hour.
+									</Text>
 
-					<Stack gap="xs">
-						<Title order={5}>Export Data</Title>
+									<Text size="xs" c="dimmed">
+										Download link will be valid for 24 hours.
+									</Text>
 
-						<Text>
-							You can request data export once per day. The export will be sent to
-							your registered email address, and you should receive it within an hour.
-							The download link will remain valid for 24 hours.
-						</Text>
-
-						<Group grow>
-							<Button leftSection={<IconDatabase size={16} />} variant="default">
-								Export Full Account Data
-							</Button>
-
-							<Button leftSection={<IconHighlight size={16} />} variant="default">
-								Export Highlights
-							</Button>
-						</Group>
-					</Stack>
+									<Group grow>
+										<Button
+											leftSection={<IconDatabase size={16} />}
+											variant="default"
+										>
+											Export Full Account Data
+										</Button>
+										<Button
+											leftSection={<IconHighlight size={16} />}
+											variant="default"
+										>
+											Export Highlights
+										</Button>
+									</Group>
+								</Stack>
+							</Accordion.Panel>
+						</Accordion.Item>
+					</Accordion>
 
 					<Group justify="space-between">
 						<Button

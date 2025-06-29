@@ -20,8 +20,7 @@ export default defineConfig(({ mode }) => {
 		plugins: [TanStackRouterVite(), react(), tsconfigPaths()],
 		resolve: {
 			alias: {
-				'@tabler/icons-react':
-					'@tabler/icons-react/dist/esm/icons/index.mjs',
+				'@tabler/icons-react': '@tabler/icons-react/dist/esm/icons/index.mjs',
 			},
 		},
 		optimizeDeps: {

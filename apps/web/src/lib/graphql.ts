@@ -8,6 +8,7 @@ export const USER_FRAGMENT = gql`
 		isEmailVerified
 		username
 		pendingEmailAddress
+		plan
 	}
 `;
 

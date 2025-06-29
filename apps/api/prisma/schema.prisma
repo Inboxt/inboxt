@@ -28,6 +28,7 @@ model user {
   emailVerifyExpiry   DateTime?    @db.Timestamp(6)
   resetPasswordCode   String?
   resetPasswordExpiry DateTime?    @db.Timestamp(6)
+  plan                user_plan    @default(FREE)
   inbox_item          inbox_item[]
 }
 
@@ -43,4 +44,9 @@ model inbox_item {
 enum inbox_item_type {
   NEWSLETTER
   ARTICLE
+}
+
+enum user_plan {
+  DEMO
+  FREE
 }

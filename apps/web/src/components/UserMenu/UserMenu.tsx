@@ -2,12 +2,10 @@ import { Avatar } from '@mantine/core';
 import {
 	IconCloudUpload,
 	IconDownload,
-	IconExternalLink,
 	IconLogout,
 	IconMail,
 	IconSettings,
 	IconTags,
-	IconWallet,
 } from '@tabler/icons-react';
 import { useMutation, useQuery } from '@apollo/client';
 import { useMemo } from 'react';
@@ -40,29 +38,19 @@ export const UserMenu = () => {
 				action: modals.openProfileModal,
 			},
 			{
-				label: 'Manage Plan',
-				icon: <IconWallet />,
-				action: modals.openPlanModal,
-			},
-			{
-				label: 'Roadmap',
-				icon: <IconExternalLink />,
-				action: () => console.log('Roadmap'),
-			},
-			{
-				label: 'All Labels',
-				icon: <IconTags />,
-				action: modals.openLabelsModal,
-			},
-			{
-				label: 'Newsletter',
+				label: 'Newsletters',
 				icon: <IconMail />,
 				action: modals.openNewslettersModal,
 			},
 			{
+				label: 'Labels',
+				icon: <IconTags />,
+				action: modals.openLabelsModal,
+			},
+			{
 				label: 'Import Data',
 				icon: <IconCloudUpload />,
-				action: () => console.log('Roadmap'),
+				action: () => console.log('Import'),
 			},
 			{
 				label: 'Install',

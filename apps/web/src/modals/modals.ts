@@ -31,18 +31,6 @@ export const modals = {
 		});
 	},
 
-	openPlanModal: (fullMode = true) => {
-		return mantineModals.openContextModal({
-			modal: 'plan',
-			size: 840,
-			centered: true,
-			title: fullMode ? 'Manage Plan' : 'Pricing',
-			innerProps: {
-				fullMode,
-			},
-		});
-	},
-
 	openProfileModal: () => {
 		return mantineModals.openContextModal({
 			modal: 'profile',

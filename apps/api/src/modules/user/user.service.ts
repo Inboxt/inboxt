@@ -20,8 +20,8 @@ export class UserService {
 		private mailService: MailService,
 	) {}
 
-	async get(query: Prisma.userFindUniqueArgs) {
-		return this.prisma.user.findUnique(query);
+	async get(query: Prisma.userFindFirstArgs) {
+		return this.prisma.user.findFirst(query);
 	}
 
 	async getMany(query: Prisma.userFindManyArgs) {

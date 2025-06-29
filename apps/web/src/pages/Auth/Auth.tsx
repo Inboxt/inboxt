@@ -19,7 +19,6 @@ import { FormLogin } from '../../forms/FormLogin.tsx';
 import { AppName } from '../../components/AppName';
 import { FormForgotPassword } from '../../forms/FormForgotPassword.tsx';
 import { DemoLogin } from '../../components/DemoLogin';
-import { modals } from '@modals/modals.ts';
 import { AuthMode, Route } from '../../routes/auth.route.tsx';
 
 export type AuthViewProps = {
@@ -42,7 +41,7 @@ export const Auth = () => {
 						<AppName size="lg" />
 
 						<Title order={4}>
-							Your inbox for articles and newsletters — simple, clean, yours.
+							Save it now. Read it later. Your inbox for the internet.
 						</Title>
 					</Stack>
 
@@ -66,7 +65,7 @@ export const Auth = () => {
 							onClick={() => handleChangeAuthMode('demo')}
 							component="button"
 						>
-							Try the app in demo mode!
+							Just curious? Try the demo first!
 						</Anchor>
 					</Stack>
 
@@ -85,9 +84,7 @@ export const Auth = () => {
 							<Anchor fz="sm">Docs</Anchor>
 							<Anchor fz="sm">Privacy</Anchor>
 							<Anchor fz="sm">Terms</Anchor>
-							<Anchor fz="sm" onClick={() => modals.openPlanModal(false)}>
-								Pricing
-							</Anchor>
+							<Anchor fz="sm">Roadmap</Anchor>
 						</Group>
 					</Box>
 				</Flex>

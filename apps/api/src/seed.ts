@@ -1,6 +1,13 @@
 import { hash } from 'argon2';
+import * as dotenv from 'dotenv';
+import { join } from 'path';
+
+dotenv.config({
+	path: join(__dirname, '../../../.env'),
+});
 
 import { PrismaClient } from '../prisma/client';
+import { UserPlan } from './enums/user-plan.enum';
 
 const prisma = new PrismaClient();
 
@@ -38,14 +45,18 @@ async function resetDatabase() {
 
 async function seedUsers() {
 	logStep('Seeding users...');
+	const demoAccountData = {
+		emailAddress: 'demo@inbox-reader.com',
+		password: await hash('Password1@'),
+		isEmailVerified: true,
+		username: 'demo',
+		plan: UserPlan.DEMO,
+	};
+
 	await prisma.user.create({
-		data: {
-			emailAddress: 'demo@inbox-reader.com',
-			password: await hash('Password1@'),
-			isEmailVerified: true,
-			username: 'demo',
-		},
+		data: { ...demoAccountData },
 	});
+
 	logSuccess('Users seeded');
 }
 

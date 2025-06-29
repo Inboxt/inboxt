@@ -1,1 +1,0 @@
-export { PlanModal } from './PlanModal';

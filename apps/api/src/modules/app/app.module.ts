@@ -5,7 +5,6 @@ import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { MailerModule } from '@nestjs-modules/mailer';
-import * as process from 'node:process';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
