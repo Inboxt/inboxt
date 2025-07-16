@@ -1,0 +1,22 @@
+.selectableLabel {
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+	padding: 4px 0;
+	user-select: none;
+	column-gap: var(--mantine-spacing-md);
+	
+}
+
+.selectableLabelGroup {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.selectableLabelText {
+	overflow: hidden;
+	text-overflow: ellipsis;
+}

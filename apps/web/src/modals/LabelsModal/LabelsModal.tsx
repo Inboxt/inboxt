@@ -1,40 +1,40 @@
 import { Button, Group, Stack } from '@mantine/core';
-import { useState } from 'react';
 import { ContextModalProps } from '@mantine/modals';
+import { useQuery } from '@apollo/client';
 
-import { EditableLabelItem } from '../../components/EditableLabelItem';
-
-import { BACKEND_LABELS } from '../../constants/fake-backend';
 import { modals } from '@modals/modals.ts';
 
+import { EditableLabelItem } from '../../components/EditableLabelItem';
+import { LABELS } from '../../lib/graphql.ts';
+import { useEffect, useState } from 'react';
+
 export const LabelsModal = ({ id, context }: ContextModalProps) => {
-	const [editingLabel, setEditingLabel] = useState<number | null>(null); // Tracks which label is being edited
+	const [editingLabelId, setEditingLabelId] = useState<number | null>(null);
+	const { data } = useQuery(LABELS);
 
-	const handleEditStart = (labelId: number) => {
-		setEditingLabel(labelId);
-	};
-
-	const handleEditSave = (labelId: number, updatedLabel: { name: string; color: string }) => {
-		// TODO: Add save logic here
-		console.log('Saved label:', labelId, updatedLabel);
-		setEditingLabel(null);
-	};
-
-	const handleEditCancel = () => {
-		setEditingLabel(null);
-	};
+	useEffect(() => {
+		const handleKeyDown = (event: KeyboardEvent) => {
+			if (event.key === 'Escape') {
+				if (editingLabelId !== null) {
+					setEditingLabelId(null);
+				} else {
+					context.closeModal(id);
+				}
+			}
+		};
+		document.addEventListener('keydown', handleKeyDown, true);
+		return () => document.removeEventListener('keydown', handleKeyDown, true);
+	}, [editingLabelId]);
 
 	return (
 		<Stack>
-			<Stack gap="xs">
-				{BACKEND_LABELS.map((label) => (
+			<Stack gap="sm">
+				{data?.labels?.map((label) => (
 					<EditableLabelItem
 						key={label.id}
 						label={label}
-						isEditing={editingLabel === label.id}
-						onEditStart={() => handleEditStart(label.id)}
-						onEditSave={handleEditSave}
-						onEditCancel={handleEditCancel}
+						isEditing={editingLabelId === label.id}
+						setIsEditing={(isEditing) => setEditingLabelId(isEditing ? label.id : null)}
 					/>
 				))}
 			</Stack>

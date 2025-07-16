@@ -8,6 +8,7 @@ import {
 	IconTrash,
 	IconX,
 } from '@tabler/icons-react';
+import { useQuery } from '@apollo/client';
 
 import classes from './Navbar.module.css';
 
@@ -16,8 +17,7 @@ import { clsx } from 'clsx';
 import { FooterLinks } from '../FooterLinks';
 import { AppViews } from '../../constants';
 import { useScreenQuery } from '../../hooks/useScreenQuery.tsx';
-
-import { BACKEND_LABELS } from '../../constants/fake-backend';
+import { LABELS } from '../../lib/graphql.ts';
 
 const NAV_LINKS = [
 	{
@@ -53,6 +53,7 @@ type NavbarProps = {
 };
 
 export const Navbar = ({ opened, toggle }: NavbarProps) => {
+	const { data } = useQuery(LABELS);
 	const isAboveLgScreen = useScreenQuery('lg', 'above');
 
 	// todo: scrollable correctly
@@ -69,9 +70,11 @@ export const Navbar = ({ opened, toggle }: NavbarProps) => {
 				/>
 			))}
 
-			<Divider m="sm" label={opened ? 'Labels' : undefined} my={opened ? 0 : 'xxs'} />
+			{data?.labels?.length ? (
+				<Divider m="sm" label={opened ? 'Labels' : undefined} my={opened ? 0 : 'xxs'} />
+			) : null}
 
-			{BACKEND_LABELS.map((label) => (
+			{data?.labels?.map((label) => (
 				<NavbarLink
 					key={label.id}
 					label={label.name}
@@ -116,7 +119,6 @@ export const Navbar = ({ opened, toggle }: NavbarProps) => {
 			opened={opened}
 			onClose={toggle}
 			title="Feeds"
-			size="xs"
 			closeButtonProps={{
 				icon: <IconX size={34} color="var(--mantine-color-text)" />,
 			}}
@@ -134,6 +136,7 @@ export const Navbar = ({ opened, toggle }: NavbarProps) => {
 				pos="sticky"
 				bottom={0}
 				style={{ backgroundColor: 'var(--mantine-color-body)' }}
+				mt="xl"
 			>
 				<FooterLinks justify="center" />
 			</Box>

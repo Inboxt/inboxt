@@ -1,23 +1,21 @@
 import { Checkbox, Group, Text } from '@mantine/core';
 import { IconLabelImportantFilled } from '@tabler/icons-react';
 
+import classes from './SelectableLabel.module.css';
+
 type SelectableLabelProps = {
 	label: { id: number; name: string; color: string };
 };
 
-// TODO: Whole component should be clickable
 export const SelectableLabel = ({ label }: SelectableLabelProps) => {
 	return (
-		<Group py={4}>
-			<IconLabelImportantFilled
-				size={21}
-				style={{
-					color: `var(--mantine-color-${label.color}-6)`,
-				}}
-			/>
+		<label className={classes.selectableLabel}>
+			<Group wrap="nowrap" className={classes.selectableLabelGroup}>
+				<IconLabelImportantFilled size={21} style={{ color: label.color }} />
+				<Text className={classes.selectableLabelText}>{label.name}</Text>
+			</Group>
 
-			<Text flex={1}>{label.name}</Text>
-			<Checkbox value={label.id.toString()} />
-		</Group>
+			<Checkbox value={label.id.toString()} ml="auto" onClick={(e) => e.stopPropagation()} />
+		</label>
 	);
 };

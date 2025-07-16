@@ -17,17 +17,21 @@ export const modals = {
 			size: 540,
 			centered: true, // TODO: or not?
 			title: 'Labels',
+			closeOnEscape: false,
 			innerProps: {},
 		});
 	},
 
-	openLabelsSelectionModal: () => {
+	openLabelsSelectionModal: ({ itemId, onClose }: { itemId: number; onClose?: () => void }) => {
 		return mantineModals.openContextModal({
 			modal: 'labelsSelection',
 			size: 540,
 			centered: true, // TODO: or not?
 			title: 'Label as',
-			innerProps: {},
+			onClose,
+			innerProps: {
+				itemId,
+			},
 		});
 	},
 
@@ -48,6 +52,7 @@ export const modals = {
 			centered: true,
 			title: 'Create Label',
 			innerProps: {},
+			withinPortal: false,
 		});
 	},
 
@@ -86,6 +91,10 @@ export const modals = {
 			title: 'Add',
 			innerProps: {},
 		});
+	},
+
+	openConfirmModal: (payload: Record<string, unknown>) => {
+		return mantineModals.openConfirmModal(payload);
 	},
 
 	closeAll: () => {

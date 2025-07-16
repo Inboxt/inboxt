@@ -1,6 +1,6 @@
 import { Box, Center, Flex } from '@mantine/core';
 import { ReactNode } from 'react';
-import { useDisclosure } from '@mantine/hooks';
+import { useDisclosure, useDocumentTitle } from '@mantine/hooks';
 import { useRouteContext } from '@tanstack/react-router';
 
 import classes from './AppLayout.module.css';
@@ -22,7 +22,8 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
 	const routeData = useRouteContext({ from: Route.id });
 	const isAboveLgScreen = useScreenQuery('lg', 'above');
 	const [opened, { toggle }] = useDisclosure(isAboveLgScreen);
-	const { isSelected } = useReaderContext();
+	const { selectedItems } = useReaderContext();
+	useDocumentTitle('Inbox Reader');
 
 	return (
 		<>
@@ -32,7 +33,10 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
 				<Flex className={classes.container}>
 					<Navbar opened={opened} toggle={toggle} />
 
-					<Box className={classes.content} pt={isSelected && !isAboveLgScreen ? 0 : 'md'}>
+					<Box
+						className={classes.content}
+						pt={selectedItems?.length && !isAboveLgScreen ? 0 : 'md'}
+					>
 						<Header opened={opened} toggle={toggle} />
 
 						{children}

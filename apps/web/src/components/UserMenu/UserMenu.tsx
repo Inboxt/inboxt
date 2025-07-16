@@ -67,7 +67,7 @@ export const UserMenu = () => {
 	);
 
 	return (
-		<MenuDrawer items={USER_MENU_ITEMS} label="Quick Actions" height={390}>
+		<MenuDrawer items={USER_MENU_ITEMS} label="Quick Actions" height={352}>
 			<Avatar
 				name={data?.me?.username || 'User'}
 				color="initials"

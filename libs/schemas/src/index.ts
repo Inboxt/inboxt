@@ -6,3 +6,5 @@ export { requestPasswordRecoverySchema } from './requestPasswordRecovery';
 export { updateAccountSchema } from './updateAccount';
 export { deleteAccountSchema } from './deleteAccount';
 export { addItemFromUrlSchema } from './addItemFromUrl';
+export { createLabelSchema } from './createLabel';
+export { updateLabelSchema } from './updateLabel';

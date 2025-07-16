@@ -6,7 +6,7 @@ import { ApolloError } from '@apollo/client';
 import { parseError } from '../../utils/parse-error';
 
 type FormProps = {
-	children: ({ error }: { error: ReactNode | null }) => ReactNode;
+	children: (({ error }: { error: ReactNode | null }) => ReactNode) | ReactNode;
 	onSubmit: (e: FormEvent<HTMLFormElement>) => void;
 	error?: ApolloError | string;
 	setErrors?: (errors: Record<string, string>) => void;
@@ -36,15 +36,25 @@ export const Form = ({ children, onSubmit, error, setErrors }: FormProps) => {
 		if (!parsed?.message || parsed.message === 'Invalid input provided') return null;
 
 		return (
-			<Alert icon={<IconAlertTriangleFilled />} color="red" variant="filled" p="xs">
+			<Alert
+				icon={<IconAlertTriangleFilled />}
+				color="red"
+				variant="filled"
+				p="xs"
+				style={{ whiteSpace: 'pre-line' }}
+			>
 				{parsed.message}
 			</Alert>
 		);
 	};
 
 	return (
-		<form onSubmit={onSubmit} noValidate>
-			{children({ error: renderError() })}
+		<form
+			onSubmit={onSubmit}
+			noValidate
+			style={{ display: 'flex', flexDirection: 'column', width: '100%' }}
+		>
+			{typeof children === 'function' ? children({ error: renderError() }) : children}
 		</form>
 	);
 };

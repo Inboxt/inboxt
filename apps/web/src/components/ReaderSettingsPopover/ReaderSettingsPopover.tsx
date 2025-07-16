@@ -6,7 +6,7 @@ import { IconX } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 
 type ReaderSettingsOptionProps = {
-	onClick?: () => void;
+	onClick?: (e: unknown) => void;
 	label: string;
 	icon: ReactNode;
 };

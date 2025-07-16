@@ -142,7 +142,7 @@ export function useTextHighlighting(containerRef?: RefObject<HTMLDivElement | nu
 			htmlContent: extractedHtmlParts.join(' '),
 		};
 
-		console.log(highlightData);
+		//console.log(highlightData);
 		selection.removeAllRanges();
 	};
 

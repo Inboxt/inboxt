@@ -20,16 +20,10 @@ type HeaderProps = {
 
 export const Header = ({ opened, toggle }: HeaderProps) => {
 	const isBelowLgScreen = useScreenQuery('lg', 'below');
-	const {
-		toggleSelectAll,
-		isAllSelected,
-		isPartiallySelected,
-		selectedItemIds,
-		isSelected,
-		deselectAll,
-	} = useReaderContext();
+	const { toggleSelectAll, isAllSelected, isPartiallySelected, selectedItems, deselectAll } =
+		useReaderContext();
 
-	if (isSelected && isBelowLgScreen) {
+	if (selectedItems.length > 0 && isBelowLgScreen) {
 		return (
 			<Box px="md" pb="md" pt="md" className={classes.mobileSelection}>
 				<Stack w="100%" justify="space-between">
@@ -46,11 +40,14 @@ export const Header = ({ opened, toggle }: HeaderProps) => {
 						</ActionIcon>
 
 						<Text fw={600} size="xl">
-							{selectedItemIds.length}
+							{selectedItems.length}
 						</Text>
 
 						<Group gap="md" ml="auto" mih={38}>
-							<ItemsOptions />
+							<ItemsOptions
+								mode={selectedItems.length > 1 ? 'bulk' : 'single'}
+								items={selectedItems}
+							/>
 						</Group>
 					</Group>
 
@@ -83,27 +80,30 @@ export const Header = ({ opened, toggle }: HeaderProps) => {
 					visibleFrom="lg"
 				/>
 
-				{isSelected ? (
+				{selectedItems.length > 0 ? (
 					<>
 						<Text fw={600} size="xl">
-							{selectedItemIds.length}
+							{selectedItems.length}
 						</Text>
 
 						<Group gap="md" ml="auto" mih={38}>
-							<ItemsOptions />
+							<ItemsOptions
+								mode={selectedItems.length > 1 ? 'bulk' : 'single'}
+								items={selectedItems}
+							/>
 						</Group>
 					</>
 				) : (
 					<AppSearch />
 				)}
 
-				{!isSelected && (
+				{!selectedItems.length && (
 					<Button variant="light" onClick={modals.openAddContentModal}>
 						Add Link
 					</Button>
 				)}
 
-				{!isSelected && !isBelowLgScreen && <UserMenu />}
+				{!selectedItems.length && !isBelowLgScreen && <UserMenu />}
 			</Flex>
 		</Stack>
 	);

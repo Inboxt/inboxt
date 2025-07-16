@@ -1,64 +1,93 @@
 import React, { createContext, useContext, useState } from 'react';
 import { useDebouncedCallback } from '@mantine/hooks';
 
+type SelectedItem = { id: number; status: 'ACTIVE' | 'ARCHIVED' | 'DELETED'; originalUrl?: string };
+
 interface ReaderContextProps {
-	selectedItemIds: number[];
-	setSelectedItemIds: (ids: number[]) => void;
-	visibleItemIds: number[];
-	setVisibleItemIds: (ids: number[]) => void;
+	selectedItems: SelectedItem[];
+	setSelectedItems: (items: SelectedItem[]) => void;
+	visibleItems: SelectedItem[];
+	setVisibleItems: (items: SelectedItem[]) => void;
 	toggleSelectAll: () => void;
 	isAllSelected: boolean;
 	isNoneSelected: boolean;
 	isPartiallySelected: boolean;
-	toggleItemSelection: (id: number) => void;
-	isSelected: boolean;
+	toggleItemSelection: (item: SelectedItem) => void;
+	isSelected: (id: number) => boolean;
 	deselectAll: () => void;
 }
 
 const ReaderContext = createContext<ReaderContextProps | undefined>(undefined);
 
 export const ReaderProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-	const [selectedItemIds, setSelectedItemIds] = useState<number[]>([]);
-	const [visibleItemIds, setVisibleItemIds] = useState<number[]>([]);
+	const [selectedItems, setSelectedItemsRaw] = useState<SelectedItem[]>([]);
+	const [visibleItems, setVisibleItemsRaw] = useState<SelectedItem[]>([]);
+
+	const toSelectedItem = (item: any): SelectedItem => {
+		return { id: item.id, status: item.status, originalUrl: item.originalUrl };
+	};
+
+	const setSelectedItems = (items: any[]) => {
+		setSelectedItemsRaw(items.map(toSelectedItem));
+	};
+
+	const setVisibleItems = (items: any[]) => {
+		setVisibleItemsRaw(items.map(toSelectedItem));
+	};
 
 	const toggleSelectAll = useDebouncedCallback(() => {
-		setSelectedItemIds((prev) => {
-			if (visibleItemIds.every((id) => selectedItemIds.includes(id))) {
-				return prev.filter((id) => !visibleItemIds.includes(id));
-			} else {
-				return Array.from(new Set([...prev, ...visibleItemIds]));
+		setSelectedItemsRaw((prev) => {
+			const visibleIds = visibleItems.map((item) => item.id);
+			const prevIds = prev.map((it) => it.id);
+
+			const allSelected =
+				visibleIds.length > 0 && visibleIds.every((id) => prevIds.includes(id));
+			if (allSelected) {
+				return prev.filter((item) => !visibleIds.includes(item.id));
 			}
+			const toAdd = visibleItems.filter((item) => !prevIds.includes(item.id));
+			return [...prev, ...toAdd];
 		});
 	}, 10);
 
 	const deselectAll = () => {
-		setSelectedItemIds([]);
+		setSelectedItems([]);
 	};
 
-	const toggleItemSelection = useDebouncedCallback((id: number) => {
-		setSelectedItemIds((prev) =>
-			prev.includes(id) ? prev.filter((itemId) => itemId !== id) : [...prev, id],
-		);
+	const toggleItemSelection = useDebouncedCallback((item: any) => {
+		const minimal = toSelectedItem(item);
+		setSelectedItemsRaw((prev) => {
+			const found = prev.find((it) => it.id === minimal.id);
+			if (found) {
+				return prev.filter((it) => it.id !== minimal.id);
+			}
+			return [...prev, minimal];
+		});
 	}, 10);
 
+	const isSelected = (id: number) => selectedItems.some((item) => item.id === id);
+
+	const visibleIds = visibleItems.map((item) => item.id);
+	const selectedIds = selectedItems.map((item) => item.id);
+
 	const isAllSelected =
-		visibleItemIds.length > 0 && visibleItemIds.every((id) => selectedItemIds.includes(id));
-	const isNoneSelected = visibleItemIds.every((id) => !selectedItemIds.includes(id));
+		visibleIds.length > 0 && visibleIds.every((id) => selectedIds.includes(id));
+	const isNoneSelected = visibleIds.every((id) => !selectedIds.includes(id));
 	const isPartiallySelected = !isAllSelected && !isNoneSelected;
 
 	return (
 		<ReaderContext.Provider
 			value={{
-				selectedItemIds,
-				setSelectedItemIds,
-				visibleItemIds,
-				setVisibleItemIds,
+				selectedItems,
+				setSelectedItems,
+				visibleItems,
+				setVisibleItems,
 				toggleSelectAll,
 				isAllSelected,
 				isNoneSelected,
 				isPartiallySelected,
 				toggleItemSelection,
-				isSelected: isAllSelected || isPartiallySelected,
+				isSelected,
 				deselectAll,
 			}}
 		>

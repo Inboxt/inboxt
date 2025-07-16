@@ -23,7 +23,7 @@ const logSuccess = (message: string, newline = false) => {
 
 const logSection = (message: string) => {
 	console.log('');
-	console.log('\x1b[36m%s\x1b[0m', message); // Cyan header
+	console.log('\x1b[36m%s\x1b[0m', message);
 	console.log('');
 };
 
@@ -45,6 +45,8 @@ async function resetDatabase() {
 
 async function seedUsers() {
 	logStep('Seeding users...');
+
+	// Demo account
 	const demoAccountData = {
 		emailAddress: 'demo@inbox-reader.com',
 		password: await hash('Password1@'),
@@ -53,18 +55,52 @@ async function seedUsers() {
 		plan: UserPlan.DEMO,
 	};
 
-	await prisma.user.create({
-		data: { ...demoAccountData },
+	const demo = await prisma.user.create({
+		data: demoAccountData,
 	});
 
 	logSuccess('Users seeded');
+	return { demo };
+}
+
+async function seedLabels(userId: number) {
+	logStep('Seeding labels...');
+	const labels = [
+		{
+			name: 'News',
+			color: '#f03e3e',
+			userId,
+		},
+		{
+			name: 'Tech',
+			color: '#4263eb',
+			userId,
+		},
+		{
+			name: 'Hobby',
+			color: '#f59f00',
+			userId,
+		},
+		{
+			name: 'Long label just for fun and testing purposes',
+			color: '#141414',
+			userId,
+		},
+	];
+
+	await prisma.label.createMany({
+		data: labels,
+	});
+
+	logSuccess('Labels seeded');
 }
 
 async function seed() {
 	logSection('🌱 Seeding started...');
 
 	await resetDatabase();
-	await seedUsers();
+	const users = await seedUsers();
+	await seedLabels(users.demo.id);
 
 	logSection('🎉 Seeding complete!');
 }

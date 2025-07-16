@@ -1,6 +1,7 @@
-import { Alert, Button, Group, Stack, Text } from '@mantine/core';
-import { useEffect } from 'react';
+import { Alert, Button, Center, Group, Stack, Text } from '@mantine/core';
 import { useSearch } from '@tanstack/react-router';
+import { useQuery } from '@apollo/client';
+import { useEffect } from 'react';
 
 import classes from './ItemsList.module.css';
 
@@ -9,20 +10,27 @@ import { ReaderItem } from '../../components/ReaderItem';
 import { Route } from '../../routes/_auth.index.tsx';
 import { AppViews } from '../../constants';
 import { AppLayout } from '../../layouts/AppLayout.tsx';
-import { BACKEND_ARTICLES } from '../../constants/fake-backend';
+import { SAVED_ITEMS } from '../../lib/graphql.ts';
 
 export const ItemsList = () => {
 	const { view } = useSearch({ from: Route.id });
+	const status =
+		view === AppViews.TRASH ? 'DELETED' : view === AppViews.ARCHIVE ? 'ARCHIVED' : 'ACTIVE';
 
-	const { setVisibleItemIds } = useReaderContext();
-	// TODO: This also probably doesn't handle well or at all infinite scrolling
+	const { data, loading, error } = useQuery(SAVED_ITEMS, {
+		variables: { data: { first: 20, status } },
+		fetchPolicy: 'cache-and-network',
+	});
+
+	// TODO: infinite scrolling - make sure this part also works with it
+	const { setVisibleItems } = useReaderContext();
 	useEffect(() => {
-		if (BACKEND_ARTICLES) {
-			const visibleIds = BACKEND_ARTICLES.map((item) => item.id);
-			setVisibleItemIds(visibleIds);
+		if (data?.savedItems?.edges) {
+			setVisibleItems(data.savedItems.edges.map(({ node }) => node));
 		}
-	}, [BACKEND_ARTICLES]);
+	}, [data?.savedItems]);
 
+	const items = data?.savedItems?.edges || [];
 	return (
 		<AppLayout>
 			<Stack gap={0} className={classes.items}>
@@ -47,16 +55,16 @@ export const ItemsList = () => {
 					</Alert>
 				)}
 
-				{BACKEND_ARTICLES.map((article) => (
-					<ReaderItem
-						id={article.id}
-						title={article.title}
-						receivedAt={article.receivedAt}
-						description={article?.description}
-						labels={article?.labels}
-						author={article.author}
-					/>
-				))}
+				{!loading && !error && items.length === 0 && (
+					<Center py="lg">
+						<Text c="dimmed" size="sm">
+							No items found in this view.
+						</Text>
+					</Center>
+				)}
+
+				{items.length > 0 &&
+					items.map(({ node }) => <ReaderItem key={node.id} item={node} />)}
 			</Stack>
 		</AppLayout>
 	);
