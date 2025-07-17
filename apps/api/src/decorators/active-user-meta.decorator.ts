@@ -6,6 +6,6 @@ export const ActiveUserMeta = createParamDecorator((_data: unknown, context: Exe
 	return ctx.getContext().req.user;
 });
 
-export type ActiveUserMeta = {
-	userId: number;
+export type ActiveUserMetaType = {
+	userId: string;
 };

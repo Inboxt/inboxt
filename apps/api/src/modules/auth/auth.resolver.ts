@@ -8,7 +8,7 @@ import { SignInInput } from './dto/sign-in.input';
 import { GqlContext } from '../../types/graphql-context';
 import { VerifyEmailInput } from './dto/verify-email.input';
 import { CreateAccountInput } from '../user/dto/create-account.input';
-import { ActiveUserMeta } from '../../decorators/active-user-meta.decorator';
+import { ActiveUserMeta, ActiveUserMetaType } from '../../decorators/active-user-meta.decorator';
 import { RequestPasswordRecoveryInput } from './dto/request-password-recovery.input';
 import { ResetPasswordInput } from './dto/reset-password.input';
 
@@ -42,7 +42,7 @@ export class AuthResolver {
 
 	@Mutation(() => Void)
 	async verifyEmail(
-		@ActiveUserMeta() activeUser: ActiveUserMeta,
+		@ActiveUserMeta() activeUser: ActiveUserMetaType,
 		@Args('data') data: VerifyEmailInput,
 	) {
 		await this.authService.verifyEmail(activeUser.userId, data);

@@ -42,7 +42,7 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 
 					return;
 				}
-				void navigate({ to: `/r/${item.id.toString()}`, search: {} });
+				void navigate({ to: `/r/${item.id}`, search: {} });
 			}}
 			{...longPressHandlers}
 		>

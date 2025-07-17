@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState } from 'react';
 import { useDebouncedCallback } from '@mantine/hooks';
 
-type SelectedItem = { id: number; status: 'ACTIVE' | 'ARCHIVED' | 'DELETED'; originalUrl?: string };
+type SelectedItem = { id: string; status: 'ACTIVE' | 'ARCHIVED' | 'DELETED'; originalUrl?: string };
 
 interface ReaderContextProps {
 	selectedItems: SelectedItem[];
@@ -13,7 +13,7 @@ interface ReaderContextProps {
 	isNoneSelected: boolean;
 	isPartiallySelected: boolean;
 	toggleItemSelection: (item: SelectedItem) => void;
-	isSelected: (id: number) => boolean;
+	isSelected: (id: string) => boolean;
 	deselectAll: () => void;
 }
 
@@ -65,7 +65,7 @@ export const ReaderProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 		});
 	}, 10);
 
-	const isSelected = (id: number) => selectedItems.some((item) => item.id === id);
+	const isSelected = (id: string) => selectedItems.some((item) => item.id === id);
 
 	const visibleIds = visibleItems.map((item) => item.id);
 	const selectedIds = selectedItems.map((item) => item.id);

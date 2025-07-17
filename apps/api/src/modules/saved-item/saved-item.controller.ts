@@ -1,7 +1,7 @@
 import { Controller, Post, Req, Res } from '@nestjs/common';
 import { Request, Response } from 'express';
 
-import { ActiveUserMeta } from '../../decorators/active-user-meta.decorator';
+import { ActiveUserMeta, ActiveUserMetaType } from '../../decorators/active-user-meta.decorator';
 import { SavedItemManagementService } from './saved-item-management.service';
 
 @Controller('inbox/items')
@@ -10,7 +10,7 @@ export class SavedItemController {
 
 	@Post('from-url')
 	async addArticleFromUrl(
-		@ActiveUserMeta() activeUser: ActiveUserMeta,
+		@ActiveUserMeta() activeUser: ActiveUserMetaType,
 		@Req() req: Request,
 		@Res() res: Response,
 	) {

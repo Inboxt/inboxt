@@ -80,7 +80,7 @@ export class ArticleService {
 	}
 
 	async create(
-		savedItemId: number,
+		savedItemId: string,
 		data: Omit<Prisma.articleCreateInput, 'savedItemId' | 'saved_item'>,
 	) {
 		return this.prismaService.article.create({

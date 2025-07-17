@@ -1,6 +1,6 @@
 import { Resolver, Query, ResolveField, Parent, Args, Mutation } from '@nestjs/graphql';
 
-import { ActiveUserMeta } from '../../decorators/active-user-meta.decorator';
+import { ActiveUserMeta, ActiveUserMetaType } from '../../decorators/active-user-meta.decorator';
 import { SavedItemService } from './saved-item.service';
 import { Article } from './article.model';
 import { ArticleService } from './entities/article/article.service';
@@ -23,7 +23,7 @@ export class SavedItemResolver {
 
 	@Query(() => SavedItemConnection)
 	async savedItems(
-		@ActiveUserMeta() user: { userId: number },
+		@ActiveUserMeta() user: ActiveUserMetaType,
 		@Args('data') data: GetSavedItemsInput,
 	) {
 		return this.savedItemService.getPaginated(user.userId, data);
@@ -48,7 +48,7 @@ export class SavedItemResolver {
 
 	@Mutation(() => Void)
 	async setSavedItemLabels(
-		@ActiveUserMeta() user: { userId: number },
+		@ActiveUserMeta() user: ActiveUserMetaType,
 		@Args('data') data: SetSavedItemLabelsInput,
 	) {
 		await this.savedItemService.setLabels(data.id, user.userId, data.labelIds);
@@ -56,7 +56,7 @@ export class SavedItemResolver {
 	}
 
 	@ResolveField('article', () => Article, { nullable: true })
-	async article(@Parent() savedItem, @ActiveUserMeta() user: { userId: number }) {
+	async article(@Parent() savedItem, @ActiveUserMeta() user: ActiveUserMetaType) {
 		if (!savedItem) {
 			return null;
 		}

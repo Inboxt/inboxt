@@ -18,7 +18,7 @@ import { Form } from '../Form';
 import { DELETE_LABEL, LABELS, UPDATE_LABEL } from '../../lib/graphql.ts';
 
 type EditableLabelItemProps = {
-	label: { id: number; name: string; color: string };
+	label: { id: string; name: string; color: string };
 	isEditing: boolean;
 	setIsEditing: (isEditing: boolean) => void;
 };

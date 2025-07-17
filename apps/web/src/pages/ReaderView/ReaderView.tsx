@@ -41,7 +41,7 @@ export const ReaderView = () => {
 
 	const { id } = useParams({ from: Route.fullPath });
 	const { data, loading, error } = useQuery(SAVED_ITEM, {
-		variables: { query: { id: Number(id) } },
+		variables: { query: { id } },
 	});
 
 	const savedItem = data?.savedItem;

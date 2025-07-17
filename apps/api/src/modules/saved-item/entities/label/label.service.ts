@@ -18,7 +18,7 @@ export class LabelService {
 		return this.prisma.label.findMany({ ...query, orderBy: { id: 'asc' } });
 	}
 
-	async create(userId: number, data: Omit<Prisma.labelCreateInput, 'user' | 'userId'>) {
+	async create(userId: string, data: Omit<Prisma.labelCreateInput, 'user' | 'userId'>) {
 		/*----------  Validation  ----------*/
 		await createLabelSchema.parseAsync(data);
 
@@ -31,7 +31,7 @@ export class LabelService {
 		});
 	}
 
-	async update(id: number, data: Omit<Prisma.labelUpdateInput, 'id'>) {
+	async update(id: string, data: Omit<Prisma.labelUpdateInput, 'id'>) {
 		/*----------  Validation  ----------*/
 		await updateLabelSchema.parseAsync(data);
 		const label = await this.get({ where: { id } });
@@ -54,7 +54,7 @@ export class LabelService {
 		});
 	}
 
-	async delete(id: number) {
+	async delete(id: string) {
 		/*----------  Validation  ----------*/
 		const label = await this.get({ where: { id } });
 		if (!label) {

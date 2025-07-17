@@ -4,7 +4,7 @@ import { IconLabelImportantFilled } from '@tabler/icons-react';
 import classes from './SelectableLabel.module.css';
 
 type SelectableLabelProps = {
-	label: { id: number; name: string; color: string };
+	label: { id: string; name: string; color: string };
 };
 
 export const SelectableLabel = ({ label }: SelectableLabelProps) => {
@@ -15,7 +15,7 @@ export const SelectableLabel = ({ label }: SelectableLabelProps) => {
 				<Text className={classes.selectableLabelText}>{label.name}</Text>
 			</Group>
 
-			<Checkbox value={label.id.toString()} ml="auto" onClick={(e) => e.stopPropagation()} />
+			<Checkbox value={label.id} ml="auto" onClick={(e) => e.stopPropagation()} />
 		</label>
 	);
 };

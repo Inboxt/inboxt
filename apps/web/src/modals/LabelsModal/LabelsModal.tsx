@@ -9,7 +9,7 @@ import { LABELS } from '../../lib/graphql.ts';
 import { useEffect, useState } from 'react';
 
 export const LabelsModal = ({ id, context }: ContextModalProps) => {
-	const [editingLabelId, setEditingLabelId] = useState<number | null>(null);
+	const [editingLabelId, setEditingLabelId] = useState<string | null>(null);
 	const { data } = useQuery(LABELS);
 
 	useEffect(() => {

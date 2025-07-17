@@ -48,7 +48,7 @@ export class AuthService {
 		return this.jwtService.decode(token);
 	}
 
-	async verifyEmailCode(userId: number, code: string) {
+	async verifyEmailCode(userId: string, code: string) {
 		/*----------  Validation  ----------*/
 		const user = await this.userService.get({
 			where: { id: userId },
@@ -82,7 +82,7 @@ export class AuthService {
 		await this.userService.markEmailAsVerified(userId);
 	}
 
-	async verifyEmail(userId: number, data: VerifyEmailInput) {
+	async verifyEmail(userId: string, data: VerifyEmailInput) {
 		/*----------  Validation  ----------*/
 		await verifyEmailSchema.parseAsync(data);
 

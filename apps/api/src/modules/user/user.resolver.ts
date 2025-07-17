@@ -3,7 +3,7 @@ import { Resolver, Args, Mutation } from '@nestjs/graphql';
 import { UpdateAccountInput } from './dto/update-account.input';
 import { UserService } from './user.service';
 import { User } from './user.model';
-import { ActiveUserMeta } from '../../decorators/active-user-meta.decorator';
+import { ActiveUserMeta, ActiveUserMetaType } from '../../decorators/active-user-meta.decorator';
 import { Void } from '../../models/void.model';
 import { VOID_RESPONSE } from '../../constants/void';
 import { DeleteAccountInput } from './dto/delete-account.input';
@@ -14,7 +14,7 @@ export class UserResolver {
 
 	@Mutation(() => User)
 	async updateAccount(
-		@ActiveUserMeta() activeUser: ActiveUserMeta,
+		@ActiveUserMeta() activeUser: ActiveUserMetaType,
 		@Args('data') data: UpdateAccountInput,
 	) {
 		return this.userService.update(activeUser.userId, data);
@@ -22,7 +22,7 @@ export class UserResolver {
 
 	@Mutation(() => Void)
 	async deleteAccount(
-		@ActiveUserMeta() activeUser: ActiveUserMeta,
+		@ActiveUserMeta() activeUser: ActiveUserMetaType,
 		@Args('data') data: DeleteAccountInput,
 	) {
 		await this.userService.delete(activeUser.userId, data);
@@ -30,7 +30,7 @@ export class UserResolver {
 	}
 
 	@Mutation(() => Void)
-	async resendVerificationEmail(@ActiveUserMeta() activeUser: ActiveUserMeta) {
+	async resendVerificationEmail(@ActiveUserMeta() activeUser: ActiveUserMetaType) {
 		await this.userService.sendVerificationEmail(activeUser.userId);
 		return VOID_RESPONSE;
 	}

@@ -2,7 +2,10 @@ import { Resolver, Args, Mutation, Query } from '@nestjs/graphql';
 
 import { Label } from './label.model';
 import { LabelService } from './label.service';
-import { ActiveUserMeta } from '../../../../decorators/active-user-meta.decorator';
+import {
+	ActiveUserMeta,
+	ActiveUserMetaType,
+} from '../../../../decorators/active-user-meta.decorator';
 import { CreateLabelInput } from './dto/create-label.input';
 import { UpdateLabelInput } from './dto/update-label.input';
 import { DeleteLabelInput } from './dto/delete-label.input';
@@ -15,7 +18,7 @@ export class LabelResolver {
 
 	@Mutation(() => Label)
 	async createLabel(
-		@ActiveUserMeta() activeUser: ActiveUserMeta,
+		@ActiveUserMeta() activeUser: ActiveUserMetaType,
 		@Args('data') data: CreateLabelInput,
 	) {
 		return this.labelService.create(activeUser.userId, data);
@@ -34,7 +37,7 @@ export class LabelResolver {
 	}
 
 	@Query(() => [Label], { nullable: true })
-	async labels(@ActiveUserMeta() user: { userId: number }) {
+	async labels(@ActiveUserMeta() user: ActiveUserMetaType) {
 		return this.labelService.getMany({ where: { userId: user.userId } });
 	}
 }

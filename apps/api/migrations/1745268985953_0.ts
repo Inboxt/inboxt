@@ -3,12 +3,19 @@ import { ColumnDefinitions, MigrationBuilder } from 'node-pg-migrate';
 export const shorthands: ColumnDefinitions | undefined = undefined;
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
+	pgm.createExtension('pgcrypto', { ifNotExists: true });
+
 	pgm.createType('saved_item_type', ['NEWSLETTER', 'ARTICLE']);
 	pgm.createType('user_plan', ['DEMO', 'FREE']);
 	pgm.createType('saved_item_status', ['ACTIVE', 'ARCHIVED', 'DELETED']);
 
 	pgm.createTable('user', {
-		id: 'id',
+		id: {
+			type: 'uuid',
+			primaryKey: true,
+			notNull: true,
+			default: pgm.func('gen_random_uuid()'),
+		},
 		createdAt: {
 			type: 'timestamp',
 			notNull: true,
@@ -29,14 +36,19 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 	});
 
 	pgm.createTable('saved_item', {
-		id: 'id',
+		id: {
+			type: 'uuid',
+			primaryKey: true,
+			notNull: true,
+			default: pgm.func('gen_random_uuid()'),
+		},
 		createdAt: {
 			type: 'timestamp',
 			notNull: true,
 			default: pgm.func('current_timestamp'),
 		},
 		userId: {
-			type: 'integer',
+			type: 'uuid',
 			notNull: true,
 			references: 'user',
 			onDelete: 'CASCADE',
@@ -63,7 +75,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 
 	pgm.createTable('article', {
 		savedItemId: {
-			type: 'integer',
+			type: 'uuid',
 			primaryKey: true,
 			references: 'saved_item',
 			onDelete: 'CASCADE',
@@ -73,14 +85,19 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 	});
 
 	pgm.createTable('label', {
-		id: 'id',
+		id: {
+			type: 'uuid',
+			primaryKey: true,
+			notNull: true,
+			default: pgm.func('gen_random_uuid()'),
+		},
 		createdAt: {
 			type: 'timestamp',
 			notNull: true,
 			default: pgm.func('current_timestamp'),
 		},
 		userId: {
-			type: 'integer',
+			type: 'uuid',
 			notNull: true,
 			references: 'user',
 			onDelete: 'CASCADE',
@@ -92,15 +109,20 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 	pgm.createIndex('label', ['userId', 'name'], { unique: true });
 
 	pgm.createTable('saved_item_label', {
-		id: 'id',
+		id: {
+			type: 'uuid',
+			primaryKey: true,
+			notNull: true,
+			default: pgm.func('gen_random_uuid()'),
+		},
 		savedItemId: {
-			type: 'integer',
+			type: 'uuid',
 			notNull: true,
 			references: 'saved_item',
 			onDelete: 'CASCADE',
 		},
 		labelId: {
-			type: 'integer',
+			type: 'uuid',
 			notNull: true,
 			references: 'label',
 			onDelete: 'CASCADE',

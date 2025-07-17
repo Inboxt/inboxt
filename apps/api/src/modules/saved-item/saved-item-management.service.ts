@@ -15,7 +15,7 @@ export class SavedItemManagementService {
 		private userService: UserService,
 	) {}
 
-	async addArticleFromUrl(userId: number, url: string) {
+	async addArticleFromUrl(userId: string, url: string) {
 		/*----------  Validation  ----------*/
 		await addItemFromUrlSchema.parseAsync({ url });
 		const existingUser = await this.userService.get({ where: { id: userId } });

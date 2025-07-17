@@ -3,8 +3,8 @@ import { SavedItemStatus } from '../../../enums/saved-item-status.enum';
 
 @InputType()
 export class UpdateSavedItemStatusInput {
-	@Field(() => [Number])
-	ids!: number[];
+	@Field(() => [String])
+	ids!: string[];
 
 	@Field(() => SavedItemStatus)
 	status!: SavedItemStatus;

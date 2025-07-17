@@ -28,7 +28,7 @@ export class UserService {
 		return this.prisma.user.findMany(query);
 	}
 
-	async initiateEmailVerification(id: number) {
+	async initiateEmailVerification(id: string) {
 		const code = generateCode();
 		const hashedCode = await hash(code);
 
@@ -44,7 +44,7 @@ export class UserService {
 	}
 
 	async initiatePasswordRecovery(
-		id: number,
+		id: string,
 		data: Pick<Prisma.userUpdateInput, 'resetPasswordCode' | 'resetPasswordExpiry'>,
 	) {
 		return this.prisma.user.update({
@@ -56,7 +56,7 @@ export class UserService {
 		});
 	}
 
-	async markEmailAsVerified(id: number) {
+	async markEmailAsVerified(id: string) {
 		const user = await this.get({ where: { id: id } });
 
 		if (!user) {
@@ -78,7 +78,7 @@ export class UserService {
 		});
 	}
 
-	async recordLogin(id: number, prevLogins: number) {
+	async recordLogin(id: string, prevLogins: number) {
 		return this.prisma.user.update({
 			where: { id },
 			data: {
@@ -88,7 +88,7 @@ export class UserService {
 		});
 	}
 
-	async resetPasswordRecovery(id: number) {
+	async resetPasswordRecovery(id: string) {
 		return this.prisma.user.update({
 			where: { id },
 			data: {
@@ -104,7 +104,7 @@ export class UserService {
 		});
 	}
 
-	async update(id: number, data: UpdateAccountInput) {
+	async update(id: string, data: UpdateAccountInput) {
 		const { emailAddress, ...input } = data;
 		const parsedEmailAddress = emailAddress?.toLowerCase();
 
@@ -144,7 +144,7 @@ export class UserService {
 		});
 	}
 
-	async sendVerificationEmail(userId: number) {
+	async sendVerificationEmail(userId: string) {
 		/*----------  Validation  ----------*/
 		const existingUser = await this.get({
 			where: { id: userId },
@@ -167,7 +167,7 @@ export class UserService {
 		);
 	}
 
-	async delete(id: number, data: DeleteAccountInput) {
+	async delete(id: string, data: DeleteAccountInput) {
 		/*----------  Validation  ----------*/
 		await deleteAccountSchema.parseAsync(data);
 		const user = await this.get({

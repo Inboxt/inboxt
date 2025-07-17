@@ -17,7 +17,7 @@ import { ReaderSettingsPopover } from '../ReaderSettingsPopover';
 import { MenuDrawer } from '../MenuDrawer';
 
 export type ReaderItem = {
-	id: number;
+	id: string;
 	status: 'ACTIVE' | 'ARCHIVED' | 'DELETED';
 	originalUrl?: string;
 };

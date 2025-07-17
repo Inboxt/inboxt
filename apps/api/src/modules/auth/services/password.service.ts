@@ -18,7 +18,7 @@ export class PasswordService {
 		return hash(password);
 	}
 
-	async createPasswordRecovery(userId: number) {
+	async createPasswordRecovery(userId: string) {
 		const code = generateCode();
 		const hashedCode = await hash(code);
 
@@ -30,7 +30,7 @@ export class PasswordService {
 		return code;
 	}
 
-	async verifyPasswordRecoveryCode(userId: number, code: string) {
+	async verifyPasswordRecoveryCode(userId: string, code: string) {
 		/*----------  Validation  ----------*/
 		const user = await this.userService.get({
 			where: { id: userId },

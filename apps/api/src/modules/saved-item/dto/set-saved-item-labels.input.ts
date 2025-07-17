@@ -3,8 +3,8 @@ import { Field, InputType } from '@nestjs/graphql';
 @InputType()
 export class SetSavedItemLabelsInput {
 	@Field()
-	id!: number;
+	id!: string;
 
-	@Field(() => [Number])
-	labelIds!: number[];
+	@Field(() => [String])
+	labelIds!: string[];
 }

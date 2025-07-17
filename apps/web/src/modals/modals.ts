@@ -22,7 +22,7 @@ export const modals = {
 		});
 	},
 
-	openLabelsSelectionModal: ({ itemId, onClose }: { itemId: number; onClose?: () => void }) => {
+	openLabelsSelectionModal: ({ itemId, onClose }: { itemId: string; onClose?: () => void }) => {
 		return mantineModals.openContextModal({
 			modal: 'labelsSelection',
 			size: 540,

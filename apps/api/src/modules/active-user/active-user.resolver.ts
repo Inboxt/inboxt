@@ -1,6 +1,6 @@
 import { Resolver, Query } from '@nestjs/graphql';
 
-import { ActiveUserMeta } from '../../decorators/active-user-meta.decorator';
+import { ActiveUserMeta, ActiveUserMetaType } from '../../decorators/active-user-meta.decorator';
 import { UserService } from '../user/user.service';
 import { Public } from '../../decorators/public.decorator';
 import { User } from '../user/user.model';
@@ -11,7 +11,7 @@ export class ActiveUserResolver {
 	constructor(private userService: UserService) {}
 
 	@Query(() => User, { nullable: true })
-	async me(@ActiveUserMeta() user: { userId: number }) {
+	async me(@ActiveUserMeta() user: ActiveUserMetaType) {
 		if (!user?.userId) {
 			return null;
 		}

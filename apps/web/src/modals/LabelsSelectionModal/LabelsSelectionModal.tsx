@@ -18,7 +18,7 @@ export const LabelsSelectionModal = ({
 	id,
 	context,
 	innerProps,
-}: ContextModalProps<{ itemId: number }>) => {
+}: ContextModalProps<{ itemId: string }>) => {
 	const { data } = useQuery(LABELS);
 	const { complete, data: itemLabels } = useFragment({
 		fragment: SAVED_ITEM_LABELS_FRAGMENT,
@@ -32,8 +32,7 @@ export const LabelsSelectionModal = ({
 	});
 
 	useEffect(() => {
-		if (complete && itemLabels)
-			setValue((itemLabels?.labels || []).map((label) => label.id.toString()));
+		if (complete && itemLabels) setValue((itemLabels?.labels || []).map((label) => label.id));
 	}, [itemLabels, complete]);
 
 	const handleSelection = async () => {
@@ -41,7 +40,7 @@ export const LabelsSelectionModal = ({
 			variables: {
 				data: {
 					id: innerProps.itemId,
-					labelIds: value.map((id) => parseInt(id, 10)),
+					labelIds: value.map((id) => id),
 				},
 			},
 		});

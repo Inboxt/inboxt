@@ -17,7 +17,7 @@ export class SavedItemService {
 		return this.prisma.saved_item.findMany(query);
 	}
 
-	async getPaginated(userId: number, data: GetSavedItemsInput) {
+	async getPaginated(userId: string, data: GetSavedItemsInput) {
 		const query: Prisma.saved_itemFindManyArgs = {
 			where: { userId, status: data.status || 'ACTIVE' },
 			orderBy: { id: 'desc' },
@@ -25,14 +25,14 @@ export class SavedItemService {
 		};
 
 		if (data.after) {
-			query.cursor = { id: Number(data.after) };
+			query.cursor = { id: data.after };
 			query.skip = 1;
 		}
 
 		const items = await this.getMany(query);
 		const edges = items.slice(0, data.first).map((item) => ({
 			node: item,
-			cursor: item.id.toString(),
+			cursor: item.id,
 		}));
 
 		return {
@@ -46,7 +46,7 @@ export class SavedItemService {
 		return this.prisma.saved_item.create({ data });
 	}
 
-	async updateStatus(id: number, status: Prisma.saved_itemUpdateInput['status']) {
+	async updateStatus(id: string, status: Prisma.saved_itemUpdateInput['status']) {
 		/*----------  Validation  ----------*/
 		const existingItem = await this.get({ where: { id } });
 		if (!existingItem) {
@@ -60,7 +60,7 @@ export class SavedItemService {
 		});
 	}
 
-	async getLabels(id: number) {
+	async getLabels(id: string) {
 		const labels = await this.prisma.saved_item_label.findMany({
 			where: { savedItemId: id },
 			include: { label: true },
@@ -69,7 +69,7 @@ export class SavedItemService {
 		return labels.map(({ label }) => label);
 	}
 
-	async setLabels(id: number, userId: number, labels: number[]) {
+	async setLabels(id: string, userId: string, labels: string[]) {
 		const validLabels = await this.prisma.label.findMany({
 			where: {
 				id: { in: labels },

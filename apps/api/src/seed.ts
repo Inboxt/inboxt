@@ -63,7 +63,7 @@ async function seedUsers() {
 	return { demo };
 }
 
-async function seedLabels(userId: number) {
+async function seedLabels(userId: string) {
 	logStep('Seeding labels...');
 	const labels = [
 		{
