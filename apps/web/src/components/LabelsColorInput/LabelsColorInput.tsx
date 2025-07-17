@@ -1,8 +1,6 @@
 import { ColorInput, DEFAULT_THEME, MantineColor } from '@mantine/core';
 import { useUncontrolled } from '@mantine/hooks';
 
-import { useScreenQuery } from '../../hooks/useScreenQuery.tsx';
-
 const colorNames: MantineColor[] = [
 	'red',
 	'pink',
@@ -27,6 +25,7 @@ type LabelsColorInputProps = {
 	defaultValue?: string;
 	onChange?: (value: string) => void;
 	label?: string;
+	className?: string;
 };
 
 export const LabelsColorInput = ({
@@ -34,6 +33,7 @@ export const LabelsColorInput = ({
 	defaultValue,
 	onChange,
 	label,
+	className,
 }: LabelsColorInputProps) => {
 	const [_value, handleChange] = useUncontrolled({
 		value,
@@ -41,17 +41,17 @@ export const LabelsColorInput = ({
 		onChange,
 	});
 
-	const isAboveLgScreen = useScreenQuery('lg', 'above');
 	return (
 		<ColorInput
 			value={_value}
 			onChange={(fieldValue) => handleChange(fieldValue)}
-			maw={isAboveLgScreen ? 110 : undefined}
+			maw={110}
 			swatches={[DEFAULT_THEME.colors.dark[9], DEFAULT_THEME.colors.gray[9], ...swatches]}
 			withPicker={false}
 			disallowInput
 			label={label}
 			closeOnColorSwatchClick
+			className={className}
 		/>
 	);
 };

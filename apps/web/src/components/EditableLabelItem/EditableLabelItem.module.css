@@ -1,0 +1,12 @@
+.editableLabelText {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.editableLabelColorInput {
+	@media (max-width: $mantine-breakpoint-sm) {
+		max-width: 100% !important;
+		width: 100% !important;
+	}
+}

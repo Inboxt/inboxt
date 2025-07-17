@@ -1,12 +1,12 @@
 import { Button, Group, Stack } from '@mantine/core';
+import { useEffect, useState } from 'react';
 import { ContextModalProps } from '@mantine/modals';
 import { useQuery } from '@apollo/client';
 
-import { modals } from '@modals/modals.ts';
+import { modals } from '@modals/modals';
 
 import { EditableLabelItem } from '../../components/EditableLabelItem';
-import { LABELS } from '../../lib/graphql.ts';
-import { useEffect, useState } from 'react';
+import { LABELS } from '../../lib/graphql';
 
 export const LabelsModal = ({ id, context }: ContextModalProps) => {
 	const [editingLabelId, setEditingLabelId] = useState<string | null>(null);
@@ -39,8 +39,8 @@ export const LabelsModal = ({ id, context }: ContextModalProps) => {
 				))}
 			</Stack>
 
-			<Group justify="flex-end">
-				<Button variant="light" color="text" onClick={modals.openCreateLabelModal}>
+			<Group justify="space-between" mt="md">
+				<Button variant="light" onClick={modals.openCreateLabelModal}>
 					Create new
 				</Button>
 

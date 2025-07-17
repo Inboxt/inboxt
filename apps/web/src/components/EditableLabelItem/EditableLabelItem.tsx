@@ -10,6 +10,8 @@ import {
 import { useMutation } from '@apollo/client';
 import { useForm, zodResolver } from '@mantine/form';
 
+import classes from './EditableLabelItem.module.css';
+
 import { updateLabelSchema } from '@inbox-reader/schemas';
 
 import { LabelsColorInput } from '../LabelsColorInput';
@@ -24,7 +26,7 @@ type EditableLabelItemProps = {
 };
 
 export const EditableLabelItem = ({ label, isEditing, setIsEditing }: EditableLabelItemProps) => {
-	const isAboveLgScreen = useScreenQuery('lg', 'above');
+	const isAboveSmScreen = useScreenQuery('sm', 'above');
 
 	const [updateLabel, { loading: updateLabelLoading, error: updateLabelError }] = useMutation(
 		UPDATE_LABEL,
@@ -64,7 +66,7 @@ export const EditableLabelItem = ({ label, isEditing, setIsEditing }: EditableLa
 	};
 
 	return (
-		<Group>
+		<Group wrap="nowrap">
 			{isEditing ? (
 				<Form onSubmit={form.onSubmit(handleSave)} error={updateLabelError}>
 					{({ error }) => (
@@ -72,7 +74,7 @@ export const EditableLabelItem = ({ label, isEditing, setIsEditing }: EditableLa
 							<Flex
 								gap="xs"
 								flex={1}
-								direction={{ base: 'column', lg: 'row' }}
+								direction={{ base: 'column', sm: 'row' }}
 								align="flex-start"
 							>
 								<TextInput
@@ -80,33 +82,34 @@ export const EditableLabelItem = ({ label, isEditing, setIsEditing }: EditableLa
 									key={form.key('name')}
 									placeholder="Label name"
 									flex={1}
-								/>
-								<LabelsColorInput
-									{...form.getInputProps('color')}
-									key={form.key('color')}
+									w="100%"
 								/>
 
-								<Group
-									ml={isAboveLgScreen ? 'auto' : 0}
-									gap="xs"
-									grow={!isAboveLgScreen}
-								>
-									<ActionIcon
-										type="submit"
-										size={36}
-										loading={updateLabelLoading}
-									>
-										<IconCheck size={18} />
-									</ActionIcon>
+								<Group wrap="nowrap" w={isAboveSmScreen ? undefined : '100%'}>
+									<LabelsColorInput
+										{...form.getInputProps('color')}
+										key={form.key('color')}
+										className={classes.editableLabelColorInput}
+									/>
 
-									<ActionIcon
-										variant="default"
-										onClick={() => setIsEditing(false)}
-										size={36}
-										loading={updateLabelLoading}
-									>
-										<IconX size={18} />
-									</ActionIcon>
+									<Group ml={isAboveSmScreen ? 'auto' : 0} gap="xs" wrap="nowrap">
+										<ActionIcon
+											type="submit"
+											size={36}
+											loading={updateLabelLoading}
+										>
+											<IconCheck size={18} />
+										</ActionIcon>
+
+										<ActionIcon
+											variant="default"
+											onClick={() => setIsEditing(false)}
+											size={36}
+											loading={updateLabelLoading}
+										>
+											<IconX size={18} />
+										</ActionIcon>
+									</Group>
 								</Group>
 							</Flex>
 
@@ -123,7 +126,7 @@ export const EditableLabelItem = ({ label, isEditing, setIsEditing }: EditableLa
 						}}
 					/>
 
-					<Text flex={1} size="lg">
+					<Text flex={1} size="lg" className={classes.editableLabelText}>
 						{label.name}
 					</Text>
 					<Group ml="auto" gap="xs">

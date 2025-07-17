@@ -16,7 +16,7 @@ export const modals = {
 			modal: 'labels',
 			size: 540,
 			centered: true, // TODO: or not?
-			title: 'Labels',
+			title: 'Manage Labels',
 			closeOnEscape: false,
 			innerProps: {},
 		});
