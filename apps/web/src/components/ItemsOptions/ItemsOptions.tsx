@@ -222,7 +222,7 @@ export const ItemsOptions: React.FC<ItemsOptionsProps> = ({
 						disabled={loading || (option.enabled && !option.enabled(ctx))}
 						onClick={(e) => handleOptionClick(e, option)}
 					>
-						<option.icon size={isSmall ? 16 : undefined} />
+						<option.icon size={isSmall ? 18 : undefined} />
 					</ActionIcon>
 				</Tooltip>
 			))}

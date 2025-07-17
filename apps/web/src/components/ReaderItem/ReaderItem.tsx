@@ -57,20 +57,11 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 
 				<Stack gap={6} flex={1}>
 					<Group wrap="nowrap" gap="md" justify="space-between" pos="relative">
-						<Breadcrumbs separator="•" separatorMargin={6}>
-							<Text fz="sm" className={classes.text}>
-								{dayjs(item.receivedAt).isSame(new Date(), 'year')
-									? dayjs(item.receivedAt).format('MMM D')
-									: dayjs(item.receivedAt).format('MMMM D, YYYY')}
-							</Text>
+						<Text fw="700" lineClamp={1} fz="lg">
+							{item.title}
+						</Text>
 
-							<Text
-								fz="sm"
-								className={classes.text}
-							>{`${Math.ceil(item?.wordCount / 240).toString()} min read`}</Text>
-						</Breadcrumbs>
-
-						{(hovered || isBelowLgScreen) && (
+						{hovered && !isBelowLgScreen ? (
 							<Group
 								gap={4}
 								style={{ position: 'absolute', right: 0 }}
@@ -78,12 +69,21 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 							>
 								<ItemsOptions size="sm" items={[item]} mode="single" />
 							</Group>
+						) : (
+							<Breadcrumbs separator="•" separatorMargin={6}>
+								<Text fz="sm" className={classes.text}>
+									{dayjs(item.receivedAt).isSame(new Date(), 'year')
+										? dayjs(item.receivedAt).format('MMM D')
+										: dayjs(item.receivedAt).format('MMMM D, YYYY')}
+								</Text>
+
+								<Text
+									fz="sm"
+									className={classes.text}
+								>{`${Math.ceil(item?.wordCount / 240).toString()} min read`}</Text>
+							</Breadcrumbs>
 						)}
 					</Group>
-
-					<Text fw="700" lineClamp={1} fz="lg">
-						{item.title}
-					</Text>
 
 					<Text lineClamp={3} fz="md" className={classes.text}>
 						{item?.description ? item.description : item.author}
