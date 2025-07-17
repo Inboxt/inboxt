@@ -82,7 +82,7 @@ async function seedLabels(userId: string) {
 			userId,
 		},
 		{
-			name: 'Long label just for fun and testing purposes',
+			name: 'Long label just for fun on max',
 			color: '#141414',
 			userId,
 		},

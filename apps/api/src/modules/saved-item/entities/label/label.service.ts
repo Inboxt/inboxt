@@ -43,7 +43,7 @@ export class LabelService {
 			where: { name: data.name?.toString(), userId: label.userId },
 		});
 
-		if (existingLabel) {
+		if (existingLabel && existingLabel.id !== id) {
 			throw new AppException('Label already exists', HttpStatus.BAD_REQUEST);
 		}
 
