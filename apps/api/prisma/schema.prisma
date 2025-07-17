@@ -14,25 +14,6 @@ model pgmigrations {
   run_on DateTime @db.Timestamp(6)
 }
 
-model user {
-  id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  createdAt           DateTime     @default(now()) @db.Timestamp(6)
-  logins              Int          @default(0)
-  lastLogin           DateTime?    @db.Timestamp(6)
-  emailAddress        String       @unique
-  pendingEmailAddress String?
-  password            String?
-  username            String?
-  isEmailVerified     Boolean      @default(false)
-  emailVerifyCode     String?
-  emailVerifyExpiry   DateTime?    @db.Timestamp(6)
-  resetPasswordCode   String?
-  resetPasswordExpiry DateTime?    @db.Timestamp(6)
-  plan                user_plan    @default(FREE)
-  label               label[]
-  saved_item          saved_item[]
-}
-
 model article {
   savedItemId String     @id @db.Uuid
   contentHtml String
@@ -80,9 +61,23 @@ model saved_item_label {
   saved_item  saved_item @relation(fields: [savedItemId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
-enum user_plan {
-  DEMO
-  FREE
+model user {
+  id                  String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt           DateTime     @default(now()) @db.Timestamp(6)
+  logins              Int          @default(0)
+  lastLogin           DateTime?    @db.Timestamp(6)
+  emailAddress        String       @unique
+  pendingEmailAddress String?
+  password            String?
+  username            String?
+  isEmailVerified     Boolean      @default(false)
+  emailVerifyCode     String?
+  emailVerifyExpiry   DateTime?    @db.Timestamp(6)
+  resetPasswordCode   String?
+  resetPasswordExpiry DateTime?    @db.Timestamp(6)
+  plan                user_plan    @default(FREE)
+  label               label[]
+  saved_item          saved_item[]
 }
 
 enum saved_item_status {
@@ -94,4 +89,9 @@ enum saved_item_status {
 enum saved_item_type {
   NEWSLETTER
   ARTICLE
+}
+
+enum user_plan {
+  DEMO
+  FREE
 }
