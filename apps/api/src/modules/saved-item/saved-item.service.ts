@@ -20,7 +20,7 @@ export class SavedItemService {
 	async getPaginated(userId: string, data: GetSavedItemsInput) {
 		const query: Prisma.saved_itemFindManyArgs = {
 			where: { userId, status: data.status || 'ACTIVE' },
-			orderBy: { id: 'desc' },
+			orderBy: { createdAt: 'desc' },
 			take: data.first + 1,
 		};
 
