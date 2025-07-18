@@ -141,12 +141,21 @@ export const ReaderView = () => {
 							<Title order={2}>{savedItem.title}</Title>
 
 							<Group gap={6}>
-								{savedItem?.author && <Text>{`By ${savedItem?.author},`}</Text>}
-								<Text>{savedItem?.sourceDomain}</Text>
-								<Text>•</Text>
-								<Anchor href={savedItem?.originalUrl} target="_blank">
-									See original
-								</Anchor>
+								{savedItem?.author && (
+									<Text>
+										{`By ${savedItem.author}`}
+										{savedItem.sourceDomain ? ',' : ''}
+									</Text>
+								)}
+								{savedItem?.sourceDomain && <Text>{savedItem.sourceDomain}</Text>}
+								{savedItem?.originalUrl && (
+									<>
+										<Text>•</Text>
+										<Anchor href={savedItem.originalUrl} target="_blank">
+											See original
+										</Anchor>
+									</>
+								)}
 							</Group>
 
 							<Group gap={6}>

@@ -20,6 +20,7 @@ import { CreateAccountInput } from '../user/dto/create-account.input';
 import { MailService } from '../mail/mail.service';
 import { RequestPasswordRecoveryInput } from './dto/request-password-recovery.input';
 import { ResetPasswordInput } from './dto/reset-password.input';
+import { SavedItemManagementService } from '../saved-item/saved-item-management.service';
 
 @Injectable()
 export class AuthService {
@@ -28,6 +29,7 @@ export class AuthService {
 		private userService: UserService,
 		private passwordService: PasswordService,
 		private mailService: MailService,
+		private savedItemManagementService: SavedItemManagementService,
 	) {}
 
 	createJwtToken(payload: Record<string, unknown>, options: JwtSignOptions): string {
@@ -164,6 +166,7 @@ export class AuthService {
 			password: hashedPassword,
 		});
 
+		await this.savedItemManagementService.createDefaultItems(user.id);
 		await this.userService.sendVerificationEmail(user.id);
 		await this.createTokens(user.emailAddress, context);
 	}

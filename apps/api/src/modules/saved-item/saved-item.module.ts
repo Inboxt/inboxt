@@ -13,6 +13,6 @@ import { UserModule } from '../user/user.module';
 	imports: [ArticleModule, LabelModule, UserModule],
 	providers: [SavedItemService, PrismaService, SavedItemManagementService, SavedItemResolver],
 	controllers: [SavedItemController],
-	exports: [SavedItemService],
+	exports: [SavedItemService, SavedItemManagementService],
 })
 export class SavedItemModule {}

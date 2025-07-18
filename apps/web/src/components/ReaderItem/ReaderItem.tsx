@@ -85,7 +85,7 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 						)}
 					</Group>
 
-					<Text lineClamp={3} fz="md" className={classes.text}>
+					<Text lineClamp={2} fz="md" className={classes.text}>
 						{item?.description ? item.description : item.author}
 					</Text>
 

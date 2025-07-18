@@ -6,9 +6,10 @@ import { UserModule } from '../user/user.module';
 import { PasswordService } from './services/password.service';
 import { JwtModule } from '../jwt/jwt.module';
 import { MailModule } from '../mail/mail.module';
+import { SavedItemModule } from '../saved-item/saved-item.module';
 
 @Module({
-	imports: [JwtModule, UserModule, MailModule],
+	imports: [JwtModule, UserModule, MailModule, SavedItemModule],
 	providers: [AuthService, AuthResolver, PasswordService],
 	exports: [AuthService],
 })
