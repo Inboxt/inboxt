@@ -103,6 +103,14 @@ export class ArticleService {
 		const host = new URL(url).hostname;
 		applyArticleDomainFilter(host, doc);
 
+		const allText = doc?.body?.textContent || '';
+		if (allText.split(/\s+/).length > 32000) {
+			throw new AppException(
+				'The article you tried to add is too large for processing. \n If you believe this is an error, please contact support for further assistance.',
+				HttpStatus.BAD_REQUEST,
+			);
+		}
+
 		const isReadable = isProbablyReaderable(doc);
 		if (!isReadable) {
 			throw new AppException(
