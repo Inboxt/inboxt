@@ -1,4 +1,4 @@
-import { createTheme, Modal, SegmentedControl } from '@mantine/core';
+import { Checkbox, createTheme, Modal, SegmentedControl } from '@mantine/core';
 
 import classes from './theme.module.css';
 
@@ -37,5 +37,6 @@ export const theme = createTheme({
 				root: classes.segmentedControlRoot,
 			},
 		}),
+		Checkbox: Checkbox.extend({ classNames: classes }),
 	},
 });

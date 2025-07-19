@@ -1,3 +1,18 @@
+.root {
+	--checkbox-size-header: 26px;
+
+	&[data-size='header'] {
+		.label {
+			font-size: 14px;
+			line-height: 20px;
+		}
+
+		.labelWrapper {
+			justify-content: center;
+		}
+	}
+}
+
 .modalHeader {
 	padding-right: var(--mantine-spacing-md);
 }

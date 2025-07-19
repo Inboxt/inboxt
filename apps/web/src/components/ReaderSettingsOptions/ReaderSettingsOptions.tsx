@@ -1,9 +1,8 @@
 import { Box, Divider, Flex } from '@mantine/core';
-import { useNavigate } from '@tanstack/react-router';
+import { useCanGoBack, useNavigate, useRouter } from '@tanstack/react-router';
 import { IconLetterCase, IconPaint, IconX } from '@tabler/icons-react';
 
 import { ReaderSettingsPopover } from '../ReaderSettingsPopover';
-import { AppViews } from '../../constants';
 import { FormReadingSettings } from '../../forms/FormReadingSettings';
 import { FormReadingThemeSettings } from '../../forms/FormReadingThemeSettings';
 import { Route } from '../../routes/r.$id.tsx';
@@ -21,19 +20,26 @@ export const ReaderSettingsOptions = ({
 	direction = 'column',
 	variant = 'full',
 }: ReaderSettingsOptionsProps) => {
+	const router = useRouter();
+	const canGoBack = useCanGoBack();
 	const navigate = useNavigate({ from: Route.fullPath });
 	const isBelowXsScreen = useScreenQuery('xs', 'below');
+
+	const handleGoBack = async () => {
+		if (canGoBack) {
+			void router.history.back();
+		} else {
+			void navigate({
+				to: '/',
+			});
+		}
+	};
 
 	return (
 		<Flex direction={direction} gap={isBelowXsScreen ? 'xxxs' : 'sm'}>
 			<Box visibleFrom="md">
 				<ReaderSettingsPopover
-					onClick={() =>
-						void navigate({
-							to: '/',
-							search: { view: AppViews.INBOX },
-						})
-					}
+					onClick={handleGoBack}
 					label="Close reader view"
 					icon={<IconX />}
 				/>
@@ -61,7 +67,7 @@ export const ReaderSettingsOptions = ({
 						items={[item]}
 						mode="reader"
 						onActionComplete={async () => {
-							await navigate({ to: '/' });
+							await handleGoBack();
 						}}
 					/>
 				</>
@@ -72,7 +78,7 @@ export const ReaderSettingsOptions = ({
 					items={[item]}
 					mode="reader-menu"
 					onActionComplete={async () => {
-						await navigate({ to: '/' });
+						await handleGoBack();
 					}}
 				/>
 			)}

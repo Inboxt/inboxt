@@ -1,7 +1,8 @@
-import { Badge, Box, Breadcrumbs, Group, Stack, Text } from '@mantine/core';
-import { useHover } from '@mantine/hooks';
+import { Badge, Box, Breadcrumbs, Group, Stack, Text, Center } from '@mantine/core';
+import { useHover, useLocalStorage } from '@mantine/hooks';
 import dayjs from 'dayjs';
 import { useNavigate } from '@tanstack/react-router';
+import { IconPhotoOff } from '@tabler/icons-react';
 
 import classes from './ReaderItem.module.css';
 
@@ -9,7 +10,7 @@ import { useLongPress } from '../../hooks/useLongPress.tsx';
 import { useReaderContext } from '../../context/ReaderContext.tsx';
 import { ReaderCheckbox } from '../ReaderCheckbox';
 import { useScreenQuery } from '../../hooks/useScreenQuery.tsx';
-import { Route } from '../../routes/r.$id.tsx';
+import { Route } from '../../routes/_auth.index';
 import { ItemsOptions } from '../ItemsOptions';
 
 type ReaderItemProps = {
@@ -21,6 +22,12 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 	const { selectedItems, toggleItemSelection, isSelected } = useReaderContext();
 	const isBelowLgScreen = useScreenQuery('lg', 'below');
 	const navigate = useNavigate({ from: Route.fullPath });
+
+	const [display] = useLocalStorage({
+		key: 'display',
+		defaultValue: 'list',
+		serialize: (value) => value || '',
+	});
 
 	const selected = isSelected(item.id);
 	const handleLongPress = () => {
@@ -42,22 +49,80 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 
 					return;
 				}
-				void navigate({ to: `/r/${item.id}`, search: {} });
+				void navigate({ to: `/r/${item.id}` });
 			}}
 			{...longPressHandlers}
 		>
 			<Group wrap="nowrap" maw="100%">
-				<ReaderCheckbox
-					checked={selected}
-					onChange={() => toggleItemSelection(item)}
-					onClick={(e) => {
-						e.stopPropagation();
-					}}
-				/>
+				{display === 'gallery' ? (
+					<Box style={{ position: 'relative' }}>
+						<Box
+							style={{
+								backgroundColor: 'red',
+								height: 90,
+								width: 90,
+								overflow: 'hidden',
+							}}
+						>
+							{item?.leadImage ? (
+								<img
+									src={item?.leadImage}
+									alt=""
+									style={{
+										height: '100%',
+										width: '100%',
+										objectFit: 'cover',
+										backgroundColor: 'white',
+									}}
+								/>
+							) : (
+								<Center
+									style={{
+										height: '100%',
+										width: '100%',
+										backgroundColor: 'white',
+									}}
+								>
+									<IconPhotoOff size={36} color="#ccc" />
+								</Center>
+							)}
+						</Box>
+
+						<Box
+							style={{
+								position: 'absolute',
+								top: 0,
+								bottom: 0,
+								left: 0,
+								right: 0,
+								display: 'flex',
+								alignItems: 'center',
+							}}
+						>
+							<ReaderCheckbox
+								checked={selected}
+								onChange={() => toggleItemSelection(item)}
+								onClick={(e) => {
+									e.stopPropagation();
+								}}
+								px={3}
+							/>
+						</Box>
+					</Box>
+				) : (
+					<ReaderCheckbox
+						checked={selected}
+						onChange={() => toggleItemSelection(item)}
+						onClick={(e) => {
+							e.stopPropagation();
+						}}
+						px={3}
+					/>
+				)}
 
 				<Stack gap={6} flex={1}>
 					<Group wrap="nowrap" gap="md" justify="space-between" pos="relative">
-						<Text fw="700" lineClamp={1} fz="lg">
+						<Text fw="700" lineClamp={1} fz="lg" maw={hovered ? '75%' : 'unset'}>
 							{item.title}
 						</Text>
 
@@ -70,7 +135,11 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 								<ItemsOptions size="sm" items={[item]} mode="single" />
 							</Group>
 						) : (
-							<Breadcrumbs separator="•" separatorMargin={6}>
+							<Breadcrumbs
+								separator="•"
+								separatorMargin={6}
+								style={{ flexWrap: 'nowrap' }}
+							>
 								<Text fz="sm" className={classes.text}>
 									{dayjs(item.receivedAt).isSame(new Date(), 'year')
 										? dayjs(item.receivedAt).format('MMM D')

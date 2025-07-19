@@ -14,7 +14,7 @@ import {
 	Title,
 	TypographyStylesProvider,
 } from '@mantine/core';
-import { useNavigate, useParams } from '@tanstack/react-router';
+import { useCanGoBack, useNavigate, useParams, useRouter } from '@tanstack/react-router';
 import { IconArrowLeft, IconHighlight, IconHighlightOff } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import { useDocumentTitle } from '@mantine/hooks';
@@ -26,7 +26,6 @@ import { AppName } from '../../components/AppName';
 import { useScreenQuery } from '../../hooks/useScreenQuery.tsx';
 import { ReaderSettingsOptions } from '../../components/ReaderSettingsOptions';
 import { Route } from '../../routes/r.$id.tsx';
-import { AppViews } from '../../constants';
 
 import { useTextHighlighting } from '../../hooks/useTextSelection.tsx';
 import { HighlightableArticle } from '../../components/HighlightableArticle';
@@ -34,6 +33,8 @@ import { SAVED_ITEM } from '../../lib/graphql.ts';
 
 export const ReaderView = () => {
 	const isAboveXsScreen = useScreenQuery('xs', 'above');
+	const router = useRouter();
+	const canGoBack = useCanGoBack();
 	const navigate = useNavigate({ from: Route.fullPath });
 
 	const { selectedText, highlightSelection, isFullyHighlighted } = useTextHighlighting();
@@ -48,6 +49,16 @@ export const ReaderView = () => {
 	const title = savedItem?.title || '';
 	const trimmedTitle = title.length > 50 ? title.slice(0, 50).trimEnd() + '...' : title;
 	useDocumentTitle(trimmedTitle ? `${trimmedTitle} | Inbox Reader` : 'Inbox Reader');
+
+	const handleGoBack = async () => {
+		if (canGoBack) {
+			void router.history.back();
+		} else {
+			void navigate({
+				to: '/',
+			});
+		}
+	};
 
 	if (loading) {
 		return (
@@ -84,16 +95,7 @@ export const ReaderView = () => {
 	return (
 		<Box py="md" px={isAboveXsScreen ? 24 : 'md'} pb="xxl">
 			<Box className={classes.headerContainer}>
-				<Group
-					onClick={() =>
-						void navigate({
-							to: '/',
-							search: { view: AppViews.INBOX },
-						})
-					}
-					align="center"
-					justify="center"
-				>
+				<Group onClick={handleGoBack} align="center" justify="center">
 					<Flex hiddenFrom="md">
 						<IconArrowLeft />
 					</Flex>

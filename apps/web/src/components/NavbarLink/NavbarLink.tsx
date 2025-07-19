@@ -1,6 +1,6 @@
 import { Box, NavLink, NavLinkProps, Tooltip, Transition } from '@mantine/core';
 import { ReactNode } from 'react';
-import { Link } from '@tanstack/react-router';
+import { Link, useSearch } from '@tanstack/react-router';
 
 import classes from './NavbarLink.module.css';
 
@@ -22,6 +22,7 @@ type NavbarLinkProps = {
 export const NavbarLink = ({ label, icon, opened, view, toggleDrawer, color }: NavbarLinkProps) => {
 	const isBelowMdScreen = useScreenQuery('md', 'below');
 	const { setSelectedItems } = useReaderContext();
+	const { ...currentSearch } = useSearch({ from: Route.id });
 
 	return (
 		<Tooltip label={label} position="right" disabled={opened}>
@@ -57,6 +58,7 @@ export const NavbarLink = ({ label, icon, opened, view, toggleDrawer, color }: N
 						<Link
 							from={Route.fullPath}
 							search={{
+								...currentSearch,
 								view:
 									view === AppViews.LABEL ? `${view}:${kebabCase(label)}` : view,
 							}}

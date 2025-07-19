@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import { extractLabelName } from '../../utils/extractLabelName.ts';
 import { useDebouncedValue } from '@mantine/hooks';
 
-export const AppSearch = () => {
+export const AppSearch = ({ variant = 'filled' }) => {
 	const { view } = useSearch({ from: Route.id });
 
 	const [search, setSearch] = useState('');
@@ -15,7 +15,7 @@ export const AppSearch = () => {
 
 	useEffect(() => {
 		let searchValue = '';
-		if (view !== AppViews.INBOX) {
+		if (view && view !== AppViews.NEWSLETTERS && !view.startsWith(AppViews.LABEL)) {
 			searchValue = `in:${view}`;
 		}
 
@@ -36,7 +36,7 @@ export const AppSearch = () => {
 
 	return (
 		<TextInput
-			variant="filled"
+			variant={variant}
 			placeholder="Search for keywords or labels..."
 			leftSection={<IconSearch size={18} />}
 			flex="1"
