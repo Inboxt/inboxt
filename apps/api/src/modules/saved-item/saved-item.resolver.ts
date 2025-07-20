@@ -13,6 +13,7 @@ import { SetSavedItemLabelsInput } from './dto/set-saved-item-labels.input';
 import { Label } from './entities/label/label.model';
 import { SavedItemConnection } from './saved-items.model';
 import { GetSavedItemsInput } from './dto/get-saved-items.input';
+import { PermanentlyDeleteSavedItemsInput } from './dto/permanently-delete-saved-items.input';
 
 @Resolver(() => SavedItem)
 export class SavedItemResolver {
@@ -52,6 +53,19 @@ export class SavedItemResolver {
 		@Args('data') data: SetSavedItemLabelsInput,
 	) {
 		await this.savedItemService.setLabels(data.id, user.userId, data.labelIds);
+		return VOID_RESPONSE;
+	}
+
+	@Mutation(() => Void)
+	async permanentlyDeleteSavedItems(@Args('data') data: PermanentlyDeleteSavedItemsInput) {
+		if (data.ids.length === 0) {
+			return VOID_RESPONSE;
+		}
+
+		for (const id of data.ids) {
+			await this.savedItemService.delete(id);
+		}
+
 		return VOID_RESPONSE;
 	}
 

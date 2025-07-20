@@ -1,7 +1,7 @@
 import { Alert, Button, Center, Group, Stack, Text } from '@mantine/core';
 import { useSearch } from '@tanstack/react-router';
-import { useQuery } from '@apollo/client';
-import { useEffect } from 'react';
+import { useMutation, useQuery } from '@apollo/client';
+import React, { useEffect } from 'react';
 
 import classes from './ItemsList.module.css';
 
@@ -10,7 +10,8 @@ import { ReaderItem } from '../../components/ReaderItem';
 import { Route } from '../../routes/_auth.index.tsx';
 import { AppViews } from '../../constants';
 import { AppLayout } from '../../layouts/AppLayout.tsx';
-import { SAVED_ITEMS } from '../../lib/graphql.ts';
+import { PERMANENTLY_DELETE_SAVED_ITEMS, SAVED_ITEMS } from '../../lib/graphql.ts';
+import { modals } from '@modals/modals.ts';
 
 export const ItemsList = () => {
 	const { view } = useSearch({ from: Route.id });
@@ -22,6 +23,10 @@ export const ItemsList = () => {
 		fetchPolicy: 'cache-and-network',
 	});
 
+	const [permanentlyDeleteSavedItems] = useMutation(PERMANENTLY_DELETE_SAVED_ITEMS, {
+		refetchQueries: [SAVED_ITEMS],
+	});
+
 	// TODO: infinite scrolling - make sure this part also works with it
 	const { setVisibleItems } = useReaderContext();
 	useEffect(() => {
@@ -31,6 +36,33 @@ export const ItemsList = () => {
 	}, [data?.savedItems]);
 
 	const items = data?.savedItems?.edges || [];
+	const handlePermanentlyDeleteSavedItems = async () => {
+		const count = items.length;
+		const confirmed = await new Promise<boolean>((resolve) => {
+			modals.openConfirmModal({
+				title: 'Delete Permanently',
+				centered: true,
+				children: (
+					<Text>
+						Are you sure you want to permanently delete{' '}
+						{count > 1 ? `${count} items` : 'this item'}? <br />
+						This action cannot be undone.
+					</Text>
+				),
+				labels: { confirm: 'Delete permanently', cancel: 'Cancel' },
+				confirmProps: { color: 'red' },
+				onConfirm: () => resolve(true),
+				onCancel: () => resolve(false),
+			});
+		});
+
+		if (!confirmed) return;
+
+		await permanentlyDeleteSavedItems({
+			variables: { data: { ids: items.map((i) => i.node.id) } },
+		});
+	};
+
 	return (
 		<AppLayout>
 			<Stack gap={0} className={classes.items}>
@@ -48,7 +80,11 @@ export const ItemsList = () => {
 								Items in Trash will be automatically deleted after 30 days.
 							</Text>
 
-							<Button variant="transparent" size="compact-sm">
+							<Button
+								variant="transparent"
+								size="compact-sm"
+								onClick={handlePermanentlyDeleteSavedItems}
+							>
 								Empty Trash Now
 							</Button>
 						</Group>

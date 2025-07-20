@@ -134,42 +134,52 @@ export const ReaderView = () => {
 			<Center py="xxl">
 				<Box w={isAboveXsScreen ? '45em' : '100%'}>
 					<Stack gap="xl">
-						<Stack gap="xxs">
-							<Breadcrumbs separator="•" separatorMargin={6}>
-								<Text>{dayjs(savedItem.createdAt).format('MMMM D, YYYY')}</Text>
-								<Text>{`${Math.ceil(savedItem?.wordCount / 240).toString()} min read`}</Text>
-							</Breadcrumbs>
+						{savedItem && (
+							<>
+								<Stack gap="xxs">
+									<Breadcrumbs separator="•" separatorMargin={6}>
+										<Text>
+											{dayjs(savedItem.createdAt).format('MMMM D, YYYY')}
+										</Text>
+										<Text>{`${Math.ceil(savedItem?.wordCount / 240).toString()} min read`}</Text>
+									</Breadcrumbs>
 
-							<Title order={2}>{savedItem.title}</Title>
+									<Title order={2}>{savedItem.title}</Title>
 
-							<Group gap={6}>
-								{savedItem?.author && (
-									<Text>
-										{`By ${savedItem.author}`}
-										{savedItem.sourceDomain ? ',' : ''}
-									</Text>
-								)}
-								{savedItem?.sourceDomain && <Text>{savedItem.sourceDomain}</Text>}
-								{savedItem?.originalUrl && (
-									<>
-										<Text>•</Text>
-										<Anchor href={savedItem.originalUrl} target="_blank">
-											See original
-										</Anchor>
-									</>
-								)}
-							</Group>
+									<Group gap={6}>
+										{savedItem?.author && (
+											<Text>
+												{`By ${savedItem.author}`}
+												{savedItem.sourceDomain ? ',' : ''}
+											</Text>
+										)}
+										{savedItem?.sourceDomain && (
+											<Text>{savedItem.sourceDomain}</Text>
+										)}
+										{savedItem?.originalUrl && (
+											<>
+												<Text>•</Text>
+												<Anchor
+													href={savedItem.originalUrl}
+													target="_blank"
+												>
+													See original
+												</Anchor>
+											</>
+										)}
+									</Group>
 
-							<Group gap={6}>
-								{savedItem?.labels.map((label) => (
-									<Badge size="sm" radius="sm" color={label.color}>
-										{label.name}
-									</Badge>
-								))}
-							</Group>
-						</Stack>
-
-						<Divider />
+									<Group gap={6}>
+										{savedItem?.labels.map((label) => (
+											<Badge size="sm" radius="sm" color={label.color}>
+												{label.name}
+											</Badge>
+										))}
+									</Group>
+								</Stack>
+								<Divider />
+							</>
+						)}
 
 						{!error ? (
 							<TypographyStylesProvider

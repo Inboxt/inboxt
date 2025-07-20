@@ -11,7 +11,11 @@ import {
 } from '@tabler/icons-react';
 import { modals } from '@modals/modals.ts';
 import { useMutation } from '@apollo/client';
-import { SAVED_ITEMS, UPDATE_SAVED_ITEM_STATUS } from '../../lib/graphql';
+import {
+	PERMANENTLY_DELETE_SAVED_ITEMS,
+	SAVED_ITEMS,
+	UPDATE_SAVED_ITEM_STATUS,
+} from '../../lib/graphql';
 import { useReaderContext } from '../../context/ReaderContext';
 import { ReaderSettingsPopover } from '../ReaderSettingsPopover';
 import { MenuDrawer } from '../MenuDrawer';
@@ -55,6 +59,10 @@ export const ItemsOptions: React.FC<ItemsOptionsProps> = ({
 	const [updateStatus, { loading }] = useMutation(UPDATE_SAVED_ITEM_STATUS);
 	const { setSelectedItems } = useReaderContext();
 	const ctx: OptionContext = { items, loading };
+
+	const [permanentlyDeleteSavedItems] = useMutation(PERMANENTLY_DELETE_SAVED_ITEMS, {
+		refetchQueries: [SAVED_ITEMS],
+	});
 
 	const OPTIONS: Option[] = [
 		{
@@ -138,7 +146,10 @@ export const ItemsOptions: React.FC<ItemsOptionsProps> = ({
 
 				if (!confirmed) return false;
 
-				// todo delete permanently: const ids = items.map((i) => i.id);
+				await permanentlyDeleteSavedItems({
+					variables: { data: { ids: items.map((i) => i.id) } },
+				});
+
 				return true;
 			},
 		},

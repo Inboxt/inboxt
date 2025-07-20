@@ -69,6 +69,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 			notNull: true,
 			default: 'ACTIVE',
 		},
+		deletedSince: 'timestamp',
 	});
 
 	pgm.createIndex('saved_item', 'userId');

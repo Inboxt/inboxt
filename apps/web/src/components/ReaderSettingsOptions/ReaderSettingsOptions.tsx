@@ -35,6 +35,10 @@ export const ReaderSettingsOptions = ({
 		}
 	};
 
+	if (!item) {
+		return null;
+	}
+
 	return (
 		<Flex direction={direction} gap={isBelowXsScreen ? 'xxxs' : 'sm'}>
 			<Box visibleFrom="md">

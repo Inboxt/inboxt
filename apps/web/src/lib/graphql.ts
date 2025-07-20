@@ -197,6 +197,14 @@ export const UPDATE_SAVED_ITEM_STATUS = gql`
 	}
 `;
 
+export const PERMANENTLY_DELETE_SAVED_ITEMS = gql`
+	mutation permanentlyDeleteSavedItems($data: PermanentlyDeleteSavedItemsInput!) {
+		permanentlyDeleteSavedItems(data: $data) {
+			success
+		}
+	}
+`;
+
 export const CREATE_LABEL = gql`
 	mutation createLabel($data: CreateLabelInput!) {
 		createLabel(data: $data) {

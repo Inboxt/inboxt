@@ -1,4 +1,5 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
+import dayjs from 'dayjs';
 
 import { PrismaService } from '../../services/prisma.service';
 import { Prisma } from '../../../prisma/client';
@@ -56,7 +57,10 @@ export class SavedItemService {
 		/*----------  Processing  ----------*/
 		return this.prisma.saved_item.update({
 			where: { id },
-			data: { status },
+			data: {
+				status,
+				deletedSince: status === 'DELETED' ? dayjs().toDate() : null,
+			},
 		});
 	}
 
@@ -95,6 +99,26 @@ export class SavedItemService {
 		await this.prisma.saved_item_label.createMany({
 			data: toAdd.map((labelId) => ({ labelId, savedItemId: id })),
 			skipDuplicates: true,
+		});
+	}
+
+	// todo: validation check that user only tries to delete resource that belong to him?
+	async delete(id: string) {
+		/*----------  Validation  ----------*/
+		const savedItem = await this.get({
+			where: { id, status: 'DELETED', deletedSince: { not: null } },
+		});
+
+		if (!savedItem) {
+			throw new AppException(
+				'This item does not exist or has already been deleted',
+				HttpStatus.NOT_FOUND,
+			);
+		}
+
+		/*----------  Processing  ----------*/
+		return this.prisma.saved_item.delete({
+			where: { id },
 		});
 	}
 }
