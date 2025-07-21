@@ -3,12 +3,16 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import dayjs from 'dayjs';
 
 import { PrismaService } from '../../services/prisma.service';
+import { SavedItemManagementService } from '../saved-item/saved-item-management.service';
 
 @Injectable()
 export class TaskSchedulerService {
 	private readonly logger = new Logger(TaskSchedulerService.name);
 
-	constructor(private prisma: PrismaService) {}
+	constructor(
+		private prisma: PrismaService,
+		private savedItemManagementService: SavedItemManagementService,
+	) {}
 
 	@Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
 	async deleteUnverifiedUsers() {
@@ -53,5 +57,24 @@ export class TaskSchedulerService {
 		this.logger.log(
 			`Deleted ${savedItems.length} saved items that were soft deleted more than 30 days ago`,
 		);
+	}
+
+	@Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+	async resetDemoAccount() {
+		const demoEmail = 'demo@inbox-reader.com';
+		const user = await this.prisma.user.findFirst({ where: { emailAddress: demoEmail } });
+		if (!user) {
+			return;
+		}
+
+		// Clean-up
+		await this.prisma.saved_item.deleteMany({ where: { user: { emailAddress: demoEmail } } });
+		await this.prisma.label.deleteMany({ where: { user: { emailAddress: demoEmail } } });
+
+		// Default values
+		// todo: default user account settings? like firstName/lastName?
+		await this.savedItemManagementService.createDefaultItems(user.id);
+
+		this.logger.log(`Demo account reset at ${new Date().toISOString()}`);
 	}
 }
