@@ -181,7 +181,7 @@ export const ReaderView = () => {
 							</>
 						)}
 
-						{!error ? (
+						{!error && savedItem ? (
 							<TypographyStylesProvider
 								style={{
 									wordBreak: 'break-word',

@@ -14,24 +14,24 @@ export class UserResolver {
 
 	@Mutation(() => User)
 	async updateAccount(
-		@ActiveUserMeta() activeUser: ActiveUserMetaType,
+		@ActiveUserMeta() user: ActiveUserMetaType,
 		@Args('data') data: UpdateAccountInput,
 	) {
-		return this.userService.update(activeUser.userId, data);
+		return this.userService.update(user.userId, data);
 	}
 
 	@Mutation(() => Void)
 	async deleteAccount(
-		@ActiveUserMeta() activeUser: ActiveUserMetaType,
+		@ActiveUserMeta() user: ActiveUserMetaType,
 		@Args('data') data: DeleteAccountInput,
 	) {
-		await this.userService.delete(activeUser.userId, data);
+		await this.userService.delete(user.userId, data);
 		return VOID_RESPONSE;
 	}
 
 	@Mutation(() => Void)
-	async resendVerificationEmail(@ActiveUserMeta() activeUser: ActiveUserMetaType) {
-		await this.userService.sendVerificationEmail(activeUser.userId);
+	async resendVerificationEmail(@ActiveUserMeta() user: ActiveUserMetaType) {
+		await this.userService.sendVerificationEmail(user.userId);
 		return VOID_RESPONSE;
 	}
 }

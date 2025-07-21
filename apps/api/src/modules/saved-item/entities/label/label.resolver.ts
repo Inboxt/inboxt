@@ -18,26 +18,32 @@ export class LabelResolver {
 
 	@Mutation(() => Label)
 	async createLabel(
-		@ActiveUserMeta() activeUser: ActiveUserMetaType,
+		@ActiveUserMeta() user: ActiveUserMetaType,
 		@Args('data') data: CreateLabelInput,
 	) {
-		return this.labelService.create(activeUser.userId, data);
+		return this.labelService.create(user.userId, data);
 	}
 
 	@Mutation(() => Label)
-	async updateLabel(@Args('data') data: UpdateLabelInput) {
+	async updateLabel(
+		@ActiveUserMeta() user: ActiveUserMetaType,
+		@Args('data') data: UpdateLabelInput,
+	) {
 		const { id, ...input } = data;
-		return this.labelService.update(id, input);
+		return this.labelService.update(user.userId, id, input);
 	}
 
 	@Mutation(() => Void)
-	async deleteLabel(@Args('data') data: DeleteLabelInput) {
-		await this.labelService.delete(data.id);
+	async deleteLabel(
+		@ActiveUserMeta() user: ActiveUserMetaType,
+		@Args('data') data: DeleteLabelInput,
+	) {
+		await this.labelService.delete(user.userId, data.id);
 		return VOID_RESPONSE;
 	}
 
 	@Query(() => [Label], { nullable: true })
 	async labels(@ActiveUserMeta() user: ActiveUserMetaType) {
-		return this.labelService.getMany({ where: { userId: user.userId } });
+		return this.labelService.getMany(user.userId, {});
 	}
 }

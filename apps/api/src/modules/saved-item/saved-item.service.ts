@@ -5,17 +5,21 @@ import { PrismaService } from '../../services/prisma.service';
 import { Prisma } from '../../../prisma/client';
 import { GetSavedItemsInput } from './dto/get-saved-items.input';
 import { AppException } from '../../utils/app-exception';
+import { LabelService } from './entities/label/label.service';
 
 @Injectable()
 export class SavedItemService {
-	constructor(private prisma: PrismaService) {}
+	constructor(
+		private prisma: PrismaService,
+		private labelService: LabelService,
+	) {}
 
-	async get(query: Prisma.saved_itemFindUniqueArgs) {
-		return this.prisma.saved_item.findUnique(query);
+	async get(userId: string, query: Prisma.saved_itemFindUniqueArgs) {
+		return this.prisma.saved_item.findUnique({ ...query, where: { ...query.where, userId } });
 	}
 
-	async getMany(query: Prisma.saved_itemFindManyArgs) {
-		return this.prisma.saved_item.findMany(query);
+	async getMany(userId: string, query: Prisma.saved_itemFindManyArgs) {
+		return this.prisma.saved_item.findMany({ ...query, where: { ...query.where, userId } });
 	}
 
 	async getPaginated(userId: string, data: GetSavedItemsInput) {
@@ -30,7 +34,7 @@ export class SavedItemService {
 			query.skip = 1;
 		}
 
-		const items = await this.getMany(query);
+		const items = await this.getMany(userId, query);
 		const edges = items.slice(0, data.first).map((item) => ({
 			node: item,
 			cursor: item.id,
@@ -43,20 +47,23 @@ export class SavedItemService {
 		};
 	}
 
-	async create(data: Prisma.saved_itemCreateArgs['data']) {
-		return this.prisma.saved_item.create({ data });
+	async create(
+		userId: string,
+		data: Omit<Prisma.saved_itemCreateArgs['data'], 'userId' | 'user'>,
+	) {
+		return this.prisma.saved_item.create({ data: { ...data, userId } });
 	}
 
-	async updateStatus(id: string, status: Prisma.saved_itemUpdateInput['status']) {
+	async updateStatus(userId: string, id: string, status: Prisma.saved_itemUpdateInput['status']) {
 		/*----------  Validation  ----------*/
-		const existingItem = await this.get({ where: { id } });
+		const existingItem = await this.get(userId, { where: { id } });
 		if (!existingItem) {
 			throw new AppException('Item not found', HttpStatus.NOT_FOUND);
 		}
 
 		/*----------  Processing  ----------*/
 		return this.prisma.saved_item.update({
-			where: { id },
+			where: { id, userId },
 			data: {
 				status,
 				deletedSince: status === 'DELETED' ? dayjs().toDate() : null,
@@ -64,7 +71,12 @@ export class SavedItemService {
 		});
 	}
 
-	async getLabels(id: string) {
+	async getLabels(userId: string, id: string) {
+		const savedItem = await this.get(userId, { where: { id } });
+		if (!savedItem) {
+			throw new AppException('Item not found', HttpStatus.NOT_FOUND);
+		}
+
 		const labels = await this.prisma.saved_item_label.findMany({
 			where: { savedItemId: id },
 			include: { label: true },
@@ -73,11 +85,16 @@ export class SavedItemService {
 		return labels.map(({ label }) => label);
 	}
 
-	async setLabels(id: string, userId: string, labels: string[]) {
-		const validLabels = await this.prisma.label.findMany({
+	async setLabels(userId: string, id: string, labels: string[]) {
+		/*----------  Validation  ----------*/
+		const item = await this.get(userId, { where: { id } });
+		if (!item) {
+			throw new AppException('Item not found', HttpStatus.NOT_FOUND);
+		}
+
+		const validLabels = await this.labelService.getMany(userId, {
 			where: {
 				id: { in: labels },
-				userId,
 			},
 			select: { id: true },
 		});
@@ -92,6 +109,11 @@ export class SavedItemService {
 		const toAdd = validLabelIds.filter((labelId) => !currentIds.includes(labelId));
 		const toRemove = currentIds.filter((labelId) => !validLabelIds.includes(labelId));
 
+		if (!toAdd.length && !toRemove.length) {
+			return;
+		}
+
+		/*----------  Processing  ----------*/
 		await this.prisma.saved_item_label.deleteMany({
 			where: { savedItemId: id, labelId: { in: toRemove } },
 		});
@@ -102,11 +124,10 @@ export class SavedItemService {
 		});
 	}
 
-	// todo: validation check that user only tries to delete resource that belong to him?
-	async delete(id: string) {
+	async delete(userId: string, id: string) {
 		/*----------  Validation  ----------*/
-		const savedItem = await this.get({
-			where: { id, status: 'DELETED', deletedSince: { not: null } },
+		const savedItem = await this.get(userId, {
+			where: { id, userId, status: 'DELETED', deletedSince: { not: null } },
 		});
 
 		if (!savedItem) {

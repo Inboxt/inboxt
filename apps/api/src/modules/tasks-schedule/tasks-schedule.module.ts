@@ -1,11 +1,9 @@
 import { Module } from '@nestjs/common';
 
-import { UserModule } from '../user/user.module';
-import { SavedItemModule } from '../saved-item/saved-item.module';
 import { TaskSchedulerService } from './tasks-schedule.service';
+import { PrismaService } from '../../services/prisma.service';
 
 @Module({
-	imports: [UserModule, SavedItemModule],
-	providers: [TaskSchedulerService],
+	providers: [PrismaService, TaskSchedulerService],
 })
 export class TaskScheduleModule {}

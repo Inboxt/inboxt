@@ -10,12 +10,16 @@ import { updateLabelSchema } from '@inbox-reader/schemas';
 export class LabelService {
 	constructor(private readonly prisma: PrismaService) {}
 
-	async get(query: Prisma.labelFindFirstArgs) {
-		return this.prisma.label.findFirst(query);
+	async get(userId: string, query: Prisma.labelFindFirstArgs) {
+		return this.prisma.label.findFirst({ ...query, where: { ...query.where, userId } });
 	}
 
-	async getMany(query: Prisma.labelFindManyArgs) {
-		return this.prisma.label.findMany({ ...query, orderBy: { id: 'asc' } });
+	async getMany(userId: string, query: Prisma.labelFindManyArgs) {
+		return this.prisma.label.findMany({
+			...query,
+			orderBy: { id: 'asc' },
+			where: { ...query.where, userId },
+		});
 	}
 
 	async create(userId: string, data: Omit<Prisma.labelCreateInput, 'user' | 'userId'>) {
@@ -25,22 +29,22 @@ export class LabelService {
 		/*----------  Processing  ----------*/
 		return this.prisma.label.create({
 			data: {
-				userId,
 				...data,
+				userId,
 			},
 		});
 	}
 
-	async update(id: string, data: Omit<Prisma.labelUpdateInput, 'id'>) {
+	async update(userId: string, id: string, data: Omit<Prisma.labelUpdateInput, 'id'>) {
 		/*----------  Validation  ----------*/
 		await updateLabelSchema.parseAsync(data);
-		const label = await this.get({ where: { id } });
+		const label = await this.get(userId, { where: { id } });
 		if (!label) {
 			throw new AppException('Label not found', HttpStatus.NOT_FOUND);
 		}
 
-		const existingLabel = await this.get({
-			where: { name: data.name?.toString(), userId: label.userId },
+		const existingLabel = await this.get(userId, {
+			where: { name: data.name?.toString() },
 		});
 
 		if (existingLabel && existingLabel.id !== id) {
@@ -49,21 +53,21 @@ export class LabelService {
 
 		/*----------  Processing  ----------*/
 		return this.prisma.label.update({
-			where: { id },
+			where: { id, userId },
 			data,
 		});
 	}
 
-	async delete(id: string) {
+	async delete(userId: string, id: string) {
 		/*----------  Validation  ----------*/
-		const label = await this.get({ where: { id } });
+		const label = await this.get(userId, { where: { id } });
 		if (!label) {
 			throw new AppException('Label not found', HttpStatus.NOT_FOUND);
 		}
 
 		/*----------  Processing  ----------*/
 		return this.prisma.label.delete({
-			where: { id },
+			where: { id, userId },
 		});
 	}
 }

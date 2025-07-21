@@ -75,8 +75,16 @@ export class ArticleService {
 		});
 	}
 
-	async get(query: Prisma.articleFindFirstArgs) {
-		return this.prismaService.article.findFirst(query);
+	async get(userId: string, query: Prisma.articleFindFirstArgs) {
+		return this.prismaService.article.findFirst({
+			...query,
+			where: {
+				...query.where,
+				saved_item: {
+					userId,
+				},
+			},
+		});
 	}
 
 	async create(

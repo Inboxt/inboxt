@@ -2,7 +2,7 @@ import { Resolver, Query, ResolveField, Parent, Args, Mutation } from '@nestjs/g
 
 import { ActiveUserMeta, ActiveUserMetaType } from '../../decorators/active-user-meta.decorator';
 import { SavedItemService } from './saved-item.service';
-import { Article } from './article.model';
+import { Article } from './entities/article/article.model';
 import { ArticleService } from './entities/article/article.service';
 import { SavedItem } from './saved-item.model';
 import { GetSavedItemInput } from './dto/get-saved-item.input';
@@ -30,18 +30,24 @@ export class SavedItemResolver {
 		return this.savedItemService.getPaginated(user.userId, data);
 	}
 
-	@Query(() => SavedItem)
-	async savedItem(@Args('query') getSavedItemInput: GetSavedItemInput) {
-		return this.savedItemService.get({
+	@Query(() => SavedItem, { nullable: true })
+	async savedItem(
+		@ActiveUserMeta() user: ActiveUserMetaType,
+		@Args('query') getSavedItemInput: GetSavedItemInput,
+	) {
+		return this.savedItemService.get(user.userId, {
 			where: { id: getSavedItemInput.id },
 		});
 	}
 
 	@Mutation(() => Void)
-	async updateSavedItemStatus(@Args('data') data: UpdateSavedItemStatusInput) {
+	async updateSavedItemStatus(
+		@ActiveUserMeta() user: ActiveUserMetaType,
+		@Args('data') data: UpdateSavedItemStatusInput,
+	) {
 		const { ids, ...input } = data;
 		for (const id of ids) {
-			await this.savedItemService.updateStatus(id, input.status);
+			await this.savedItemService.updateStatus(user.userId, id, input.status);
 		}
 
 		return VOID_RESPONSE;
@@ -52,18 +58,21 @@ export class SavedItemResolver {
 		@ActiveUserMeta() user: ActiveUserMetaType,
 		@Args('data') data: SetSavedItemLabelsInput,
 	) {
-		await this.savedItemService.setLabels(data.id, user.userId, data.labelIds);
+		await this.savedItemService.setLabels(user.userId, data.id, data.labelIds);
 		return VOID_RESPONSE;
 	}
 
 	@Mutation(() => Void)
-	async permanentlyDeleteSavedItems(@Args('data') data: PermanentlyDeleteSavedItemsInput) {
+	async permanentlyDeleteSavedItems(
+		@ActiveUserMeta() user: ActiveUserMetaType,
+		@Args('data') data: PermanentlyDeleteSavedItemsInput,
+	) {
 		if (data.ids.length === 0) {
 			return VOID_RESPONSE;
 		}
 
 		for (const id of data.ids) {
-			await this.savedItemService.delete(id);
+			await this.savedItemService.delete(user.userId, id);
 		}
 
 		return VOID_RESPONSE;
@@ -75,15 +84,15 @@ export class SavedItemResolver {
 			return null;
 		}
 
-		return this.articleService.get({ where: { savedItemId: savedItem.id } });
+		return this.articleService.get(user.userId, { where: { savedItemId: savedItem.id } });
 	}
 
 	@ResolveField('labels', () => [Label], { nullable: true })
-	async labels(@Parent() savedItem) {
+	async labels(@ActiveUserMeta() user: ActiveUserMetaType, @Parent() savedItem) {
 		if (!savedItem) {
 			return null;
 		}
 
-		return this.savedItemService.getLabels(savedItem.id);
+		return this.savedItemService.getLabels(user.userId, savedItem.id);
 	}
 }

@@ -2,22 +2,18 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import dayjs from 'dayjs';
 
-import { UserService } from '../user/user.service';
-import { SavedItemService } from '../saved-item/saved-item.service';
+import { PrismaService } from '../../services/prisma.service';
 
 @Injectable()
 export class TaskSchedulerService {
 	private readonly logger = new Logger(TaskSchedulerService.name);
 
-	constructor(
-		private userService: UserService,
-		private savedItemService: SavedItemService,
-	) {}
+	constructor(private prisma: PrismaService) {}
 
 	@Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
 	async deleteUnverifiedUsers() {
 		const thresholdDate = dayjs().subtract(45, 'days').toDate();
-		const users = await this.userService.getMany({
+		const users = await this.prisma.user.findMany({
 			where: {
 				isEmailVerified: false,
 				createdAt: {
@@ -27,11 +23,11 @@ export class TaskSchedulerService {
 		});
 
 		await Promise.all(
-			users.map(async (user) => {
-				await this.userService.delete(user.id, {
-					emailAddress: user.emailAddress,
-				});
-			}),
+			users.map((user) =>
+				this.prisma.user.delete({
+					where: { id: user.id, emailAddress: user.emailAddress },
+				}),
+			),
 		);
 
 		this.logger.log(`Deleted ${users.length} unverified users older than 45 days`);
@@ -40,7 +36,7 @@ export class TaskSchedulerService {
 	@Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
 	async permanentlyDeleteSavedItems() {
 		const thresholdDate = dayjs().subtract(30, 'days').toDate();
-		const savedItems = await this.savedItemService.getMany({
+		const savedItems = await this.prisma.saved_item.findMany({
 			where: {
 				deletedSince: {
 					lte: thresholdDate,
@@ -49,7 +45,9 @@ export class TaskSchedulerService {
 		});
 
 		await Promise.all(
-			savedItems.map((savedItem) => this.savedItemService.delete(savedItem.id)),
+			savedItems.map((savedItem) =>
+				this.prisma.saved_item.delete({ where: { id: savedItem.id } }),
+			),
 		);
 
 		this.logger.log(

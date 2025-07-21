@@ -32,12 +32,9 @@ export class SavedItemManagementService {
 			throw new AppException('User not found', HttpStatus.NOT_FOUND);
 		}
 
-		// todo: add blocked urls?
-
 		/*----------  Processing  ----------*/
 		const parsed = await this.articleService.parse(url);
-		const savedItem = await this.savedItemService.create({
-			userId,
+		const savedItem = await this.savedItemService.create(userId, {
 			originalUrl: url,
 			sourceDomain: new URL(url).hostname.replace(/^www\\./, ''),
 			description: parsed?.description,
@@ -89,7 +86,7 @@ export class SavedItemManagementService {
 
 		await Promise.all(
 			[gettingStarted, tipsAndTricks].map((defaultItem) =>
-				this.savedItemService.setLabels(defaultItem.id, userId, [defaultLabel.id]),
+				this.savedItemService.setLabels(userId, defaultItem.id, [defaultLabel.id]),
 			),
 		);
 	}
