@@ -25,9 +25,9 @@ export class SavedItemResolver {
 	@Query(() => SavedItemConnection)
 	async savedItems(
 		@ActiveUserMeta() user: ActiveUserMetaType,
-		@Args('data') data: GetSavedItemsInput,
+		@Args('query') query: GetSavedItemsInput,
 	) {
-		return this.savedItemService.getPaginated(user.userId, data);
+		return this.savedItemService.getPaginated(user.userId, query);
 	}
 
 	@Query(() => SavedItem, { nullable: true })

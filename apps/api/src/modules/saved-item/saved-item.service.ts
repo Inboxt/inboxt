@@ -22,20 +22,20 @@ export class SavedItemService {
 		return this.prisma.saved_item.findMany({ ...query, where: { ...query.where, userId } });
 	}
 
-	async getPaginated(userId: string, data: GetSavedItemsInput) {
-		const query: Prisma.saved_itemFindManyArgs = {
-			where: { userId, status: data.status || 'ACTIVE' },
+	async getPaginated(userId: string, query: GetSavedItemsInput) {
+		const prismaQuery: Prisma.saved_itemFindManyArgs = {
+			where: { userId, status: query.status || 'ACTIVE' },
 			orderBy: { createdAt: 'desc' },
-			take: data.first + 1,
+			take: query.first + 1,
 		};
 
-		if (data.after) {
-			query.cursor = { id: data.after };
-			query.skip = 1;
+		if (query.after) {
+			prismaQuery.cursor = { id: query.after };
+			prismaQuery.skip = 1;
 		}
 
-		const items = await this.getMany(userId, query);
-		const edges = items.slice(0, data.first).map((item) => ({
+		const items = await this.getMany(userId, prismaQuery);
+		const edges = items.slice(0, query.first).map((item) => ({
 			node: item,
 			cursor: item.id,
 		}));
@@ -43,7 +43,7 @@ export class SavedItemService {
 		return {
 			edges,
 			endCursor: edges.length ? edges[edges.length - 1].cursor : null,
-			hasNextPage: items.length > data.first,
+			hasNextPage: items.length > query.first,
 		};
 	}
 

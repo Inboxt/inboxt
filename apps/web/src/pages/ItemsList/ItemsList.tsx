@@ -19,7 +19,7 @@ export const ItemsList = () => {
 		view === AppViews.TRASH ? 'DELETED' : view === AppViews.ARCHIVE ? 'ARCHIVED' : 'ACTIVE';
 
 	const { data, loading, error } = useQuery(SAVED_ITEMS, {
-		variables: { data: { first: 20, status } },
+		variables: { query: { first: 20, status } },
 		fetchPolicy: 'cache-and-network',
 	});
 

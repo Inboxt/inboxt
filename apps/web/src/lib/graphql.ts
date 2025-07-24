@@ -68,8 +68,8 @@ export const LABELS = gql`
 `;
 
 export const SAVED_ITEMS = gql`
-	query savedItems($data: GetSavedItemsInput!) {
-		savedItems(data: $data) {
+	query savedItems($query: GetSavedItemsInput!) {
+		savedItems(query: $query) {
 			edges {
 				node {
 					...SavedItemFragment
