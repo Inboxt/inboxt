@@ -10,6 +10,7 @@ export const USER_FRAGMENT = gql`
 		username
 		pendingEmailAddress
 		plan
+		labelsCount
 	}
 `;
 

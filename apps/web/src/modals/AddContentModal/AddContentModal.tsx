@@ -8,6 +8,7 @@ import { addItemFromUrlSchema } from '@inbox-reader/schemas';
 import { Form } from '../../components/Form';
 import { client } from '../../lib/apolloClient.ts';
 import { SAVED_ITEMS } from '../../lib/graphql.ts';
+import { LabelsMultiSelect } from '../../components/LabelsMultiSelect';
 
 export const AddContentModal = ({ id, context }: ContextModalProps) => {
 	const [loading, setLoading] = useState(false);
@@ -16,11 +17,12 @@ export const AddContentModal = ({ id, context }: ContextModalProps) => {
 	const form = useForm({
 		initialValues: {
 			url: '',
+			labels: [],
 		},
 		validate: zodResolver(addItemFromUrlSchema),
 	});
 
-	const handleAddContent = async () => {
+	const handleAddContent = async (values: typeof form.values) => {
 		setLoading(true);
 		try {
 			const respone = await fetch(`${process.env.API_URL}/inbox/items/from-url`, {
@@ -29,7 +31,8 @@ export const AddContentModal = ({ id, context }: ContextModalProps) => {
 					'Content-Type': 'application/json',
 				},
 				body: JSON.stringify({
-					url: form.values.url,
+					url: values.url,
+					labelIds: values.labels,
 				}),
 				credentials: 'include',
 			});
@@ -57,6 +60,11 @@ export const AddContentModal = ({ id, context }: ContextModalProps) => {
 						placeholder="https://example.com/"
 						{...form.getInputProps('url')}
 						label="	Page URL"
+					/>
+
+					<LabelsMultiSelect
+						key={form.key('labels')}
+						{...form!.getInputProps('labels')}
 					/>
 
 					{error}

@@ -58,7 +58,7 @@ export const Navbar = ({ opened, toggle }: NavbarProps) => {
 
 	// todo: scrollable correctly
 	const navLinks = (
-		<Stack mt={isAboveLgScreen ? 18 : 0} gap={0}>
+		<Stack mt={isAboveLgScreen ? 18 : 0} gap={0} h="100%" pb={32}>
 			{NAV_LINKS.map((link) => (
 				<NavbarLink
 					key={link.id}
@@ -66,7 +66,7 @@ export const Navbar = ({ opened, toggle }: NavbarProps) => {
 					icon={link.icon}
 					opened={opened}
 					toggleDrawer={toggle}
-					view={link.id}
+					view={link.id as AppViews}
 				/>
 			))}
 
@@ -74,17 +74,19 @@ export const Navbar = ({ opened, toggle }: NavbarProps) => {
 				<Divider m="sm" label={opened ? 'Labels' : undefined} my={opened ? 0 : 'xxs'} />
 			) : null}
 
-			{data?.labels?.map((label) => (
-				<NavbarLink
-					key={label.id}
-					label={label.name}
-					icon={<IconLabelImportantFilled size={21} />}
-					opened={opened}
-					view={AppViews.LABEL}
-					color={label.color}
-					toggleDrawer={toggle}
-				/>
-			))}
+			<Box className={classes.navbarLabelsList}>
+				{data?.labels?.map((label: any) => (
+					<NavbarLink
+						key={label.id}
+						label={label.name}
+						icon={<IconLabelImportantFilled size={21} />}
+						opened={opened}
+						view={AppViews.LABEL}
+						color={label.color}
+						toggleDrawer={toggle}
+					/>
+				))}
+			</Box>
 		</Stack>
 	);
 

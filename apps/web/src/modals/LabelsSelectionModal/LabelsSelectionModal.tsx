@@ -47,7 +47,13 @@ export const LabelsSelectionModal = ({
 	return (
 		<Stack>
 			{data?.labels?.length ? (
-				<Checkbox.Group value={value} onChange={setValue} mr={3}>
+				<Checkbox.Group
+					value={value}
+					onChange={setValue}
+					mr={3}
+					mah={300}
+					className="overflow-container"
+				>
 					<Stack gap="xs">
 						{data.labels.map((label) => (
 							<SelectableLabel label={label} key={label.id} />

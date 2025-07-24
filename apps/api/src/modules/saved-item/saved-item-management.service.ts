@@ -21,6 +21,7 @@ export class SavedItemManagementService {
 	async addArticleFromUrl(
 		userId: string,
 		url: string,
+		labelIds?: string[],
 		data?: Partial<
 			Omit<Prisma.saved_itemCreateInput, 'user' | 'saved_item_label' | 'article' | 'id'>
 		>,
@@ -46,6 +47,10 @@ export class SavedItemManagementService {
 			...data,
 		});
 
+		if (labelIds && labelIds?.length) {
+			await this.savedItemService.setLabels(userId, savedItem.id, labelIds);
+		}
+
 		await this.articleService.create(savedItem.id, {
 			contentHtml: parsed?.contentHtml || '',
 			contentText: parsed?.contentText || '',
@@ -60,9 +65,10 @@ export class SavedItemManagementService {
 			color: '#1c7ed6',
 		});
 
-		const gettingStarted = await this.addArticleFromUrl(
+		await this.addArticleFromUrl(
 			userId,
 			`${process.env.WEB_URL}/getting-started.html`,
+			[defaultLabel.id],
 			{
 				author: 'Inbox Reader Team',
 				originalUrl: null,
@@ -72,9 +78,10 @@ export class SavedItemManagementService {
 			},
 		);
 
-		const tipsAndTricks = await this.addArticleFromUrl(
+		await this.addArticleFromUrl(
 			userId,
 			`${process.env.WEB_URL}/tips-and-tricks.html`,
+			[defaultLabel.id],
 			{
 				author: 'Inbox Reader Team',
 				originalUrl: null,
@@ -82,12 +89,6 @@ export class SavedItemManagementService {
 				description:
 					'Discover handy shortcuts, expert tips, and clever ways to organize and save content in Inbox Reader. Learn what’s possible (and what’s coming soon) to boost your productivity and reading experience.',
 			},
-		);
-
-		await Promise.all(
-			[gettingStarted, tipsAndTricks].map((defaultItem) =>
-				this.savedItemService.setLabels(userId, defaultItem.id, [defaultLabel.id]),
-			),
 		);
 	}
 }

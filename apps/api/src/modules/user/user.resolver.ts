@@ -1,4 +1,4 @@
-import { Resolver, Args, Mutation } from '@nestjs/graphql';
+import { Resolver, Args, Mutation, ResolveField, Parent } from '@nestjs/graphql';
 
 import { UpdateAccountInput } from './dto/update-account.input';
 import { UserService } from './user.service';
@@ -33,5 +33,10 @@ export class UserResolver {
 	async resendVerificationEmail(@ActiveUserMeta() user: ActiveUserMetaType) {
 		await this.userService.sendVerificationEmail(user.userId);
 		return VOID_RESPONSE;
+	}
+
+	@ResolveField(() => Number)
+	async labelsCount(@Parent() user: User): Promise<number> {
+		return this.userService.countLabels(user.id);
 	}
 }

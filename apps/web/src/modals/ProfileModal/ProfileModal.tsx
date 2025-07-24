@@ -15,7 +15,7 @@ import {
 	useMantineColorScheme,
 	useComputedColorScheme,
 } from '@mantine/core';
-import { IconBell, IconDatabase, IconHighlight } from '@tabler/icons-react';
+import { IconBell, IconDatabase, IconHighlight, IconTag } from '@tabler/icons-react';
 import { ContextModalProps } from '@mantine/modals';
 import { useMutation, useQuery } from '@apollo/client';
 import { useForm, zodResolver } from '@mantine/form';
@@ -32,7 +32,7 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 	const { setColorScheme, colorScheme } = useMantineColorScheme();
 	const computedColorScheme = useComputedColorScheme();
 
-	const { data, loading } = useQuery(ACTIVE_USER);
+	const { data } = useQuery(ACTIVE_USER, { fetchPolicy: 'cache-and-network' });
 	const [updateProfile, { loading: updateProfileLoading, error: updateProfileError }] =
 		useMutation(UPDATE_ACCOUNT);
 
@@ -75,7 +75,10 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 	const usedStorage = 3;
 	const totalStorage = 10;
 	const storagePercentage = (usedStorage / totalStorage) * 100;
+	const labelLimit = 50; // todo: move to shared const
+	const labelsUsed = data?.me?.labelsCount ?? 0;
 
+	const loading = true;
 	return (
 		<Form onSubmit={form.onSubmit(handleUpdateProfile)} error={updateProfileError}>
 			{({ error }) => (
@@ -134,8 +137,39 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 					</Card>
 
 					<Card withBorder radius="md">
-						<Title order={5}>Storage Usage</Title>
 						<Skeleton visible={loading}>
+							<Group justify="space-between">
+								<Stack gap="xxxs">
+									<Title order={5}>Labels</Title>
+									<Text size="xs" c={labelsUsed >= labelLimit ? 'red' : 'dimmed'}>
+										{labelsUsed} of {labelLimit} labels used
+									</Text>
+									<Text size="xs" c="dimmed">
+										Use labels to organize your saved content.
+									</Text>
+								</Stack>
+								<Button
+									onClick={modals.openLabelsModal}
+									size="xs"
+									variant="light"
+									disabled={labelsUsed >= labelLimit}
+								>
+									Manage
+								</Button>
+							</Group>
+
+							{labelsUsed >= labelLimit && (
+								<Alert color="red" icon={<IconTag />} mt="sm">
+									You have reached your label limit. Please delete a label before
+									creating a new one.
+								</Alert>
+							)}
+						</Skeleton>
+					</Card>
+
+					<Card withBorder radius="md">
+						<Skeleton visible={loading}>
+							<Title order={5}>Storage Usage</Title>
 							<Stack gap="xs" mt="sm">
 								<Progress
 									value={storagePercentage}

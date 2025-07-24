@@ -28,7 +28,7 @@ export const LabelsModal = ({ id, context }: ContextModalProps) => {
 
 	return (
 		<Stack>
-			<Stack gap="sm">
+			<Stack gap="sm" mah={300} className="overflow-container">
 				{data?.labels?.map((label) => (
 					<EditableLabelItem
 						key={label.id}

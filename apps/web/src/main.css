@@ -3,4 +3,7 @@
 	flex-direction: column;
 	height: 100vh;
 }
-	
+
+.overflow-container {
+	overflow: auto;
+}

@@ -86,6 +86,11 @@ async function seedLabels(userId: string) {
 			color: '#141414',
 			userId,
 		},
+		...Array.from({ length: 45 }).map((_, i) => ({
+			name: `BulkLabel${i + 1}`,
+			color: '#999999',
+			userId,
+		})),
 	];
 
 	await prisma.label.createMany({

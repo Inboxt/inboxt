@@ -15,7 +15,11 @@ export class SavedItemController {
 		@Res() res: Response,
 	) {
 		if (req.body && activeUser) {
-			await this.inboxManagementService.addArticleFromUrl(activeUser.userId, req.body.url);
+			await this.inboxManagementService.addArticleFromUrl(
+				activeUser.userId,
+				req.body.url,
+				req?.body?.labelIds || [],
+			);
 		}
 
 		res.sendStatus(200);

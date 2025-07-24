@@ -1,0 +1,156 @@
+import { useState } from 'react';
+import {
+	Combobox,
+	useCombobox,
+	Pill,
+	PillsInput,
+	Group,
+	Stack,
+	Text,
+	Checkbox,
+} from '@mantine/core';
+import { useQuery } from '@apollo/client';
+import { LABELS } from '../../lib/graphql.ts';
+import { IconLabelImportantFilled } from '@tabler/icons-react';
+
+const MAX_DISPLAYED_VALUES = 3;
+
+type Label = {
+	value: string;
+	label: string;
+	color: string;
+};
+
+type LabelsMultiSelectProps = {
+	value?: string[];
+	onChange?: (value: string[]) => void;
+};
+
+export const LabelsMultiSelect = ({ value = [], onChange = () => {} }: LabelsMultiSelectProps) => {
+	const [search, setSearch] = useState('');
+	const { data, loading: labelsLoading } = useQuery(LABELS);
+
+	const combobox = useCombobox({
+		onDropdownClose: () => combobox.resetSelectedOption(),
+		onDropdownOpen: () => combobox.updateSelectedOptionIndex('active'),
+	});
+
+	if (labelsLoading) return null;
+
+	const labelsData: Label[] =
+		data?.labels?.map((label: any) => ({
+			value: label.id,
+			label: label.name,
+			color: label.color,
+		})) ?? [];
+
+	const handleValueSelect = (val: string) =>
+		onChange(value.includes(val) ? value.filter((v) => v !== val) : [...value, val]);
+
+	const handleValueRemove = (val: string) => onChange(value.filter((v) => v !== val));
+
+	const values = value
+		.slice(
+			0,
+			MAX_DISPLAYED_VALUES === value.length ? MAX_DISPLAYED_VALUES : MAX_DISPLAYED_VALUES - 1,
+		)
+
+		.map((id) => {
+			const item = labelsData.find((l) => l.value === id);
+			if (!item) return null;
+			return (
+				<Pill
+					key={item.value}
+					bg={item.color}
+					c="white"
+					withRemoveButton
+					onRemove={() => handleValueRemove(item.value)}
+				>
+					{item.label}
+				</Pill>
+			);
+		});
+
+	const options = labelsData
+		.filter((item) => item.label.toLowerCase().includes(search.trim().toLowerCase()))
+		.map((item) => (
+			<Combobox.Option
+				value={item.value}
+				key={item.value}
+				active={value.includes(item.value)}
+			>
+				<Group gap="sm" justify="space-between">
+					<Group gap={7}>
+						<IconLabelImportantFilled size={18} style={{ color: item.color }} />
+						<span>{item.label}</span>
+					</Group>
+
+					<Checkbox
+						checked={value.includes(item.value)}
+						onChange={() => {}}
+						aria-hidden
+						tabIndex={-1}
+						style={{ pointerEvents: 'none' }}
+					/>
+				</Group>
+			</Combobox.Option>
+		));
+
+	return (
+		<Stack gap={2}>
+			<Text>Labels:</Text>
+
+			<Combobox store={combobox} onOptionSubmit={handleValueSelect}>
+				<Combobox.DropdownTarget>
+					<PillsInput onClick={() => combobox.openDropdown()}>
+						<Pill.Group>
+							{value.length > 0 && (
+								<>
+									{values}
+									{value.length > MAX_DISPLAYED_VALUES && (
+										<Pill>
+											+{value.length - (MAX_DISPLAYED_VALUES - 1)} more
+										</Pill>
+									)}
+								</>
+							)}
+
+							<Combobox.EventsTarget>
+								<PillsInput.Field
+									onFocus={() => combobox.openDropdown()}
+									onBlur={() => combobox.closeDropdown()}
+									value={search}
+									onChange={(event) => {
+										combobox.updateSelectedOptionIndex();
+										setSearch(event.currentTarget.value);
+									}}
+									onKeyDown={(event) => {
+										if (
+											event.key === 'Backspace' &&
+											search.length === 0 &&
+											value.length > 0
+										) {
+											event.preventDefault();
+											const lastVal = value[value.length - 1];
+											if (lastVal) handleValueRemove(lastVal);
+										}
+									}}
+								/>
+							</Combobox.EventsTarget>
+						</Pill.Group>
+					</PillsInput>
+				</Combobox.DropdownTarget>
+
+				<Combobox.Dropdown>
+					<Combobox.Options mah={200} style={{ overflowY: 'auto' }}>
+						{options.length > 0 ? (
+							options
+						) : (
+							<Combobox.Empty>Nothing found...</Combobox.Empty>
+						)}
+					</Combobox.Options>
+				</Combobox.Dropdown>
+			</Combobox>
+		</Stack>
+	);
+};

@@ -28,6 +28,12 @@ export class UserService {
 		return this.prisma.user.findMany(query);
 	}
 
+	async countLabels(userId: string): Promise<number> {
+		return this.prisma.label.count({
+			where: { userId },
+		});
+	}
+
 	async initiateEmailVerification(id: string) {
 		const code = generateCode();
 		const hashedCode = await hash(code);

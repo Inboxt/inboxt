@@ -1,10 +1,11 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 
+import { createLabelSchema } from '@inbox-reader/schemas';
+import { updateLabelSchema } from '@inbox-reader/schemas';
+
 import { Prisma } from '../../../../../prisma/client';
 import { PrismaService } from '../../../../services/prisma.service';
 import { AppException } from '../../../../utils/app-exception';
-import { createLabelSchema } from '@inbox-reader/schemas';
-import { updateLabelSchema } from '@inbox-reader/schemas';
 
 @Injectable()
 export class LabelService {
@@ -17,7 +18,7 @@ export class LabelService {
 	async getMany(userId: string, query: Prisma.labelFindManyArgs) {
 		return this.prisma.label.findMany({
 			...query,
-			orderBy: { id: 'asc' },
+			orderBy: { createdAt: 'asc' },
 			where: { ...query.where, userId },
 		});
 	}
@@ -25,6 +26,17 @@ export class LabelService {
 	async create(userId: string, data: Omit<Prisma.labelCreateInput, 'user' | 'userId'>) {
 		/*----------  Validation  ----------*/
 		await createLabelSchema.parseAsync(data);
+
+		const labelCount = await this.prisma.label.count({
+			where: { userId },
+		});
+
+		if (labelCount >= 50) {
+			throw new AppException(
+				`You have reached the maximum of ${50} labels.`,
+				HttpStatus.BAD_REQUEST,
+			);
+		}
 
 		/*----------  Processing  ----------*/
 		return this.prisma.label.create({
