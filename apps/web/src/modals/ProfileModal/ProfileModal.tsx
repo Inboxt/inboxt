@@ -32,7 +32,7 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 	const { setColorScheme, colorScheme } = useMantineColorScheme();
 	const computedColorScheme = useComputedColorScheme();
 
-	const { data } = useQuery(ACTIVE_USER, { fetchPolicy: 'cache-and-network' });
+	const { data, loading } = useQuery(ACTIVE_USER, { fetchPolicy: 'cache-and-network' });
 	const [updateProfile, { loading: updateProfileLoading, error: updateProfileError }] =
 		useMutation(UPDATE_ACCOUNT);
 
@@ -78,7 +78,6 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 	const labelLimit = 50; // todo: move to shared const
 	const labelsUsed = data?.me?.labelsCount ?? 0;
 
-	const loading = true;
 	return (
 		<Form onSubmit={form.onSubmit(handleUpdateProfile)} error={updateProfileError}>
 			{({ error }) => (
