@@ -38,9 +38,9 @@ export const UserMenu = () => {
 				action: modals.openProfileModal,
 			},
 			{
-				label: 'Newsletters',
+				label: 'Emails',
 				icon: <IconMail />,
-				action: modals.openNewslettersModal,
+				action: modals.openEmailsModal,
 			},
 			{
 				label: 'Labels',

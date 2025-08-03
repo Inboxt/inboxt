@@ -77,6 +77,7 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 	const storagePercentage = (usedStorage / totalStorage) * 100;
 	const labelLimit = 50; // todo: move to shared const
 	const labelsUsed = data?.me?.labelsCount ?? 0;
+	const inboundEmailAddressesUsed = data?.me?.inboundEmailAddressesCount ?? 0;
 
 	return (
 		<Form onSubmit={form.onSubmit(handleUpdateProfile)} error={updateProfileError}>
@@ -116,20 +117,20 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 
 					<Card withBorder radius="md">
 						<Group justify="space-between">
-							<Stack gap="xxxs">
-								<Title order={5}>Newsletters</Title>
+							<Stack gap="xxxs" maw="60%">
+								<Title order={5}>Email Addresses</Title>
 
 								<Text size="xs" c="dimmed">
-									2 of 5 newsletter addresses used
+									{`${inboundEmailAddressesUsed} of 2 addresses used`}
 								</Text>
 
 								<Text size="xs" c="dimmed">
-									Create private email addresses to receive newsletters inside
-									Inbox-Reader.
+									Create private email addresses to receive newsletters and other
+									messages directly in Inbox-Reader.
 								</Text>
 							</Stack>
 
-							<Button size="xs" variant="light" onClick={modals.openNewslettersModal}>
+							<Button size="xs" variant="light" onClick={modals.openEmailsModal}>
 								Manage
 							</Button>
 						</Group>

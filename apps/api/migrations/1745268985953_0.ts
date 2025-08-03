@@ -8,6 +8,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 	pgm.createType('saved_item_type', ['NEWSLETTER', 'ARTICLE']);
 	pgm.createType('user_plan', ['DEMO', 'FREE']);
 	pgm.createType('saved_item_status', ['ACTIVE', 'ARCHIVED', 'DELETED']);
+	pgm.createType('newsletter_subscription_status', ['ACTIVE', 'UNSUBSCRIBED']);
 
 	pgm.createTable('user', {
 		id: {
@@ -129,19 +130,105 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 			onDelete: 'CASCADE',
 		},
 	});
+
+	pgm.createTable('inbound_email_address', {
+		id: {
+			type: 'uuid',
+			primaryKey: true,
+			notNull: true,
+			default: pgm.func('gen_random_uuid()'),
+		},
+		userId: {
+			type: 'uuid',
+			notNull: false,
+			references: 'user',
+			onDelete: 'SET NULL',
+		},
+		createdAt: {
+			type: 'timestamp',
+			notNull: true,
+			default: pgm.func('current_timestamp'),
+		},
+		deletedAt: 'timestamp',
+		localPart: { type: 'varchar(64)', notNull: true },
+		fullAddress: { type: 'text', notNull: true, unique: true },
+	});
+
+	pgm.addConstraint('inbound_email_address', 'inbound_email_address_user_local_part_unique', {
+		unique: ['userId', 'localPart'],
+	});
+
+	pgm.createTable('newsletter_subscription', {
+		id: {
+			type: 'uuid',
+			primaryKey: true,
+			notNull: true,
+			default: pgm.func('gen_random_uuid()'),
+		},
+		createdAt: {
+			type: 'timestamp',
+			notNull: true,
+			default: pgm.func('current_timestamp'),
+		},
+		status: {
+			type: 'newsletter_subscription_status',
+			notNull: true,
+			default: 'ACTIVE',
+		},
+		name: { type: 'text', notNull: true },
+		lastReceivedAt: 'timestamp',
+		unsubscribeUrl: 'text',
+		unsubscribeAttemptedAt: { type: 'timestamp' },
+		inboundEmailAddressId: {
+			type: 'uuid',
+			notNull: true,
+			references: 'inbound_email_address',
+			onDelete: 'CASCADE',
+		},
+	});
+
+	pgm.createTable('newsletter', {
+		savedItemId: {
+			type: 'uuid',
+			primaryKey: true,
+			references: 'saved_item',
+			onDelete: 'CASCADE',
+		},
+		inboundEmailAddressId: {
+			type: 'uuid',
+			notNull: false,
+			references: 'inbound_email_address',
+			onDelete: 'SET NULL',
+		},
+		contentHtml: { type: 'text', notNull: true },
+		contentText: { type: 'text', notNull: true },
+		messageId: { type: 'text', notNull: true },
+		subscriptionId: {
+			type: 'uuid',
+			notNull: false,
+			references: 'newsletter_subscription',
+			onDelete: 'SET NULL',
+		},
+	});
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
-	pgm.dropType('saved_item_type');
-	pgm.dropType('user_plan');
-	pgm.dropType('saved_item_status');
-
-	pgm.dropIndex('saved_item', 'user_id');
-	pgm.dropIndex('saved_item_label', ['labelId', 'savedItemId']);
-
-	pgm.dropTable('user');
-	pgm.dropTable('saved_item');
-	pgm.dropTable('article');
+	// Drop tables
+	pgm.dropTable('newsletter');
+	pgm.dropTable('newsletter_subscription');
+	pgm.dropTable('inbound_email_address');
 	pgm.dropTable('saved_item_label');
+	pgm.dropTable('article');
 	pgm.dropTable('label');
+	pgm.dropTable('saved_item');
+	pgm.dropTable('user');
+
+	// Drop custom types
+	pgm.dropType('newsletter_subscription_status');
+	pgm.dropType('saved_item_status');
+	pgm.dropType('user_plan');
+	pgm.dropType('saved_item_type');
+
+	// Drop extensions
+	pgm.dropExtension('pgcrypto');
 }

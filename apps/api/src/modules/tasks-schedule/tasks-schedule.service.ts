@@ -3,7 +3,7 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import dayjs from 'dayjs';
 
 import { PrismaService } from '../../services/prisma.service';
-import { SavedItemManagementService } from '../saved-item/saved-item-management.service';
+import { SavedItemManagerService } from '../../managers/saved-item-manager/saved-item-manager.service';
 
 @Injectable()
 export class TaskSchedulerService {
@@ -11,7 +11,7 @@ export class TaskSchedulerService {
 
 	constructor(
 		private prisma: PrismaService,
-		private savedItemManagementService: SavedItemManagementService,
+		private savedItemManagerService: SavedItemManagerService,
 	) {}
 
 	@Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
@@ -61,7 +61,7 @@ export class TaskSchedulerService {
 
 	@Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
 	async resetDemoAccount() {
-		const demoEmail = 'demo@inbox-reader.com';
+		const demoEmail = 'demo@inbox-reader.com'; // todo: use user_plan rather that email address or a combination of both?
 		const user = await this.prisma.user.findFirst({ where: { emailAddress: demoEmail } });
 		if (!user) {
 			return;
@@ -73,8 +73,29 @@ export class TaskSchedulerService {
 
 		// Default values
 		// todo: default user account settings? like firstName/lastName?
-		await this.savedItemManagementService.createDefaultItems(user.id);
+		await this.savedItemManagerService.createDefaultItems(user.id);
 
 		this.logger.log(`Demo account reset at ${new Date().toISOString()}`);
+	}
+
+	@Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+	async deleteExpiredUnsubscribedNewsletters() {
+		const thresholdDate = dayjs().subtract(90, 'days').toDate();
+		const expiredSubscriptions = await this.prisma.newsletter_subscription.findMany({
+			where: {
+				status: 'UNSUBSCRIBED',
+				unsubscribeAttemptedAt: { lte: thresholdDate },
+			},
+		});
+
+		await Promise.all(
+			expiredSubscriptions.map((subscription) =>
+				this.prisma.newsletter_subscription.delete({ where: { id: subscription.id } }),
+			),
+		);
+
+		this.logger.log(
+			`Deleted ${expiredSubscriptions.length} unsubscribed newsletter subscriptions older than 90 days`,
+		);
 	}
 }

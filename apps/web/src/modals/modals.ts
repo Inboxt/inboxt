@@ -4,7 +4,7 @@ export const modals = {
 	openInstallModal: () => {
 		return mantineModals.openContextModal({
 			modal: 'install',
-			size: 'lg',
+			size: 540,
 			centered: true,
 			title: 'Install on Other Devices',
 			innerProps: {},
@@ -26,7 +26,7 @@ export const modals = {
 		return mantineModals.openContextModal({
 			modal: 'labelsSelection',
 			size: 540,
-			centered: true, // TODO: or not?
+			centered: true,
 			title: 'Label as',
 			onClose,
 			innerProps: {
@@ -65,11 +65,12 @@ export const modals = {
 		});
 	},
 
-	openNewslettersModal: () => {
+	openEmailsModal: () => {
 		return mantineModals.openContextModal({
-			modal: 'newsletters',
-			size: 540,
-			title: 'Newsletters',
+			modal: 'emails',
+			size: 640,
+			title: 'Emails',
+			centered: true,
 			innerProps: {},
 		});
 	},
@@ -94,7 +95,7 @@ export const modals = {
 	},
 
 	openConfirmModal: (payload: Record<string, unknown>) => {
-		return mantineModals.openConfirmModal(payload);
+		return mantineModals.openConfirmModal({ size: 540, ...payload });
 	},
 
 	closeAll: () => {
@@ -103,5 +104,9 @@ export const modals = {
 
 	close: (id: string) => {
 		mantineModals.close(id);
+	},
+
+	update: (id: string, props: Record<string, unknown>) => {
+		mantineModals.updateContextModal({ modalId: id, ...props });
 	},
 };

@@ -12,12 +12,16 @@ import { AppException } from '../../utils/app-exception';
 import { generateCode } from '../../utils/generate-code';
 import { MailService } from '../mail/mail.service';
 import { DeleteAccountInput } from './dto/delete-account.input';
+import { InboundEmailAddressService } from '../inbound-email-address/inbound-email-address.service';
+import { NewsletterSubscriptionManagerService } from '../../managers/newsletter-subscription-manager/newsletter-subscription-manager.service';
 
 @Injectable()
 export class UserService {
 	constructor(
 		private prisma: PrismaService,
 		private mailService: MailService,
+		private inboundEmailAddressService: InboundEmailAddressService,
+		private newsletterSubscriptionManagerService: NewsletterSubscriptionManagerService,
 	) {}
 
 	async get(query: Prisma.userFindFirstArgs) {
@@ -28,8 +32,14 @@ export class UserService {
 		return this.prisma.user.findMany(query);
 	}
 
-	async countLabels(userId: string): Promise<number> {
+	async countLabels(userId: string) {
 		return this.prisma.label.count({
+			where: { userId },
+		});
+	}
+
+	async countInboundEmailAddresses(userId: string) {
+		return this.prisma.inbound_email_address.count({
 			where: { userId },
 		});
 	}
@@ -188,6 +198,17 @@ export class UserService {
 		}
 
 		/*----------  Processing  ----------*/
+		const inboundEmailAddresses = await this.inboundEmailAddressService.getMany(id, {});
+		if (inboundEmailAddresses?.length) {
+			await Promise.all(
+				inboundEmailAddresses.map((address) =>
+					this.newsletterSubscriptionManagerService.deleteForInboundEmailAddress(
+						address.id,
+					),
+				),
+			);
+		}
+
 		return this.prisma.user.delete({
 			where: { id },
 		});

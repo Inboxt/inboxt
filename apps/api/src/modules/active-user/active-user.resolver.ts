@@ -11,13 +11,13 @@ export class ActiveUserResolver {
 	constructor(private userService: UserService) {}
 
 	@Query(() => User, { nullable: true })
-	async me(@ActiveUserMeta() user: ActiveUserMetaType) {
-		if (!user?.userId) {
+	async me(@ActiveUserMeta() activeUser: ActiveUserMetaType) {
+		if (!activeUser?.id) {
 			return null;
 		}
 
 		return this.userService.get({
-			where: { id: user.userId },
+			where: { id: activeUser.id },
 		});
 	}
 }

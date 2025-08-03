@@ -36,7 +36,7 @@ async function resetDatabase() {
 		EXECUTE 'TRUNCATE TABLE ' || 
 		(SELECT string_agg(format('%I.%I', schemaname, tablename), ', ')
 		  FROM pg_tables
-		  WHERE schemaname = 'public' AND tablename != '_prisma_migrations') 
+		  WHERE schemaname = 'public' AND tablename != 'pgmigrations') 
 		|| ' RESTART IDENTITY CASCADE';
 	  END $$;
 	`;

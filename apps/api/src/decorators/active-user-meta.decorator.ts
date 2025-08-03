@@ -7,5 +7,5 @@ export const ActiveUserMeta = createParamDecorator((_data: unknown, context: Exe
 });
 
 export type ActiveUserMetaType = {
-	userId: string;
+	id: string;
 };

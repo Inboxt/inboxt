@@ -45,7 +45,7 @@ export class AuthResolver {
 		@ActiveUserMeta() activeUser: ActiveUserMetaType,
 		@Args('data') data: VerifyEmailInput,
 	) {
-		await this.authService.verifyEmail(activeUser.userId, data);
+		await this.authService.verifyEmail(activeUser.id, data);
 		return VOID_RESPONSE;
 	}
 

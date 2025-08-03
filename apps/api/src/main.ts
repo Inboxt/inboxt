@@ -6,6 +6,7 @@ import { join } from 'path';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 import dayjs from 'dayjs';
+import { json } from 'express';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -28,6 +29,9 @@ async function bootstrap() {
 			origin: true,
 		});
 	}
+
+	app.use('/inbox/items/mail-webhook', json({ limit: '40mb' }));
+	app.use(json({ limit: '100kb' }));
 
 	app.use(cookieParser());
 

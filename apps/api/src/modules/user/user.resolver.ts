@@ -14,29 +14,34 @@ export class UserResolver {
 
 	@Mutation(() => User)
 	async updateAccount(
-		@ActiveUserMeta() user: ActiveUserMetaType,
+		@ActiveUserMeta() activeUser: ActiveUserMetaType,
 		@Args('data') data: UpdateAccountInput,
 	) {
-		return this.userService.update(user.userId, data);
+		return this.userService.update(activeUser.id, data);
 	}
 
 	@Mutation(() => Void)
 	async deleteAccount(
-		@ActiveUserMeta() user: ActiveUserMetaType,
+		@ActiveUserMeta() activeUser: ActiveUserMetaType,
 		@Args('data') data: DeleteAccountInput,
 	) {
-		await this.userService.delete(user.userId, data);
+		await this.userService.delete(activeUser.id, data);
 		return VOID_RESPONSE;
 	}
 
 	@Mutation(() => Void)
-	async resendVerificationEmail(@ActiveUserMeta() user: ActiveUserMetaType) {
-		await this.userService.sendVerificationEmail(user.userId);
+	async resendVerificationEmail(@ActiveUserMeta() activeUser: ActiveUserMetaType) {
+		await this.userService.sendVerificationEmail(activeUser.id);
 		return VOID_RESPONSE;
 	}
 
 	@ResolveField(() => Number)
 	async labelsCount(@Parent() user: User): Promise<number> {
 		return this.userService.countLabels(user.id);
+	}
+
+	@ResolveField(() => Number)
+	async inboundEmailAddressesCount(@Parent() user: User): Promise<number> {
+		return this.userService.countInboundEmailAddresses(user.id);
 	}
 }

@@ -6,10 +6,10 @@ import { UserModule } from '../user/user.module';
 import { PasswordService } from './services/password.service';
 import { JwtModule } from '../jwt/jwt.module';
 import { MailModule } from '../mail/mail.module';
-import { SavedItemModule } from '../saved-item/saved-item.module';
+import { SavedItemManagerModule } from '../../managers/saved-item-manager/saved-item-manager.module';
 
 @Module({
-	imports: [JwtModule, UserModule, MailModule, SavedItemModule],
+	imports: [JwtModule, UserModule, MailModule, SavedItemManagerModule],
 	providers: [AuthService, AuthResolver, PasswordService],
 	exports: [AuthService],
 })

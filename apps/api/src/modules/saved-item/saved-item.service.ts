@@ -23,13 +23,33 @@ export class SavedItemService {
 	}
 
 	async getPaginated(userId: string, query: GetSavedItemsInput) {
+		const prismaWhere: Prisma.saved_itemWhereInput = {
+			userId,
+			status: query?.status || 'ACTIVE',
+		};
+
+		if (query?.type) {
+			prismaWhere.type = query.type;
+		}
+
+		if (query?.labelId) {
+			prismaWhere.saved_item_label = {
+				some: {
+					labelId: query.labelId,
+				},
+			};
+		}
+
 		const prismaQuery: Prisma.saved_itemFindManyArgs = {
-			where: { userId, status: query.status || 'ACTIVE' },
-			orderBy: { createdAt: 'desc' },
+			where: prismaWhere,
 			take: query.first + 1,
 		};
 
-		if (query.after) {
+		if (query?.sort?.field && query?.sort?.direction) {
+			prismaQuery.orderBy = { [query.sort.field]: query.sort.direction };
+		}
+
+		if (query?.after) {
 			prismaQuery.cursor = { id: query.after };
 			prismaQuery.skip = 1;
 		}

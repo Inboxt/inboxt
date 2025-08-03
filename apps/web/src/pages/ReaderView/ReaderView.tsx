@@ -30,6 +30,7 @@ import { Route } from '../../routes/r.$id.tsx';
 import { useTextHighlighting } from '../../hooks/useTextSelection.tsx';
 import { HighlightableArticle } from '../../components/HighlightableArticle';
 import { SAVED_ITEM } from '../../lib/graphql.ts';
+import { NewsletterSubscriptionButton } from '../../components/NewsletterSubscriptionButton';
 
 export const ReaderView = () => {
 	const isAboveXsScreen = useScreenQuery('xs', 'above');
@@ -91,6 +92,13 @@ export const ReaderView = () => {
 	// 		window.removeEventListener('beforeunload', savePosition);
 	// 	};
 	// }, [scroll.y, setSavedScrollPosition]);
+
+	const content =
+		savedItem?.type === 'ARTICLE'
+			? savedItem?.article?.contentHtml
+			: savedItem?.type === 'NEWSLETTER'
+				? savedItem?.newsletter?.contentHtml
+				: undefined;
 
 	return (
 		<Box py="md" px={isAboveXsScreen ? 24 : 'md'} pb="xxl">
@@ -167,6 +175,10 @@ export const ReaderView = () => {
 												</Anchor>
 											</>
 										)}
+
+										<NewsletterSubscriptionButton
+											subscription={savedItem?.newsletter?.subscription}
+										/>
 									</Group>
 
 									<Group gap={6}>
@@ -188,7 +200,7 @@ export const ReaderView = () => {
 								}}
 								className={classes.readerContent}
 							>
-								<HighlightableArticle content={savedItem?.article?.contentHtml} />
+								<HighlightableArticle content={content} />
 							</TypographyStylesProvider>
 						) : (
 							<Text ta="center">

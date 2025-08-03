@@ -11,6 +11,7 @@ export const USER_FRAGMENT = gql`
 		pendingEmailAddress
 		plan
 		labelsCount
+		inboundEmailAddressesCount
 	}
 `;
 
@@ -48,6 +49,21 @@ export const SAVED_ITEM_LABELS_FRAGMENT = gql`
 	${SAVED_ITEM_LABEL_FRAGMENT}
 `;
 
+export const NEWSLETTER_FRAGMENT = gql`
+	fragment NewsletterFragment on Newsletter {
+		contentHtml
+		contentText
+		subscription {
+			id
+			name
+			status
+			lastReceivedAt
+			unsubscribeUrl
+			unsubscribeAttemptedAt
+		}
+	}
+`;
+
 /*----------  Queries  ----------*/
 export const ACTIVE_USER = gql`
 	query me {
@@ -80,6 +96,9 @@ export const SAVED_ITEMS = gql`
 						contentHtml
 						contentText
 					}
+					newsletter {
+						...NewsletterFragment
+					}
 				}
 				cursor
 			}
@@ -89,6 +108,7 @@ export const SAVED_ITEMS = gql`
 	}
 	${SAVED_ITEM_FRAGMENT}
 	${SAVED_ITEM_LABEL_FRAGMENT}
+	${NEWSLETTER_FRAGMENT}
 `;
 
 export const SAVED_ITEM = gql`
@@ -102,10 +122,31 @@ export const SAVED_ITEM = gql`
 				contentHtml
 				contentText
 			}
+			newsletter {
+				...NewsletterFragment
+			}
 		}
 	}
 	${SAVED_ITEM_FRAGMENT}
 	${SAVED_ITEM_LABEL_FRAGMENT}
+	${NEWSLETTER_FRAGMENT}
+`;
+
+export const INBOUND_EMAIL_ADDRESSES = gql`
+	query inboundEmailAddresses {
+		inboundEmailAddresses {
+			id
+			fullAddress
+			subscriptions {
+				id
+				name
+				status
+				lastReceivedAt
+				unsubscribeUrl
+				unsubscribeAttemptedAt
+			}
+		}
+	}
 `;
 
 /*----------  Mutations  ----------*/
@@ -227,6 +268,31 @@ export const UPDATE_LABEL = gql`
 export const DELETE_LABEL = gql`
 	mutation deleteLabel($data: DeleteLabelInput!) {
 		deleteLabel(data: $data) {
+			success
+		}
+	}
+`;
+
+export const CREATE_INBOUND_EMAIL_ADDRESS = gql`
+	mutation createInboundEmailAddress {
+		createInboundEmailAddress {
+			id
+			fullAddress
+		}
+	}
+`;
+
+export const DELETE_INBOUND_EMAIL_ADDRESS = gql`
+	mutation deleteInboundEmailAddress($data: DeleteInboundEmailAddressInput!) {
+		deleteInboundEmailAddress(data: $data) {
+			success
+		}
+	}
+`;
+
+export const UPDATE_NEWSLETTER_SUBSCRIPTION_STATUS = gql`
+	mutation updateNewsletterSubscriptionStatus($data: UpdateNewsletterSubscriptionStatusInput!) {
+		updateNewsletterSubscriptionStatus(data: $data) {
 			success
 		}
 	}

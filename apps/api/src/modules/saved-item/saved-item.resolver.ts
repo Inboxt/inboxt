@@ -14,40 +14,43 @@ import { Label } from './entities/label/label.model';
 import { SavedItemConnection } from './saved-items.model';
 import { GetSavedItemsInput } from './dto/get-saved-items.input';
 import { PermanentlyDeleteSavedItemsInput } from './dto/permanently-delete-saved-items.input';
+import { Newsletter } from './entities/newsletter/newsletter.model';
+import { NewsletterService } from './entities/newsletter/newsletter.service';
 
 @Resolver(() => SavedItem)
 export class SavedItemResolver {
 	constructor(
 		private savedItemService: SavedItemService,
 		private articleService: ArticleService,
+		private newsletterService: NewsletterService,
 	) {}
 
 	@Query(() => SavedItemConnection)
 	async savedItems(
-		@ActiveUserMeta() user: ActiveUserMetaType,
+		@ActiveUserMeta() activeUser: ActiveUserMetaType,
 		@Args('query') query: GetSavedItemsInput,
 	) {
-		return this.savedItemService.getPaginated(user.userId, query);
+		return this.savedItemService.getPaginated(activeUser.id, query);
 	}
 
 	@Query(() => SavedItem, { nullable: true })
 	async savedItem(
-		@ActiveUserMeta() user: ActiveUserMetaType,
+		@ActiveUserMeta() activeUser: ActiveUserMetaType,
 		@Args('query') getSavedItemInput: GetSavedItemInput,
 	) {
-		return this.savedItemService.get(user.userId, {
+		return this.savedItemService.get(activeUser.id, {
 			where: { id: getSavedItemInput.id },
 		});
 	}
 
 	@Mutation(() => Void)
 	async updateSavedItemStatus(
-		@ActiveUserMeta() user: ActiveUserMetaType,
+		@ActiveUserMeta() activeUser: ActiveUserMetaType,
 		@Args('data') data: UpdateSavedItemStatusInput,
 	) {
 		const { ids, ...input } = data;
 		for (const id of ids) {
-			await this.savedItemService.updateStatus(user.userId, id, input.status);
+			await this.savedItemService.updateStatus(activeUser.id, id, input.status);
 		}
 
 		return VOID_RESPONSE;
@@ -55,16 +58,16 @@ export class SavedItemResolver {
 
 	@Mutation(() => Void)
 	async setSavedItemLabels(
-		@ActiveUserMeta() user: ActiveUserMetaType,
+		@ActiveUserMeta() activeUser: ActiveUserMetaType,
 		@Args('data') data: SetSavedItemLabelsInput,
 	) {
-		await this.savedItemService.setLabels(user.userId, data.id, data.labelIds);
+		await this.savedItemService.setLabels(activeUser.id, data.id, data.labelIds);
 		return VOID_RESPONSE;
 	}
 
 	@Mutation(() => Void)
 	async permanentlyDeleteSavedItems(
-		@ActiveUserMeta() user: ActiveUserMetaType,
+		@ActiveUserMeta() activeUser: ActiveUserMetaType,
 		@Args('data') data: PermanentlyDeleteSavedItemsInput,
 	) {
 		if (data.ids.length === 0) {
@@ -72,27 +75,38 @@ export class SavedItemResolver {
 		}
 
 		for (const id of data.ids) {
-			await this.savedItemService.delete(user.userId, id);
+			await this.savedItemService.delete(activeUser.id, id);
 		}
 
 		return VOID_RESPONSE;
 	}
 
 	@ResolveField('article', () => Article, { nullable: true })
-	async article(@Parent() savedItem, @ActiveUserMeta() user: ActiveUserMetaType) {
-		if (!savedItem) {
+	async article(@Parent() savedItem, @ActiveUserMeta() activeUser: ActiveUserMetaType) {
+		if (!savedItem?.id) {
 			return null;
 		}
 
-		return this.articleService.get(user.userId, { where: { savedItemId: savedItem.id } });
+		return this.articleService.get(activeUser.id, { where: { savedItemId: savedItem.id } });
+	}
+
+	@ResolveField('newsletter', () => Newsletter, { nullable: true })
+	async newsletter(@Parent() savedItem, @ActiveUserMeta() activeUser: ActiveUserMetaType) {
+		if (!savedItem?.id) {
+			return null;
+		}
+
+		return this.newsletterService.get(activeUser.id, {
+			where: { savedItemId: savedItem.id },
+		});
 	}
 
 	@ResolveField('labels', () => [Label], { nullable: true })
-	async labels(@ActiveUserMeta() user: ActiveUserMetaType, @Parent() savedItem) {
-		if (!savedItem) {
+	async labels(@ActiveUserMeta() activeUser: ActiveUserMetaType, @Parent() savedItem) {
+		if (!savedItem?.id) {
 			return null;
 		}
 
-		return this.savedItemService.getLabels(user.userId, savedItem.id);
+		return this.savedItemService.getLabels(activeUser.id, savedItem.id);
 	}
 }

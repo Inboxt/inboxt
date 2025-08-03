@@ -19,6 +19,8 @@ import { config } from '../../config/config';
 import { GraphqlConfig } from '../../config/config.interface';
 import { TaskScheduleModule } from '../tasks-schedule/tasks-schedule.module';
 import { SavedItemModule } from '../saved-item/saved-item.module';
+import { InboundEmailAddressModule } from '../inbound-email-address/inbound-email-address.module';
+import { SavedItemManagerModule } from '../../managers/saved-item-manager/saved-item-manager.module';
 
 @Module({
 	imports: [
@@ -58,6 +60,8 @@ import { SavedItemModule } from '../saved-item/saved-item.module';
 		MailModule,
 		TaskScheduleModule,
 		SavedItemModule,
+		InboundEmailAddressModule,
+		SavedItemManagerModule,
 	],
 	providers: [
 		PrismaService,
