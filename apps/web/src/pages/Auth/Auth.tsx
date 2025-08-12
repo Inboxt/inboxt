@@ -10,27 +10,32 @@ import {
 	Text,
 	Title,
 } from '@mantine/core';
-import { useNavigate, useSearch } from '@tanstack/react-router';
+import { useNavigate, useLocation, useSearch } from '@tanstack/react-router';
+
+import { AppName } from '~components/AppName';
+import { DemoLogin } from '~components/DemoLogin';
+import { FormCreateAccount } from '~forms/FormCreateAccount';
+import { FormForgotPassword } from '~forms/FormForgotPassword';
+import { FormLogin } from '~forms/FormLogin';
+import { AuthMode, Route } from '~routes/auth.route';
 
 import classes from './Auth.module.css';
 
-import { FormCreateAccount } from '../../forms/FormCreateAccount.tsx';
-import { FormLogin } from '../../forms/FormLogin.tsx';
-import { AppName } from '../../components/AppName';
-import { FormForgotPassword } from '../../forms/FormForgotPassword.tsx';
-import { DemoLogin } from '../../components/DemoLogin';
-import { AuthMode, Route } from '../../routes/auth.route.tsx';
-
 export type AuthViewProps = {
-	handleChangeAuthMode: (mode: AuthMode) => void;
+	handleChangeAuthMode: (mode: AuthMode, emailAddress?: string) => Promise<void>;
 };
 
 export const Auth = () => {
 	const { mode } = useSearch({ from: Route.fullPath });
 	const navigate = useNavigate({ from: Route.fullPath });
+	const location = useLocation();
+	const state = location.state as { emailAddress?: string } | undefined;
 
-	const handleChangeAuthMode = async (mode: AuthMode) => {
-		await navigate({ search: { mode } });
+	const handleChangeAuthMode = async (mode: AuthMode, emailAddress?: string) => {
+		await navigate({
+			search: { mode },
+			state: { emailAddress: emailAddress || state?.emailAddress },
+		});
 	};
 
 	if (!mode) {
@@ -46,13 +51,13 @@ export const Auth = () => {
 					</Stack>
 
 					<Stack>
-						<Button size="md" onClick={() => handleChangeAuthMode('signup')}>
+						<Button size="md" onClick={() => void handleChangeAuthMode('signup')}>
 							Create account
 						</Button>
 						<Button
 							size="md"
 							variant="light"
-							onClick={() => handleChangeAuthMode('login')}
+							onClick={() => void handleChangeAuthMode('login')}
 						>
 							Sign In
 						</Button>
@@ -62,7 +67,7 @@ export const Auth = () => {
 							size="compact-md"
 							c="dark"
 							mt="xs"
-							onClick={() => handleChangeAuthMode('demo')}
+							onClick={() => void handleChangeAuthMode('demo')}
 							component="button"
 						>
 							Just curious? Try the demo first!

@@ -1,1 +1,1 @@
-export { ItemsOptions } from './ItemsOptions.tsx';
+export { ItemsOptions } from './ItemsOptions';

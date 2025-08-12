@@ -10,7 +10,17 @@
 		"useDefineForClassFields": true,
 		"noUncheckedSideEffectImports": true,
 		"paths": {
-			"@modals/*": ["./src/modals/*"]
+			"~components/*": ["./src/components/*"],
+			"~context/*": ["./src/context/*"],
+			"~forms/*": ["./src/forms/*"],
+			"~hooks/*": ["./src/hooks/*"],
+			"~layouts/*": ["./src/layouts/*"],
+			"~lib/*": ["./src/lib/*"],
+			"~modals/*": ["./src/modals/*"],
+			"~pages/*": ["./src/pages/*"],
+			"~utils/*": ["./src/utils/*"],
+			"~routes/*": ["./src/routes/*"],
+			"@inbox-reader/common": ["../../libs/common/src"]
 		},
 		"tsBuildInfoFile": "../../node_modules/.tmp/web.tsbuildinfo"
 	},

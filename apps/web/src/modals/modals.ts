@@ -15,7 +15,7 @@ export const modals = {
 		return mantineModals.openContextModal({
 			modal: 'labels',
 			size: 540,
-			centered: true, // TODO: or not?
+			centered: true,
 			title: 'Manage Labels',
 			closeOnEscape: false,
 			innerProps: {},

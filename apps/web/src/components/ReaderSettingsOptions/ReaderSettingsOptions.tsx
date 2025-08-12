@@ -1,16 +1,18 @@
 import { Box, Divider, Flex } from '@mantine/core';
-import { useCanGoBack, useNavigate, useRouter } from '@tanstack/react-router';
 import { IconLetterCase, IconPaint, IconX } from '@tabler/icons-react';
+import { useCanGoBack, useNavigate, useRouter } from '@tanstack/react-router';
 
-import { ReaderSettingsPopover } from '../ReaderSettingsPopover';
-import { FormReadingSettings } from '../../forms/FormReadingSettings';
-import { FormReadingThemeSettings } from '../../forms/FormReadingThemeSettings';
-import { Route } from '../../routes/r.$id.tsx';
-import { useScreenQuery } from '../../hooks/useScreenQuery.tsx';
+import { FormReadingSettings } from '~forms/FormReadingSettings';
+import { FormReadingThemeSettings } from '~forms/FormReadingThemeSettings';
+import { useScreenQuery } from '~hooks/useScreenQuery';
+import { SavedItem } from '~lib/graphql/generated/graphql';
+import { Route } from '~routes/r.$id';
+
 import { ItemsOptions } from '../ItemsOptions';
+import { ReaderSettingsPopover } from '../ReaderSettingsPopover';
 
 type ReaderSettingsOptionsProps = {
-	item: Record<string, unknown>;
+	item: SavedItem | null;
 	direction?: 'column' | 'row';
 	variant?: 'full' | 'menu';
 };
@@ -25,9 +27,9 @@ export const ReaderSettingsOptions = ({
 	const navigate = useNavigate({ from: Route.fullPath });
 	const isBelowXsScreen = useScreenQuery('xs', 'below');
 
-	const handleGoBack = async () => {
+	const handleGoBack = () => {
 		if (canGoBack) {
-			void router.history.back();
+			router.history.back();
 		} else {
 			void navigate({
 				to: '/',
@@ -67,24 +69,12 @@ export const ReaderSettingsOptions = ({
 						orientation={direction === 'column' ? 'horizontal' : 'vertical'}
 					/>
 
-					<ItemsOptions
-						items={[item]}
-						mode="reader"
-						onActionComplete={async () => {
-							await handleGoBack();
-						}}
-					/>
+					<ItemsOptions items={[item]} mode="reader" onActionComplete={handleGoBack} />
 				</>
 			)}
 
 			{variant === 'menu' && (
-				<ItemsOptions
-					items={[item]}
-					mode="reader-menu"
-					onActionComplete={async () => {
-						await handleGoBack();
-					}}
-				/>
+				<ItemsOptions items={[item]} mode="reader-menu" onActionComplete={handleGoBack} />
 			)}
 		</Flex>
 	);

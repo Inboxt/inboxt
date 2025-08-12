@@ -1,15 +1,16 @@
-import { Button, Group, Stack, Text, TextInput } from '@mantine/core';
-import { ContextModalProps } from '@mantine/modals';
-import { useForm, zodResolver } from '@mantine/form';
 import { useMutation } from '@apollo/client';
+import { Button, Group, Stack, Text, TextInput } from '@mantine/core';
+import { useForm, zodResolver } from '@mantine/form';
 import { useInterval } from '@mantine/hooks';
+import { ContextModalProps } from '@mantine/modals';
 import { useState } from 'react';
 
-import { verifyEmailSchema } from '@inbox-reader/schemas';
+import { verifyEmailSchema } from '@inbox-reader/common';
 
-import { ACTIVE_USER, RESEND_VERIFICATION_EMAIL, VERIFY_EMAIL } from '../../lib/graphql.ts';
-import { router } from '../../main.tsx';
-import { Form } from '../../components/Form';
+import { Form } from '~components/Form';
+import { ACTIVE_USER, RESEND_VERIFICATION_EMAIL, VERIFY_EMAIL } from '~lib/graphql';
+
+import { router } from '../../main';
 
 export const VerifyEmailModal = ({ id, context }: ContextModalProps) => {
 	const [resendCooldown, setResendCooldown] = useState(0);
@@ -80,7 +81,7 @@ export const VerifyEmailModal = ({ id, context }: ContextModalProps) => {
 						<Button
 							variant="light"
 							color="text"
-							onClick={handleResendEmail}
+							onClick={() => void handleResendEmail()}
 							loading={resendVerificationEmailLoading || verifyEmailLoading}
 							disabled={isCooldownActive}
 						>

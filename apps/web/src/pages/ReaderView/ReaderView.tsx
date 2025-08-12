@@ -1,3 +1,4 @@
+import { useQuery } from '@apollo/client';
 import {
 	ActionIcon,
 	Anchor,
@@ -14,23 +15,22 @@ import {
 	Title,
 	TypographyStylesProvider,
 } from '@mantine/core';
-import { useCanGoBack, useNavigate, useParams, useRouter } from '@tanstack/react-router';
-import { IconArrowLeft, IconHighlight, IconHighlightOff } from '@tabler/icons-react';
-import dayjs from 'dayjs';
 import { useDocumentTitle } from '@mantine/hooks';
-import { useQuery } from '@apollo/client';
+import { IconArrowLeft, IconHighlight, IconHighlightOff } from '@tabler/icons-react';
+import { useCanGoBack, useNavigate, useParams, useRouter } from '@tanstack/react-router';
+import dayjs from 'dayjs';
+
+import { AppName } from '~components/AppName';
+import { HighlightableArticle } from '~components/HighlightableArticle';
+import { NewsletterSubscriptionButton } from '~components/NewsletterSubscriptionButton';
+import { ReaderSettingsOptions } from '~components/ReaderSettingsOptions';
+import { useScreenQuery } from '~hooks/useScreenQuery';
+import { useTextHighlighting } from '~hooks/useTextSelection';
+import { SAVED_ITEM } from '~lib/graphql';
+import { SavedItemType } from '~lib/graphql/generated/graphql.ts';
+import { Route } from '~routes/r.$id';
 
 import classes from './ReaderView.module.css';
-import { AppName } from '../../components/AppName';
-
-import { useScreenQuery } from '../../hooks/useScreenQuery.tsx';
-import { ReaderSettingsOptions } from '../../components/ReaderSettingsOptions';
-import { Route } from '../../routes/r.$id.tsx';
-
-import { useTextHighlighting } from '../../hooks/useTextSelection.tsx';
-import { HighlightableArticle } from '../../components/HighlightableArticle';
-import { SAVED_ITEM } from '../../lib/graphql.ts';
-import { NewsletterSubscriptionButton } from '../../components/NewsletterSubscriptionButton';
 
 export const ReaderView = () => {
 	const isAboveXsScreen = useScreenQuery('xs', 'above');
@@ -51,9 +51,9 @@ export const ReaderView = () => {
 	const trimmedTitle = title.length > 50 ? title.slice(0, 50).trimEnd() + '...' : title;
 	useDocumentTitle(trimmedTitle ? `${trimmedTitle} | Inbox Reader` : 'Inbox Reader');
 
-	const handleGoBack = async () => {
+	const handleGoBack = () => {
 		if (canGoBack) {
-			void router.history.back();
+			router.history.back();
 		} else {
 			void navigate({
 				to: '/',
@@ -94,10 +94,10 @@ export const ReaderView = () => {
 	// }, [scroll.y, setSavedScrollPosition]);
 
 	const content =
-		savedItem?.type === 'ARTICLE'
-			? savedItem?.article?.contentHtml
-			: savedItem?.type === 'NEWSLETTER'
-				? savedItem?.newsletter?.contentHtml
+		savedItem?.type === SavedItemType.Article
+			? savedItem.article?.contentHtml
+			: savedItem?.type === SavedItemType.Newsletter
+				? savedItem.newsletter?.contentHtml
 				: undefined;
 
 	return (
@@ -130,13 +130,17 @@ export const ReaderView = () => {
 					</ActionIcon>
 				) : (
 					<Box hiddenFrom="md">
-						<ReaderSettingsOptions direction="row" variant="menu" item={savedItem} />
+						<ReaderSettingsOptions
+							direction="row"
+							variant="menu"
+							item={savedItem || null}
+						/>
 					</Box>
 				)}
 			</Box>
 
 			<Box visibleFrom="md" className={classes.readerSettingsContainer}>
-				<ReaderSettingsOptions item={savedItem} />
+				<ReaderSettingsOptions item={data?.savedItem || null} />
 			</Box>
 
 			<Center py="xxl">
@@ -149,22 +153,22 @@ export const ReaderView = () => {
 										<Text>
 											{dayjs(savedItem.createdAt).format('MMMM D, YYYY')}
 										</Text>
-										<Text>{`${Math.ceil(savedItem?.wordCount / 240).toString()} min read`}</Text>
+										<Text>{`${Math.ceil((savedItem.wordCount || 0) / 240)} min read`}</Text>
 									</Breadcrumbs>
 
 									<Title order={2}>{savedItem.title}</Title>
 
 									<Group gap={6}>
-										{savedItem?.author && (
+										{savedItem.author && (
 											<Text>
 												{`By ${savedItem.author}`}
 												{savedItem.sourceDomain ? ',' : ''}
 											</Text>
 										)}
-										{savedItem?.sourceDomain && (
+										{savedItem.sourceDomain && (
 											<Text>{savedItem.sourceDomain}</Text>
 										)}
-										{savedItem?.originalUrl && (
+										{savedItem.originalUrl && (
 											<>
 												<Text>•</Text>
 												<Anchor
@@ -176,13 +180,15 @@ export const ReaderView = () => {
 											</>
 										)}
 
-										<NewsletterSubscriptionButton
-											subscription={savedItem?.newsletter?.subscription}
-										/>
+										{savedItem.newsletter?.subscription && (
+											<NewsletterSubscriptionButton
+												subscription={savedItem.newsletter.subscription}
+											/>
+										)}
 									</Group>
 
 									<Group gap={6}>
-										{savedItem?.labels.map((label) => (
+										{(savedItem.labels || []).map((label) => (
 											<Badge size="sm" radius="sm" color={label.color}>
 												{label.name}
 											</Badge>
@@ -200,7 +206,7 @@ export const ReaderView = () => {
 								}}
 								className={classes.readerContent}
 							>
-								<HighlightableArticle content={content} />
+								<HighlightableArticle content={content || null} />
 							</TypographyStylesProvider>
 						) : (
 							<Text ta="center">

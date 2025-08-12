@@ -1,52 +1,50 @@
-import React from 'react';
-import { ActionIcon, Tooltip, Text } from '@mantine/core';
-import {
-	IconTag,
-	IconArchive,
-	IconTrash,
-	IconArrowBackUp,
-	IconWorld,
-	IconTrashX,
-	IconDots,
-} from '@tabler/icons-react';
-import { modals } from '@modals/modals.ts';
 import { useMutation } from '@apollo/client';
+import { ActionIcon, Text, Tooltip } from '@mantine/core';
+import {
+	IconArchive,
+	IconArrowBackUp,
+	IconDots,
+	IconProps,
+	IconTag,
+	IconTrash,
+	IconTrashX,
+	IconWorld,
+} from '@tabler/icons-react';
+import React from 'react';
+
+import { useReaderContext } from '~context/reader';
 import {
 	PERMANENTLY_DELETE_SAVED_ITEMS,
 	SAVED_ITEMS,
 	UPDATE_SAVED_ITEM_STATUS,
-} from '../../lib/graphql';
-import { useReaderContext } from '../../context/ReaderContext';
-import { ReaderSettingsPopover } from '../ReaderSettingsPopover';
-import { MenuDrawer } from '../MenuDrawer';
+} from '~lib/graphql';
+import { SavedItem, SavedItemStatus } from '~lib/graphql/generated/graphql';
+import { modals } from '~modals/modals';
 
-export type ReaderItem = {
-	id: string;
-	status: 'ACTIVE' | 'ARCHIVED' | 'DELETED';
-	originalUrl?: string;
-};
+import { MenuDrawer } from '../MenuDrawer';
+import { ReaderSettingsPopover } from '../ReaderSettingsPopover';
 
 export type ItemsOptionsMode = 'single' | 'bulk' | 'reader' | 'reader-menu';
 
 type ItemsOptionsProps = {
-	items: ReaderItem[];
+	items: Pick<SavedItem, 'status' | 'id' | 'originalUrl'>[];
 	mode: ItemsOptionsMode;
 	size?: 'sm' | 'md';
 	onActionComplete?: () => void | Promise<void>;
 };
 
 type OptionContext = {
-	items: ReaderItem[];
+	items: Pick<SavedItem, 'status' | 'id' | 'originalUrl'>[];
 	loading: boolean;
 };
 
 type Option = {
 	label: string;
-	icon: React.ComponentType<any>;
+	icon: React.ComponentType<IconProps>;
 	modes: ItemsOptionsMode[];
 	visible?: (ctx: OptionContext) => boolean;
 	enabled?: (ctx: OptionContext) => boolean;
-	onClick: (ctx: OptionContext) => boolean | void | Promise<boolean | void>;
+	onClick: (ctx: OptionContext) => boolean | Promise<boolean | undefined> | undefined;
 };
 
 export const ItemsOptions: React.FC<ItemsOptionsProps> = ({
@@ -69,59 +67,72 @@ export const ItemsOptions: React.FC<ItemsOptionsProps> = ({
 			label: 'Edit labels',
 			icon: IconTag,
 			modes: ['single', 'reader', 'reader-menu'],
-			visible: ({ items }) => items.length === 1 && items[0].status !== 'DELETED',
+			visible: ({ items }) =>
+				items.length === 1 && items[0]!.status !== SavedItemStatus.Deleted,
 			onClick: ({ items }) => {
 				modals.openLabelsSelectionModal({
-					itemId: items[0].id,
+					itemId: items[0]!.id,
 					onClose: () => {
 						setSelectedItems([]);
 					},
 				});
+				return undefined;
 			},
 		},
 		{
 			label: 'Restore',
 			icon: IconArrowBackUp,
 			modes: ['single', 'bulk', 'reader', 'reader-menu'],
-			visible: ({ items }) => items.length > 0 && items.some((i) => i.status !== 'ACTIVE'),
+			visible: ({ items }) =>
+				items.length > 0 && items.some((i) => i.status !== SavedItemStatus.Active),
 			onClick: async ({ items }) => {
 				await updateStatus({
-					variables: { data: { ids: items.map((i) => i.id), status: 'ACTIVE' } },
+					variables: {
+						data: { ids: items.map((i) => i.id), status: SavedItemStatus.Active },
+					},
 					refetchQueries: [SAVED_ITEMS],
 				});
+				return undefined;
 			},
 		},
 		{
 			label: 'Move to archive',
 			icon: IconArchive,
 			modes: ['single', 'bulk', 'reader', 'reader-menu'],
-			visible: ({ items }) => items.length > 0 && items.some((i) => i.status !== 'ARCHIVED'),
+			visible: ({ items }) =>
+				items.length > 0 && items.some((i) => i.status !== SavedItemStatus.Archived),
 			onClick: async ({ items }) => {
 				await updateStatus({
 					variables: {
-						data: { ids: items.map((i) => i.id), status: 'ARCHIVED' },
+						data: { ids: items.map((i) => i.id), status: SavedItemStatus.Archived },
 					},
 					refetchQueries: [SAVED_ITEMS],
 				});
+				return undefined;
 			},
 		},
 		{
 			label: 'Move to trash',
 			icon: IconTrash,
 			modes: ['single', 'bulk', 'reader', 'reader-menu'],
-			visible: ({ items }) => items.length > 0 && items.some((i) => i.status !== 'DELETED'),
+			visible: ({ items }) =>
+				items.length > 0 && items.some((i) => i.status !== SavedItemStatus.Deleted),
 			onClick: async ({ items }) => {
 				await updateStatus({
-					variables: { data: { ids: items.map((i) => i.id), status: 'DELETED' } },
+					variables: {
+						data: { ids: items.map((i) => i.id), status: SavedItemStatus.Deleted },
+					},
 					refetchQueries: [SAVED_ITEMS],
 				});
+				return undefined;
 			},
 		},
 		{
 			label: 'Delete permanently',
 			icon: IconTrashX,
 			modes: ['single', 'bulk', 'reader', 'reader-menu'],
-			visible: ({ items }) => items.length > 0 && items.every((i) => i.status === 'DELETED'),
+			visible: ({ items }) =>
+				items.length > 0 && items.every((i) => i.status === SavedItemStatus.Deleted),
 			enabled: ({ items }) => items.length > 0,
 			onClick: async ({ items }) => {
 				const count = items.length;
@@ -144,7 +155,9 @@ export const ItemsOptions: React.FC<ItemsOptionsProps> = ({
 					});
 				});
 
-				if (!confirmed) return false;
+				if (!confirmed) {
+					return false;
+				}
 
 				await permanentlyDeleteSavedItems({
 					variables: { data: { ids: items.map((i) => i.id) } },
@@ -158,15 +171,17 @@ export const ItemsOptions: React.FC<ItemsOptionsProps> = ({
 			icon: IconWorld,
 			modes: ['single'],
 			onClick: ({ items }) => {
-				items?.length === 1 && items[0]?.originalUrl
-					? window.open(items[0]?.originalUrl, '_blank', 'noopener,noreferrer')
-					: null;
+				if (items.length === 1 && items[0]?.originalUrl) {
+					window.open(items[0].originalUrl, '_blank', 'noopener,noreferrer');
+				}
+
+				return undefined;
 			},
 		},
 	];
 
-	const handleOptionClick = async (e?: React.MouseEvent, option: Option) => {
-		e?.stopPropagation?.();
+	const handleOptionClick = async (option: Option, e?: React.MouseEvent) => {
+		e?.stopPropagation();
 		if (option.label !== 'Edit labels') {
 			setSelectedItems([]);
 		}
@@ -189,7 +204,7 @@ export const ItemsOptions: React.FC<ItemsOptionsProps> = ({
 						key={option.label}
 						label={option.label}
 						icon={<option.icon />}
-						onClick={(e) => handleOptionClick(e, option)}
+						onClick={(e) => void handleOptionClick(option, e)}
 					/>
 				))}
 			</>
@@ -206,7 +221,7 @@ export const ItemsOptions: React.FC<ItemsOptionsProps> = ({
 				).map((option) => ({
 					icon: <option.icon />,
 					label: option.label,
-					action: () => handleOptionClick(undefined, option),
+					action: () => handleOptionClick(option),
 				}))}
 				label="More options"
 				height={220}
@@ -231,7 +246,7 @@ export const ItemsOptions: React.FC<ItemsOptionsProps> = ({
 						size={isSmall ? 'md' : 38}
 						radius="xl"
 						disabled={loading || (option.enabled && !option.enabled(ctx))}
-						onClick={(e) => handleOptionClick(e, option)}
+						onClick={(e) => void handleOptionClick(option, e)}
 					>
 						<option.icon size={isSmall ? 18 : undefined} />
 					</ActionIcon>

@@ -1,7 +1,7 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 
-import { createLabelSchema } from '@inbox-reader/schemas';
-import { updateLabelSchema } from '@inbox-reader/schemas';
+import { createLabelSchema, USER_LABELS_LIMIT } from '@inbox-reader/common';
+import { updateLabelSchema } from '@inbox-reader/common';
 
 import { Prisma } from '../../../../../prisma/client';
 import { PrismaService } from '../../../../services/prisma.service';
@@ -31,9 +31,9 @@ export class LabelService {
 			where: { userId },
 		});
 
-		if (labelCount >= 50) {
+		if (labelCount >= USER_LABELS_LIMIT) {
 			throw new AppException(
-				`You have reached the maximum of ${50} labels.`,
+				`You have reached the maximum of ${USER_LABELS_LIMIT} labels.`,
 				HttpStatus.BAD_REQUEST,
 			);
 		}

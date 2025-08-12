@@ -1,18 +1,20 @@
-import { Button, Group, PasswordInput, Stack, TextInput } from '@mantine/core';
-import { IconAt, IconLock } from '@tabler/icons-react';
-import { useForm, zodResolver } from '@mantine/form';
 import { useMutation } from '@apollo/client';
-import { useNavigate, useRouterState } from '@tanstack/react-router';
-import { signInSchema } from '@inbox-reader/schemas';
+import { Button, Group, PasswordInput, Stack, TextInput } from '@mantine/core';
+import { useForm, zodResolver } from '@mantine/form';
+import { IconAt, IconLock } from '@tabler/icons-react';
+import { useLocation, useNavigate } from '@tanstack/react-router';
 
-import { AuthViewProps } from '../pages/Auth/Auth.tsx';
-import { SIGN_IN } from '../lib/graphql.ts';
-import { Route } from '../routes/auth.route.tsx';
-import { Form } from '../components/Form';
+import { signInSchema } from '@inbox-reader/common';
+
+import { Form } from '~components/Form';
+import { SIGN_IN } from '~lib/graphql';
+import { AuthViewProps } from '~pages/Auth/Auth';
+import { Route } from '~routes/auth.route';
 
 export const FormLogin = ({ handleChangeAuthMode }: AuthViewProps) => {
 	const [signIn, { loading, error }] = useMutation(SIGN_IN);
-	const state = useRouterState({ select: (s) => s.location.state });
+	const location = useLocation();
+	const state = location.state as { emailAddress?: string } | undefined;
 	const navigate = useNavigate({ from: Route.id });
 
 	const form = useForm({
@@ -61,7 +63,12 @@ export const FormLogin = ({ handleChangeAuthMode }: AuthViewProps) => {
 								color="gray"
 								size="compact-xs"
 								mr="xs"
-								onClick={() => handleChangeAuthMode('forgot-password')}
+								onClick={() =>
+									void handleChangeAuthMode(
+										'forgot-password',
+										form.getValues().emailAddress,
+									)
+								}
 							>
 								Forgot?
 							</Button>
@@ -76,7 +83,9 @@ export const FormLogin = ({ handleChangeAuthMode }: AuthViewProps) => {
 						<Button
 							variant="default"
 							size="md"
-							onClick={() => handleChangeAuthMode(undefined)}
+							onClick={() =>
+								void handleChangeAuthMode(undefined, form.getValues().emailAddress)
+							}
 							loading={loading}
 						>
 							Back

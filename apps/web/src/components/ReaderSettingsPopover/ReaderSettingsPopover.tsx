@@ -1,12 +1,14 @@
 import { ActionIcon, Box, Drawer, Popover, Title, Tooltip } from '@mantine/core';
-import { forwardRef, ReactNode } from 'react';
-import { useScreenQuery } from '../../hooks/useScreenQuery.tsx';
-import classes from '../MenuDrawer/MenuDrawer.module.css';
-import { IconX } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
+import { IconX } from '@tabler/icons-react';
+import { forwardRef, ReactNode, MouseEvent } from 'react';
+
+import { useScreenQuery } from '~hooks/useScreenQuery';
+
+import classes from '../MenuDrawer/MenuDrawer.module.css';
 
 type ReaderSettingsOptionProps = {
-	onClick?: (e: unknown) => void;
+	onClick?: (e: MouseEvent<HTMLButtonElement>) => void;
 	label: string;
 	icon: ReactNode;
 };

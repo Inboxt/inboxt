@@ -1,1 +1,1 @@
-export { VerifyEmailModal } from './VerifyEmailModal.tsx';
+export { VerifyEmailModal } from './VerifyEmailModal';

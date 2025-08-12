@@ -1,3 +1,4 @@
+import { useMutation } from '@apollo/client';
 import {
 	Button,
 	Divider,
@@ -8,19 +9,22 @@ import {
 	TextInput,
 	Title,
 } from '@mantine/core';
-import { IconAt, IconLock } from '@tabler/icons-react';
-import { useEffect, useState } from 'react';
 import { useForm, zodResolver } from '@mantine/form';
-import { useNavigate } from '@tanstack/react-router';
-import { useMutation } from '@apollo/client';
-import { resetPasswordSchema, requestPasswordRecoverySchema } from '@inbox-reader/schemas';
+import { IconAt, IconLock } from '@tabler/icons-react';
+import { useLocation, useNavigate } from '@tanstack/react-router';
+import { useEffect, useState } from 'react';
 
-import { AuthViewProps } from '../pages/Auth/Auth.tsx';
-import { REQUEST_PASSWORD_RECOVERY, RESET_PASSWORD } from '../lib/graphql.ts';
-import { Form } from '../components/Form';
+import { resetPasswordSchema, requestPasswordRecoverySchema } from '@inbox-reader/common';
+
+import { Form } from '~components/Form';
+import { REQUEST_PASSWORD_RECOVERY, RESET_PASSWORD } from '~lib/graphql';
+import { AuthViewProps } from '~pages/Auth/Auth';
 
 export const FormForgotPassword = ({ handleChangeAuthMode }: AuthViewProps) => {
 	const navigate = useNavigate();
+	const location = useLocation();
+	const state = location.state as { emailAddress?: string } | undefined;
+
 	const [
 		requestPasswordRecovery,
 		{ loading: requestPasswordRecoveryLoading, error: requestPasswordRecoveryError },
@@ -34,7 +38,7 @@ export const FormForgotPassword = ({ handleChangeAuthMode }: AuthViewProps) => {
 	const requestPasswordRecoveryForm = useForm({
 		mode: 'uncontrolled',
 		initialValues: {
-			emailAddress: '',
+			emailAddress: state?.emailAddress || '',
 		},
 		validate: zodResolver(requestPasswordRecoverySchema),
 	});
@@ -49,11 +53,14 @@ export const FormForgotPassword = ({ handleChangeAuthMode }: AuthViewProps) => {
 		validate: zodResolver(resetPasswordSchema),
 	});
 
-	const handleBack = () => {
+	const handleBack = async () => {
 		if (forgotPasswordStep === 1) {
 			setForgotPasswordStep(0);
 		} else {
-			handleChangeAuthMode('login');
+			await handleChangeAuthMode(
+				'login',
+				requestPasswordRecoveryForm.getValues().emailAddress,
+			);
 		}
 	};
 
@@ -86,7 +93,7 @@ export const FormForgotPassword = ({ handleChangeAuthMode }: AuthViewProps) => {
 
 				<Button
 					onClick={() =>
-						navigate({
+						void navigate({
 							to: '/auth',
 							search: { mode: 'login' },
 							state: {
@@ -170,7 +177,7 @@ export const FormForgotPassword = ({ handleChangeAuthMode }: AuthViewProps) => {
 					{error}
 
 					<Group mt="xl" justify="space-between">
-						<Button variant="default" size="md" onClick={handleBack}>
+						<Button variant="default" size="md" onClick={() => void handleBack()}>
 							Back
 						</Button>
 						<Button
@@ -189,7 +196,13 @@ export const FormForgotPassword = ({ handleChangeAuthMode }: AuthViewProps) => {
 							<Button
 								variant="subtle"
 								mx="auto"
-								onClick={() => setForgotPasswordStep(1)}
+								onClick={() => {
+									setForgotPasswordStep(1);
+									resetPasswordForm.setFieldValue(
+										'emailAddress',
+										requestPasswordRecoveryForm.getValues().emailAddress,
+									);
+								}}
 							>
 								Already have a code?
 							</Button>

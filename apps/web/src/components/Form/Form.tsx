@@ -1,9 +1,9 @@
-import { ReactNode, FormEvent, useEffect } from 'react';
+import { ApolloError } from '@apollo/client';
 import { Alert } from '@mantine/core';
 import { IconAlertTriangleFilled } from '@tabler/icons-react';
-import { ApolloError } from '@apollo/client';
+import { ReactNode, FormEvent, useEffect } from 'react';
 
-import { parseError } from '../../utils/parse-error';
+import { parseError } from '~utils/parse-error';
 
 type FormProps = {
 	children: (({ error }: { error: ReactNode | null }) => ReactNode) | ReactNode;
@@ -30,10 +30,14 @@ export const Form = ({ children, onSubmit, error, setErrors }: FormProps) => {
 	}, [error, setErrors]);
 
 	const renderError = () => {
-		if (!error) return null;
+		if (!error) {
+			return null;
+		}
 
 		const parsed = parseError(error);
-		if (!parsed?.message || parsed.message === 'Invalid input provided') return null;
+		if (!parsed?.message || parsed.message === 'Invalid input provided') {
+			return null;
+		}
 
 		return (
 			<Alert

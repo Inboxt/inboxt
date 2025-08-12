@@ -1,1 +1,1 @@
-export { EditableLabelItem } from './EditableLabelItem.tsx';
+export { EditableLabelItem } from './EditableLabelItem';

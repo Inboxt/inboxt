@@ -1,18 +1,17 @@
-import { Button, Checkbox, Group, Stack, Text } from '@mantine/core';
-import { useEffect, useState } from 'react';
-import { ContextModalProps } from '@mantine/modals';
 import { useFragment, useMutation, useQuery } from '@apollo/client';
+import { Button, Checkbox, Group, Stack, Text } from '@mantine/core';
+import { ContextModalProps } from '@mantine/modals';
+import { useEffect, useState } from 'react';
 
-import { modals } from '@modals/modals';
-
-import { SelectableLabel } from '../../components/SelectableLabel';
+import { SelectableLabel } from '~components/SelectableLabel';
 import {
 	LABELS,
 	SAVED_ITEM,
 	SAVED_ITEM_LABELS_FRAGMENT,
 	SAVED_ITEMS,
 	SET_SAVED_ITEM_LABELS,
-} from '../../lib/graphql';
+} from '~lib/graphql';
+import { modals } from '~modals/modals';
 
 export const LabelsSelectionModal = ({
 	id,
@@ -32,7 +31,9 @@ export const LabelsSelectionModal = ({
 	});
 
 	useEffect(() => {
-		if (complete && itemLabels) setValue((itemLabels.labels || []).map((label) => label.id));
+		if (complete) {
+			setValue((itemLabels.labels || []).map((label) => label.id));
+		}
 	}, [itemLabels, complete]);
 
 	const handleSelection = async () => {
@@ -71,7 +72,7 @@ export const LabelsSelectionModal = ({
 					Create new
 				</Button>
 
-				<Button onClick={handleSelection} loading={loading}>
+				<Button onClick={() => void handleSelection()} loading={loading}>
 					Save & Close
 				</Button>
 			</Group>

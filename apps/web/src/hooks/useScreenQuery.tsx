@@ -7,6 +7,7 @@ export const useScreenQuery = (
 ): boolean => {
 	const theme = useMantineTheme();
 	const mediaQuery = query === 'above' ? 'min-width' : 'max-width';
+
 	const screenSize = useMediaQuery(`(${mediaQuery}: ${theme.breakpoints[breakpoint]})`, false, {
 		getInitialValueInEffect: false,
 	});

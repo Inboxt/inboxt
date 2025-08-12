@@ -1,27 +1,22 @@
 import { Box, Card, Group, Stack, Text, TextInput, Title } from '@mantine/core';
 import dayjs from 'dayjs';
 
-import { Subscription, SubscriptionList } from './SubscriptionList.tsx';
-import { EmailActions } from './EmailActions.tsx';
+import { InboundEmailAddress, NewsletterSubscriptionStatus } from '~lib/graphql/generated/graphql';
 
-export type Email = {
-	id: string;
-	fullAddress: string;
-	createdAt: string;
-	subscriptions: Subscription[];
-};
+import { EmailActions } from './EmailActions';
+import { SubscriptionList } from './SubscriptionList';
 
 type EmailCardProps = {
-	email: Email;
+	email: InboundEmailAddress;
 };
 
 export const EmailCard = ({ email }: EmailCardProps) => {
-	const activeSubscriptions = (email?.subscriptions ?? []).filter(
-		(sub) => sub.status === 'ACTIVE',
+	const activeSubscriptions = (email.subscriptions ?? []).filter(
+		(sub) => sub.status === NewsletterSubscriptionStatus.Active,
 	);
 
-	const unsubscribedSubscriptions = (email?.subscriptions ?? []).filter(
-		(sub) => sub.status === 'UNSUBSCRIBED',
+	const unsubscribedSubscriptions = (email.subscriptions ?? []).filter(
+		(sub) => sub.status === NewsletterSubscriptionStatus.Unsubscribed,
 	);
 
 	return (

@@ -2,6 +2,8 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import dayjs from 'dayjs';
 import { randomBytes } from 'crypto';
 
+import { USER_INBOUND_EMAIL_ADDRESS_LIMIT } from '@inbox-reader/common';
+
 import { Prisma } from '../../../prisma/client';
 
 import { PrismaService } from '../../services/prisma.service';
@@ -80,7 +82,7 @@ export class InboundEmailAddressService {
 			where: { deletedAt: null },
 		});
 
-		if (existingInboundEmailAddresses.length >= 2) {
+		if (existingInboundEmailAddresses.length >= USER_INBOUND_EMAIL_ADDRESS_LIMIT) {
 			throw new AppException(
 				'You have reached the maximum number of inbox newsletter emails',
 				HttpStatus.BAD_REQUEST,

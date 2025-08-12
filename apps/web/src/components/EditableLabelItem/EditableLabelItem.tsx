@@ -1,5 +1,6 @@
-import { useEffect } from 'react';
+import { useMutation } from '@apollo/client';
 import { Group, Text, TextInput, ActionIcon, Flex, Stack } from '@mantine/core';
+import { useForm, zodResolver } from '@mantine/form';
 import {
 	IconLabelImportantFilled,
 	IconEdit,
@@ -7,20 +8,21 @@ import {
 	IconCheck,
 	IconX,
 } from '@tabler/icons-react';
-import { useMutation } from '@apollo/client';
-import { useForm, zodResolver } from '@mantine/form';
+import { useEffect } from 'react';
+
+import { updateLabelSchema } from '@inbox-reader/common';
+
+import { useScreenQuery } from '~hooks/useScreenQuery';
+import { DELETE_LABEL, LABELS, UPDATE_LABEL } from '~lib/graphql';
+import { Label } from '~lib/graphql/generated/graphql';
+
+import { Form } from '../Form';
+import { LabelsColorInput } from '../LabelsColorInput';
 
 import classes from './EditableLabelItem.module.css';
 
-import { updateLabelSchema } from '@inbox-reader/schemas';
-
-import { LabelsColorInput } from '../LabelsColorInput';
-import { useScreenQuery } from '../../hooks/useScreenQuery.tsx';
-import { Form } from '../Form';
-import { DELETE_LABEL, LABELS, UPDATE_LABEL } from '../../lib/graphql.ts';
-
 type EditableLabelItemProps = {
-	label: { id: string; name: string; color: string };
+	label: Label;
 	isEditing: boolean;
 	setIsEditing: (isEditing: boolean) => void;
 };
@@ -138,7 +140,9 @@ export const EditableLabelItem = ({ label, isEditing, setIsEditing }: EditableLa
 							variant="light"
 							color="red"
 							loading={deleteLabelLoading}
-							onClick={() => deleteLabel({ variables: { data: { id: label.id } } })}
+							onClick={() =>
+								void deleteLabel({ variables: { data: { id: label.id } } })
+							}
 							size={36}
 						>
 							<IconTrash size={18} />

@@ -1,22 +1,15 @@
 import { Button, Group, Stack, Text, Title, Flex } from '@mantine/core';
 import dayjs from 'dayjs';
-import { NewsletterSubscriptionButton } from '../../components/NewsletterSubscriptionButton';
 import { useState } from 'react';
-import { useScreenQuery } from '../../hooks/useScreenQuery.tsx';
 
-export type Subscription = {
-	id: string;
-	name: string;
-	status: 'ACTIVE' | 'UNSUBSCRIBED';
-	unsubscribeUrl: string;
-	unsubscribeAttemptedAt: string;
-	lastReceivedAt: string;
-};
+import { NewsletterSubscriptionButton } from '~components/NewsletterSubscriptionButton';
+import { useScreenQuery } from '~hooks/useScreenQuery';
+import { NewsletterSubscription } from '~lib/graphql/generated/graphql';
 
 type SubscriptionsListProps = {
 	emailId: string;
 	type: 'unsubscribed' | 'active';
-	subscriptions: Subscription[];
+	subscriptions: NewsletterSubscription[];
 	maxVisible?: number;
 };
 
@@ -35,7 +28,7 @@ export const SubscriptionList = ({
 		);
 	};
 
-	if (!subscriptions?.length) {
+	if (!subscriptions.length) {
 		return null;
 	}
 
@@ -82,7 +75,7 @@ export const SubscriptionList = ({
 						)}
 					</Stack>
 
-					{sub?.unsubscribeUrl && (
+					{sub.unsubscribeUrl && (
 						<Group mt={isBelowXsScreen ? 'xs' : undefined}>
 							<NewsletterSubscriptionButton subscription={sub} />
 						</Group>

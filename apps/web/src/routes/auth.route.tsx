@@ -1,9 +1,10 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
 
-import { Auth } from '../pages/Auth';
-import { client } from '../lib/apolloClient.ts';
-import { ACTIVE_USER } from '../lib/graphql.ts';
-import { AppViews } from '../constants';
+import { AppViews } from '@inbox-reader/common';
+
+import { ACTIVE_USER } from '~lib/graphql';
+import { client } from '~lib/graphql/client';
+import { Auth } from '~pages/Auth';
 
 export type AuthMode = 'login' | 'signup' | 'demo' | 'forgot-password' | undefined;
 
@@ -24,7 +25,7 @@ export const Route = createFileRoute('/auth')({
 			fetchPolicy: 'network-only',
 		});
 
-		if (data?.me) {
+		if (data.me) {
 			throw redirect({ to: '/', search: { view: AppViews['INBOX'] } });
 		}
 	},

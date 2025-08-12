@@ -1,18 +1,18 @@
 import { Box, Center, Flex } from '@mantine/core';
-import { ReactNode } from 'react';
 import { useDisclosure, useDocumentTitle } from '@mantine/hooks';
 import { useRouteContext } from '@tanstack/react-router';
+import { ReactNode } from 'react';
+
+import { Footer } from '~components/Footer';
+import { Header } from '~components/Header';
+import { Navbar } from '~components/Navbar';
+import { UnverifiedEmailAlert } from '~components/UnverifiedEmailAlert';
+import { useReaderContext } from '~context/reader';
+import { useScreenQuery } from '~hooks/useScreenQuery';
+
+import { Route } from '../routes/_auth';
 
 import classes from './AppLayout.module.css';
-
-import { Navbar } from '../components/Navbar';
-import { Footer } from '../components/Footer';
-import { Header } from '../components/Header';
-
-import { useReaderContext } from '../context/ReaderContext.tsx';
-import { useScreenQuery } from '../hooks/useScreenQuery.tsx';
-import { Route } from '../routes/_auth.tsx';
-import { UnverifiedEmailAlert } from '../components/UnverifiedEmailAlert';
 
 type AppLayoutProps = {
 	children: ReactNode;
@@ -24,10 +24,9 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
 	const [opened, { toggle }] = useDisclosure(isAboveLgScreen);
 	const { selectedItems } = useReaderContext();
 	useDocumentTitle('Inbox Reader');
-
 	return (
 		<>
-			<UnverifiedEmailAlert user={routeData?.user} />
+			<UnverifiedEmailAlert user={routeData.user} />
 
 			<Center className={classes.layout}>
 				<Flex className={classes.container}>
@@ -35,7 +34,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
 
 					<Box
 						className={classes.content}
-						pt={selectedItems?.length && !isAboveLgScreen ? 0 : 'md'}
+						pt={selectedItems.length && !isAboveLgScreen ? 0 : 'md'}
 					>
 						<Header opened={opened} toggle={toggle} />
 

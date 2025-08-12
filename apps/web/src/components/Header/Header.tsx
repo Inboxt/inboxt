@@ -11,22 +11,24 @@ import {
 	Select,
 	rem,
 } from '@mantine/core';
+import { useLocalStorage } from '@mantine/hooks';
 import { IconArrowLeft, IconList, IconPhoto } from '@tabler/icons-react';
 import { useSearch, useRouter } from '@tanstack/react-router';
-import { useLocalStorage } from '@mantine/hooks';
 
-import { modals } from '@modals/modals.ts';
+import { SORT_OPTIONS } from '@inbox-reader/common';
 
-import classes from './Header.module.css';
+import { useReaderContext } from '~context/reader';
+import { useScreenQuery } from '~hooks/useScreenQuery';
+import { modals } from '~modals/modals';
+import { Route } from '~routes/_auth.index';
 
 import { AppName } from '../AppName';
-import { UserMenu } from '../UserMenu';
-import { useReaderContext } from '../../context/ReaderContext.tsx';
+import { AppSearch } from '../AppSearch';
 import { ItemsOptions } from '../ItemsOptions';
 import { ReaderCheckbox } from '../ReaderCheckbox';
-import { AppSearch } from '../AppSearch';
-import { useScreenQuery } from '../../hooks/useScreenQuery.tsx';
-import { Route } from '../../routes/_auth.index.tsx';
+import { UserMenu } from '../UserMenu';
+
+import classes from './Header.module.css';
 
 type HeaderProps = {
 	opened: boolean;
@@ -129,7 +131,7 @@ export const Header = ({ opened, toggle }: HeaderProps) => {
 							indeterminate={isPartiallySelected}
 							visibleFrom="lg"
 							size="header"
-							label={`Selected (${selectedItems.length})`}
+							label={`Selected (${selectedItems.length || 0})`}
 						/>
 
 						<Text fw={600} size="xl"></Text>
@@ -174,7 +176,7 @@ export const Header = ({ opened, toggle }: HeaderProps) => {
 								}
 
 								setSort(val as typeof searchParams.sort);
-								router.navigate({
+								void router.navigate({
 									to: Route.fullPath,
 									search: {
 										...searchParams,
@@ -183,12 +185,7 @@ export const Header = ({ opened, toggle }: HeaderProps) => {
 									replace: true,
 								});
 							}}
-							data={[
-								{ value: 'date_desc', label: 'Date (newest first)' },
-								{ value: 'date_asc', label: 'Date (oldest first)' },
-								{ value: 'title_asc', label: 'Title (A–Z)' },
-								{ value: 'title_desc', label: 'Title (Z–A)' },
-							]}
+							data={SORT_OPTIONS}
 						/>
 
 						<Flex

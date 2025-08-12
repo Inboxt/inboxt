@@ -1,24 +1,28 @@
-import { useEffect } from 'react';
-import { Alert, Button, Group, Skeleton, Stack, Text } from '@mantine/core';
 import { useMutation, useQuery } from '@apollo/client';
+import { Alert, Button, Group, Skeleton, Stack, Text } from '@mantine/core';
 import { ContextModalProps } from '@mantine/modals';
 import { IconAlertTriangleFilled } from '@tabler/icons-react';
+import { useEffect } from 'react';
 
-import { modals } from '@modals/modals.ts';
+import { USER_INBOUND_EMAIL_ADDRESS_LIMIT } from '@inbox-reader/common';
 
-import { Email, EmailCard } from './EmailCard.tsx';
-import { CREATE_INBOUND_EMAIL_ADDRESS, INBOUND_EMAIL_ADDRESSES } from '../../lib/graphql.ts';
-import { parseError } from '../../utils/parse-error.ts';
+import { CREATE_INBOUND_EMAIL_ADDRESS, INBOUND_EMAIL_ADDRESSES } from '~lib/graphql';
+import { modals } from '~modals/modals';
+import { parseError } from '~utils/parse-error';
+
+import { EmailCard } from './EmailCard';
 
 export const EmailsModal = ({ id, context }: ContextModalProps) => {
 	const { data, loading } = useQuery(INBOUND_EMAIL_ADDRESSES, {
 		fetchPolicy: 'cache-and-network',
 	});
 
-	const emails: Email[] = data?.inboundEmailAddresses || [];
+	const emails = data?.inboundEmailAddresses || [];
 	useEffect(() => {
-		modals.update(id, { title: `Manage Email Addresses (${emails.length}/2)` });
-	}, [emails.length]);
+		modals.update(id, {
+			title: `Manage Email Addresses (${emails.length}/${USER_INBOUND_EMAIL_ADDRESS_LIMIT})`,
+		});
+	}, [emails.length, id]);
 
 	const [createInboundEmailAddress, { loading: creating, error }] = useMutation(
 		CREATE_INBOUND_EMAIL_ADDRESS,
@@ -70,7 +74,11 @@ export const EmailsModal = ({ id, context }: ContextModalProps) => {
 					Close
 				</Button>
 
-				<Button onClick={handleCreate} disabled={emails.length >= 2} loading={creating}>
+				<Button
+					onClick={() => void handleCreate()}
+					disabled={emails.length >= USER_INBOUND_EMAIL_ADDRESS_LIMIT}
+					loading={creating}
+				>
 					Create Email Address
 				</Button>
 			</Group>

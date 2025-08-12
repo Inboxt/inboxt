@@ -6,19 +6,23 @@ type FormFieldError = {
 };
 
 export const parseError = (
-	error: ApolloError | string,
+	error?: ApolloError | string,
 ): { message: string; fieldErrors?: FormFieldError[] } | null => {
 	if (typeof error === 'string') {
 		return { message: error };
 	}
 
-	const graphQLErrors = error?.graphQLErrors;
+	if (!error) {
+		return null;
+	}
 
-	if (graphQLErrors && graphQLErrors.length > 0) {
+	const graphQLErrors = error.graphQLErrors;
+
+	if (graphQLErrors.length > 0) {
 		const gqlError = graphQLErrors[0];
 
 		if (gqlError) {
-			const extensions = gqlError.extensions as Record<string, any>;
+			const extensions = gqlError.extensions as Record<string, unknown> | undefined;
 
 			if (extensions?.response?.message && Array.isArray(extensions.response.message)) {
 				const fieldErrors: FormFieldError[] = extensions.response.message.map(

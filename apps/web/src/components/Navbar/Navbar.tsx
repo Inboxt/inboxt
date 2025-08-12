@@ -1,3 +1,4 @@
+import { useQuery } from '@apollo/client';
 import { Box, Burger, Divider, Drawer, Group, Stack } from '@mantine/core';
 import {
 	IconArchive,
@@ -8,16 +9,17 @@ import {
 	IconTrash,
 	IconX,
 } from '@tabler/icons-react';
-import { useQuery } from '@apollo/client';
+import { clsx } from 'clsx';
+
+import { AppViews } from '@inbox-reader/common';
+
+import { useScreenQuery } from '~hooks/useScreenQuery';
+import { LABELS } from '~lib/graphql';
+
+import { FooterLinks } from '../FooterLinks';
+import { NavbarLink } from '../NavbarLink';
 
 import classes from './Navbar.module.css';
-
-import { NavbarLink } from '../NavbarLink';
-import { clsx } from 'clsx';
-import { FooterLinks } from '../FooterLinks';
-import { AppViews } from '../../constants';
-import { useScreenQuery } from '../../hooks/useScreenQuery.tsx';
-import { LABELS } from '../../lib/graphql.ts';
 
 const NAV_LINKS = [
 	{
@@ -45,7 +47,7 @@ const NAV_LINKS = [
 		label: 'Trash',
 		icon: <IconTrash size={21} />,
 	},
-]; // todo: enum
+];
 
 type NavbarProps = {
 	opened: boolean;
@@ -75,7 +77,7 @@ export const Navbar = ({ opened, toggle }: NavbarProps) => {
 			) : null}
 
 			<Box className={classes.navbarLabelsList}>
-				{data?.labels?.map((label: any) => (
+				{data?.labels?.map((label) => (
 					<NavbarLink
 						key={label.id}
 						label={label.name}

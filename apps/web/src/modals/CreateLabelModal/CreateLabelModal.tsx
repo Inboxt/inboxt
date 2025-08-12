@@ -1,18 +1,22 @@
+import { useMutation } from '@apollo/client';
 import { Group, Stack, TextInput, Button } from '@mantine/core';
 import { useForm, zodResolver } from '@mantine/form';
-import { useMutation } from '@apollo/client';
 import { ContextModalProps } from '@mantine/modals';
 
-import { createLabelSchema } from '@inbox-reader/schemas';
-import { LabelsColorInput } from '../../components/LabelsColorInput';
-import { Form } from '../../components/Form';
-import { CREATE_LABEL, LABELS } from '../../lib/graphql';
+import { createLabelSchema } from '@inbox-reader/common';
+
+import { Form } from '~components/Form';
+import { LabelsColorInput } from '~components/LabelsColorInput';
+import { CREATE_LABEL, LABELS } from '~lib/graphql';
+import { getRandomArrayItem } from '~utils/getRandomArrayItem';
+
+import { labelColors } from '../../theme/labelColors.ts';
 
 export const CreateLabelModal = ({ id, context }: ContextModalProps) => {
 	const [createLabel, { loading, error }] = useMutation(CREATE_LABEL);
 	const form = useForm({
 		mode: 'uncontrolled',
-		initialValues: { name: '', color: '#fa5252' },
+		initialValues: { name: '', color: getRandomArrayItem(labelColors) as string },
 		validate: zodResolver(createLabelSchema),
 	});
 

@@ -1,4 +1,4 @@
-import { MouseEvent, TouchEvent, useMemo, useRef } from 'react';
+import { MouseEvent, TouchEvent, useCallback, useMemo, useRef } from 'react';
 
 type LongPressEvent = MouseEvent<HTMLElement> | TouchEvent<HTMLElement>;
 
@@ -16,23 +16,26 @@ export function useLongPress(
 	const isLongPress = useRef(false);
 	const targetElement = useRef<HTMLElement | null>(null);
 
-	const start = (event: LongPressEvent) => {
-		if (typeof callback !== 'function') {
-			return;
-		}
+	const start = useCallback(
+		(event: LongPressEvent) => {
+			if (typeof callback !== 'function') {
+				return;
+			}
 
-		if (event.target instanceof HTMLElement) {
-			targetElement.current = event.target;
-			targetElement.current.style.userSelect = 'none';
-		}
+			if (event.target instanceof HTMLElement) {
+				targetElement.current = event.target;
+				targetElement.current.style.userSelect = 'none';
+			}
 
-		timerId.current = window.setTimeout(() => {
-			callback(event);
-			isLongPress.current = true;
-		}, threshold);
-	};
+			timerId.current = window.setTimeout(() => {
+				callback(event);
+				isLongPress.current = true;
+			}, threshold);
+		},
+		[callback, threshold],
+	);
 
-	const clear = () => {
+	const clear = useCallback(() => {
 		if (timerId.current !== null) {
 			clearTimeout(timerId.current);
 			timerId.current = null;
@@ -43,7 +46,7 @@ export function useLongPress(
 			targetElement.current.style.userSelect = '';
 			targetElement.current = null;
 		}
-	};
+	}, []);
 
 	return useMemo(
 		() => ({
@@ -51,6 +54,6 @@ export function useLongPress(
 			onTouchEnd: () => clear(),
 			onTouchCancel: () => clear(),
 		}),
-		[callback, threshold],
+		[start, clear],
 	);
 }

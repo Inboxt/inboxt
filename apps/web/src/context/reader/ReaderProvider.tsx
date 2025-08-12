@@ -1,37 +1,23 @@
-import React, { createContext, useContext, useState } from 'react';
 import { useDebouncedCallback } from '@mantine/hooks';
+import React, { useState } from 'react';
 
-type SelectedItem = { id: string; status: 'ACTIVE' | 'ARCHIVED' | 'DELETED'; originalUrl?: string };
+import { SavedItem } from '~lib/graphql/generated/graphql.ts';
 
-interface ReaderContextProps {
-	selectedItems: SelectedItem[];
-	setSelectedItems: (items: SelectedItem[]) => void;
-	visibleItems: SelectedItem[];
-	setVisibleItems: (items: SelectedItem[]) => void;
-	toggleSelectAll: () => void;
-	isAllSelected: boolean;
-	isNoneSelected: boolean;
-	isPartiallySelected: boolean;
-	toggleItemSelection: (item: SelectedItem) => void;
-	isSelected: (id: string) => boolean;
-	deselectAll: () => void;
-}
-
-const ReaderContext = createContext<ReaderContextProps | undefined>(undefined);
+import { ReaderContext, SelectedSavedItem } from './ReaderContext';
 
 export const ReaderProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-	const [selectedItems, setSelectedItemsRaw] = useState<SelectedItem[]>([]);
-	const [visibleItems, setVisibleItemsRaw] = useState<SelectedItem[]>([]);
+	const [selectedItems, setSelectedItemsRaw] = useState<SelectedSavedItem[]>([]);
+	const [visibleItems, setVisibleItemsRaw] = useState<SelectedSavedItem[]>([]);
 
-	const toSelectedItem = (item: any): SelectedItem => {
+	const toSelectedItem = (item: SavedItem): SelectedSavedItem => {
 		return { id: item.id, status: item.status, originalUrl: item.originalUrl };
 	};
 
-	const setSelectedItems = (items: any[]) => {
+	const setSelectedItems = (items: SavedItem[]) => {
 		setSelectedItemsRaw(items.map(toSelectedItem));
 	};
 
-	const setVisibleItems = (items: any[]) => {
+	const setVisibleItems = (items: SavedItem[]) => {
 		setVisibleItemsRaw(items.map(toSelectedItem));
 	};
 
@@ -54,7 +40,7 @@ export const ReaderProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 		setSelectedItems([]);
 	};
 
-	const toggleItemSelection = useDebouncedCallback((item: any) => {
+	const toggleItemSelection = useDebouncedCallback((item: SavedItem) => {
 		const minimal = toSelectedItem(item);
 		setSelectedItemsRaw((prev) => {
 			const found = prev.find((it) => it.id === minimal.id);
@@ -94,12 +80,4 @@ export const ReaderProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 			{children}
 		</ReaderContext.Provider>
 	);
-};
-
-export const useReaderContext = () => {
-	const context = useContext(ReaderContext);
-	if (!context) {
-		throw new Error('useReaderContext must be used within a ReaderProvider');
-	}
-	return context;
 };

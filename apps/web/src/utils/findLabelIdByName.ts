@@ -1,11 +1,15 @@
-import { client } from '../lib/apolloClient';
-import { LABELS } from '../lib/graphql';
+import { LABELS } from '~lib/graphql';
+import { client } from '~lib/graphql/client';
 
 export function findLabelIdByName(name: string): string | undefined {
 	try {
 		const { labels } = client.readQuery({
 			query: LABELS,
 		}) || { labels: [] };
+
+		if (!labels) {
+			return;
+		}
 
 		const label = labels.find(
 			(l: { id: string; name: string }) => l.name.toLowerCase() === name.toLowerCase(),

@@ -1,14 +1,15 @@
-import { Button, Text, Group, Stack, TextInput } from '@mantine/core';
-import { ContextModalProps } from '@mantine/modals';
-import { useForm, zodResolver } from '@mantine/form';
 import { useMutation } from '@apollo/client';
+import { Button, Text, Group, Stack, TextInput } from '@mantine/core';
+import { useForm, zodResolver } from '@mantine/form';
+import { ContextModalProps } from '@mantine/modals';
 
-import { deleteAccountSchema } from '@inbox-reader/schemas';
+import { deleteAccountSchema } from '@inbox-reader/common';
 
-import { Form } from '../../components/Form';
-import { DELETE_ACCOUNT } from '../../lib/graphql.ts';
-import { client } from '../../lib/apolloClient.ts';
-import { router } from '../../main.tsx';
+import { Form } from '~components/Form';
+import { DELETE_ACCOUNT } from '~lib/graphql';
+import { client } from '~lib/graphql/client';
+
+import { router } from '../../main';
 
 export const DeleteAccountModal = ({ id, context }: ContextModalProps) => {
 	const [deleteAccount, { loading, error }] = useMutation(DELETE_ACCOUNT);

@@ -1,5 +1,5 @@
-import { IconInbox } from '@tabler/icons-react';
 import { Group, Title, TitleOrder } from '@mantine/core';
+import { IconInbox } from '@tabler/icons-react';
 
 type AppNameProps = {
 	size?: 'sm' | 'md' | 'lg';

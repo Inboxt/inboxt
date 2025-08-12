@@ -1,11 +1,11 @@
-import { useDisclosure } from '@mantine/hooks';
 import { Box, Drawer, Menu, Text, Title } from '@mantine/core';
-import { cloneElement, ReactElement, ReactNode } from 'react';
+import { useDisclosure } from '@mantine/hooks';
 import { IconX } from '@tabler/icons-react';
+import { cloneElement, ReactElement, ReactNode } from 'react';
+
+import { useScreenQuery } from '~hooks/useScreenQuery';
 
 import classes from './MenuDrawer.module.css';
-
-import { useScreenQuery } from '../../hooks/useScreenQuery.tsx';
 
 type MenuItem = {
 	icon: ReactElement<{ size: number }>;
@@ -49,11 +49,9 @@ export const MenuDrawer = ({ items, children, label, height = 300 }: MenuDrawerP
 				key={index}
 				onClick={() => {
 					closeDrawer();
-					if (item?.action) {
-						setTimeout(() => {
-							item.action();
-						}, 300);
-					}
+					setTimeout(() => {
+						item.action();
+					}, 300);
 				}}
 				className={classes.drawerItem}
 			>

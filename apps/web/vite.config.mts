@@ -1,7 +1,7 @@
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 import tsconfigPaths from 'vite-tsconfig-paths';
-import { TanStackRouterVite } from '@tanstack/router-plugin/vite';
+import { tanstackRouter } from '@tanstack/router-plugin/vite';
 
 export default defineConfig(({ mode }) => {
 	const env = {
@@ -17,14 +17,22 @@ export default defineConfig(({ mode }) => {
 		define: {
 			'process.env': env,
 		},
-		plugins: [TanStackRouterVite(), react(), tsconfigPaths()],
+		plugins: [
+			tanstackRouter({
+				target: 'react',
+				autoCodeSplitting: true,
+				tmpDir: 'src/.tsr-temp', // Changed to use a local tmp directory
+			}),
+			react(),
+			tsconfigPaths(),
+		],
 		resolve: {
 			alias: {
 				'@tabler/icons-react': '@tabler/icons-react/dist/esm/icons/index.mjs',
 			},
 		},
 		optimizeDeps: {
-			include: ['@inbox-reader/schemas'],
+			include: ['@inbox-reader/common'],
 		},
 	};
 });

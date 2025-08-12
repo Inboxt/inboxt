@@ -1,24 +1,7 @@
-import { ColorInput, DEFAULT_THEME, MantineColor } from '@mantine/core';
+import { ColorInput } from '@mantine/core';
 import { useUncontrolled } from '@mantine/hooks';
 
-const colorNames: MantineColor[] = [
-	'red',
-	'pink',
-	'grape',
-	'violet',
-	'indigo',
-	'blue',
-	'cyan',
-	'teal',
-	'green',
-	'lime',
-	'yellow',
-	'orange',
-];
-
-const swatches = colorNames
-	.map((name) => DEFAULT_THEME.colors[name]?.[7])
-	.filter((color): color is string => Boolean(color));
+import { labelColors } from '../../theme/labelColors.ts';
 
 type LabelsColorInputProps = {
 	value?: string;
@@ -46,7 +29,7 @@ export const LabelsColorInput = ({
 			value={_value}
 			onChange={(fieldValue) => handleChange(fieldValue)}
 			maw={110}
-			swatches={[DEFAULT_THEME.colors.dark[9], DEFAULT_THEME.colors.gray[9], ...swatches]}
+			swatches={labelColors}
 			withPicker={false}
 			disallowInput
 			label={label}

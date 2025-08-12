@@ -1,9 +1,8 @@
 import { Checkbox, createTheme, Modal, SegmentedControl } from '@mantine/core';
 
+import { fontSizes } from './fontSizes';
+import { spacing } from './spacing';
 import classes from './theme.module.css';
-
-import { fontSizes } from './fontSizes.ts';
-import { spacing } from './spacing.ts';
 
 export const theme = createTheme({
 	//fontFamily: '"Poppins", sans-serif',

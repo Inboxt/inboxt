@@ -1,7 +1,7 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 
 import { SavedItemType } from '../../enums/saved-item-type.enum';
-import { addItemFromUrlSchema } from '@inbox-reader/schemas';
+import { addItemFromUrlSchema } from '@inbox-reader/common';
 import { AppException } from '../../utils/app-exception';
 import { Prisma } from '../../../prisma/client';
 import { ArticleService } from 'src/modules/saved-item/entities/article/article.service';

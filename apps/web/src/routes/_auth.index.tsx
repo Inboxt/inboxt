@@ -1,11 +1,11 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { ItemsList } from '../pages/ItemsList';
-import { AppViews } from '../constants';
 import { readLocalStorageValue } from '@mantine/hooks';
+import { createFileRoute } from '@tanstack/react-router';
 
-const SORT_OPTIONS = ['date_asc', 'date_desc', 'title_asc', 'title_desc'] as const;
+import { AppViews, SORT_VALUES } from '@inbox-reader/common';
 
-type SortOption = (typeof SORT_OPTIONS)[number];
+import { ItemsList } from '~pages/ItemsList';
+
+type SortOption = (typeof SORT_VALUES)[number];
 export type AppSearch = {
 	view?: AppViews | `label:${string}`;
 	sort?: SortOption;
@@ -14,11 +14,11 @@ export type AppSearch = {
 export const Route = createFileRoute('/_auth/')({
 	component: ItemsList,
 	validateSearch: (search: Record<string, unknown>): AppSearch => {
-		let sort = search.sort as AppSearch['sort'] | undefined;
+		let sort = search.sort as SortOption | undefined;
 
 		if (!sort && typeof window !== 'undefined') {
-			const storedSort = readLocalStorageValue({ key: 'sort' });
-			if (SORT_OPTIONS.includes(storedSort as any)) {
+			const storedSort: SortOption = readLocalStorageValue({ key: 'sort' });
+			if (SORT_VALUES.includes(storedSort)) {
 				sort = storedSort as AppSearch['sort'];
 			}
 		}
@@ -27,13 +27,13 @@ export const Route = createFileRoute('/_auth/')({
 			localStorage.setItem('sort', sort);
 		}
 
-		if (!SORT_OPTIONS.includes(sort as any)) {
+		if (!sort || !SORT_VALUES.includes(sort)) {
 			sort = 'date_desc';
 		}
 
 		return {
 			...search,
-			view: (search.view as AppViews) || AppViews.INBOX,
+			view: (search.view as AppViews | undefined) || AppViews.INBOX,
 			sort,
 		};
 	},

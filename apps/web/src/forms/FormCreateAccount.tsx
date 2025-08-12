@@ -1,3 +1,4 @@
+import { useMutation } from '@apollo/client';
 import {
 	Anchor,
 	Button,
@@ -8,24 +9,26 @@ import {
 	Text,
 	TextInput,
 } from '@mantine/core';
-import { IconAt, IconLock, IconMail } from '@tabler/icons-react';
-import { useNavigate } from '@tanstack/react-router';
 import { useForm, zodResolver } from '@mantine/form';
-import { useMutation } from '@apollo/client';
-import { createAccountSchema } from '@inbox-reader/schemas';
+import { IconAt, IconLock, IconMail } from '@tabler/icons-react';
+import { useLocation, useNavigate } from '@tanstack/react-router';
 
-import { AuthViewProps } from '../pages/Auth/Auth.tsx';
-import { CREATE_ACCOUNT } from '../lib/graphql.ts';
-import { Form } from '../components/Form';
+import { createAccountSchema } from '@inbox-reader/common';
+
+import { Form } from '~components/Form';
+import { CREATE_ACCOUNT } from '~lib/graphql';
+import { AuthViewProps } from '~pages/Auth/Auth';
 
 export const FormCreateAccount = ({ handleChangeAuthMode }: AuthViewProps) => {
 	const navigate = useNavigate();
+	const location = useLocation();
+	const state = location.state as { emailAddress?: string } | undefined;
 	const [createAccount, { loading: loadingCreateAccount, error }] = useMutation(CREATE_ACCOUNT);
 
 	const form = useForm({
 		mode: 'uncontrolled',
 		initialValues: {
-			emailAddress: '',
+			emailAddress: state?.emailAddress || '',
 			username: '',
 			password: '',
 		},
@@ -81,7 +84,9 @@ export const FormCreateAccount = ({ handleChangeAuthMode }: AuthViewProps) => {
 						<Button
 							variant="default"
 							size="md"
-							onClick={() => handleChangeAuthMode(undefined)}
+							onClick={() =>
+								void handleChangeAuthMode(undefined, form.getValues().emailAddress)
+							}
 							loading={loadingCreateAccount}
 						>
 							Back

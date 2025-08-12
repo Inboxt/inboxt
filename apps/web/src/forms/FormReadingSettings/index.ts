@@ -1,1 +1,1 @@
-export { FormReadingSettings } from './FormReadingSettings.tsx';
+export { FormReadingSettings } from './FormReadingSettings';

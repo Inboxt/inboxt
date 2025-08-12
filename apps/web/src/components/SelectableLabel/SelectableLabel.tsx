@@ -1,10 +1,12 @@
 import { Checkbox, Group, Text } from '@mantine/core';
 import { IconLabelImportantFilled } from '@tabler/icons-react';
 
+import { Label } from '~lib/graphql/generated/graphql.ts';
+
 import classes from './SelectableLabel.module.css';
 
 type SelectableLabelProps = {
-	label: { id: string; name: string; color: string };
+	label: Pick<Label, 'id' | 'name' | 'color'>;
 };
 
 export const SelectableLabel = ({ label }: SelectableLabelProps) => {

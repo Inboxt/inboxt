@@ -1,21 +1,23 @@
 import { Alert, Button, Flex, Text } from '@mantine/core';
 import dayjs from 'dayjs';
 
-import { modals } from '@modals/modals';
-
-import { useScreenQuery } from '../../hooks/useScreenQuery';
+import { useScreenQuery } from '~hooks/useScreenQuery';
+import { User } from '~lib/graphql/generated/graphql';
+import { modals } from '~modals/modals';
 
 type UnverifiedEmailAlertProps = {
-	user: Record<string, unknown>;
+	user: User | null;
 };
 
 export const UnverifiedEmailAlert = ({ user }: UnverifiedEmailAlertProps) => {
 	const isAboveMdScreen = useScreenQuery('md', 'above');
-	const isUserVerified = user?.isEmailVerified && !!user?.id;
+	const isUserVerified = user?.isEmailVerified && !!user.id;
 
-	if (isUserVerified) return null;
+	if (isUserVerified) {
+		return null;
+	}
 
-	const createdAt = user?.createdAt ? dayjs(user.createdAt as string) : null;
+	const createdAt = user?.createdAt ? dayjs(user.createdAt) : null;
 	const daysSinceCreated = createdAt ? dayjs().diff(createdAt, 'day') : 0;
 	const daysLeft = Math.max(0, 45 - daysSinceCreated);
 

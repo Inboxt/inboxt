@@ -1,21 +1,17 @@
-import { useMemo, useRef } from 'react';
 import { Box, Popover, Button } from '@mantine/core';
 import { IconHighlight } from '@tabler/icons-react';
+import { useMemo, useRef } from 'react';
+
+import { useScreenQuery } from '~hooks/useScreenQuery';
+import { useTextHighlighting } from '~hooks/useTextSelection';
 
 import classes from './HighlightableArticle.module.css';
 
-import { useScreenQuery } from '../../hooks/useScreenQuery.tsx';
-import { useTextHighlighting } from '../../hooks/useTextSelection.tsx';
-import Markdown from 'react-markdown';
-import { Route } from '../../routes/r.$id.tsx';
-
 type ArticleWithHighlightsProps = {
-	content: string;
+	content: string | null;
 };
 
 export const HighlightableArticle = ({ content }: ArticleWithHighlightsProps) => {
-	const { format } = Route.useSearch();
-
 	const isAboveMdScreen = useScreenQuery('md', 'above');
 	const containerRef = useRef(null);
 	const { selectedText, hasValidSelection, highlightSelection, rangeRect, isFullyHighlighted } =
@@ -23,18 +19,14 @@ export const HighlightableArticle = ({ content }: ArticleWithHighlightsProps) =>
 
 	const sanitizedContent = useMemo(
 		() => ({
-			__html: content,
+			__html: content || '',
 		}),
 		[content],
 	);
 
 	return (
 		<>
-			{format === 'markdown' ? (
-				<Markdown>{content}</Markdown>
-			) : (
-				<Box ref={containerRef} dangerouslySetInnerHTML={sanitizedContent}></Box>
-			)}
+			<Box ref={containerRef} dangerouslySetInnerHTML={sanitizedContent}></Box>
 
 			{selectedText && rangeRect && hasValidSelection && isAboveMdScreen && (
 				<Popover

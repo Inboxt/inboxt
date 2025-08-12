@@ -1,14 +1,15 @@
 import { Box, NavLink, NavLinkProps, Tooltip, Transition } from '@mantine/core';
-import { ReactNode } from 'react';
 import { Link, useSearch } from '@tanstack/react-router';
+import { ReactNode } from 'react';
+
+import { AppViews } from '@inbox-reader/common';
+
+import { useReaderContext } from '~context/reader';
+import { useScreenQuery } from '~hooks/useScreenQuery';
+import { Route } from '~routes/_auth.index';
+import { kebabCase } from '~utils/kebabCase';
 
 import classes from './NavbarLink.module.css';
-
-import { Route } from '../../routes/_auth.index';
-import { AppViews } from '../../constants';
-import { kebabCase } from '../../utils/kebabCase.ts';
-import { useScreenQuery } from '../../hooks/useScreenQuery.tsx';
-import { useReaderContext } from '../../context/ReaderContext.tsx';
 
 type NavbarLinkProps = {
 	label: string;

@@ -9,7 +9,7 @@ import {
 	requestPasswordRecoverySchema,
 	resetPasswordSchema,
 	verifyEmailSchema,
-} from '@inbox-reader/schemas';
+} from '@inbox-reader/common';
 
 import { UserService } from '../user/user.service';
 import { GqlContext } from '../../types/graphql-context';

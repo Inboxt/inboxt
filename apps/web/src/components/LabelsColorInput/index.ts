@@ -1,1 +1,1 @@
-export { LabelsColorInput } from './LabelsColorInput';
+export * from './LabelsColorInput';

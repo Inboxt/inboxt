@@ -7,6 +7,7 @@ import { Logger } from '@nestjs/common';
 import { Prisma } from '../../../../../prisma/client';
 import { PrismaService } from '../../../../services/prisma.service';
 import { InboundEmailAddressService } from '../../../inbound-email-address/inbound-email-address.service';
+import { MAX_NEWSLETTER_WORD_COUNT, MIN_NEWSLETTER_WORD_COUNT } from '@inbox-reader/common';
 
 @Injectable()
 export class NewsletterService {
@@ -174,14 +175,14 @@ export class NewsletterService {
 
 		const allText = doc?.body?.textContent || '';
 		const allTextLength = allText.split(/\s+/).length;
-		if (allTextLength > 32000) {
+		if (allTextLength > MAX_NEWSLETTER_WORD_COUNT) {
 			this.logger.warn('Email body exceeds word limit. Skipping.');
 			return {
 				success: false,
 				shouldForward: true,
 				userId: inboundEmailAddress.userId,
 			};
-		} else if (allTextLength < 100) {
+		} else if (allTextLength < MIN_NEWSLETTER_WORD_COUNT) {
 			this.logger.warn('Email body is too short. Skipping.');
 			return {
 				success: false,

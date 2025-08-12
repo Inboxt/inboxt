@@ -1,7 +1,7 @@
 import { Outlet, createFileRoute, redirect } from '@tanstack/react-router';
 
-import { client } from '../lib/apolloClient';
-import { ACTIVE_USER } from '../lib/graphql';
+import { ACTIVE_USER } from '~lib/graphql';
+import { client } from '~lib/graphql/client';
 
 export const Route = createFileRoute('/_auth')({
 	beforeLoad: async () => {
@@ -10,7 +10,7 @@ export const Route = createFileRoute('/_auth')({
 			fetchPolicy: 'network-only',
 		});
 
-		if (!data?.me) {
+		if (!data.me) {
 			throw redirect({
 				to: '/auth',
 			});

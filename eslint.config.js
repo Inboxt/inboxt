@@ -4,6 +4,7 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import tseslint from 'typescript-eslint';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
+import importPlugin from 'eslint-plugin-import';
 
 export default tseslint.config(
 	{ ignores: ['dist', '**/node_modules'] },
@@ -32,16 +33,61 @@ export default tseslint.config(
 		plugins: {
 			'react-hooks': reactHooks,
 			'react-refresh': reactRefresh,
+			import: importPlugin,
 		},
 		languageOptions: {
 			parserOptions: {
-				project: ['./tsconfig.app.json', './tsconfig.node.json'],
+				project: ['./apps/web/tsconfig.app.json', './apps/web/tsconfig.node.json'],
 				tsconfigRootDir: new URL('.', import.meta.url),
 			},
 		},
 		rules: {
 			...reactHooks.configs.recommended.rules,
+			'no-throw-literal': 'off',
+			'@typescript-eslint/only-throw-error': 'off',
+			'@typescript-eslint/restrict-template-expressions': [
+				'error',
+				{
+					allowAny: true,
+					allowBoolean: true,
+					allowNullish: true,
+					allowNumber: true,
+					allowRegExp: true,
+				},
+			],
 			'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+			curly: ['error', 'all'],
+			'import/order': [
+				'error',
+				{
+					groups: [
+						['builtin', 'external'],
+						'internal',
+						'parent',
+						'sibling',
+						'index',
+						'type',
+					],
+					'newlines-between': 'always',
+					pathGroups: [
+						{
+							pattern: '@inbox-reader/**',
+							group: 'internal',
+							position: 'after',
+						},
+						{
+							pattern: '~**/**',
+							group: 'internal',
+							position: 'after',
+						},
+					],
+					pathGroupsExcludedImportTypes: ['type'],
+					alphabetize: {
+						order: 'asc',
+						caseInsensitive: true,
+					},
+				},
+			],
 		},
 	},
 
@@ -54,7 +100,7 @@ export default tseslint.config(
 				...globals.jest,
 			},
 			parserOptions: {
-				project: ['./tsconfig.json'],
+				project: ['./apps/api/tsconfig.json'],
 				tsconfigRootDir: new URL('.', import.meta.url),
 			},
 		},

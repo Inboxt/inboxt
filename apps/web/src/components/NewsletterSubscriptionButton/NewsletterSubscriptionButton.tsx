@@ -1,17 +1,20 @@
-import { Button, Text } from '@mantine/core';
 import { useMutation } from '@apollo/client';
+import { Button, Text } from '@mantine/core';
 
-import { modals } from '@modals/modals.ts';
-
+import { useScreenQuery } from '~hooks/useScreenQuery';
 import {
 	INBOUND_EMAIL_ADDRESSES,
 	SAVED_ITEM,
 	UPDATE_NEWSLETTER_SUBSCRIPTION_STATUS,
-} from '../../lib/graphql';
-import { useScreenQuery } from '../../hooks/useScreenQuery.tsx';
+} from '~lib/graphql';
+import {
+	NewsletterSubscription,
+	NewsletterSubscriptionStatus,
+} from '~lib/graphql/generated/graphql';
+import { modals } from '~modals/modals';
 
 type NewsletterSubscriptionButton = {
-	subscription: { id: string; status: 'UNSUBSCRIBED' | 'ACTIVE'; unsubscribeUrl?: string };
+	subscription: NewsletterSubscription;
 };
 
 export const NewsletterSubscriptionButton = ({ subscription }: NewsletterSubscriptionButton) => {
@@ -24,12 +27,12 @@ export const NewsletterSubscriptionButton = ({ subscription }: NewsletterSubscri
 		},
 	);
 
-	const handleButtonAction = async (status: 'UNSUBSCRIBED' | 'ACTIVE') => {
-		if (!subscription?.unsubscribeUrl) {
+	const handleButtonAction = async (status: NewsletterSubscription['status']) => {
+		if (!subscription.unsubscribeUrl) {
 			return;
 		}
 
-		if (status === 'UNSUBSCRIBED') {
+		if (status === NewsletterSubscriptionStatus.Unsubscribed) {
 			window.open(subscription.unsubscribeUrl, '_blank');
 		}
 
@@ -43,17 +46,17 @@ export const NewsletterSubscriptionButton = ({ subscription }: NewsletterSubscri
 		});
 	};
 
-	if (!subscription?.unsubscribeUrl) {
+	if (!subscription.unsubscribeUrl) {
 		return null;
 	}
 
-	if (subscription.status === 'UNSUBSCRIBED') {
+	if (subscription.status === NewsletterSubscriptionStatus.Unsubscribed) {
 		return (
 			<Button
 				size="compact-md"
 				fz="xs"
 				variant={isBelowXsScreen ? 'light' : 'white'}
-				onClick={() => handleButtonAction('ACTIVE')}
+				onClick={() => void handleButtonAction(NewsletterSubscriptionStatus.Active)}
 				loading={loading}
 				w={isBelowXsScreen ? undefined : 128}
 				fullWidth={isBelowXsScreen}
@@ -98,7 +101,7 @@ export const NewsletterSubscriptionButton = ({ subscription }: NewsletterSubscri
 						cancel: 'Cancel',
 					},
 					confirmProps: { color: 'red' },
-					onConfirm: () => handleButtonAction('UNSUBSCRIBED'),
+					onConfirm: () => handleButtonAction(NewsletterSubscriptionStatus.Unsubscribed),
 				})
 			}
 		>

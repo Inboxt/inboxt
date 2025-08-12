@@ -1,11 +1,12 @@
+import { useMutation } from '@apollo/client';
 import { Anchor, Button, Divider, Group, List, Stack, Switch, Text } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { useMutation } from '@apollo/client';
 import { useNavigate } from '@tanstack/react-router';
 
-import { AuthViewProps } from '../../pages/Auth/Auth.tsx';
-import { SIGN_IN } from '../../lib/graphql.ts';
-import { Route } from '../../routes/auth.route.tsx';
+import { SIGN_IN } from '~lib/graphql';
+import { AuthViewProps } from '~pages/Auth/Auth';
+import { Route } from '~routes/auth.route';
+
 import { Form } from '../Form';
 
 export const DemoLogin = ({ handleChangeAuthMode }: AuthViewProps) => {
@@ -101,7 +102,7 @@ export const DemoLogin = ({ handleChangeAuthMode }: AuthViewProps) => {
 							variant="default"
 							size="md"
 							mt="md"
-							onClick={() => handleChangeAuthMode(undefined)}
+							onClick={() => void handleChangeAuthMode(undefined)}
 						>
 							Back
 						</Button>

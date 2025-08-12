@@ -9,6 +9,7 @@ import { Prisma } from '../../../../../prisma/client';
 import { PrismaService } from '../../../../services/prisma.service';
 import { AppException } from '../../../../utils/app-exception';
 import { applyArticleDomainFilter } from '../../../../filters/articleDomainFilters';
+import { MAX_ARTICLE_WORD_COUNT } from '@inbox-reader/common';
 
 @Injectable()
 export class ArticleService {
@@ -112,7 +113,7 @@ export class ArticleService {
 		applyArticleDomainFilter(host, doc);
 
 		const allText = doc?.body?.textContent || '';
-		if (allText.split(/\s+/).length > 32000) {
+		if (allText.split(/\s+/).length > MAX_ARTICLE_WORD_COUNT) {
 			throw new AppException(
 				'The article you tried to add is too large for processing. \n If you believe this is an error, please contact support for further assistance.',
 				HttpStatus.BAD_REQUEST,

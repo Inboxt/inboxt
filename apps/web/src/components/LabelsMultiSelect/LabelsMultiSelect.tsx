@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useQuery } from '@apollo/client';
 import {
 	Combobox,
 	useCombobox,
@@ -9,13 +9,14 @@ import {
 	Text,
 	Checkbox,
 } from '@mantine/core';
-import { useQuery } from '@apollo/client';
-import { LABELS } from '../../lib/graphql.ts';
 import { IconLabelImportantFilled } from '@tabler/icons-react';
+import { useState } from 'react';
 
-const MAX_DISPLAYED_VALUES = 3;
+import { MAX_VISIBLE_SELECTED_LABELS } from '@inbox-reader/common';
 
-type Label = {
+import { LABELS } from '~lib/graphql';
+
+type LabelValue = {
 	value: string;
 	label: string;
 	color: string;
@@ -35,10 +36,12 @@ export const LabelsMultiSelect = ({ value = [], onChange = () => {} }: LabelsMul
 		onDropdownOpen: () => combobox.updateSelectedOptionIndex('active'),
 	});
 
-	if (labelsLoading) return null;
+	if (labelsLoading) {
+		return null;
+	}
 
-	const labelsData: Label[] =
-		data?.labels?.map((label: any) => ({
+	const labelsData: LabelValue[] =
+		data?.labels?.map((label) => ({
 			value: label.id,
 			label: label.name,
 			color: label.color,
@@ -52,12 +55,17 @@ export const LabelsMultiSelect = ({ value = [], onChange = () => {} }: LabelsMul
 	const values = value
 		.slice(
 			0,
-			MAX_DISPLAYED_VALUES === value.length ? MAX_DISPLAYED_VALUES : MAX_DISPLAYED_VALUES - 1,
+			MAX_VISIBLE_SELECTED_LABELS === value.length
+				? MAX_VISIBLE_SELECTED_LABELS
+				: MAX_VISIBLE_SELECTED_LABELS - 1,
 		)
 
 		.map((id) => {
 			const item = labelsData.find((l) => l.value === id);
-			if (!item) return null;
+			if (!item) {
+				return null;
+			}
+
 			return (
 				<Pill
 					key={item.value}
@@ -107,9 +115,9 @@ export const LabelsMultiSelect = ({ value = [], onChange = () => {} }: LabelsMul
 							{value.length > 0 && (
 								<>
 									{values}
-									{value.length > MAX_DISPLAYED_VALUES && (
+									{value.length > MAX_VISIBLE_SELECTED_LABELS && (
 										<Pill>
-											+{value.length - (MAX_DISPLAYED_VALUES - 1)} more
+											+{value.length - (MAX_VISIBLE_SELECTED_LABELS - 1)} more
 										</Pill>
 									)}
 								</>
@@ -132,7 +140,9 @@ export const LabelsMultiSelect = ({ value = [], onChange = () => {} }: LabelsMul
 										) {
 											event.preventDefault();
 											const lastVal = value[value.length - 1];
-											if (lastVal) handleValueRemove(lastVal);
+											if (lastVal) {
+												handleValueRemove(lastVal);
+											}
 										}
 									}}
 								/>

@@ -1,6 +1,7 @@
-import { RefObject, useEffect, useMemo } from 'react';
 import { useTextSelection } from '@mantine/hooks';
-import { getSafeTextRanges, getXPath, wrapSafeRangeWithSpan } from '../utils/highlightsDOM.ts';
+import { RefObject, useEffect, useMemo } from 'react';
+
+import { getSafeTextRanges, wrapSafeRangeWithSpan } from '../utils/highlightsDOM';
 
 export function useTextHighlighting(containerRef?: RefObject<HTMLDivElement | null>) {
 	const selection = useTextSelection();
@@ -10,7 +11,9 @@ export function useTextHighlighting(containerRef?: RefObject<HTMLDivElement | nu
 	const rangeRect = currentRange ? currentRange.getBoundingClientRect() : null;
 
 	const hasValidSelection = useMemo(() => {
-		if (!currentRange) return false;
+		if (!currentRange) {
+			return false;
+		}
 
 		const startInFigcaption =
 			currentRange.startContainer.nodeType === Node.TEXT_NODE
@@ -21,28 +24,36 @@ export function useTextHighlighting(containerRef?: RefObject<HTMLDivElement | nu
 				? currentRange.endContainer.parentElement?.closest('figcaption')
 				: (currentRange.endContainer as Element).closest('figcaption');
 
-		if (startInFigcaption || endInFigcaption) return false;
+		if (startInFigcaption || endInFigcaption) {
+			return false;
+		}
 
 		const fragment = currentRange.cloneContents();
-		if (fragment.querySelector('img')) return false;
+		if (fragment.querySelector('img')) {
+			return false;
+		}
 
 		const invalidSelectors = ['button', 'input', 'select', 'textarea', 'video', 'audio'];
-		if (fragment.querySelector(invalidSelectors.join(','))) return false;
-
-		return true;
+		return !fragment.querySelector(invalidSelectors.join(','));
 	}, [currentRange]);
 
 	const isFullyHighlighted = () => {
-		if (!selection || selection.rangeCount === 0) return false;
+		if (!selection || selection.rangeCount === 0) {
+			return false;
+		}
 
 		const range = selection.getRangeAt(0);
 		const safeRanges = getSafeTextRanges(range);
 
 		for (const { node, start, end } of safeRanges) {
-			if (start === end) continue;
+			if (start === end) {
+				continue;
+			}
 
 			const text = node.textContent?.slice(start, end);
-			if (!text?.trim()) continue;
+			if (!text?.trim()) {
+				continue;
+			}
 
 			const parent = node.parentElement;
 			if (!parent || !parent.classList.contains('highlight')) {
@@ -54,7 +65,9 @@ export function useTextHighlighting(containerRef?: RefObject<HTMLDivElement | nu
 	};
 
 	const highlightSelection = () => {
-		if (!selection || selection.rangeCount === 0) return;
+		if (!selection || selection.rangeCount === 0) {
+			return;
+		}
 
 		const range = selection.getRangeAt(0);
 		const safeRanges = getSafeTextRanges(range);
@@ -82,7 +95,7 @@ export function useTextHighlighting(containerRef?: RefObject<HTMLDivElement | nu
 		}
 
 		// Remove existing highlights inside selection
-		if (containerRef?.current && range) {
+		if (containerRef?.current) {
 			const highlights = containerRef.current.querySelectorAll('.highlight');
 
 			highlights.forEach((highlight) => {
@@ -133,26 +146,31 @@ export function useTextHighlighting(containerRef?: RefObject<HTMLDivElement | nu
 			extractedTextParts.push(textContent);
 		});
 
-		const highlightData = {
-			startContainer: getXPath(range.startContainer),
-			endContainer: getXPath(range.endContainer),
-			startOffset: range.startOffset,
-			endOffset: range.endOffset,
-			content: extractedTextParts.join(' '),
-			htmlContent: extractedHtmlParts.join(' '),
-		};
+		// const highlightData = {
+		// 	startContainer: getXPath(range.startContainer),
+		// 	endContainer: getXPath(range.endContainer),
+		// 	startOffset: range.startOffset,
+		// 	endOffset: range.endOffset,
+		// 	content: extractedTextParts.join(' '),
+		// 	htmlContent: extractedHtmlParts.join(' '),
+		// };
 
 		//console.log(highlightData);
 		selection.removeAllRanges();
 	};
 
 	useEffect(() => {
-		if (!containerRef?.current) return;
+		if (!containerRef?.current) {
+			return;
+		}
 
 		const sel = document.getSelection();
-		if (sel && containerRef.current.contains(sel.anchorNode)) {
-		} else {
-			sel?.removeAllRanges();
+		if (!sel) {
+			return;
+		}
+
+		if (!containerRef.current.contains(sel.anchorNode)) {
+			sel.removeAllRanges();
 		}
 	}, [selection, containerRef]);
 

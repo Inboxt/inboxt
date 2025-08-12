@@ -7,7 +7,8 @@
 		"dev": "vite",
 		"build": "tsc -b && vite build",
 		"lint": "eslint .",
-		"preview": "vite preview"
+		"preview": "vite preview",
+		"codegen": "graphql-codegen --config codegen.ts"
 	},
 	"dependencies": {
 		"@mantine/core": "7.17.8",
@@ -15,30 +16,29 @@
 		"@mantine/hooks": "7.17.8",
 		"@mantine/modals": "7.17.8",
 		"@tabler/icons-react": "3.28.1",
-		"@tanstack/react-router": "1.100.0",
+		"@tanstack/react-router": "1.131.2",
 		"clsx": "2.1.1",
 		"react": "19.0.0",
 		"react-dom": "19.0.0",
 		"react-markdown": "9.0.3",
 		"react-use-pwa-install": "1.0.3",
 		"@apollo/client": "3.13.8",
-		"@inbox-reader/schemas": "1.0.0"
+		"@inbox-reader/common": "1.0.0",
+		"dotenv": "16.5.0"
 	},
 	"devDependencies": {
-		"@tanstack/router-devtools": "1.100.0",
-		"@tanstack/router-plugin": "1.100.0",
+		"@tanstack/router-plugin": "1.131.2",
 		"@types/react": "19.0.7",
 		"@types/react-dom": "19.0.3",
-		"@vitejs/plugin-react-swc": "3.7.2",
+		"@vitejs/plugin-react-swc": "3.11.0",
 		"eslint-plugin-react-hooks": "5.1.0",
 		"eslint-plugin-react-refresh": "0.4.18",
 		"postcss": "8.5.1",
 		"postcss-preset-mantine": "1.17.0",
 		"postcss-simple-vars": "7.0.1",
-		"vite": "6.0.7",
-		"vite-tsconfig-paths": "5.1.4"
-	},
-	"overrides": {
-		"@tanstack/router-generator": "1.100.0"
+		"vite": "6.3.5",
+		"vite-tsconfig-paths": "5.1.4",
+		"@graphql-codegen/cli": "5.0.7",
+		"@graphql-codegen/client-preset": "4.8.3"
 	}
 }

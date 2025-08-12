@@ -1,3 +1,4 @@
+import { useMutation, useQuery } from '@apollo/client';
 import {
 	Card,
 	Stack,
@@ -14,19 +15,26 @@ import {
 	Skeleton,
 	useMantineColorScheme,
 	useComputedColorScheme,
+	MantineColorScheme,
 } from '@mantine/core';
-import { IconBell, IconDatabase, IconHighlight, IconTag } from '@tabler/icons-react';
-import { ContextModalProps } from '@mantine/modals';
-import { useMutation, useQuery } from '@apollo/client';
 import { useForm, zodResolver } from '@mantine/form';
+import { ContextModalProps } from '@mantine/modals';
+import { IconBell, IconDatabase, IconHighlight, IconTag } from '@tabler/icons-react';
 import { useEffect } from 'react';
 
-import { updateAccountSchema } from '@inbox-reader/schemas';
+import {
+	updateAccountSchema,
+	USER_INBOUND_EMAIL_ADDRESS_LIMIT,
+	USER_LABELS_LIMIT,
+	USER_MAX_STORAGE,
+} from '@inbox-reader/common';
 
-import { modals } from '@modals/modals.ts';
-import { ACTIVE_USER, UPDATE_ACCOUNT } from '../../lib/graphql.ts';
-import { Form } from '../../components/Form';
-import { router } from '../../main.tsx';
+import { Form } from '~components/Form';
+import { ACTIVE_USER, UPDATE_ACCOUNT } from '~lib/graphql';
+import { modals } from '~modals/modals';
+import { formatBytes } from '~utils/formatBytes.ts';
+
+import { router } from '../../main';
 
 export const ProfileModal = ({ id, context }: ContextModalProps) => {
 	const { setColorScheme, colorScheme } = useMantineColorScheme();
@@ -69,13 +77,11 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 			return router.invalidate();
 		}
 
-		return context.closeModal(id);
+		context.closeModal(id);
 	};
 
-	const usedStorage = 3;
-	const totalStorage = 10;
-	const storagePercentage = (usedStorage / totalStorage) * 100;
-	const labelLimit = 50; // todo: move to shared const
+	const usedStorage = 19000680; // todo: from backend...
+	const storagePercentage = Math.min(Math.round((usedStorage / USER_MAX_STORAGE) * 100), 100);
 	const labelsUsed = data?.me?.labelsCount ?? 0;
 	const inboundEmailAddressesUsed = data?.me?.inboundEmailAddressesCount ?? 0;
 
@@ -106,7 +112,7 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 							mt="sm"
 							color={computedColorScheme === 'dark' ? undefined : 'dark'}
 							value={colorScheme}
-							onChange={setColorScheme}
+							onChange={(value) => setColorScheme(value as MantineColorScheme)}
 							data={[
 								{ label: 'System', value: 'auto' },
 								{ label: 'Light', value: 'light' },
@@ -121,7 +127,7 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 								<Title order={5}>Email Addresses</Title>
 
 								<Text size="xs" c="dimmed">
-									{`${inboundEmailAddressesUsed} of 2 addresses used`}
+									{`${inboundEmailAddressesUsed} of ${USER_INBOUND_EMAIL_ADDRESS_LIMIT} addresses used`}
 								</Text>
 
 								<Text size="xs" c="dimmed">
@@ -141,8 +147,11 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 							<Group justify="space-between">
 								<Stack gap="xxxs">
 									<Title order={5}>Labels</Title>
-									<Text size="xs" c={labelsUsed >= labelLimit ? 'red' : 'dimmed'}>
-										{labelsUsed} of {labelLimit} labels used
+									<Text
+										size="xs"
+										c={labelsUsed >= USER_LABELS_LIMIT ? 'red' : 'dimmed'}
+									>
+										{labelsUsed} of {USER_LABELS_LIMIT} labels used
 									</Text>
 									<Text size="xs" c="dimmed">
 										Use labels to organize your saved content.
@@ -152,13 +161,13 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 									onClick={modals.openLabelsModal}
 									size="xs"
 									variant="light"
-									disabled={labelsUsed >= labelLimit}
+									disabled={labelsUsed >= USER_LABELS_LIMIT}
 								>
 									Manage
 								</Button>
 							</Group>
 
-							{labelsUsed >= labelLimit && (
+							{labelsUsed >= USER_LABELS_LIMIT && (
 								<Alert color="red" icon={<IconTag />} mt="sm">
 									You have reached your label limit. Please delete a label before
 									creating a new one.
@@ -178,7 +187,7 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 									color="blue"
 								/>
 								<Text size="xs" c="dimmed">
-									{usedStorage}GB of {totalStorage}GB used
+									{`${formatBytes(usedStorage)} of ${formatBytes(USER_MAX_STORAGE)} used`}
 								</Text>
 							</Stack>
 						</Skeleton>

@@ -1,16 +1,13 @@
+import { useMutation } from '@apollo/client';
 import { ActionIcon, Button, Group, Stack, Text, Tooltip } from '@mantine/core';
 import { IconCopy, IconTrash } from '@tabler/icons-react';
-import { useMutation } from '@apollo/client';
 
-import { modals } from '@modals/modals.ts';
-
-import { DELETE_INBOUND_EMAIL_ADDRESS, INBOUND_EMAIL_ADDRESSES } from '../../lib/graphql';
+import { DELETE_INBOUND_EMAIL_ADDRESS, INBOUND_EMAIL_ADDRESSES } from '~lib/graphql';
+import { InboundEmailAddress } from '~lib/graphql/generated/graphql';
+import { modals } from '~modals/modals';
 
 type EmailActionsProps = {
-	email: {
-		id: string;
-		fullAddress: string;
-	};
+	email: InboundEmailAddress;
 };
 
 export const EmailActions = ({ email }: EmailActionsProps) => {
@@ -63,7 +60,7 @@ export const EmailActions = ({ email }: EmailActionsProps) => {
 					<ActionIcon
 						variant="light"
 						size="lg"
-						onClick={() => handleCopy(email.fullAddress)}
+						onClick={() => void handleCopy(email.fullAddress)}
 					>
 						<IconCopy size={18} />
 					</ActionIcon>
@@ -86,7 +83,7 @@ export const EmailActions = ({ email }: EmailActionsProps) => {
 				<Button
 					variant="light"
 					leftSection={<IconCopy size={18} />}
-					onClick={() => handleCopy(email.fullAddress)}
+					onClick={() => void handleCopy(email.fullAddress)}
 					fullWidth
 				>
 					Copy Email

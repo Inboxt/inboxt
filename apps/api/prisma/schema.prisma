@@ -122,13 +122,6 @@ model inbound_email_address {
   @@unique([userId, localPart], map: "inbound_email_address_user_local_part_unique")
 }
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-model test_migration {
-  id         Int      @id @default(autoincrement())
-  name       String
-  created_at DateTime @default(now()) @db.Timestamp(6)
-}
-
 enum saved_item_status {
   ACTIVE
   ARCHIVED

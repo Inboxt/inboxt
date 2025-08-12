@@ -1,17 +1,17 @@
-import { IconSearch } from '@tabler/icons-react';
 import { TextInput } from '@mantine/core';
+import { IconSearch } from '@tabler/icons-react';
 import { useSearch } from '@tanstack/react-router';
-import { Route } from '../../routes/_auth.index';
-import { AppViews } from '../../constants';
 import { useEffect, useState } from 'react';
-import { extractLabelName } from '../../utils/extractLabelName.ts';
-import { useDebouncedValue } from '@mantine/hooks';
+
+import { AppViews } from '@inbox-reader/common';
+
+import { Route } from '~routes/_auth.index';
+import { extractLabelName } from '~utils/extractLabelName';
 
 export const AppSearch = ({ variant = 'filled' }) => {
 	const { view } = useSearch({ from: Route.id });
 
 	const [search, setSearch] = useState('');
-	const [debounced] = useDebouncedValue(search, 600); // todo: test with backend :)
 
 	useEffect(() => {
 		let searchValue = '';

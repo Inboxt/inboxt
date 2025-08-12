@@ -12,10 +12,12 @@ import {
 	SelectProps,
 	ActionIcon,
 } from '@mantine/core';
-import { usePWAInstall } from 'react-use-pwa-install';
-import { IconCheck, IconDeviceDesktopPlus, IconDownload } from '@tabler/icons-react';
 import { ContextModalProps } from '@mantine/modals';
+import { IconCheck, IconDeviceDesktopPlus, IconDownload } from '@tabler/icons-react';
+import { ReactNode } from 'react';
+import { usePWAInstall } from 'react-use-pwa-install';
 
+type BrowserType = 'firefox' | 'chrome' | 'edge' | 'safari';
 const icons = {
 	firefox: '/firefox-icon.png',
 	chrome: '/chrome-icon.png',
@@ -23,13 +25,13 @@ const icons = {
 	safari: '/safari-icon.png',
 };
 
-const BrowserIcon = ({ browser }: { browser: string }) => {
+const BrowserIcon = ({ browser }: { browser: BrowserType }) => {
 	return <Image src={icons[browser]} h={20} w="auto" />;
 };
 
 const renderSelectOption: SelectProps['renderOption'] = ({ option, checked }) => (
 	<Group flex="1" gap="xs">
-		<BrowserIcon browser={option.value} />
+		<BrowserIcon browser={option.value as BrowserType} />
 		{option.label}
 		{checked && <IconCheck style={{ marginInlineStart: 'auto' }} size={18} opacity={0.6} />}
 	</Group>
@@ -46,7 +48,7 @@ const InstallOption = ({
 	altText: string;
 	title: string;
 	description: string;
-	children?: React.ReactNode;
+	children?: ReactNode;
 }) => (
 	<Flex
 		align={{ base: 'flex-start', sm: 'center' }}
@@ -94,7 +96,7 @@ export const InstallModal = ({ id, context }: ContextModalProps) => {
 					>
 						<Button
 							leftSection={<IconDeviceDesktopPlus size={16} />}
-							onClick={installPWA}
+							onClick={() => void installPWA()}
 						>
 							Install PWA
 						</Button>

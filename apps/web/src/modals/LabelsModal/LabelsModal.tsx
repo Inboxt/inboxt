@@ -1,12 +1,11 @@
-import { Button, Group, Stack } from '@mantine/core';
-import { useEffect, useState } from 'react';
-import { ContextModalProps } from '@mantine/modals';
 import { useQuery } from '@apollo/client';
+import { Button, Group, Stack } from '@mantine/core';
+import { ContextModalProps } from '@mantine/modals';
+import { useEffect, useState } from 'react';
 
-import { modals } from '@modals/modals';
-
-import { EditableLabelItem } from '../../components/EditableLabelItem';
-import { LABELS } from '../../lib/graphql';
+import { EditableLabelItem } from '~components/EditableLabelItem';
+import { LABELS } from '~lib/graphql';
+import { modals } from '~modals/modals';
 
 export const LabelsModal = ({ id, context }: ContextModalProps) => {
 	const [editingLabelId, setEditingLabelId] = useState<string | null>(null);
@@ -24,7 +23,7 @@ export const LabelsModal = ({ id, context }: ContextModalProps) => {
 		};
 		document.addEventListener('keydown', handleKeyDown, true);
 		return () => document.removeEventListener('keydown', handleKeyDown, true);
-	}, [editingLabelId]);
+	}, [editingLabelId, id]);
 
 	return (
 		<Stack>

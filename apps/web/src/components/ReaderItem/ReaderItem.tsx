@@ -1,20 +1,22 @@
 import { Badge, Box, Breadcrumbs, Group, Stack, Text, Center } from '@mantine/core';
 import { useHover, useLocalStorage } from '@mantine/hooks';
-import dayjs from 'dayjs';
-import { useNavigate } from '@tanstack/react-router';
 import { IconPhotoOff } from '@tabler/icons-react';
+import { useNavigate } from '@tanstack/react-router';
+import dayjs from 'dayjs';
+
+import { useReaderContext } from '~context/reader';
+import { useLongPress } from '~hooks/useLongPress';
+import { useScreenQuery } from '~hooks/useScreenQuery';
+import { SavedItem } from '~lib/graphql/generated/graphql';
+import { Route } from '~routes/_auth.index';
+
+import { ItemsOptions } from '../ItemsOptions';
+import { ReaderCheckbox } from '../ReaderCheckbox';
 
 import classes from './ReaderItem.module.css';
 
-import { useLongPress } from '../../hooks/useLongPress.tsx';
-import { useReaderContext } from '../../context/ReaderContext.tsx';
-import { ReaderCheckbox } from '../ReaderCheckbox';
-import { useScreenQuery } from '../../hooks/useScreenQuery.tsx';
-import { Route } from '../../routes/_auth.index';
-import { ItemsOptions } from '../ItemsOptions';
-
 type ReaderItemProps = {
-	item: Record<string, unknown>;
+	item: SavedItem;
 };
 
 export const ReaderItem = ({ item }: ReaderItemProps) => {
@@ -64,9 +66,9 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 								overflow: 'hidden',
 							}}
 						>
-							{item?.leadImage ? (
+							{item.leadImage ? (
 								<img
-									src={item?.leadImage}
+									src={item.leadImage}
 									alt=""
 									style={{
 										height: '100%',
@@ -141,32 +143,32 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 								style={{ flexWrap: 'nowrap' }}
 							>
 								<Text fz="sm" className={classes.text}>
-									{dayjs(item.receivedAt).isSame(new Date(), 'year')
-										? dayjs(item.receivedAt).format('MMM D')
-										: dayjs(item.receivedAt).format('MMMM D, YYYY')}
+									{dayjs(item.createdAt).isSame(new Date(), 'year')
+										? dayjs(item.createdAt).format('MMM D')
+										: dayjs(item.createdAt).format('MMMM D, YYYY')}
 								</Text>
 
 								<Text
 									fz="sm"
 									className={classes.text}
-								>{`${Math.ceil(item?.wordCount / 240).toString()} min read`}</Text>
+								>{`${Math.ceil(item.wordCount / 240)} min read`}</Text>
 							</Breadcrumbs>
 						)}
 					</Group>
 
 					<Text lineClamp={2} fz="md" className={classes.text}>
-						{item?.description ? item.description : item.author}
+						{item.description ? item.description : item.author}
 					</Text>
 
 					<Group
 						align="center"
 						mt={6}
-						justify={item?.labels?.length ? 'space-between' : 'flex-start'}
+						justify={item.labels?.length ? 'space-between' : 'flex-start'}
 						wrap="nowrap"
 					>
-						{item?.labels?.length && (
+						{item.labels?.length && (
 							<Group wrap="nowrap" gap="xxxs">
-								{item?.labels?.map(({ id, name, color }) => (
+								{item.labels.map(({ id, name, color }) => (
 									<Badge size="xs" radius="sm" key={id} color={color}>
 										{name}
 									</Badge>
@@ -174,9 +176,11 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 							</Group>
 						)}
 
-						<Text fz="xs" c="dimmed">
-							{item?.sourceDomain}
-						</Text>
+						{item.sourceDomain && (
+							<Text fz="xs" c="dimmed">
+								{item.sourceDomain}
+							</Text>
+						)}
 					</Group>
 				</Stack>
 			</Group>

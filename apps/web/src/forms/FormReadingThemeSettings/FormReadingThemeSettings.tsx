@@ -2,7 +2,7 @@ import { Group, Stack, Text, Title, Radio, SimpleGrid, Box } from '@mantine/core
 
 import classes from './FormReadingThemeSettings.module.css';
 
-// todo: move to an enum?
+// todo: move to an enum? constants?
 const readerThemes = [
 	{
 		name: 'Auto',
@@ -36,7 +36,7 @@ const readerThemes = [
 			highlights: '#FFF9B0',
 		},
 	},
-]; // todo: all colors in here because why not?
+];
 
 export const FormReadingThemeSettings = () => {
 	const cards = readerThemes.map((item) => (
