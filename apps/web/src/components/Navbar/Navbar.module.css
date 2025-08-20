@@ -1,7 +1,7 @@
 .navbar {
 	transition:
-		width 0.3s,
-		margin 0.3s;
+			width 0.3s,
+			margin 0.3s;
 	display: flex;
 	flex-direction: column;
 }
@@ -9,7 +9,7 @@
 .navbarLabelsList {
 	flex: 1 1 0;
 	overflow-y: auto;
-	min-height: 0; 
+	min-height: 0;
 }
 
 .closedNavbar {
@@ -31,8 +31,21 @@
 	display: flex;
 	flex-direction: column;
 	overflow: hidden;
+	height: 100%;
 }
 
 .mobileDrawerBody {
 	height: 100%;
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+	overflow: hidden;
+}
+
+.mobileNavMain {
+	flex: 1 1 0;
+	min-height: 0;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
 }

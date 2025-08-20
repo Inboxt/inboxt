@@ -1,0 +1,8 @@
+.notificationsTitle {
+	cursor: pointer;
+}
+
+.notificationsList {
+	overflow-y: auto;
+	flex-grow: 1;
+}

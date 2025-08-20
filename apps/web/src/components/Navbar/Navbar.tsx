@@ -13,6 +13,7 @@ import { clsx } from 'clsx';
 
 import { AppViews } from '@inbox-reader/common';
 
+import { AppNotifications } from '~components/AppNotifications';
 import { useScreenQuery } from '~hooks/useScreenQuery';
 import { LABELS } from '~lib/graphql';
 
@@ -58,9 +59,8 @@ export const Navbar = ({ opened, toggle }: NavbarProps) => {
 	const { data } = useQuery(LABELS);
 	const isAboveLgScreen = useScreenQuery('lg', 'above');
 
-	// todo: scrollable correctly
 	const navLinks = (
-		<Stack mt={isAboveLgScreen ? 18 : 0} gap={0} h="100%" pb={32}>
+		<Stack mt={isAboveLgScreen ? 18 : 0} gap={0} h="100%" pb={isAboveLgScreen ? 32 : 0}>
 			{NAV_LINKS.map((link) => (
 				<NavbarLink
 					key={link.id}
@@ -133,15 +133,10 @@ export const Navbar = ({ opened, toggle }: NavbarProps) => {
 				body: classes.mobileDrawerBody,
 			}}
 		>
-			{navLinks}
+			<Box className={classes.mobileNavMain}>{navLinks}</Box>
 
-			<Box
-				py="sm"
-				pos="sticky"
-				bottom={0}
-				style={{ backgroundColor: 'var(--mantine-color-body)' }}
-				mt="xl"
-			>
+			<Box style={{ backgroundColor: 'var(--mantine-color-body)' }}>
+				<AppNotifications />
 				<FooterLinks justify="center" />
 			</Box>
 		</Drawer>
