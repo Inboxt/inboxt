@@ -1,21 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import { MailerService } from '@nestjs-modules/mailer';
+import { Queue } from 'bullmq';
+import { InjectQueue } from '@nestjs/bullmq';
 
 @Injectable()
 export class MailService {
-	constructor(private readonly mailerService: MailerService) {}
+	constructor(@InjectQueue('mail') private readonly mailQueue: Queue) {}
 
 	async sendEmail(
 		to: string,
 		subject: string,
 		text = 'TODO: Use some sort of templater to render emails content',
 	) {
-		await this.mailerService.sendMail({
-			to,
-			subject,
-			text,
-			from: '"Inbox Reader" <no-reply@inbox-reader.com>',
-		});
+		await this.mailQueue.add('send', { to, subject, text });
 	}
 
 	// Handle HTML version and overall better styling/description
@@ -38,7 +34,6 @@ ${plainText}`;
 			to,
 			subject: `[Forwarded] ${subject}`,
 			text: forwardedText,
-			from: '"Inbox Reader" <no-reply@inbox-reader.com>',
 			headers: {
 				'X-Inbox-Reader-Forwarded': 'true',
 				'X-Original-From': from,
@@ -52,6 +47,6 @@ ${plainText}`;
 			},
 		};
 
-		await this.mailerService.sendMail(mailOptions);
+		await this.mailQueue.add('send', mailOptions);
 	}
 }

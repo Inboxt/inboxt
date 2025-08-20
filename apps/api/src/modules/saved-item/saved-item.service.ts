@@ -74,6 +74,19 @@ export class SavedItemService {
 		return this.prisma.saved_item.create({ data: { ...data, userId } });
 	}
 
+	async update(
+		userId: string,
+		id: string,
+		data: Omit<Prisma.saved_itemUpdateArgs['data'], 'id' | 'userId'>,
+	) {
+		const existingItem = await this.get(userId, { where: { id } });
+		if (!existingItem) {
+			throw new AppException('Item not found', HttpStatus.NOT_FOUND);
+		}
+
+		return this.prisma.saved_item.update({ where: { id, userId }, data });
+	}
+
 	async updateStatus(userId: string, id: string, status: Prisma.saved_itemUpdateInput['status']) {
 		/*----------  Validation  ----------*/
 		const existingItem = await this.get(userId, { where: { id } });

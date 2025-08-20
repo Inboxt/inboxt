@@ -100,6 +100,24 @@ export class ArticleService {
 		});
 	}
 
+	async update(
+		id: string,
+		userId: string,
+		data: Omit<Prisma.articleUpdateInput, 'savedItemId' | 'saved_item' | 'id'>,
+	) {
+		const existingArticle = await this.get(userId, { where: { savedItemId: id } });
+		if (!existingArticle) {
+			throw new AppException('Article not found', HttpStatus.NOT_FOUND);
+		}
+
+		return this.prismaService.article.update({
+			where: {
+				savedItemId: id,
+			},
+			data,
+		});
+	}
+
 	async parse(url: string) {
 		const html = await this.fetchHtml(url);
 		const ogImage = this.extractOgImage(html, url);

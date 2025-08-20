@@ -1,36 +1,59 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 
-import { SavedItemType } from '../../enums/saved-item-type.enum';
 import { addItemFromUrlSchema } from '@inbox-reader/common';
 import { AppException } from '../../utils/app-exception';
 import { Prisma } from '../../../prisma/client';
-import { ArticleService } from 'src/modules/saved-item/entities/article/article.service';
-import { SavedItemService } from '../../modules/saved-item/saved-item.service';
 import { UserService } from 'src/modules/user/user.service';
 import { LabelService } from '../../modules/saved-item/entities/label/label.service';
-import { NewsletterService } from '../../modules/saved-item/entities/newsletter/newsletter.service';
-import { NewsletterSubscriptionService } from '../../modules/saved-item/entities/newsletter/newsletter-subscription/newsletter-subscription.service';
-import { MailService } from '../../modules/mail/mail.service';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
+import { SavedItemService } from '../../modules/saved-item/saved-item.service';
+import { SavedItemType } from '../../enums/saved-item-type.enum';
+import { ArticleService } from '../../modules/saved-item/entities/article/article.service';
 
 @Injectable()
 export class SavedItemManagerService {
 	constructor(
-		private articleService: ArticleService,
-		private savedItemService: SavedItemService,
 		private userService: UserService,
 		private labelService: LabelService,
-		private newsletterService: NewsletterService,
-		private newsletterSubscriptionService: NewsletterSubscriptionService,
-		private mailService: MailService,
+		private savedItemService: SavedItemService,
+		private articleService: ArticleService,
+		@InjectQueue('article-processing') private readonly articleProcessingQueue: Queue,
+		@InjectQueue('newsletter-processing') private readonly newsletterProcessingQueue: Queue,
 	) {}
+
+	async handleArticleProcessing(
+		userId: string,
+		savedItemId: string,
+		url: string,
+		prismaData?: Partial<
+			Omit<Prisma.saved_itemCreateInput, 'user' | 'saved_item_label' | 'article' | 'id'>
+		>,
+	) {
+		const parsed = await this.articleService.parse(url);
+		const updatedItem = await this.savedItemService.update(userId, savedItemId, {
+			description: parsed.description,
+			title: parsed.title || 'Untitled Article',
+			leadImage: parsed.leadImage,
+			wordCount: parsed.wordCount,
+			author: parsed.author,
+			...prismaData,
+		});
+
+		await this.articleService.update(updatedItem.id, userId, {
+			contentHtml: parsed.contentHtml || 'Sorry, we were unable to parse the content.',
+			contentText: parsed.contentText || 'Sorry, we were unable to parse the content.',
+		});
+	}
 
 	async addArticleFromUrl(
 		userId: string,
 		url: string,
 		labelIds?: string[],
-		data?: Partial<
+		prismaData?: Partial<
 			Omit<Prisma.saved_itemCreateInput, 'user' | 'saved_item_label' | 'article' | 'id'>
 		>,
+		options = { skipQueue: false },
 	) {
 		/*----------  Validation  ----------*/
 		await addItemFromUrlSchema.parseAsync({ url });
@@ -40,27 +63,37 @@ export class SavedItemManagerService {
 		}
 
 		/*----------  Processing  ----------*/
-		const parsed = await this.articleService.parse(url);
-		const savedItem = await this.savedItemService.create(userId, {
+		const domain = new URL(url).hostname.replace(/^www\./, '');
+		const description = `Your article from ${domain} is being prepared for your reading library. We're removing ads, formatting content, and optimizing for readability. Once processing is complete, you'll be able to read it offline, highlight important sections, and add notes.`;
+		const placeholderItem = await this.savedItemService.create(userId, {
 			originalUrl: url,
-			sourceDomain: new URL(url).hostname.replace(/^www\\./, ''),
-			description: parsed?.description,
-			title: parsed?.title || '',
-			leadImage: parsed?.leadImage,
+			sourceDomain: new URL(url).hostname.replace(/^www\./, ''),
+			title: 'Processing...',
+			description,
 			type: SavedItemType.ARTICLE,
-			wordCount: parsed?.wordCount,
-			author: parsed?.author,
-			...data,
+			wordCount: 0,
+			...prismaData,
 		});
 
-		if (labelIds && labelIds?.length) {
-			await this.savedItemService.setLabels(userId, savedItem.id, labelIds);
+		await this.articleService.create(placeholderItem.id, {
+			contentHtml: description,
+			contentText: description,
+		});
+
+		if (labelIds?.length) {
+			await this.savedItemService.setLabels(userId, placeholderItem.id, labelIds);
 		}
 
-		await this.articleService.create(savedItem.id, {
-			contentHtml: parsed?.contentHtml || 'Sorry, we were unable to parse the content.',
-			contentText: parsed?.contentText || 'Sorry, we were unable to parse the content.',
-		});
+		if (options.skipQueue) {
+			await this.handleArticleProcessing(userId, placeholderItem.id, url, prismaData);
+		} else {
+			await this.articleProcessingQueue.add('process-article', {
+				userId,
+				url,
+				prismaData,
+				savedItemId: placeholderItem.id,
+			});
+		}
 	}
 
 	async createDefaultItems(userId: string) {
@@ -80,6 +113,7 @@ export class SavedItemManagerService {
 				description:
 					'Welcome to Inbox Reader! This guide introduces the core features, support channels, and ways to contribute or self-host.',
 			},
+			{ skipQueue: true },
 		);
 
 		await this.addArticleFromUrl(
@@ -93,78 +127,11 @@ export class SavedItemManagerService {
 				description:
 					'Discover handy shortcuts, expert tips, and clever ways to organize and save content in Inbox Reader. Learn what’s possible (and what’s coming soon) to boost your productivity and reading experience.',
 			},
+			{ skipQueue: true },
 		);
 	}
 
 	async addNewsletterFromEmail(payload: any) {
-		const { success, shouldForward, data, userId } =
-			await this.newsletterService.parse(payload);
-
-		if (!success && !shouldForward) {
-			return;
-		}
-
-		if (!success && shouldForward) {
-			const user = await this.userService.get({ where: { id: userId } });
-			if (!user) {
-				return;
-			}
-
-			await this.mailService.forward(user.emailAddress, payload);
-			return;
-		}
-
-		if (!data || !userId) {
-			return;
-		}
-
-		const savedItem = await this.savedItemService.create(userId, {
-			title: data?.title || '',
-			type: SavedItemType.NEWSLETTER,
-			wordCount: data.wordCount,
-			author: data?.author,
-			description: data?.description,
-		});
-
-		await this.newsletterService.create(savedItem.id, data.inboundEmailAddressId, {
-			contentHtml: data?.contentHtml || 'Sorry, we were unable to parse the content.',
-			contentText: data?.contentText || 'Sorry, we were unable to parse the content.',
-			messageId: data.messageId,
-		});
-
-		if (data?.unsubscribeUrl && data?.author && data?.inboundEmailAddressId && userId) {
-			let subscription = await this.newsletterSubscriptionService.get(userId, {
-				where: { name: data.author, inboundEmailAddressId: data.inboundEmailAddressId },
-			});
-
-			if (subscription) {
-				subscription = await this.newsletterSubscriptionService.update(
-					userId,
-					subscription.id,
-					{
-						lastReceivedAt: new Date(),
-						unsubscribeAttemptedAt: null,
-						status: 'ACTIVE',
-						unsubscribeUrl: data?.unsubscribeUrl,
-					},
-				);
-			} else {
-				subscription = await this.newsletterSubscriptionService.create(
-					userId,
-					data.inboundEmailAddressId,
-					{
-						name: data.author,
-						lastReceivedAt: new Date(),
-						unsubscribeUrl: data?.unsubscribeUrl,
-					},
-				);
-			}
-
-			await this.newsletterSubscriptionService.link(userId, subscription.id, savedItem.id);
-		}
-
-		if (payload?.deletion_url) {
-			await fetch(payload.deletion_url);
-		}
+		return this.newsletterProcessingQueue.add('process-newsletter', payload);
 	}
 }

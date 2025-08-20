@@ -17,4 +17,12 @@ export interface Config {
 	cors: CorsConfig;
 	graphql: GraphqlConfig;
 	security: SecurityConfig;
+	valkey: ValkeyConfig;
+}
+
+export interface ValkeyConfig {
+	connection: {
+		host: string;
+		port: number;
+	};
 }

@@ -15,7 +15,7 @@ export class SavedItemManagerController {
 		@Req() req: Request,
 		@Res() res: Response,
 	) {
-		if (req.body && activeUser) {
+		if (req.body && activeUser?.id) {
 			await this.savedItemManagerService.addArticleFromUrl(
 				activeUser.id,
 				req.body.url,

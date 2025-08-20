@@ -1,21 +1,39 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
+import { Job } from 'bullmq';
+import { Logger } from '@nestjs/common';
+import { Processor } from '@nestjs/bullmq';
 import dayjs from 'dayjs';
-
 import { PrismaService } from '../../services/prisma.service';
 import { SavedItemManagerService } from '../../managers/saved-item-manager/saved-item-manager.service';
+import { BaseQueueProcessor } from '../../common/processors/base-queue.processor';
+import { LogExecutionTime } from '../../decorators/log-execution-time.decorator';
 
-@Injectable()
-export class TaskSchedulerService {
-	private readonly logger = new Logger(TaskSchedulerService.name);
-
+@Processor('schedule-tasks', { concurrency: 10 })
+export class ScheduleTasksProcessor extends BaseQueueProcessor {
+	protected readonly logger = new Logger(ScheduleTasksProcessor.name);
 	constructor(
 		private prisma: PrismaService,
 		private savedItemManagerService: SavedItemManagerService,
-	) {}
+	) {
+		super();
+	}
 
-	@Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
-	async deleteUnverifiedUsers() {
+	async process(job: Job): Promise<any> {
+		switch (job.name) {
+			case 'delete-unverified-users':
+				return this.deleteUnverifiedUsers();
+			case 'permanently-delete-saved-items':
+				return this.permanentlyDeleteSavedItems();
+			case 'reset-demo-account':
+				return this.resetDemoAccount();
+			case 'delete-expired-unsubscribed-newsletters':
+				return this.deleteExpiredUnsubscribedNewsletters();
+			default:
+				throw new Error(`Unknown job type: ${job.name}`);
+		}
+	}
+
+	@LogExecutionTime
+	private async deleteUnverifiedUsers() {
 		const thresholdDate = dayjs().subtract(45, 'days').toDate();
 		const users = await this.prisma.user.findMany({
 			where: {
@@ -37,8 +55,8 @@ export class TaskSchedulerService {
 		this.logger.log(`Deleted ${users.length} unverified users older than 45 days`);
 	}
 
-	@Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
-	async permanentlyDeleteSavedItems() {
+	@LogExecutionTime
+	private async permanentlyDeleteSavedItems() {
 		const thresholdDate = dayjs().subtract(30, 'days').toDate();
 		const savedItems = await this.prisma.saved_item.findMany({
 			where: {
@@ -59,27 +77,27 @@ export class TaskSchedulerService {
 		);
 	}
 
-	@Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
-	async resetDemoAccount() {
+	@LogExecutionTime
+	private async resetDemoAccount() {
 		const demoEmail = 'demo@inbox-reader.com'; // todo: use user_plan rather that email address or a combination of both?
-		const user = await this.prisma.user.findFirst({ where: { emailAddress: demoEmail } });
+		const user = await this.prisma.user.findFirst({
+			where: { emailAddress: demoEmail },
+		});
 		if (!user) {
 			return;
 		}
 
-		// Clean-up
 		await this.prisma.saved_item.deleteMany({ where: { user: { emailAddress: demoEmail } } });
 		await this.prisma.label.deleteMany({ where: { user: { emailAddress: demoEmail } } });
 
-		// Default values
 		// todo: default user account settings? like firstName/lastName?
 		await this.savedItemManagerService.createDefaultItems(user.id);
 
 		this.logger.log(`Demo account reset at ${new Date().toISOString()}`);
 	}
 
-	@Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
-	async deleteExpiredUnsubscribedNewsletters() {
+	@LogExecutionTime
+	private async deleteExpiredUnsubscribedNewsletters() {
 		const thresholdDate = dayjs().subtract(90, 'days').toDate();
 		const expiredSubscriptions = await this.prisma.newsletter_subscription.findMany({
 			where: {

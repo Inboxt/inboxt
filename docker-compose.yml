@@ -18,6 +18,17 @@ services:
       timeout: 5s
       retries: 5
 
+  valkey:
+    image: valkey/valkey:8-alpine
+    container_name: "valkey"
+    ports:
+      - ${VALKEY_PORT}:${VALKEY_PORT}
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   api:
     container_name: "api"
     restart: always
@@ -35,6 +46,8 @@ services:
       DATABASE_URL: ${DATABASE_URL}
     depends_on:
       database:
+        condition: service_healthy
+      valkey:
         condition: service_healthy
 
   web:
