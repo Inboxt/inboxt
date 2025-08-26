@@ -1,0 +1,54 @@
+import appHeader from './elements/appHeader';
+import footer from './elements/footer';
+import header from './elements/header';
+import baseStyles from './elements/baseStyles';
+import alert from './elements/alert';
+import button from './elements/button';
+import { EMAIL_ACCOUNT_DELETED } from '../common/constants/email.constants';
+
+export const accountDeletedTemplate = ({ timestamp }: { timestamp: string }) => `
+<mjml>
+	<mj-head>
+		<mj-title>${EMAIL_ACCOUNT_DELETED.subject}</mj-title>
+		<mj-preview>${EMAIL_ACCOUNT_DELETED.description}</mj-preview>
+		${baseStyles()}
+	</mj-head>
+	<mj-body>
+		${appHeader()}
+		
+		<mj-section>
+			<mj-column>
+				${header('🔒 Account deleted')}
+				
+				<mj-text>
+					As requested, your Inbox Reader account has been permanently deleted on ${timestamp}.
+				</mj-text>
+				
+				<mj-text>
+					All your personal data, including saved articles, newsletter subscriptions, reading preferences, and account information, have been permanently removed from our systems in accordance with our privacy policy.
+				</mj-text>
+				
+				${alert({
+					content: 'This action is irreversible. Your data cannot be recovered.',
+					type: 'important',
+				})}
+				
+				<mj-text>
+					We're sorry to see you go. If you'd like to provide feedback on why you decided to delete your account, please reply to this email. Your insights help us improve our service.
+				</mj-text>
+				
+				<mj-text>
+					If you deleted your account by mistake or wish to create a new account in the future, you can always register again at <a href="${process.env.WEB_URL as string}">inbox-reader.app</a>.
+				</mj-text>
+				
+				${button({
+					text: 'Create New Account',
+					url: `${process.env.WEB_URL as string}/auth?mode=signup`,
+				})}
+			</mj-column>
+		</mj-section>
+		
+		${footer()}
+	</mj-body>
+</mjml>
+`;

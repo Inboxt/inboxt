@@ -1,39 +1,32 @@
 import { Injectable } from '@nestjs/common';
 import { Queue } from 'bullmq';
 import { InjectQueue } from '@nestjs/bullmq';
+import mjml2html from 'mjml';
+import { forwardedEmailTemplate } from '../../mail-templates/forwardedEmailTemplate';
+import { EMAIL_FORWARDED } from '../../common/constants/email.constants';
 
 @Injectable()
 export class MailService {
 	constructor(@InjectQueue('mail') private readonly mailQueue: Queue) {}
 
-	async sendEmail(
-		to: string,
-		subject: string,
-		text = 'TODO: Use some sort of templater to render emails content',
-	) {
-		await this.mailQueue.add('send', { to, subject, text });
-	}
-
-	// Handle HTML version and overall better styling/description
 	async forward(to: string, payload: any) {
 		const subject = payload.headers?.Subject?.[0] || 'Email without subject';
 		const from = payload.headers?.From?.[0] || 'Unknown sender';
-		const date = payload.headers?.Date?.[0] || new Date().toISOString();
-		const plainText = payload?.body?.stripped_plaintext || '';
-		const htmlContent = payload?.body?.stripped_html || '';
+		const date = payload.headers?.Date?.[0] || new Date().toLocaleString(); // dayjs?
+		const plainText = payload.body?.stripped_plaintext || '';
+		const htmlContent = payload.body?.stripped_html || '';
 
-		const explanationHeader = `This email couldn't be processed in Inbox Reader. We're forwarding it to you so you don't miss any content.`;
-		const forwardedText = `${explanationHeader}
-From: ${from}
-Date: ${date}
-Subject: ${subject}
-
-${plainText}`;
-
-		const mailOptions = {
+		await this.sendTemplate({
 			to,
-			subject: `[Forwarded] ${subject}`,
-			text: forwardedText,
+			subject: EMAIL_FORWARDED.subject({ originalSubject: subject }),
+			template: forwardedEmailTemplate,
+			templateData: {
+				from,
+				date,
+				originalSubject: subject,
+				plainText,
+				htmlContent,
+			},
 			headers: {
 				'X-Inbox-Reader-Forwarded': 'true',
 				'X-Original-From': from,
@@ -45,8 +38,25 @@ ${plainText}`;
 					payload.headers?.References?.[0] || payload.headers?.['Message-ID']?.[0] || '',
 				'In-Reply-To': payload.headers?.['Message-ID']?.[0] || '',
 			},
-		};
+		});
+	}
 
-		await this.mailQueue.add('send', mailOptions);
+	private renderTemplate<T>(template: (args: T) => string, args: T): string {
+		return mjml2html(template(args), { validationLevel: 'soft', keepComments: false }).html;
+	}
+
+	async sendTemplate<TData>(options: {
+		to: string;
+		subject: string;
+		template: (data: TData) => string;
+		templateData: TData;
+		headers?: Record<string, string>;
+	}) {
+		await this.mailQueue.add('send', {
+			to: options.to,
+			subject: options.subject,
+			html: this.renderTemplate(options.template, options.templateData),
+			headers: options.headers,
+		});
 	}
 }

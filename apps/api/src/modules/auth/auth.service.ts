@@ -21,6 +21,12 @@ import { MailService } from '../mail/mail.service';
 import { RequestPasswordRecoveryInput } from './dto/request-password-recovery.input';
 import { ResetPasswordInput } from './dto/reset-password.input';
 import { SavedItemManagerService } from '../../managers/saved-item-manager/saved-item-manager.service';
+import {
+	EMAIL_CHANGED_PASSWORD,
+	EMAIL_RESET_PASSWORD,
+} from '../../common/constants/email.constants';
+import { passwordResetTemplate } from '../../mail-templates/passwordResetTemplate';
+import { passwordChangedTemplate } from '../../mail-templates/passwordChangedTemplate';
 
 @Injectable()
 export class AuthService {
@@ -187,11 +193,12 @@ export class AuthService {
 			existingUser.id,
 		);
 
-		return this.mailService.sendEmail(
-			data.emailAddress,
-			'Your request to recover your password',
-			`Use this code to start the process of recovering your password ${passwordRecoveryCode}`,
-		);
+		await this.mailService.sendTemplate({
+			to: data.emailAddress,
+			subject: EMAIL_RESET_PASSWORD.subject,
+			template: passwordResetTemplate,
+			templateData: { code: passwordRecoveryCode },
+		});
 	}
 
 	async resetPassword(data: ResetPasswordInput) {
@@ -215,6 +222,15 @@ export class AuthService {
 
 		await this.userService.update(existingUser.id, {
 			password: updatedHashedPassword,
+		});
+
+		await this.mailService.sendTemplate({
+			template: passwordChangedTemplate,
+			to: data.emailAddress,
+			subject: EMAIL_CHANGED_PASSWORD.subject,
+			templateData: {
+				timestamp: dayjs().format('dddd, MMMM D, YYYY, HH:mm'),
+			},
 		});
 	}
 }

@@ -6,6 +6,13 @@ import { PrismaService } from '../../services/prisma.service';
 import { SavedItemManagerService } from '../../managers/saved-item-manager/saved-item-manager.service';
 import { BaseQueueProcessor } from '../../common/processors/base-queue.processor';
 import { LogExecutionTime } from '../../decorators/log-execution-time.decorator';
+import { MailService } from '../mail/mail.service';
+import {
+	EMAIL_ACCOUNT_DELETED,
+	EMAIL_VERIFY_REMINDER,
+} from '../../common/constants/email.constants';
+import { accountDeletedTemplate } from '../../mail-templates/accountDeletedTemplate';
+import { verifyEmailReminderTemplate } from '../../mail-templates/verifyEmailReminderTemplate';
 
 @Processor('schedule-tasks', { concurrency: 10 })
 export class ScheduleTasksProcessor extends BaseQueueProcessor {
@@ -13,6 +20,7 @@ export class ScheduleTasksProcessor extends BaseQueueProcessor {
 	constructor(
 		private prisma: PrismaService,
 		private savedItemManagerService: SavedItemManagerService,
+		private mailService: MailService,
 	) {
 		super();
 	}
@@ -27,6 +35,8 @@ export class ScheduleTasksProcessor extends BaseQueueProcessor {
 				return this.resetDemoAccount();
 			case 'delete-expired-unsubscribed-newsletters':
 				return this.deleteExpiredUnsubscribedNewsletters();
+			case 'last-reminder-for-unverified-users':
+				return this.lastReminderForUnverifiedUsers();
 			default:
 				throw new Error(`Unknown job type: ${job.name}`);
 		}
@@ -45,11 +55,20 @@ export class ScheduleTasksProcessor extends BaseQueueProcessor {
 		});
 
 		await Promise.all(
-			users.map((user) =>
-				this.prisma.user.delete({
+			users.map(async (user) => {
+				await this.prisma.user.delete({
 					where: { id: user.id, emailAddress: user.emailAddress },
-				}),
-			),
+				});
+
+				await this.mailService.sendTemplate({
+					subject: EMAIL_ACCOUNT_DELETED.subject,
+					template: accountDeletedTemplate,
+					templateData: {
+						timestamp: dayjs().format('dddd, MMMM D, YYYY, HH:mm'),
+					},
+					to: user.emailAddress,
+				});
+			}),
 		);
 
 		this.logger.log(`Deleted ${users.length} unverified users older than 45 days`);
@@ -115,5 +134,33 @@ export class ScheduleTasksProcessor extends BaseQueueProcessor {
 		this.logger.log(
 			`Deleted ${expiredSubscriptions.length} unsubscribed newsletter subscriptions older than 90 days`,
 		);
+	}
+
+	@LogExecutionTime
+	private async lastReminderForUnverifiedUsers() {
+		const lowerBound = dayjs().subtract(41, 'days').toDate();
+		const upperBound = dayjs().subtract(40, 'days').toDate();
+
+		const users = await this.prisma.user.findMany({
+			where: {
+				isEmailVerified: false,
+				createdAt: {
+					gt: lowerBound,
+					lte: upperBound,
+				},
+			},
+		});
+
+		for (const user of users) {
+			const daysRemaining = 45 - dayjs().diff(dayjs(user.createdAt), 'day');
+			await this.mailService.sendTemplate({
+				template: verifyEmailReminderTemplate,
+				templateData: { daysRemaining },
+				to: user.emailAddress,
+				subject: EMAIL_VERIFY_REMINDER.subject,
+			});
+		}
+
+		this.logger.log(`Sent reminder emails to ${users.length} unverified users`);
 	}
 }

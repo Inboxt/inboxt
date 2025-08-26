@@ -14,6 +14,16 @@ import { MailService } from '../mail/mail.service';
 import { DeleteAccountInput } from './dto/delete-account.input';
 import { InboundEmailAddressService } from '../inbound-email-address/inbound-email-address.service';
 import { NewsletterSubscriptionManagerService } from '../../managers/newsletter-subscription-manager/newsletter-subscription-manager.service';
+import { verifyEmailTemplate } from '../../mail-templates/verifyEmailTemplate';
+import {
+	EMAIL_ACCOUNT_DELETED,
+	EMAIL_CHANGED_EMAIL,
+	EMAIL_VERIFY,
+	EMAIL_WELCOME,
+} from '../../common/constants/email.constants';
+import { accountDeletedTemplate } from '../../mail-templates/accountDeletedTemplate';
+import { welcomeTemplate } from '../../mail-templates/welcomeTemplate';
+import { emailChangedTemplate } from '../../mail-templates/emailChangedTemplate';
 
 @Injectable()
 export class UserService {
@@ -80,6 +90,19 @@ export class UserService {
 		}
 
 		const { pendingEmailAddress } = user;
+		if (pendingEmailAddress) {
+			await this.mailService.sendTemplate({
+				template: emailChangedTemplate,
+				subject: EMAIL_CHANGED_EMAIL.subject,
+				to: user.emailAddress,
+				templateData: {
+					timestamp: dayjs().format('dddd, MMMM D, YYYY, HH:mm'),
+					oldEmail: user.emailAddress,
+					newEmail: pendingEmailAddress,
+				},
+			});
+		}
+
 		return this.prisma.user.update({
 			where: { id },
 			data: {
@@ -115,9 +138,18 @@ export class UserService {
 	}
 
 	async create(data: CreateAccountInput) {
-		return this.prisma.user.create({
+		const user = await this.prisma.user.create({
 			data,
 		});
+
+		await this.mailService.sendTemplate({
+			to: data.emailAddress,
+			subject: EMAIL_WELCOME.subject,
+			template: welcomeTemplate,
+			templateData: {},
+		});
+
+		return user;
 	}
 
 	async update(id: string, data: UpdateAccountInput) {
@@ -152,7 +184,7 @@ export class UserService {
 				return;
 			}
 
-			await this.sendVerificationEmail(id);
+			await this.sendVerificationEmail(id, true);
 		}
 
 		return this.prisma.user.update({
@@ -161,7 +193,7 @@ export class UserService {
 		});
 	}
 
-	async sendVerificationEmail(userId: string) {
+	async sendVerificationEmail(userId: string, isEmailChange = false) {
 		/*----------  Validation  ----------*/
 		const existingUser = await this.get({
 			where: { id: userId },
@@ -177,11 +209,12 @@ export class UserService {
 		/*----------  Processing  ----------*/
 		const code = await this.initiateEmailVerification(userId);
 
-		return this.mailService.sendEmail(
-			existingUser?.pendingEmailAddress || existingUser.emailAddress,
-			'Confirm your email address',
-			`Use this code to verify your email address: ${code}`,
-		);
+		return this.mailService.sendTemplate({
+			to: existingUser.pendingEmailAddress || existingUser.emailAddress,
+			subject: EMAIL_VERIFY.subject,
+			template: verifyEmailTemplate,
+			templateData: { code, isEmailChange },
+		});
 	}
 
 	async delete(id: string, data: DeleteAccountInput) {
@@ -210,8 +243,17 @@ export class UserService {
 			);
 		}
 
-		return this.prisma.user.delete({
+		await this.prisma.user.delete({
 			where: { id },
+		});
+
+		await this.mailService.sendTemplate({
+			to: data.emailAddress,
+			subject: EMAIL_ACCOUNT_DELETED.subject,
+			template: accountDeletedTemplate,
+			templateData: {
+				timestamp: dayjs().format('dddd, MMMM D, YYYY, HH:mm'),
+			},
 		});
 	}
 }

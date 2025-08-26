@@ -33,4 +33,9 @@ export class ScheduleTasksService {
 	async deleteExpiredUnsubscribedNewsletters() {
 		return this.scheduleTasksQueue.add('delete-expired-unsubscribed-newsletters', {});
 	}
+
+	@Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+	async lastReminderForUnverifiedUsers() {
+		return this.scheduleTasksQueue.add('last-reminder-for-unverified-users', {});
+	}
 }
