@@ -1,5 +1,5 @@
 import { useTextSelection } from '@mantine/hooks';
-import { RefObject, useEffect, useMemo } from 'react';
+import { RefObject, useMemo } from 'react';
 
 import { getSafeTextRanges, wrapSafeRangeWithSpan } from '../utils/highlightsDOM';
 
@@ -12,6 +12,17 @@ export function useTextHighlighting(containerRef?: RefObject<HTMLDivElement | nu
 
 	const hasValidSelection = useMemo(() => {
 		if (!currentRange) {
+			return false;
+		}
+
+		const highlightContainer = document.getElementById('highlight-container');
+		if (
+			highlightContainer &&
+			!(
+				highlightContainer.contains(currentRange.startContainer) &&
+				highlightContainer.contains(currentRange.endContainer)
+			)
+		) {
 			return false;
 		}
 
@@ -64,6 +75,7 @@ export function useTextHighlighting(containerRef?: RefObject<HTMLDivElement | nu
 		return true;
 	};
 
+	// Highlight the selected text
 	const highlightSelection = () => {
 		if (!selection || selection.rangeCount === 0) {
 			return;
@@ -158,21 +170,6 @@ export function useTextHighlighting(containerRef?: RefObject<HTMLDivElement | nu
 		//console.log(highlightData);
 		selection.removeAllRanges();
 	};
-
-	useEffect(() => {
-		if (!containerRef?.current) {
-			return;
-		}
-
-		const sel = document.getSelection();
-		if (!sel) {
-			return;
-		}
-
-		if (!containerRef.current.contains(sel.anchorNode)) {
-			sel.removeAllRanges();
-		}
-	}, [selection, containerRef]);
 
 	return {
 		selectedText,

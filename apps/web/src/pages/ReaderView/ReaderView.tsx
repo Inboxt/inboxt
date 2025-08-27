@@ -38,8 +38,8 @@ export const ReaderView = () => {
 	const canGoBack = useCanGoBack();
 	const navigate = useNavigate({ from: Route.fullPath });
 
-	const { selectedText, highlightSelection, isFullyHighlighted } = useTextHighlighting();
-	const hasSelection = Boolean(selectedText);
+	const { selectedText, highlightSelection, isFullyHighlighted, rangeRect, hasValidSelection } =
+		useTextHighlighting();
 
 	const { id } = useParams({ from: Route.fullPath });
 	const { data, loading, error } = useQuery(SAVED_ITEM, {
@@ -111,7 +111,7 @@ export const ReaderView = () => {
 					<AppName size="md" variant={isAboveXsScreen ? 'full' : 'short'} />
 				</Group>
 
-				{hasSelection ? (
+				{selectedText && rangeRect && hasValidSelection ? (
 					<ActionIcon
 						variant="subtle"
 						color="text"

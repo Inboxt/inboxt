@@ -26,7 +26,11 @@ export const HighlightableArticle = ({ content }: ArticleWithHighlightsProps) =>
 
 	return (
 		<>
-			<Box ref={containerRef} dangerouslySetInnerHTML={sanitizedContent}></Box>
+			<Box
+				ref={containerRef}
+				id="highlight-container"
+				dangerouslySetInnerHTML={sanitizedContent}
+			></Box>
 
 			{selectedText && rangeRect && hasValidSelection && isAboveMdScreen && (
 				<Popover
