@@ -1,0 +1,1 @@
+export { HighlightPopover } from './HighlightPopover';

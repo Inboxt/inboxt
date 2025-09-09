@@ -99,7 +99,7 @@ export const getNextNode = (node: Node | null): ChildNode | null => {
 	return node?.nextSibling || null;
 };
 
-export const wrapSafeRangeWithSpan = ({ node, start, end }: SageRange) => {
+export const wrapSafeRangeWithSpan = ({ node, start, end }: SageRange, highlightId: string) => {
 	const text = node.textContent;
 	if (!text) {
 		return;
@@ -111,8 +111,9 @@ export const wrapSafeRangeWithSpan = ({ node, start, end }: SageRange) => {
 
 	const highlightSpan = document.createElement('span');
 	highlightSpan.className = 'highlight';
-	highlightSpan.style.backgroundColor = 'yellow';
 	highlightSpan.textContent = highlightedText;
+	highlightSpan.setAttribute('data-highlight-id', highlightId);
+	(highlightSpan as HTMLElement).dataset.highlightId = highlightId;
 
 	const parent = node.parentNode;
 	if (!parent) {

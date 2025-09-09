@@ -38,7 +38,7 @@ export const ReaderView = () => {
 	const canGoBack = useCanGoBack();
 	const navigate = useNavigate({ from: Route.fullPath });
 
-	const { selectedText, highlightSelection, isFullyHighlighted, rangeRect, hasValidSelection } =
+	const { selectedText, highlightSelection, rangeRect, hasValidSelection } =
 		useTextHighlighting();
 
 	const { id } = useParams({ from: Route.fullPath });
@@ -126,7 +126,7 @@ export const ReaderView = () => {
 						}}
 						hiddenFrom="md"
 					>
-						{isFullyHighlighted() ? <IconHighlightOff /> : <IconHighlight />}
+						<IconHighlight />
 					</ActionIcon>
 				) : (
 					<Box hiddenFrom="md">

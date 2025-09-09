@@ -1,11 +1,11 @@
-import { Box, Popover, Button } from '@mantine/core';
+import { Box } from '@mantine/core';
 import { IconHighlight } from '@tabler/icons-react';
 import { useMemo, useRef } from 'react';
 
+import { HighlightPopover } from '~components/HighlightPopover';
+import { useLongPress } from '~hooks/useLongPress';
 import { useScreenQuery } from '~hooks/useScreenQuery';
 import { useTextHighlighting } from '~hooks/useTextSelection';
-
-import classes from './HighlightableArticle.module.css';
 
 type ArticleWithHighlightsProps = {
 	content: string | null;
@@ -14,8 +14,15 @@ type ArticleWithHighlightsProps = {
 export const HighlightableArticle = ({ content }: ArticleWithHighlightsProps) => {
 	const isAboveMdScreen = useScreenQuery('md', 'above');
 	const containerRef = useRef(null);
-	const { selectedText, hasValidSelection, highlightSelection, rangeRect, isFullyHighlighted } =
-		useTextHighlighting(containerRef);
+	const {
+		selectedText,
+		hasValidSelection,
+		highlightSelection,
+		rangeRect,
+		hoveredHighlight,
+		hoveredRect,
+		unhighlight,
+	} = useTextHighlighting(containerRef);
 
 	const sanitizedContent = useMemo(
 		() => ({
@@ -24,56 +31,51 @@ export const HighlightableArticle = ({ content }: ArticleWithHighlightsProps) =>
 		[content],
 	);
 
+	const longPressHandlers = useLongPress(
+		(ev) => {
+			const target = ev.target as HTMLElement | null;
+			const highlightEl = target?.closest('.highlight') as HTMLElement | null;
+			if (highlightEl) {
+				unhighlight(highlightEl);
+			}
+		},
+		{ threshold: 700 },
+	);
+
+	const touchHandlers = {
+		onTouchStart: (e: any) => {
+			const target = e?.target as HTMLElement | null;
+			if (target?.closest('.highlight')) {
+				longPressHandlers.onTouchStart?.(e);
+			}
+		},
+		onTouchEnd: longPressHandlers.onTouchEnd,
+		onTouchCancel: longPressHandlers.onTouchCancel,
+	};
+
 	return (
 		<>
 			<Box
 				ref={containerRef}
 				id="highlight-container"
 				dangerouslySetInnerHTML={sanitizedContent}
-			></Box>
+				{...touchHandlers}
+			/>
 
-			{selectedText && rangeRect && hasValidSelection && isAboveMdScreen && (
-				<Popover
-					opened
-					withArrow
-					position="top"
-					withinPortal
-					styles={{
-						dropdown: {
-							left: rangeRect.left + window.scrollX + rangeRect.width / 2,
-							transform: 'translateX(-50%)',
-						},
-					}}
-					classNames={{
-						arrow: classes.popoverArrow,
-						dropdown: classes.popoverDropdown,
-					}}
-					arrowSize={12}
-					radius={6}
-				>
-					<Popover.Target>
-						<Box
-							style={{
-								top: rangeRect.top + window.scrollY,
-								left: rangeRect.left + window.scrollX + rangeRect.width / 2,
-								transform: 'translateX(-50%)',
-							}}
-							className={classes.popoverContent}
-						/>
-					</Popover.Target>
-					<Popover.Dropdown>
-						<Button
-							variant="transparent"
-							color="white"
-							size="compact-sm"
-							leftSection={<IconHighlight size={21} />}
-							onClick={highlightSelection}
-						>
-							{isFullyHighlighted() ? 'Unhighlight' : 'Highlight'}
-						</Button>
-					</Popover.Dropdown>
-				</Popover>
-			)}
+			<HighlightPopover
+				visible={!!selectedText && !!rangeRect && hasValidSelection && isAboveMdScreen}
+				rect={rangeRect}
+				buttonLabel="Highlight"
+				buttonIcon={<IconHighlight size={21} />}
+				onButtonClick={highlightSelection}
+			/>
+
+			<HighlightPopover
+				visible={!selectedText && !!hoveredHighlight && !!hoveredRect && isAboveMdScreen}
+				rect={hoveredRect}
+				buttonLabel="Unhighlight"
+				onButtonClick={() => unhighlight(hoveredHighlight as HTMLElement)}
+			/>
 		</>
 	);
 };
