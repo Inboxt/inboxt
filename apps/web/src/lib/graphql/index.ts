@@ -66,6 +66,22 @@ export const NEWSLETTER_FRAGMENT = gql(`
 	}
 `);
 
+export const HIGHLIGHT_FRAGMENT = gql(`
+	fragment HighlightFragment on Highlight {
+		id
+		createdAt
+		segments {
+			id
+			xpath
+			beforeText
+			startOffset
+			endOffset
+			afterText
+			text
+		}
+	}
+`);
+
 /*----------  Queries  ----------*/
 export const ACTIVE_USER = gql(`
 	query me {
@@ -127,6 +143,9 @@ export const SAVED_ITEM = gql(`
 			}
 			newsletter {
 				...NewsletterFragment
+			}
+			highlights {
+				...HighlightFragment
 			}
 		}
 	}
@@ -292,6 +311,22 @@ export const DELETE_INBOUND_EMAIL_ADDRESS = gql(`
 export const UPDATE_NEWSLETTER_SUBSCRIPTION_STATUS = gql(`
 	mutation updateNewsletterSubscriptionStatus($data: UpdateNewsletterSubscriptionStatusInput!) {
 		updateNewsletterSubscriptionStatus(data: $data) {
+			success
+		}
+	}
+`);
+
+export const CREATE_HIGHLIGHT = gql(`
+	mutation createHighlight($data: CreateHighlightInput!) {
+		createHighlight(data: $data) {
+			id
+		}
+	}
+`);
+
+export const DELETE_HIGHLIGHT = gql(`
+	mutation DeleteHighlight($data: DeleteHighlightInput!) {
+		deleteHighlight(data: $data) {
 			success
 		}
 	}

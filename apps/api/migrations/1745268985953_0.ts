@@ -210,9 +210,63 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 			onDelete: 'SET NULL',
 		},
 	});
+
+	pgm.createTable('highlight', {
+		id: {
+			type: 'uuid',
+			primaryKey: true,
+			notNull: true,
+			default: pgm.func('gen_random_uuid()'),
+		},
+		createdAt: {
+			type: 'timestamp',
+			notNull: true,
+			default: pgm.func('current_timestamp'),
+		},
+		savedItemId: {
+			type: 'uuid',
+			notNull: false,
+			references: 'saved_item',
+			onDelete: 'SET NULL',
+		},
+		userId: {
+			type: 'uuid',
+			notNull: true,
+			references: 'user',
+			onDelete: 'CASCADE',
+		},
+	});
+
+	pgm.createTable('highlight_segment', {
+		id: {
+			type: 'uuid',
+			primaryKey: true,
+			notNull: true,
+			default: pgm.func('gen_random_uuid()'),
+		},
+		highlightId: {
+			type: 'uuid',
+			notNull: true,
+			references: 'highlight',
+			onDelete: 'CASCADE',
+		},
+		xpath: { type: 'text', notNull: true },
+		beforeText: { type: 'text', notNull: true },
+		startOffset: { type: 'integer', notNull: true },
+		endOffset: { type: 'integer', notNull: true },
+		afterText: { type: 'text', notNull: true },
+		text: 'text',
+	});
+
+	pgm.createIndex('highlight_segment', 'highlightId');
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
+	// Drop indexes
+	pgm.dropIndex('saved_item', 'userId');
+	pgm.dropIndex('label', ['userId', 'name'], { unique: true });
+	pgm.dropIndex('highlight_segment', 'highlightId');
+
 	// Drop tables
 	pgm.dropTable('newsletter');
 	pgm.dropTable('newsletter_subscription');
@@ -222,6 +276,8 @@ export async function down(pgm: MigrationBuilder): Promise<void> {
 	pgm.dropTable('label');
 	pgm.dropTable('saved_item');
 	pgm.dropTable('user');
+	pgm.dropTable('highlight_segment');
+	pgm.dropTable('highlight');
 
 	// Drop custom types
 	pgm.dropType('newsletter_subscription_status');

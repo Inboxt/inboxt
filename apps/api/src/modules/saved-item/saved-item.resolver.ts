@@ -16,6 +16,8 @@ import { GetSavedItemsInput } from './dto/get-saved-items.input';
 import { PermanentlyDeleteSavedItemsInput } from './dto/permanently-delete-saved-items.input';
 import { Newsletter } from './entities/newsletter/newsletter.model';
 import { NewsletterService } from './entities/newsletter/newsletter.service';
+import { Highlight } from '../highlight/highlight.model';
+import { HighlightService } from '../highlight/highlight.service';
 
 @Resolver(() => SavedItem)
 export class SavedItemResolver {
@@ -23,6 +25,7 @@ export class SavedItemResolver {
 		private savedItemService: SavedItemService,
 		private articleService: ArticleService,
 		private newsletterService: NewsletterService,
+		private highlightService: HighlightService,
 	) {}
 
 	@Query(() => SavedItemConnection)
@@ -108,5 +111,16 @@ export class SavedItemResolver {
 		}
 
 		return this.savedItemService.getLabels(activeUser.id, savedItem.id);
+	}
+
+	@ResolveField('highlights', () => [Highlight], { nullable: true })
+	async highlights(@ActiveUserMeta() activeUser: ActiveUserMetaType, @Parent() savedItem) {
+		if (!savedItem?.id) {
+			return null;
+		}
+
+		return this.highlightService.getMany({
+			where: { savedItemId: savedItem.id, userId: activeUser.id },
+		});
 	}
 }

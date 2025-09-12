@@ -48,6 +48,7 @@ model saved_item {
   status           saved_item_status  @default(ACTIVE)
   deletedSince     DateTime?          @db.Timestamp(6)
   article          article?
+  highlight        highlight[]
   newsletter       newsletter?
   user             user               @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   saved_item_label saved_item_label[]
@@ -78,6 +79,7 @@ model user {
   resetPasswordCode     String?
   resetPasswordExpiry   DateTime?               @db.Timestamp(6)
   plan                  user_plan               @default(FREE)
+  highlight             highlight[]
   inbound_email_address inbound_email_address[]
   label                 label[]
   saved_item            saved_item[]
@@ -120,6 +122,31 @@ model inbound_email_address {
   newsletter_subscription newsletter_subscription[]
 
   @@unique([userId, localPart], map: "inbound_email_address_user_local_part_unique")
+}
+
+model highlight {
+  id                String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt         DateTime            @default(now()) @db.Timestamp(6)
+  savedItemId       String?             @db.Uuid
+  userId            String              @db.Uuid
+  saved_item        saved_item?         @relation(fields: [savedItemId], references: [id], onUpdate: NoAction)
+  user              user                @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  highlight_segment highlight_segment[]
+}
+
+model highlight_segment {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  highlightId String    @db.Uuid
+  xpath       String
+  beforeText  String
+  startOffset Int
+  endOffset   Int
+  afterText   String
+  text        String?
+  highlight   highlight @relation(fields: [highlightId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([highlightId], map: "highlight_segment_highlightId_index")
+  @@index([xpath, startOffset, endOffset], map: "highlight_segment_xpath_startOffset_endOffset_index")
 }
 
 enum saved_item_status {

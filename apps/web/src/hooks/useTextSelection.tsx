@@ -1,9 +1,20 @@
+import { useMutation } from '@apollo/client';
 import { useTextSelection } from '@mantine/hooks';
 import { RefObject, useMemo, useState, useEffect, useRef } from 'react';
 
-import { getSafeTextRanges, wrapSafeRangeWithSpan } from '../utils/highlightsDOM';
+import { CREATE_HIGHLIGHT, DELETE_HIGHLIGHT } from '~lib/graphql';
 
-export function useTextHighlighting(containerRef?: RefObject<HTMLDivElement | null>) {
+import {
+	createHighlightsFromSelection,
+	updateHighlightIds,
+	collectContiguousHighlightsToUnwrap,
+	removeHighlights,
+} from '../utils/highlightsDOM';
+
+export function useTextHighlighting(
+	containerRef?: RefObject<HTMLDivElement | null>,
+	savedItemId?: string,
+) {
 	const selection = useTextSelection();
 	const selectedText = selection?.toString();
 
@@ -15,51 +26,8 @@ export function useTextHighlighting(containerRef?: RefObject<HTMLDivElement | nu
 
 	const hoverClearTimeout = useRef<number | null>(null);
 
-	const nodeIsOnlySameIdHighlights = (node: Node | null, id: string) => {
-		if (!node) {
-			return true;
-		}
-
-		if (node.nodeType === Node.TEXT_NODE) {
-			const txt = (node.textContent ?? '').trim();
-			if (txt === '') {
-				return true;
-			}
-
-			const parentEl = node.parentElement as Element | null;
-			const containingHighlight = parentEl?.closest('.highlight') as HTMLElement | null;
-			return !!containingHighlight && containingHighlight.dataset.highlightId === id;
-		}
-
-		const el = node as Element;
-		if (el.classList.contains('highlight')) {
-			return el.getAttribute('data-highlight-id') === id;
-		}
-
-		// Check text nodes under this element: they must be either whitespace or inside same-id highlight
-		const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
-		let t = walker.nextNode();
-		while (t) {
-			if ((t.textContent ?? '').trim() !== '') {
-				const parentEl = t.parentElement as Element | null;
-				const containingHighlight = parentEl?.closest('.highlight') as HTMLElement | null;
-				if (!containingHighlight || containingHighlight.dataset.highlightId !== id) {
-					return false;
-				}
-			}
-			t = walker.nextNode();
-		}
-
-		// ensure any nested .highlight elements also have the same id
-		const innerHighlights = el.querySelectorAll('.highlight');
-		for (const h of innerHighlights) {
-			if ((h as HTMLElement).dataset.highlightId !== id) {
-				return false;
-			}
-		}
-
-		return true;
-	};
+	const [createHighlight] = useMutation(CREATE_HIGHLIGHT);
+	const [deleteHighlight] = useMutation(DELETE_HIGHLIGHT);
 
 	// clear any hovered highlight when the user starts a new text selection
 	useEffect(() => {
@@ -131,7 +99,7 @@ export function useTextHighlighting(containerRef?: RefObject<HTMLDivElement | nu
 					window.clearTimeout(hoverClearTimeout.current);
 					hoverClearTimeout.current = null;
 				}
-				setHoveredHighlight(highlightEl);
+				setHoveredHighlight(highlightEl as HTMLElement);
 				setHoveredRect(highlightEl.getBoundingClientRect());
 				return;
 			}
@@ -204,168 +172,85 @@ export function useTextHighlighting(containerRef?: RefObject<HTMLDivElement | nu
 		);
 	}, [currentRange, selectedText]);
 
-	const highlightSelection = () => {
-		if (!selection || selection.rangeCount === 0) {
+	const unhighlight = async (el: HTMLElement | null) => {
+		if (!el) {
 			return;
 		}
 
-		const range = selection.getRangeAt(0);
-		const safeRanges = getSafeTextRanges(range);
-
-		// TODO: IDs somehow should be handled by backend
-		const highlightId = `h-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
-		safeRanges.forEach((safeRange) => {
-			const parent = safeRange.node.parentElement;
-			if (parent && parent.classList.contains('highlight')) {
-				// toggling behavior: if selecting inside an existing highlight, unwrap that single highlight element
-				parent.replaceWith(...Array.from(parent.childNodes));
-				return;
-			}
-			wrapSafeRangeWithSpan(safeRange, highlightId);
-		});
-	};
-
-	function isNodeBlockingUnwrap(node: Node, startId: string): boolean {
-		if (node.nodeType === Node.TEXT_NODE) {
-			const txt = (node.textContent ?? '').trim();
-			if (txt !== '') {
-				const parentEl = node.parentElement as Element | null;
-				const containing = parentEl?.closest('.highlight') as HTMLElement | null;
-				if (!containing || containing.dataset.highlightId !== startId) {
-					return true;
-				}
-			}
-			return false;
-		}
-
-		const el = node as Element;
-		if (el.classList.contains('highlight')) {
-			if ((el as HTMLElement).dataset.highlightId !== startId) {
-				return true;
-			}
-			return false;
-		}
-
-		if (!nodeIsOnlySameIdHighlights(el, startId)) {
-			return true;
-		}
-
-		return false;
-	}
-
-	function expandHighlights(
-		highlightItems: { el: HTMLElement; idx: number }[],
-		nodes: Node[],
-		startIndex: number,
-		startId: string,
-		direction: 'left' | 'right',
-	): HTMLElement[] {
-		const toUnwrap: HTMLElement[] = [];
-		let currentNodeIdx = highlightItems[startIndex]?.idx;
-		const range =
-			direction === 'left'
-				? { iStart: startIndex - 1, iEnd: -1, step: -1 }
-				: { iStart: startIndex + 1, iEnd: highlightItems.length, step: 1 };
-
-		for (let i = range.iStart; i !== range.iEnd; i += range.step) {
-			const candidate = highlightItems[i];
-			let blocked = false;
-			const kStart = direction === 'left' ? candidate.idx + 1 : currentNodeIdx + 1;
-			const kEnd = direction === 'left' ? currentNodeIdx : candidate.idx;
-			for (let k = kStart; k < kEnd; k++) {
-				if (isNodeBlockingUnwrap(nodes[k], startId)) {
-					blocked = true;
-					break;
-				}
-			}
-			if (blocked) break;
-			if (direction === 'left') {
-				toUnwrap.unshift(candidate.el);
-			} else {
-				toUnwrap.push(candidate.el);
-			}
-			currentNodeIdx = candidate.idx;
-		}
-		return toUnwrap;
-	}
-
-	const unwrapContiguousHighlights = (startEl: HTMLElement | null) => {
-		if (!startEl) {
-			return;
-		}
 		const container = document.getElementById('highlight-container');
 		if (!container) {
 			return;
 		}
 
-		const startId = startEl.dataset.highlightId;
-		if (!startId) {
-			// no id -> safe fallback: just unwrap the single element
-			if (startEl.parentNode) {
-				startEl.replaceWith(...Array.from(startEl.childNodes));
-			}
+		// Use shared function to collect highlights to remove
+		const toUnwrap = collectContiguousHighlightsToUnwrap(el, container);
+		const idsToDelete = [
+			...new Set(toUnwrap.map((h) => h.dataset.highlightId).filter(Boolean)),
+		]; // Array without duplicates, as segments may have the same id
 
-			container.normalize();
-			return;
-		}
+		removeHighlights(toUnwrap);
 
-		// Build-ordered list of nodes under the container
-		const walker = document.createTreeWalker(
-			container,
-			NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT,
-			null,
+		await Promise.all(
+			idsToDelete.map((id) =>
+				deleteHighlight({
+					variables: {
+						data: {
+							id,
+							savedItemId,
+						},
+					},
+				}),
+			),
 		);
 
-		const nodes: Node[] = [];
-		let n: Node | null = walker.nextNode();
-		while (n) {
-			nodes.push(n);
-			n = walker.nextNode();
-		}
-
-		type HItem = { el: HTMLElement; idx: number };
-		const highlightItems: HItem[] = [];
-		for (let i = 0; i < nodes.length; i++) {
-			const nd = nodes[i];
-			if (nd?.nodeType === Node.ELEMENT_NODE) {
-				const el = nd as Element;
-				if (el.classList.contains('highlight')) {
-					// only consider highlights with the same id
-					if ((el as HTMLElement).dataset.highlightId === startId) {
-						highlightItems.push({ el: el as HTMLElement, idx: i });
-					}
-				}
-			}
-		}
-
-		const startIndex = highlightItems.findIndex((it) => it.el === startEl);
-		if (startIndex === -1) {
-			// nothing to do
-			return;
-		}
-
-		const leftUnwrap = expandHighlights(highlightItems, nodes, startIndex, startId, 'left');
-		const rightUnwrap = expandHighlights(highlightItems, nodes, startIndex, startId, 'right');
-		const toUnwrap = [...leftUnwrap, startEl, ...rightUnwrap];
-
-		// Unwrap all collected highlights
-		for (const h of toUnwrap) {
-			if (h.parentNode) {
-				h.replaceWith(...Array.from(h.childNodes));
-			}
-		}
-
-		container.normalize();
-	};
-
-	const unhighlight = (el: HTMLElement) => {
-		if (!el) {
-			return;
-		}
-
-		unwrapContiguousHighlights(el);
 		setHoveredHighlight(null);
 		setHoveredRect(null);
+	};
+
+	const highlightSelection = async () => {
+		if (!selection || selection.rangeCount === 0 || !savedItemId) {
+			return;
+		}
+
+		const range = selection.getRangeAt(0);
+		const tempId = `h-temp-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+		const { segments } = createHighlightsFromSelection(range, tempId);
+
+		if (segments.length === 0) {
+			return;
+		}
+
+		try {
+			const { data } = await createHighlight({
+				variables: {
+					data: {
+						savedItemId: savedItemId,
+						segments,
+					},
+				},
+			});
+
+			const serverId = data?.createHighlight?.id;
+			if (serverId) {
+				updateHighlightIds(tempId, serverId);
+			}
+		} catch (err) {
+			const els = document.querySelectorAll(`[data-highlight-id="${tempId}"]`);
+			els.forEach((el) => {
+				const parent = el.parentNode;
+				if (parent) {
+					parent.replaceChild(
+						document.createTextNode((el as HTMLElement).textContent ?? ''),
+						el,
+					);
+				}
+			});
+
+			const container = containerRef?.current;
+			if (container) {
+				container.normalize();
+			}
+		}
 	};
 
 	return {

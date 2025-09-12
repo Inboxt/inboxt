@@ -16,7 +16,7 @@ import {
 	TypographyStylesProvider,
 } from '@mantine/core';
 import { useDocumentTitle } from '@mantine/hooks';
-import { IconArrowLeft, IconHighlight, IconHighlightOff } from '@tabler/icons-react';
+import { IconArrowLeft, IconHighlight } from '@tabler/icons-react';
 import { useCanGoBack, useNavigate, useParams, useRouter } from '@tanstack/react-router';
 import dayjs from 'dayjs';
 
@@ -38,18 +38,21 @@ export const ReaderView = () => {
 	const canGoBack = useCanGoBack();
 	const navigate = useNavigate({ from: Route.fullPath });
 
-	const { selectedText, highlightSelection, rangeRect, hasValidSelection } =
-		useTextHighlighting();
-
 	const { id } = useParams({ from: Route.fullPath });
 	const { data, loading, error } = useQuery(SAVED_ITEM, {
 		variables: { query: { id } },
+		fetchPolicy: 'cache-and-network',
 	});
 
 	const savedItem = data?.savedItem;
 	const title = savedItem?.title || '';
 	const trimmedTitle = title.length > 50 ? title.slice(0, 50).trimEnd() + '...' : title;
 	useDocumentTitle(trimmedTitle ? `${trimmedTitle} | Inbox Reader` : 'Inbox Reader');
+
+	const { selectedText, highlightSelection, rangeRect, hasValidSelection } = useTextHighlighting(
+		undefined,
+		savedItem?.id,
+	);
 
 	const handleGoBack = () => {
 		if (canGoBack) {
@@ -65,7 +68,7 @@ export const ReaderView = () => {
 		return (
 			<Center py="xxl" mt="lg">
 				<Stack w={isAboveXsScreen ? '45em' : '100%'} gap="xxl">
-					<Skeleton visible height={108} animate />
+					<Skeleton visible height={120} animate />
 
 					<Skeleton visible height={560} animate />
 				</Stack>
@@ -206,7 +209,7 @@ export const ReaderView = () => {
 								}}
 								className={classes.readerContent}
 							>
-								<HighlightableArticle content={content || null} />
+								<HighlightableArticle content={content || null} data={savedItem} />
 							</TypographyStylesProvider>
 						) : (
 							<Text ta="center">
