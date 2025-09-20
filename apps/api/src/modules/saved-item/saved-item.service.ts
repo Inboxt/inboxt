@@ -3,9 +3,9 @@ import dayjs from 'dayjs';
 
 import { PrismaService } from '../../services/prisma.service';
 import { Prisma } from '../../../prisma/client';
-import { GetSavedItemsInput } from './dto/get-saved-items.input';
 import { AppException } from '../../utils/app-exception';
 import { LabelService } from './entities/label/label.service';
+import { GetSavedItemsInput } from './dto/get-saved-items.input';
 
 @Injectable()
 export class SavedItemService {
@@ -45,7 +45,7 @@ export class SavedItemService {
 			take: query.first + 1,
 		};
 
-		if (query?.sort?.field && query?.sort?.direction) {
+		if (query.sort?.field && query.sort?.direction) {
 			prismaQuery.orderBy = { [query.sort.field]: query.sort.direction };
 		}
 

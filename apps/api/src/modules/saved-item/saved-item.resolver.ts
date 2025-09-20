@@ -11,13 +11,9 @@ import { VOID_RESPONSE } from '../../constants/void';
 import { UpdateSavedItemStatusInput } from './dto/update-saved-item-status.input';
 import { SetSavedItemLabelsInput } from './dto/set-saved-item-labels.input';
 import { Label } from './entities/label/label.model';
-import { SavedItemConnection } from './saved-items.model';
-import { GetSavedItemsInput } from './dto/get-saved-items.input';
 import { PermanentlyDeleteSavedItemsInput } from './dto/permanently-delete-saved-items.input';
 import { Newsletter } from './entities/newsletter/newsletter.model';
 import { NewsletterService } from './entities/newsletter/newsletter.service';
-import { Highlight } from '../highlight/highlight.model';
-import { HighlightService } from '../highlight/highlight.service';
 
 @Resolver(() => SavedItem)
 export class SavedItemResolver {
@@ -25,16 +21,7 @@ export class SavedItemResolver {
 		private savedItemService: SavedItemService,
 		private articleService: ArticleService,
 		private newsletterService: NewsletterService,
-		private highlightService: HighlightService,
 	) {}
-
-	@Query(() => SavedItemConnection)
-	async savedItems(
-		@ActiveUserMeta() activeUser: ActiveUserMetaType,
-		@Args('query') query: GetSavedItemsInput,
-	) {
-		return this.savedItemService.getPaginated(activeUser.id, query);
-	}
 
 	@Query(() => SavedItem, { nullable: true })
 	async savedItem(
@@ -111,16 +98,5 @@ export class SavedItemResolver {
 		}
 
 		return this.savedItemService.getLabels(activeUser.id, savedItem.id);
-	}
-
-	@ResolveField('highlights', () => [Highlight], { nullable: true })
-	async highlights(@ActiveUserMeta() activeUser: ActiveUserMetaType, @Parent() savedItem) {
-		if (!savedItem?.id) {
-			return null;
-		}
-
-		return this.highlightService.getMany({
-			where: { savedItemId: savedItem.id, userId: activeUser.id },
-		});
 	}
 }

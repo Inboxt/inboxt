@@ -6,35 +6,51 @@ import { ActiveUserMeta, ActiveUserMetaType } from '../../decorators/active-user
 import { Void } from '../../models/void.model';
 import { VOID_RESPONSE } from '../../constants/void';
 import { HighlightSegment } from './highlight-segment.model';
-import { DeleteHighlightInput } from './dto/delete-highlight.input';
+import { DeleteHighlightsInput } from './dto/delete-highlights.input';
+import { SavedItemService } from '../saved-item/saved-item.service';
+import { SavedItem } from '../saved-item/saved-item.model';
 
 @Resolver(() => Highlight)
 export class HighlightResolver {
-	constructor(private highlightService: HighlightService) {}
+	constructor(
+		private highlightService: HighlightService,
+		private savedItemService: SavedItemService,
+	) {}
 
 	@Mutation(() => Highlight)
 	async createHighlight(
 		@ActiveUserMeta() activeUser: ActiveUserMetaType,
 		@Args('data') data: CreateHighlightInput,
 	) {
-		return this.highlightService.create(data, activeUser.id);
+		return this.highlightService.create(activeUser.id, data);
 	}
 
 	@Mutation(() => Void)
-	async deleteHighlight(
+	async deleteHighlights(
 		@ActiveUserMeta() activeUser: ActiveUserMetaType,
-		@Args('data') data: DeleteHighlightInput,
+		@Args('data') data: DeleteHighlightsInput,
 	) {
-		await this.highlightService.delete(data, activeUser.id);
+		await this.highlightService.delete(activeUser.id, data);
 		return VOID_RESPONSE;
 	}
 
 	@ResolveField('segments', () => [HighlightSegment], { nullable: true })
-	async segments(@Parent() highlight) {
+	async segments(@ActiveUserMeta() activeUser: ActiveUserMetaType, @Parent() highlight) {
 		if (!highlight?.id) {
 			return null;
 		}
 
-		return this.highlightService.getSegments(highlight.id);
+		return this.highlightService.getSegments(activeUser.id, highlight.id);
+	}
+
+	@ResolveField('savedItem', () => SavedItem, { nullable: true })
+	async savedItem(@ActiveUserMeta() activeUser: ActiveUserMetaType, @Parent() highlight) {
+		if (!highlight?.savedItemId) {
+			return null;
+		}
+
+		return this.savedItemService.get(activeUser.id, {
+			where: { id: highlight.savedItemId },
+		});
 	}
 }

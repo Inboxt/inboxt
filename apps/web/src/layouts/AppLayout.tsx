@@ -7,7 +7,7 @@ import { Footer } from '~components/Footer';
 import { Header } from '~components/Header';
 import { Navbar } from '~components/Navbar';
 import { UnverifiedEmailAlert } from '~components/UnverifiedEmailAlert';
-import { useReaderContext } from '~context/reader';
+import { useContentSelection } from '~context/content-selection';
 import { useScreenQuery } from '~hooks/useScreenQuery';
 
 import { Route } from '../routes/_auth';
@@ -22,8 +22,9 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
 	const routeData = useRouteContext({ from: Route.id });
 	const isAboveLgScreen = useScreenQuery('lg', 'above');
 	const [opened, { toggle }] = useDisclosure(isAboveLgScreen);
-	const { selectedItems } = useReaderContext();
+	const { selectedItems } = useContentSelection();
 	useDocumentTitle('Inbox Reader');
+
 	return (
 		<>
 			<UnverifiedEmailAlert user={routeData.user} />

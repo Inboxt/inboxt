@@ -6,10 +6,9 @@ import { SavedItemResolver } from './saved-item.resolver';
 import { ArticleModule } from './entities/article/article.module';
 import { LabelModule } from './entities/label/label.module';
 import { NewsletterModule } from './entities/newsletter/newsletter.module';
-import { HighlightModule } from '../highlight/highlight.module';
 
 @Module({
-	imports: [ArticleModule, LabelModule, NewsletterModule, HighlightModule],
+	imports: [ArticleModule, LabelModule, NewsletterModule],
 	providers: [SavedItemService, PrismaService, SavedItemResolver],
 	exports: [SavedItemService],
 })

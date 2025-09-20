@@ -3,79 +3,119 @@ import { ActionIcon, Text, Tooltip } from '@mantine/core';
 import {
 	IconArchive,
 	IconArrowBackUp,
+	IconCopy,
 	IconDots,
+	IconEraser,
+	IconFileText,
 	IconProps,
 	IconTag,
 	IconTrash,
 	IconTrashX,
 	IconWorld,
 } from '@tabler/icons-react';
-import React from 'react';
+import { useNavigate } from '@tanstack/react-router';
+import React, { useMemo } from 'react';
 
-import { useReaderContext } from '~context/reader';
+import { SelectableItem, useContentSelection } from '~context/content-selection';
 import {
 	PERMANENTLY_DELETE_SAVED_ITEMS,
-	SAVED_ITEMS,
 	UPDATE_SAVED_ITEM_STATUS,
+	DELETE_HIGHLIGHTS,
+	ENTRIES,
 } from '~lib/graphql';
-import { SavedItem, SavedItemStatus } from '~lib/graphql/generated/graphql';
+import { SavedItem, SavedItemStatus, Highlight } from '~lib/graphql/generated/graphql';
 import { modals } from '~modals/modals';
 
 import { MenuDrawer } from '../MenuDrawer';
 import { ReaderSettingsPopover } from '../ReaderSettingsPopover';
 
-export type ItemsOptionsMode = 'single' | 'bulk' | 'reader' | 'reader-menu';
+export type ItemsOptionsMode = 'single' | 'bulk' | 'reader' | 'reader-menu' | 'highlights';
 
 type ItemsOptionsProps = {
-	items: Pick<SavedItem, 'status' | 'id' | 'originalUrl'>[];
+	items: SelectableItem[];
 	mode: ItemsOptionsMode;
 	size?: 'sm' | 'md';
 	onActionComplete?: () => void | Promise<void>;
-};
-
-type OptionContext = {
-	items: Pick<SavedItem, 'status' | 'id' | 'originalUrl'>[];
-	loading: boolean;
 };
 
 type Option = {
 	label: string;
 	icon: React.ComponentType<IconProps>;
 	modes: ItemsOptionsMode[];
-	visible?: (ctx: OptionContext) => boolean;
-	enabled?: (ctx: OptionContext) => boolean;
-	onClick: (ctx: OptionContext) => boolean | Promise<boolean | undefined> | undefined;
+	visible?: () => boolean;
+	onClick: () => boolean | Promise<boolean | undefined> | undefined;
+	clearsSelection?: boolean; // default: true
+	runsOnActionComplete?: boolean; // default: true
 };
 
-export const ItemsOptions: React.FC<ItemsOptionsProps> = ({
-	items,
-	mode,
-	size = 'md',
-	onActionComplete,
-}) => {
-	const isSmall = size === 'sm';
-	const [updateStatus, { loading }] = useMutation(UPDATE_SAVED_ITEM_STATUS);
-	const { setSelectedItems } = useReaderContext();
-	const ctx: OptionContext = { items, loading };
+// Narrowed item types for stronger typing inside options
+type SavedSelectable = Extract<SelectableItem, { __typename: 'SavedItem' }>;
+type HighlightSelectable = Extract<SelectableItem, { __typename: 'Highlight' }>;
 
-	const [permanentlyDeleteSavedItems] = useMutation(PERMANENTLY_DELETE_SAVED_ITEMS, {
-		refetchQueries: [SAVED_ITEMS],
+export const ItemsOptions = ({ items, mode, size = 'md', onActionComplete }: ItemsOptionsProps) => {
+	const isSmall = size === 'sm';
+	const [updateStatus, { loading: updateLoading }] = useMutation(UPDATE_SAVED_ITEM_STATUS, {
+		refetchQueries: [ENTRIES],
 	});
+	const [deleteHighlights, { loading: deleteLoading }] = useMutation(DELETE_HIGHLIGHTS, {
+		refetchQueries: [ENTRIES],
+	});
+	const [permanentlyDeleteSavedItems] = useMutation(PERMANENTLY_DELETE_SAVED_ITEMS, {
+		refetchQueries: [ENTRIES],
+	});
+	const { setSelectedItems } = useContentSelection();
+	const navigate = useNavigate();
+	const loading = updateLoading || deleteLoading;
+
+	const savedItems: SavedItem[] = useMemo(
+		() => items.filter((i): i is SavedSelectable => i.__typename === 'SavedItem'),
+		[items],
+	);
+	const highlightItems: Highlight[] = useMemo(
+		() => items.filter((i): i is HighlightSelectable => i.__typename === 'Highlight'),
+		[items],
+	);
+
+	const getSavedItemIds = (list: SavedItem[], predicate: (status: SavedItemStatus) => boolean) =>
+		list.filter((i) => predicate(i.status)).map((i) => i.id);
+
+	const confirm = (opts: {
+		title: string;
+		message: React.ReactNode;
+		confirmLabel?: string;
+		confirmColor?: string;
+	}) =>
+		new Promise<boolean>((resolve) => {
+			modals.openConfirmModal({
+				title: opts.title,
+				centered: true,
+				children: <Text>{opts.message}</Text>,
+				labels: { confirm: opts.confirmLabel ?? 'Confirm', cancel: 'Cancel' },
+				confirmProps: { color: opts.confirmColor ?? 'blue' },
+				onConfirm: () => resolve(true),
+				onCancel: () => resolve(false),
+			});
+		});
 
 	const OPTIONS: Option[] = [
 		{
 			label: 'Edit labels',
 			icon: IconTag,
 			modes: ['single', 'reader', 'reader-menu'],
-			visible: ({ items }) =>
-				items.length === 1 && items[0]!.status !== SavedItemStatus.Deleted,
-			onClick: ({ items }) => {
-				modals.openLabelsSelectionModal({
-					itemId: items[0]!.id,
-					onClose: () => {
-						setSelectedItems([]);
-					},
-				});
+			clearsSelection: false,
+			runsOnActionComplete: false,
+			visible: () =>
+				savedItems.length === 1 && savedItems[0]?.status !== SavedItemStatus.Deleted,
+			onClick: () => {
+				const [item] = savedItems;
+				if (item) {
+					modals.openLabelsSelectionModal({
+						itemId: item.id,
+						onClose: () => {
+							setSelectedItems([]);
+						},
+					});
+				}
 				return undefined;
 			},
 		},
@@ -83,14 +123,22 @@ export const ItemsOptions: React.FC<ItemsOptionsProps> = ({
 			label: 'Restore',
 			icon: IconArrowBackUp,
 			modes: ['single', 'bulk', 'reader', 'reader-menu'],
-			visible: ({ items }) =>
-				items.length > 0 && items.some((i) => i.status !== SavedItemStatus.Active),
-			onClick: async ({ items }) => {
+			visible: () =>
+				savedItems.length > 0 &&
+				savedItems.some((i) => i.status !== SavedItemStatus.Active),
+			onClick: async () => {
+				const savedItemIds = getSavedItemIds(
+					savedItems,
+					(s) => s !== SavedItemStatus.Active,
+				);
+				if (savedItemIds.length === 0) {
+					return undefined;
+				}
+
 				await updateStatus({
 					variables: {
-						data: { ids: items.map((i) => i.id), status: SavedItemStatus.Active },
+						data: { ids: savedItemIds, status: SavedItemStatus.Active },
 					},
-					refetchQueries: [SAVED_ITEMS],
 				});
 				return undefined;
 			},
@@ -99,14 +147,22 @@ export const ItemsOptions: React.FC<ItemsOptionsProps> = ({
 			label: 'Move to archive',
 			icon: IconArchive,
 			modes: ['single', 'bulk', 'reader', 'reader-menu'],
-			visible: ({ items }) =>
-				items.length > 0 && items.some((i) => i.status !== SavedItemStatus.Archived),
-			onClick: async ({ items }) => {
+			visible: () =>
+				savedItems.length > 0 &&
+				savedItems.some((i) => i.status !== SavedItemStatus.Archived),
+			onClick: async () => {
+				const savedItemIds = getSavedItemIds(
+					savedItems,
+					(s) => s !== SavedItemStatus.Archived,
+				);
+				if (savedItemIds.length === 0) {
+					return undefined;
+				}
+
 				await updateStatus({
 					variables: {
-						data: { ids: items.map((i) => i.id), status: SavedItemStatus.Archived },
+						data: { ids: savedItemIds, status: SavedItemStatus.Archived },
 					},
-					refetchQueries: [SAVED_ITEMS],
 				});
 				return undefined;
 			},
@@ -115,14 +171,22 @@ export const ItemsOptions: React.FC<ItemsOptionsProps> = ({
 			label: 'Move to trash',
 			icon: IconTrash,
 			modes: ['single', 'bulk', 'reader', 'reader-menu'],
-			visible: ({ items }) =>
-				items.length > 0 && items.some((i) => i.status !== SavedItemStatus.Deleted),
-			onClick: async ({ items }) => {
+			visible: () =>
+				savedItems.length > 0 &&
+				savedItems.some((i) => i.status !== SavedItemStatus.Deleted),
+			onClick: async () => {
+				const savedItemIds = getSavedItemIds(
+					savedItems,
+					(s) => s !== SavedItemStatus.Deleted,
+				);
+				if (savedItemIds.length === 0) {
+					return undefined;
+				}
+
 				await updateStatus({
 					variables: {
-						data: { ids: items.map((i) => i.id), status: SavedItemStatus.Deleted },
+						data: { ids: savedItemIds, status: SavedItemStatus.Deleted },
 					},
-					refetchQueries: [SAVED_ITEMS],
 				});
 				return undefined;
 			},
@@ -131,38 +195,38 @@ export const ItemsOptions: React.FC<ItemsOptionsProps> = ({
 			label: 'Delete permanently',
 			icon: IconTrashX,
 			modes: ['single', 'bulk', 'reader', 'reader-menu'],
-			visible: ({ items }) =>
-				items.length > 0 && items.every((i) => i.status === SavedItemStatus.Deleted),
-			enabled: ({ items }) => items.length > 0,
-			onClick: async ({ items }) => {
-				const count = items.length;
+			visible: () =>
+				savedItems.length > 0 &&
+				savedItems.some((i) => i.status === SavedItemStatus.Deleted),
+			onClick: async () => {
+				const savedItemIds = getSavedItemIds(
+					savedItems,
+					(s) => s === SavedItemStatus.Deleted,
+				);
+				if (savedItemIds.length === 0) {
+					return undefined;
+				}
 
-				const confirmed = await new Promise<boolean>((resolve) => {
-					modals.openConfirmModal({
-						title: 'Delete Permanently',
-						centered: true,
-						children: (
-							<Text>
-								Are you sure you want to permanently delete{' '}
-								{count > 1 ? `${count} items` : 'this item'}? <br />
-								This action cannot be undone.
-							</Text>
-						),
-						labels: { confirm: 'Delete permanently', cancel: 'Cancel' },
-						confirmProps: { color: 'red' },
-						onConfirm: () => resolve(true),
-						onCancel: () => resolve(false),
-					});
+				const count = savedItemIds.length;
+				const confirmed = await confirm({
+					title: 'Delete Permanently',
+					message: (
+						<>
+							Are you sure you want to permanently delete{' '}
+							{count > 1 ? `${count} items` : 'this item'}? <br />
+							This action cannot be undone.
+						</>
+					),
+					confirmLabel: 'Delete permanently',
+					confirmColor: 'red',
 				});
-
 				if (!confirmed) {
 					return false;
 				}
 
 				await permanentlyDeleteSavedItems({
-					variables: { data: { ids: items.map((i) => i.id) } },
+					variables: { data: { ids: savedItemIds } },
 				});
-
 				return true;
 			},
 		},
@@ -170,9 +234,89 @@ export const ItemsOptions: React.FC<ItemsOptionsProps> = ({
 			label: 'Open original',
 			icon: IconWorld,
 			modes: ['single'],
-			onClick: ({ items }) => {
-				if (items.length === 1 && items[0]?.originalUrl) {
-					window.open(items[0].originalUrl, '_blank', 'noopener,noreferrer');
+			visible: () => savedItems.length === 1 && Boolean(savedItems[0]?.originalUrl),
+			onClick: () => {
+				const [item] = savedItems;
+				if (item?.originalUrl) {
+					window.open(item.originalUrl, '_blank', 'noopener,noreferrer');
+				}
+				return undefined;
+			},
+		},
+		{
+			label: 'Copy Highlight',
+			icon: IconCopy,
+			modes: ['highlights'],
+			visible: () => highlightItems.length === 1,
+			onClick: async () => {
+				const [highlight] = highlightItems;
+				if (highlight && highlight.segments?.length) {
+					const text = highlight.segments
+						.slice()
+						.reverse()
+						.map((s) => s.text)
+						.join('')
+						.replace(/\s+/g, ' ')
+						.trim();
+
+					await navigator.clipboard.writeText(text);
+				}
+
+				return undefined;
+			},
+		},
+		{
+			label: 'Delete highlight',
+			icon: IconEraser,
+			modes: ['highlights'],
+			visible: () => highlightItems.length > 0,
+			onClick: async () => {
+				if (highlightItems.length === 0) {
+					return undefined;
+				}
+
+				const count = highlightItems.length;
+				const confirmed = await confirm({
+					title: `Delete Highlight${count > 1 ? 's' : ''}`,
+					message: (
+						<>
+							Are you sure you want to permanently delete{' '}
+							{count > 1 ? `${count} highlights` : 'this highlight'}? <br />
+							This action cannot be undone.
+						</>
+					),
+					confirmLabel: 'Delete permanently',
+					confirmColor: 'red',
+				});
+
+				if (!confirmed) {
+					return false;
+				}
+
+				await deleteHighlights({
+					variables: {
+						data: {
+							items: highlightItems.map((item) => ({
+								id: item.id,
+								savedItemId: item.savedItem?.id || null,
+							})),
+						},
+					},
+				});
+
+				return true;
+			},
+		},
+		{
+			label: 'Open source',
+			icon: IconFileText,
+			modes: ['highlights'],
+			visible: () => highlightItems.length === 1 && Boolean(highlightItems[0]?.savedItem?.id),
+			onClick: async () => {
+				const [highlight] = highlightItems;
+				if (highlight?.savedItem?.id) {
+					await navigate({ to: '/r/$id', params: { id: highlight.savedItem.id } });
+					return undefined;
 				}
 
 				return undefined;
@@ -182,24 +326,29 @@ export const ItemsOptions: React.FC<ItemsOptionsProps> = ({
 
 	const handleOptionClick = async (option: Option, e?: React.MouseEvent) => {
 		e?.stopPropagation();
-		if (option.label !== 'Edit labels') {
+		if (option.clearsSelection ?? true) {
 			setSelectedItems([]);
 		}
 
-		const result = await option.onClick(ctx);
-		if (result !== false && onActionComplete && option.label !== 'Edit labels') {
+		const result = await option.onClick();
+		if (result !== false && (option.runsOnActionComplete ?? true) && onActionComplete) {
 			await onActionComplete();
 		}
 	};
 
+	const filteredOptions = useMemo(
+		() =>
+			OPTIONS.filter(
+				(option) =>
+					option.modes.includes(mode) && (option.visible ? option.visible() : true),
+			),
+		[mode, items, savedItems, highlightItems, loading],
+	);
+
 	if (mode === 'reader') {
 		return (
 			<>
-				{OPTIONS.filter(
-					(option) =>
-						option.modes.includes(mode) &&
-						(option.visible ? option.visible(ctx) : true),
-				).map((option) => (
+				{filteredOptions.map((option) => (
 					<ReaderSettingsPopover
 						key={option.label}
 						label={option.label}
@@ -214,11 +363,7 @@ export const ItemsOptions: React.FC<ItemsOptionsProps> = ({
 	if (mode === 'reader-menu') {
 		return (
 			<MenuDrawer
-				items={OPTIONS.filter(
-					(option) =>
-						option.modes.includes(mode) &&
-						(option.visible ? option.visible(ctx) : true),
-				).map((option) => ({
+				items={filteredOptions.map((option) => ({
 					icon: <option.icon />,
 					label: option.label,
 					action: () => handleOptionClick(option),
@@ -235,17 +380,14 @@ export const ItemsOptions: React.FC<ItemsOptionsProps> = ({
 
 	return (
 		<>
-			{OPTIONS.filter(
-				(option) =>
-					option.modes.includes(mode) && (option.visible ? option.visible(ctx) : true),
-			).map((option) => (
+			{filteredOptions.map((option) => (
 				<Tooltip key={option.label} label={option.label} openDelay={600} withArrow>
 					<ActionIcon
 						variant="subtle"
 						color="text"
 						size={isSmall ? 'md' : 38}
 						radius="xl"
-						disabled={loading || (option.enabled && !option.enabled(ctx))}
+						disabled={loading}
 						onClick={(e) => void handleOptionClick(option, e)}
 					>
 						<option.icon size={isSmall ? 18 : undefined} />

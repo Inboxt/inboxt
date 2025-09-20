@@ -19,12 +19,13 @@ type Documents = {
     "\n\tfragment SavedItemLabelFragment on Label {\n\t\tcreatedAt\n\t\tid\n\t\tname\n\t\tcolor\n\t}\n": typeof types.SavedItemLabelFragmentFragmentDoc,
     "\n\tfragment SavedItemLabelsFragment on SavedItem {\n\t\tid\n\t\tlabels {\n\t\t\tid\n\t\t\t...SavedItemLabelFragment\n\t\t}\n\t}\n": typeof types.SavedItemLabelsFragmentFragmentDoc,
     "\n\tfragment NewsletterFragment on Newsletter {\n\t\tcontentHtml\n\t\tcontentText\n\t\tsubscription {\n\t\t\tid\n\t\t\tcreatedAt\n\t\t\tname\n\t\t\tstatus\n\t\t\tlastReceivedAt\n\t\t\tunsubscribeUrl\n\t\t\tunsubscribeAttemptedAt\n\t\t}\n\t}\n": typeof types.NewsletterFragmentFragmentDoc,
-    "\n\tfragment HighlightFragment on Highlight {\n\t\tid\n\t\tcreatedAt\n\t\tsegments {\n\t\t\tid\n\t\t\txpath\n\t\t\tbeforeText\n\t\t\tstartOffset\n\t\t\tendOffset\n\t\t\tafterText\n\t\t\ttext\n\t\t}\n\t}\n": typeof types.HighlightFragmentFragmentDoc,
+    "\n\tfragment HighlightFragment on Highlight {\n\t\tid\n\t\tcreatedAt\n\t\tsavedItem {\n        \tid\n            title\n        }\n\t\tsegments {\n\t\t\tid\n\t\t\txpath\n\t\t\tbeforeText\n\t\t\tstartOffset\n\t\t\tendOffset\n\t\t\tafterText\n\t\t\ttext\n\t\t}\n\t}\n": typeof types.HighlightFragmentFragmentDoc,
+    "\n\tfragment EntryFragment on Entry {\n\t\t__typename\n\t\t... on SavedItem {\n\t\t\t...SavedItemFragment\n\t\t\tlabels {\n\t\t\t\t...SavedItemLabelFragment\n\t\t\t}\n\t\t}\n\t\t... on Highlight {\n\t\t\t...HighlightFragment\n\t\t}\n\t}\n": typeof types.EntryFragmentFragmentDoc,
     "\n\tquery me {\n\t\tme {\n\t\t\tid\n\t\t\t...UserFragment\n\t\t}\n\t}\n": typeof types.MeDocument,
     "\n\tquery labels {\n\t\tlabels {\n\t\t\tid\n\t\t\t...SavedItemLabelFragment\n\t\t}\n\t}\n": typeof types.LabelsDocument,
-    "\n\tquery savedItems($query: GetSavedItemsInput!) {\n\t\tsavedItems(query: $query) {\n\t\t\tedges {\n\t\t\t\tnode {\n\t\t\t\t\tid\n\t\t\t\t\t...SavedItemFragment\n\t\t\t\t\tlabels {\n\t\t\t\t\t\tid\n\t\t\t\t\t\t...SavedItemLabelFragment\n\t\t\t\t\t}\n\t\t\t\t\tarticle {\n\t\t\t\t\t\tcontentHtml\n\t\t\t\t\t\tcontentText\n\t\t\t\t\t}\n\t\t\t\t\tnewsletter {\n\t\t\t\t\t\t...NewsletterFragment\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t\tcursor\n\t\t\t}\n\t\t\tendCursor\n\t\t\thasNextPage\n\t\t}\n\t}\n": typeof types.SavedItemsDocument,
     "\n\tquery savedItem($query: GetSavedItemInput!) {\n\t\tsavedItem(query: $query) {\n\t\t\tid\n\t\t\t...SavedItemFragment\n\t\t\tlabels {\n\t\t\t\tid\n\t\t\t\t...SavedItemLabelFragment\n\t\t\t}\n\t\t\tarticle {\n\t\t\t\tcontentHtml\n\t\t\t\tcontentText\n\t\t\t}\n\t\t\tnewsletter {\n\t\t\t\t...NewsletterFragment\n\t\t\t}\n\t\t\thighlights {\n\t\t\t\t...HighlightFragment\n\t\t\t}\n\t\t}\n\t}\n": typeof types.SavedItemDocument,
     "\n\tquery inboundEmailAddresses {\n\t\tinboundEmailAddresses {\n\t\t\tid\n\t\t\tcreatedAt\n\t\t\tfullAddress\n\t\t\tsubscriptions {\n\t\t\t\tid\n\t\t\t\tcreatedAt\n\t\t\t\tname\n\t\t\t\tstatus\n\t\t\t\tlastReceivedAt\n\t\t\t\tunsubscribeUrl\n\t\t\t\tunsubscribeAttemptedAt\n\t\t\t}\n\t\t}\n\t}\n": typeof types.InboundEmailAddressesDocument,
+    "\n\tquery entries($query: GetEntriesInput!) {\n\t\tentries(query: $query) {\n\t\t\tedges {\n\t\t\t\tnode {\n\t\t\t\t\t...EntryFragment\n\t\t\t\t}\n\t\t\t\tcursor\n\t\t\t}\n\t\t\thasNextPage\n\t\t\tendCursor\n\t\t}\n\t}\n": typeof types.EntriesDocument,
     "\n\tmutation signIn($data: SignInInput!) {\n\t\tsignIn(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": typeof types.SignInDocument,
     "\n\tmutation signOut {\n\t\tsignOut {\n\t\t\tsuccess\n\t\t}\n\t}\n": typeof types.SignOutDocument,
     "\n\tmutation createAccount($data: CreateAccountInput!) {\n\t\tcreateAccount(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": typeof types.CreateAccountDocument,
@@ -44,7 +45,7 @@ type Documents = {
     "\n\tmutation deleteInboundEmailAddress($data: DeleteInboundEmailAddressInput!) {\n\t\tdeleteInboundEmailAddress(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": typeof types.DeleteInboundEmailAddressDocument,
     "\n\tmutation updateNewsletterSubscriptionStatus($data: UpdateNewsletterSubscriptionStatusInput!) {\n\t\tupdateNewsletterSubscriptionStatus(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": typeof types.UpdateNewsletterSubscriptionStatusDocument,
     "\n\tmutation createHighlight($data: CreateHighlightInput!) {\n\t\tcreateHighlight(data: $data) {\n\t\t\tid\n\t\t}\n\t}\n": typeof types.CreateHighlightDocument,
-    "\n\tmutation DeleteHighlight($data: DeleteHighlightInput!) {\n\t\tdeleteHighlight(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": typeof types.DeleteHighlightDocument,
+    "\n\tmutation DeleteHighlights($data: DeleteHighlightsInput!) {\n\t\tdeleteHighlights(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": typeof types.DeleteHighlightsDocument,
 };
 const documents: Documents = {
     "\n\tfragment UserFragment on User {\n\t\tid\n\t\tcreatedAt\n\t\temailAddress\n\t\tisEmailVerified\n\t\tusername\n\t\tpendingEmailAddress\n\t\tplan\n\t\tlabelsCount\n\t\tinboundEmailAddressesCount\n\t}\n": types.UserFragmentFragmentDoc,
@@ -52,12 +53,13 @@ const documents: Documents = {
     "\n\tfragment SavedItemLabelFragment on Label {\n\t\tcreatedAt\n\t\tid\n\t\tname\n\t\tcolor\n\t}\n": types.SavedItemLabelFragmentFragmentDoc,
     "\n\tfragment SavedItemLabelsFragment on SavedItem {\n\t\tid\n\t\tlabels {\n\t\t\tid\n\t\t\t...SavedItemLabelFragment\n\t\t}\n\t}\n": types.SavedItemLabelsFragmentFragmentDoc,
     "\n\tfragment NewsletterFragment on Newsletter {\n\t\tcontentHtml\n\t\tcontentText\n\t\tsubscription {\n\t\t\tid\n\t\t\tcreatedAt\n\t\t\tname\n\t\t\tstatus\n\t\t\tlastReceivedAt\n\t\t\tunsubscribeUrl\n\t\t\tunsubscribeAttemptedAt\n\t\t}\n\t}\n": types.NewsletterFragmentFragmentDoc,
-    "\n\tfragment HighlightFragment on Highlight {\n\t\tid\n\t\tcreatedAt\n\t\tsegments {\n\t\t\tid\n\t\t\txpath\n\t\t\tbeforeText\n\t\t\tstartOffset\n\t\t\tendOffset\n\t\t\tafterText\n\t\t\ttext\n\t\t}\n\t}\n": types.HighlightFragmentFragmentDoc,
+    "\n\tfragment HighlightFragment on Highlight {\n\t\tid\n\t\tcreatedAt\n\t\tsavedItem {\n        \tid\n            title\n        }\n\t\tsegments {\n\t\t\tid\n\t\t\txpath\n\t\t\tbeforeText\n\t\t\tstartOffset\n\t\t\tendOffset\n\t\t\tafterText\n\t\t\ttext\n\t\t}\n\t}\n": types.HighlightFragmentFragmentDoc,
+    "\n\tfragment EntryFragment on Entry {\n\t\t__typename\n\t\t... on SavedItem {\n\t\t\t...SavedItemFragment\n\t\t\tlabels {\n\t\t\t\t...SavedItemLabelFragment\n\t\t\t}\n\t\t}\n\t\t... on Highlight {\n\t\t\t...HighlightFragment\n\t\t}\n\t}\n": types.EntryFragmentFragmentDoc,
     "\n\tquery me {\n\t\tme {\n\t\t\tid\n\t\t\t...UserFragment\n\t\t}\n\t}\n": types.MeDocument,
     "\n\tquery labels {\n\t\tlabels {\n\t\t\tid\n\t\t\t...SavedItemLabelFragment\n\t\t}\n\t}\n": types.LabelsDocument,
-    "\n\tquery savedItems($query: GetSavedItemsInput!) {\n\t\tsavedItems(query: $query) {\n\t\t\tedges {\n\t\t\t\tnode {\n\t\t\t\t\tid\n\t\t\t\t\t...SavedItemFragment\n\t\t\t\t\tlabels {\n\t\t\t\t\t\tid\n\t\t\t\t\t\t...SavedItemLabelFragment\n\t\t\t\t\t}\n\t\t\t\t\tarticle {\n\t\t\t\t\t\tcontentHtml\n\t\t\t\t\t\tcontentText\n\t\t\t\t\t}\n\t\t\t\t\tnewsletter {\n\t\t\t\t\t\t...NewsletterFragment\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t\tcursor\n\t\t\t}\n\t\t\tendCursor\n\t\t\thasNextPage\n\t\t}\n\t}\n": types.SavedItemsDocument,
     "\n\tquery savedItem($query: GetSavedItemInput!) {\n\t\tsavedItem(query: $query) {\n\t\t\tid\n\t\t\t...SavedItemFragment\n\t\t\tlabels {\n\t\t\t\tid\n\t\t\t\t...SavedItemLabelFragment\n\t\t\t}\n\t\t\tarticle {\n\t\t\t\tcontentHtml\n\t\t\t\tcontentText\n\t\t\t}\n\t\t\tnewsletter {\n\t\t\t\t...NewsletterFragment\n\t\t\t}\n\t\t\thighlights {\n\t\t\t\t...HighlightFragment\n\t\t\t}\n\t\t}\n\t}\n": types.SavedItemDocument,
     "\n\tquery inboundEmailAddresses {\n\t\tinboundEmailAddresses {\n\t\t\tid\n\t\t\tcreatedAt\n\t\t\tfullAddress\n\t\t\tsubscriptions {\n\t\t\t\tid\n\t\t\t\tcreatedAt\n\t\t\t\tname\n\t\t\t\tstatus\n\t\t\t\tlastReceivedAt\n\t\t\t\tunsubscribeUrl\n\t\t\t\tunsubscribeAttemptedAt\n\t\t\t}\n\t\t}\n\t}\n": types.InboundEmailAddressesDocument,
+    "\n\tquery entries($query: GetEntriesInput!) {\n\t\tentries(query: $query) {\n\t\t\tedges {\n\t\t\t\tnode {\n\t\t\t\t\t...EntryFragment\n\t\t\t\t}\n\t\t\t\tcursor\n\t\t\t}\n\t\t\thasNextPage\n\t\t\tendCursor\n\t\t}\n\t}\n": types.EntriesDocument,
     "\n\tmutation signIn($data: SignInInput!) {\n\t\tsignIn(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": types.SignInDocument,
     "\n\tmutation signOut {\n\t\tsignOut {\n\t\t\tsuccess\n\t\t}\n\t}\n": types.SignOutDocument,
     "\n\tmutation createAccount($data: CreateAccountInput!) {\n\t\tcreateAccount(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": types.CreateAccountDocument,
@@ -77,7 +79,7 @@ const documents: Documents = {
     "\n\tmutation deleteInboundEmailAddress($data: DeleteInboundEmailAddressInput!) {\n\t\tdeleteInboundEmailAddress(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": types.DeleteInboundEmailAddressDocument,
     "\n\tmutation updateNewsletterSubscriptionStatus($data: UpdateNewsletterSubscriptionStatusInput!) {\n\t\tupdateNewsletterSubscriptionStatus(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": types.UpdateNewsletterSubscriptionStatusDocument,
     "\n\tmutation createHighlight($data: CreateHighlightInput!) {\n\t\tcreateHighlight(data: $data) {\n\t\t\tid\n\t\t}\n\t}\n": types.CreateHighlightDocument,
-    "\n\tmutation DeleteHighlight($data: DeleteHighlightInput!) {\n\t\tdeleteHighlight(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": types.DeleteHighlightDocument,
+    "\n\tmutation DeleteHighlights($data: DeleteHighlightsInput!) {\n\t\tdeleteHighlights(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": types.DeleteHighlightsDocument,
 };
 
 /**
@@ -117,7 +119,11 @@ export function gql(source: "\n\tfragment NewsletterFragment on Newsletter {\n\t
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n\tfragment HighlightFragment on Highlight {\n\t\tid\n\t\tcreatedAt\n\t\tsegments {\n\t\t\tid\n\t\t\txpath\n\t\t\tbeforeText\n\t\t\tstartOffset\n\t\t\tendOffset\n\t\t\tafterText\n\t\t\ttext\n\t\t}\n\t}\n"): (typeof documents)["\n\tfragment HighlightFragment on Highlight {\n\t\tid\n\t\tcreatedAt\n\t\tsegments {\n\t\t\tid\n\t\t\txpath\n\t\t\tbeforeText\n\t\t\tstartOffset\n\t\t\tendOffset\n\t\t\tafterText\n\t\t\ttext\n\t\t}\n\t}\n"];
+export function gql(source: "\n\tfragment HighlightFragment on Highlight {\n\t\tid\n\t\tcreatedAt\n\t\tsavedItem {\n        \tid\n            title\n        }\n\t\tsegments {\n\t\t\tid\n\t\t\txpath\n\t\t\tbeforeText\n\t\t\tstartOffset\n\t\t\tendOffset\n\t\t\tafterText\n\t\t\ttext\n\t\t}\n\t}\n"): (typeof documents)["\n\tfragment HighlightFragment on Highlight {\n\t\tid\n\t\tcreatedAt\n\t\tsavedItem {\n        \tid\n            title\n        }\n\t\tsegments {\n\t\t\tid\n\t\t\txpath\n\t\t\tbeforeText\n\t\t\tstartOffset\n\t\t\tendOffset\n\t\t\tafterText\n\t\t\ttext\n\t\t}\n\t}\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n\tfragment EntryFragment on Entry {\n\t\t__typename\n\t\t... on SavedItem {\n\t\t\t...SavedItemFragment\n\t\t\tlabels {\n\t\t\t\t...SavedItemLabelFragment\n\t\t\t}\n\t\t}\n\t\t... on Highlight {\n\t\t\t...HighlightFragment\n\t\t}\n\t}\n"): (typeof documents)["\n\tfragment EntryFragment on Entry {\n\t\t__typename\n\t\t... on SavedItem {\n\t\t\t...SavedItemFragment\n\t\t\tlabels {\n\t\t\t\t...SavedItemLabelFragment\n\t\t\t}\n\t\t}\n\t\t... on Highlight {\n\t\t\t...HighlightFragment\n\t\t}\n\t}\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -129,15 +135,15 @@ export function gql(source: "\n\tquery labels {\n\t\tlabels {\n\t\t\tid\n\t\t\t.
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n\tquery savedItems($query: GetSavedItemsInput!) {\n\t\tsavedItems(query: $query) {\n\t\t\tedges {\n\t\t\t\tnode {\n\t\t\t\t\tid\n\t\t\t\t\t...SavedItemFragment\n\t\t\t\t\tlabels {\n\t\t\t\t\t\tid\n\t\t\t\t\t\t...SavedItemLabelFragment\n\t\t\t\t\t}\n\t\t\t\t\tarticle {\n\t\t\t\t\t\tcontentHtml\n\t\t\t\t\t\tcontentText\n\t\t\t\t\t}\n\t\t\t\t\tnewsletter {\n\t\t\t\t\t\t...NewsletterFragment\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t\tcursor\n\t\t\t}\n\t\t\tendCursor\n\t\t\thasNextPage\n\t\t}\n\t}\n"): (typeof documents)["\n\tquery savedItems($query: GetSavedItemsInput!) {\n\t\tsavedItems(query: $query) {\n\t\t\tedges {\n\t\t\t\tnode {\n\t\t\t\t\tid\n\t\t\t\t\t...SavedItemFragment\n\t\t\t\t\tlabels {\n\t\t\t\t\t\tid\n\t\t\t\t\t\t...SavedItemLabelFragment\n\t\t\t\t\t}\n\t\t\t\t\tarticle {\n\t\t\t\t\t\tcontentHtml\n\t\t\t\t\t\tcontentText\n\t\t\t\t\t}\n\t\t\t\t\tnewsletter {\n\t\t\t\t\t\t...NewsletterFragment\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t\tcursor\n\t\t\t}\n\t\t\tendCursor\n\t\t\thasNextPage\n\t\t}\n\t}\n"];
-/**
- * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
 export function gql(source: "\n\tquery savedItem($query: GetSavedItemInput!) {\n\t\tsavedItem(query: $query) {\n\t\t\tid\n\t\t\t...SavedItemFragment\n\t\t\tlabels {\n\t\t\t\tid\n\t\t\t\t...SavedItemLabelFragment\n\t\t\t}\n\t\t\tarticle {\n\t\t\t\tcontentHtml\n\t\t\t\tcontentText\n\t\t\t}\n\t\t\tnewsletter {\n\t\t\t\t...NewsletterFragment\n\t\t\t}\n\t\t\thighlights {\n\t\t\t\t...HighlightFragment\n\t\t\t}\n\t\t}\n\t}\n"): (typeof documents)["\n\tquery savedItem($query: GetSavedItemInput!) {\n\t\tsavedItem(query: $query) {\n\t\t\tid\n\t\t\t...SavedItemFragment\n\t\t\tlabels {\n\t\t\t\tid\n\t\t\t\t...SavedItemLabelFragment\n\t\t\t}\n\t\t\tarticle {\n\t\t\t\tcontentHtml\n\t\t\t\tcontentText\n\t\t\t}\n\t\t\tnewsletter {\n\t\t\t\t...NewsletterFragment\n\t\t\t}\n\t\t\thighlights {\n\t\t\t\t...HighlightFragment\n\t\t\t}\n\t\t}\n\t}\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n\tquery inboundEmailAddresses {\n\t\tinboundEmailAddresses {\n\t\t\tid\n\t\t\tcreatedAt\n\t\t\tfullAddress\n\t\t\tsubscriptions {\n\t\t\t\tid\n\t\t\t\tcreatedAt\n\t\t\t\tname\n\t\t\t\tstatus\n\t\t\t\tlastReceivedAt\n\t\t\t\tunsubscribeUrl\n\t\t\t\tunsubscribeAttemptedAt\n\t\t\t}\n\t\t}\n\t}\n"): (typeof documents)["\n\tquery inboundEmailAddresses {\n\t\tinboundEmailAddresses {\n\t\t\tid\n\t\t\tcreatedAt\n\t\t\tfullAddress\n\t\t\tsubscriptions {\n\t\t\t\tid\n\t\t\t\tcreatedAt\n\t\t\t\tname\n\t\t\t\tstatus\n\t\t\t\tlastReceivedAt\n\t\t\t\tunsubscribeUrl\n\t\t\t\tunsubscribeAttemptedAt\n\t\t\t}\n\t\t}\n\t}\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n\tquery entries($query: GetEntriesInput!) {\n\t\tentries(query: $query) {\n\t\t\tedges {\n\t\t\t\tnode {\n\t\t\t\t\t...EntryFragment\n\t\t\t\t}\n\t\t\t\tcursor\n\t\t\t}\n\t\t\thasNextPage\n\t\t\tendCursor\n\t\t}\n\t}\n"): (typeof documents)["\n\tquery entries($query: GetEntriesInput!) {\n\t\tentries(query: $query) {\n\t\t\tedges {\n\t\t\t\tnode {\n\t\t\t\t\t...EntryFragment\n\t\t\t\t}\n\t\t\t\tcursor\n\t\t\t}\n\t\t\thasNextPage\n\t\t\tendCursor\n\t\t}\n\t}\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -217,7 +223,7 @@ export function gql(source: "\n\tmutation createHighlight($data: CreateHighlight
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n\tmutation DeleteHighlight($data: DeleteHighlightInput!) {\n\t\tdeleteHighlight(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n"): (typeof documents)["\n\tmutation DeleteHighlight($data: DeleteHighlightInput!) {\n\t\tdeleteHighlight(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n"];
+export function gql(source: "\n\tmutation DeleteHighlights($data: DeleteHighlightsInput!) {\n\t\tdeleteHighlights(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n"): (typeof documents)["\n\tmutation DeleteHighlights($data: DeleteHighlightsInput!) {\n\t\tdeleteHighlights(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n"];
 
 export function gql(source: string) {
   return (documents as any)[source] ?? {};

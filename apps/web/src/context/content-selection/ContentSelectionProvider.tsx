@@ -1,24 +1,20 @@
 import { useDebouncedCallback } from '@mantine/hooks';
-import React, { useState } from 'react';
+import { ReactNode, useState } from 'react';
 
-import { SavedItem } from '~lib/graphql/generated/graphql.ts';
+import { SavedItem, Highlight } from '~lib/graphql/generated/graphql.ts';
 
-import { ReaderContext, SelectedSavedItem } from './ReaderContext';
+import { ContentSelectionContext, SelectableItem } from './ContentSelectionContext';
 
-export const ReaderProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-	const [selectedItems, setSelectedItemsRaw] = useState<SelectedSavedItem[]>([]);
-	const [visibleItems, setVisibleItemsRaw] = useState<SelectedSavedItem[]>([]);
+export const ContentSelectionProvider = ({ children }: { children: ReactNode }) => {
+	const [selectedItems, setSelectedItemsRaw] = useState<SelectableItem[]>([]);
+	const [visibleItems, setVisibleItemsRaw] = useState<SelectableItem[]>([]);
 
-	const toSelectedItem = (item: SavedItem): SelectedSavedItem => {
-		return { id: item.id, status: item.status, originalUrl: item.originalUrl };
+	const setSelectedItems = (items: (SavedItem | Highlight)[]) => {
+		setSelectedItemsRaw(items);
 	};
 
-	const setSelectedItems = (items: SavedItem[]) => {
-		setSelectedItemsRaw(items.map(toSelectedItem));
-	};
-
-	const setVisibleItems = (items: SavedItem[]) => {
-		setVisibleItemsRaw(items.map(toSelectedItem));
+	const setVisibleItems = (items: (SavedItem | Highlight)[]) => {
+		setVisibleItemsRaw(items);
 	};
 
 	const toggleSelectAll = useDebouncedCallback(() => {
@@ -37,17 +33,16 @@ export const ReaderProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 	}, 10);
 
 	const deselectAll = () => {
-		setSelectedItems([]);
+		setSelectedItemsRaw([]);
 	};
 
-	const toggleItemSelection = useDebouncedCallback((item: SavedItem) => {
-		const minimal = toSelectedItem(item);
+	const toggleItemSelection = useDebouncedCallback((item: SavedItem | Highlight) => {
 		setSelectedItemsRaw((prev) => {
-			const found = prev.find((it) => it.id === minimal.id);
+			const found = prev.find((it) => it.id === item.id);
 			if (found) {
-				return prev.filter((it) => it.id !== minimal.id);
+				return prev.filter((it) => it.id !== item.id);
 			}
-			return [...prev, minimal];
+			return [...prev, item];
 		});
 	}, 10);
 
@@ -62,7 +57,7 @@ export const ReaderProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 	const isPartiallySelected = !isAllSelected && !isNoneSelected;
 
 	return (
-		<ReaderContext.Provider
+		<ContentSelectionContext.Provider
 			value={{
 				selectedItems,
 				setSelectedItems,
@@ -78,6 +73,6 @@ export const ReaderProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 			}}
 		>
 			{children}
-		</ReaderContext.Provider>
+		</ContentSelectionContext.Provider>
 	);
 };

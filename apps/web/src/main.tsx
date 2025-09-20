@@ -8,7 +8,7 @@ import { RouterProvider, createRouter } from '@tanstack/react-router';
 import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
 
-import { ReaderProvider } from '~context/reader';
+import { ContentSelectionProvider } from '~context/content-selection';
 import { client } from '~lib/graphql/client';
 import { AddContentModal } from '~modals/AddContentModal';
 import { CreateLabelModal } from '~modals/CreateLabelModal';
@@ -49,7 +49,7 @@ if (!rootElement.innerHTML) {
 		<StrictMode>
 			<ApolloProvider client={client}>
 				<MantineProvider theme={theme} defaultColorScheme="light">
-					<ReaderProvider>
+					<ContentSelectionProvider>
 						<ModalsProvider
 							modals={{
 								install: InstallModal,
@@ -65,7 +65,7 @@ if (!rootElement.innerHTML) {
 						>
 							<RouterProvider router={router} />
 						</ModalsProvider>
-					</ReaderProvider>
+					</ContentSelectionProvider>
 				</MantineProvider>
 			</ApolloProvider>
 		</StrictMode>,

@@ -17,7 +17,7 @@ import { useSearch, useRouter } from '@tanstack/react-router';
 
 import { SORT_OPTIONS } from '@inbox-reader/common';
 
-import { useReaderContext } from '~context/reader';
+import { useContentSelection } from '~context/content-selection';
 import { useScreenQuery } from '~hooks/useScreenQuery';
 import { modals } from '~modals/modals';
 import { Route } from '~routes/_auth.index';
@@ -38,7 +38,7 @@ type HeaderProps = {
 export const Header = ({ opened, toggle }: HeaderProps) => {
 	const isBelowLgScreen = useScreenQuery('lg', 'below');
 	const { toggleSelectAll, isAllSelected, isPartiallySelected, selectedItems, deselectAll } =
-		useReaderContext();
+		useContentSelection();
 
 	const router = useRouter();
 	const searchParams = useSearch({ from: Route.id });
@@ -97,7 +97,14 @@ export const Header = ({ opened, toggle }: HeaderProps) => {
 
 						<Group gap="md" ml="auto">
 							<ItemsOptions
-								mode={selectedItems.length > 1 ? 'bulk' : 'single'}
+								mode={
+									selectedItems.length > 0 &&
+									selectedItems.every((item) => item.__typename === 'Highlight')
+										? 'highlights'
+										: selectedItems.length > 1
+											? 'bulk'
+											: 'single'
+								}
 								items={selectedItems}
 							/>
 						</Group>
@@ -138,7 +145,14 @@ export const Header = ({ opened, toggle }: HeaderProps) => {
 
 						<Group gap="md" ml="auto">
 							<ItemsOptions
-								mode={selectedItems.length > 1 ? 'bulk' : 'single'}
+								mode={
+									selectedItems.length > 0 &&
+									selectedItems.every((item) => item.__typename === 'Highlight')
+										? 'highlights'
+										: selectedItems.length > 1
+											? 'bulk'
+											: 'single'
+								}
 								items={selectedItems}
 							/>
 						</Group>

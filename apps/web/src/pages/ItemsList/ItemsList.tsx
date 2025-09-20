@@ -5,18 +5,17 @@ import { useEffect } from 'react';
 
 import { AppViews } from '@inbox-reader/common';
 
-import { useReaderContext } from '~context/reader';
+import { useContentSelection } from '~context/content-selection';
 import { AppLayout } from '~layouts/AppLayout';
-import { PERMANENTLY_DELETE_SAVED_ITEMS, SAVED_ITEMS } from '~lib/graphql';
-import { SavedItem, SavedItemType } from '~lib/graphql/generated/graphql';
+import { PERMANENTLY_DELETE_SAVED_ITEMS, ENTRIES } from '~lib/graphql';
 import { modals } from '~modals/modals';
 import { Route } from '~routes/_auth.index';
+import { entriesQueryBuilder } from '~utils/entriesQueryBuilder.ts';
 import { extractLabelName } from '~utils/extractLabelName';
 import { findLabelIdByName } from '~utils/findLabelIdByName';
 import { fromKebabCase } from '~utils/fromKebabCase';
-import { itemsQueryBuilder } from '~utils/itemsQueryBuilder';
 
-import { ArticleRenderer, NewsletterRenderer } from './ItemRenderers';
+import { ItemRenderer } from './ItemRenderers';
 import classes from './ItemsList.module.css';
 
 export const ItemsList = () => {
@@ -26,27 +25,36 @@ export const ItemsList = () => {
 	const labelName = safeView.startsWith('label:') ? extractLabelName(safeView) : null;
 	const labelId = labelName ? findLabelIdByName(fromKebabCase(labelName)) : undefined;
 
-	const variables = itemsQueryBuilder(safeView, { pageSize: 20, sort, labelId });
-	const { data, loading, error } = useQuery(SAVED_ITEMS, {
+	const variables = entriesQueryBuilder(safeView, { pageSize: 20, sort, labelId });
+	const { data, loading, error } = useQuery(ENTRIES, {
 		variables,
 		fetchPolicy: 'cache-and-network',
 	});
 
 	const [permanentlyDeleteSavedItems] = useMutation(PERMANENTLY_DELETE_SAVED_ITEMS, {
-		refetchQueries: [SAVED_ITEMS],
+		refetchQueries: [ENTRIES],
 	});
 
 	// TODO: infinite scrolling - make sure this part also works with it
-	const { setVisibleItems } = useReaderContext();
+	const { setVisibleItems } = useContentSelection();
 	useEffect(() => {
-		if (data?.savedItems.edges.length) {
-			setVisibleItems(data.savedItems.edges.map(({ node }) => node));
+		if (data?.entries.edges.length) {
+			setVisibleItems(data.entries.edges.map(({ node }) => node));
 		}
-	}, [data?.savedItems]);
+	}, [data?.entries]);
 
-	const items = data?.savedItems.edges || [];
+	const items = data?.entries.edges || [];
+
 	const handlePermanentlyDeleteSavedItems = async () => {
-		const count = items.length;
+		const savedItemIds = items
+			.filter(({ node }) => node.__typename === 'SavedItem')
+			.map(({ node }) => node.id);
+
+		if (savedItemIds.length === 0) {
+			return;
+		}
+
+		const count = savedItemIds.length;
 		const confirmed = await new Promise<boolean>((resolve) => {
 			modals.openConfirmModal({
 				title: 'Delete Permanently',
@@ -70,18 +78,8 @@ export const ItemsList = () => {
 		}
 
 		await permanentlyDeleteSavedItems({
-			variables: { data: { ids: items.map((i) => i.node.id) } },
+			variables: { data: { ids: savedItemIds } },
 		});
-	};
-
-	const renderItem = (item: SavedItem) => {
-		switch (variables.query.type) {
-			case SavedItemType.Newsletter:
-				return <NewsletterRenderer key={item.id} item={item} />;
-			case SavedItemType.Article:
-			default:
-				return <ArticleRenderer key={item.id} item={item} />;
-		}
 	};
 
 	return (
@@ -115,12 +113,13 @@ export const ItemsList = () => {
 				{!loading && !error && items.length === 0 && (
 					<Center py="lg">
 						<Text c="dimmed" size="sm">
-							No items found in this safeView.
+							No items found.
 						</Text>
 					</Center>
 				)}
 
-				{items.length > 0 && items.map(({ node }) => renderItem(node))}
+				{items.length > 0 &&
+					items.map(({ node }) => <ItemRenderer key={node.id} item={node} />)}
 			</Stack>
 		</AppLayout>
 	);

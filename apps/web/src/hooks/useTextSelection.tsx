@@ -2,7 +2,7 @@ import { useMutation } from '@apollo/client';
 import { useTextSelection } from '@mantine/hooks';
 import { RefObject, useMemo, useState, useEffect, useRef } from 'react';
 
-import { CREATE_HIGHLIGHT, DELETE_HIGHLIGHT } from '~lib/graphql';
+import { CREATE_HIGHLIGHT, DELETE_HIGHLIGHTS } from '~lib/graphql';
 
 import {
 	createHighlightsFromSelection,
@@ -27,7 +27,7 @@ export function useTextHighlighting(
 	const hoverClearTimeout = useRef<number | null>(null);
 
 	const [createHighlight] = useMutation(CREATE_HIGHLIGHT);
-	const [deleteHighlight] = useMutation(DELETE_HIGHLIGHT);
+	const [deleteHighlights] = useMutation(DELETE_HIGHLIGHTS);
 
 	// clear any hovered highlight when the user starts a new text selection
 	useEffect(() => {
@@ -192,11 +192,10 @@ export function useTextHighlighting(
 
 		await Promise.all(
 			idsToDelete.map((id) =>
-				deleteHighlight({
+				deleteHighlights({
 					variables: {
 						data: {
-							id,
-							savedItemId,
+							items: [{ id, savedItemId }],
 						},
 					},
 				}),

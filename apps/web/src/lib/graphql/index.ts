@@ -70,6 +70,10 @@ export const HIGHLIGHT_FRAGMENT = gql(`
 	fragment HighlightFragment on Highlight {
 		id
 		createdAt
+		savedItem {
+        	id
+            title
+        }
 		segments {
 			id
 			xpath
@@ -78,6 +82,21 @@ export const HIGHLIGHT_FRAGMENT = gql(`
 			endOffset
 			afterText
 			text
+		}
+	}
+`);
+
+export const ENTRY_FRAGMENT = gql(`
+	fragment EntryFragment on Entry {
+		__typename
+		... on SavedItem {
+			...SavedItemFragment
+			labels {
+				...SavedItemLabelFragment
+			}
+		}
+		... on Highlight {
+			...HighlightFragment
 		}
 	}
 `);
@@ -97,33 +116,6 @@ export const LABELS = gql(`
 		labels {
 			id
 			...SavedItemLabelFragment
-		}
-	}
-`);
-
-export const SAVED_ITEMS = gql(`
-	query savedItems($query: GetSavedItemsInput!) {
-		savedItems(query: $query) {
-			edges {
-				node {
-					id
-					...SavedItemFragment
-					labels {
-						id
-						...SavedItemLabelFragment
-					}
-					article {
-						contentHtml
-						contentText
-					}
-					newsletter {
-						...NewsletterFragment
-					}
-				}
-				cursor
-			}
-			endCursor
-			hasNextPage
 		}
 	}
 `);
@@ -166,6 +158,21 @@ export const INBOUND_EMAIL_ADDRESSES = gql(`
 				unsubscribeUrl
 				unsubscribeAttemptedAt
 			}
+		}
+	}
+`);
+
+export const ENTRIES = gql(`
+	query entries($query: GetEntriesInput!) {
+		entries(query: $query) {
+			edges {
+				node {
+					...EntryFragment
+				}
+				cursor
+			}
+			hasNextPage
+			endCursor
 		}
 	}
 `);
@@ -324,9 +331,9 @@ export const CREATE_HIGHLIGHT = gql(`
 	}
 `);
 
-export const DELETE_HIGHLIGHT = gql(`
-	mutation DeleteHighlight($data: DeleteHighlightInput!) {
-		deleteHighlight(data: $data) {
+export const DELETE_HIGHLIGHTS = gql(`
+	mutation DeleteHighlights($data: DeleteHighlightsInput!) {
+		deleteHighlights(data: $data) {
 			success
 		}
 	}

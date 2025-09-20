@@ -7,7 +7,7 @@ import { addItemFromUrlSchema } from '@inbox-reader/common';
 
 import { Form } from '~components/Form';
 import { LabelsMultiSelect } from '~components/LabelsMultiSelect';
-import { SAVED_ITEMS } from '~lib/graphql';
+import { ENTRIES } from '~lib/graphql';
 import { client } from '~lib/graphql/client';
 
 export const AddContentModal = ({ id, context }: ContextModalProps) => {
@@ -43,7 +43,7 @@ export const AddContentModal = ({ id, context }: ContextModalProps) => {
 				return;
 			}
 
-			await client.refetchQueries({ include: [SAVED_ITEMS] });
+			await client.refetchQueries({ include: [ENTRIES] });
 			context.closeModal(id);
 		} catch (err) {
 			console.error('Network error:', err);

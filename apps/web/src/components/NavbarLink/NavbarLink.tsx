@@ -4,7 +4,7 @@ import { ReactNode } from 'react';
 
 import { AppViews } from '@inbox-reader/common';
 
-import { useReaderContext } from '~context/reader';
+import { useContentSelection } from '~context/content-selection';
 import { useScreenQuery } from '~hooks/useScreenQuery';
 import { Route } from '~routes/_auth.index';
 import { kebabCase } from '~utils/kebabCase';
@@ -22,7 +22,7 @@ type NavbarLinkProps = {
 
 export const NavbarLink = ({ label, icon, opened, view, toggleDrawer, color }: NavbarLinkProps) => {
 	const isBelowMdScreen = useScreenQuery('md', 'below');
-	const { setSelectedItems } = useReaderContext();
+	const { setSelectedItems } = useContentSelection();
 	const { ...currentSearch } = useSearch({ from: Route.id });
 
 	return (

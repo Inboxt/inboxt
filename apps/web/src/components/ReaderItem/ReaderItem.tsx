@@ -4,7 +4,7 @@ import { IconPhotoOff } from '@tabler/icons-react';
 import { useNavigate } from '@tanstack/react-router';
 import dayjs from 'dayjs';
 
-import { useReaderContext } from '~context/reader';
+import { useContentSelection } from '~context/content-selection';
 import { useLongPress } from '~hooks/useLongPress';
 import { useScreenQuery } from '~hooks/useScreenQuery';
 import { SavedItem } from '~lib/graphql/generated/graphql';
@@ -21,7 +21,7 @@ type ReaderItemProps = {
 
 export const ReaderItem = ({ item }: ReaderItemProps) => {
 	const { hovered, ref } = useHover();
-	const { selectedItems, toggleItemSelection, isSelected } = useReaderContext();
+	const { selectedItems, toggleItemSelection, isSelected } = useContentSelection();
 	const isBelowLgScreen = useScreenQuery('lg', 'below');
 	const navigate = useNavigate({ from: Route.fullPath });
 
@@ -40,9 +40,7 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 
 	return (
 		<Box
-			key={item.id}
-			px="md"
-			py="md"
+			p="md"
 			className={classes.item}
 			ref={ref}
 			onClick={() => {

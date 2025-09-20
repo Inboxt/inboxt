@@ -1,10 +1,16 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { BaseModel } from '../../models/base.model';
 import { SavedItemType } from '../../enums/saved-item-type.enum';
 import { SavedItemStatus } from '../../enums/saved-item-status.enum';
+import { Entry } from '../../managers/entry-manager/entry.model';
 
-@ObjectType({ isAbstract: true })
-export class SavedItem extends BaseModel {
+@ObjectType({ implements: [Entry] })
+export class SavedItem implements Entry {
+	@Field()
+	id!: string;
+
+	@Field(() => Date)
+	createdAt!: Date;
+
 	@Field()
 	title: string;
 

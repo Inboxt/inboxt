@@ -53,9 +53,13 @@ export type DeleteAccountInput = {
   emailAddress: Scalars['String']['input'];
 };
 
-export type DeleteHighlightInput = {
+export type DeleteHighlightItemInput = {
   id: Scalars['String']['input'];
   savedItemId: Scalars['String']['input'];
+};
+
+export type DeleteHighlightsInput = {
+  items: Array<DeleteHighlightItemInput>;
 };
 
 export type DeleteInboundEmailAddressInput = {
@@ -66,24 +70,59 @@ export type DeleteLabelInput = {
   id: Scalars['String']['input'];
 };
 
+export type Entry = {
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['String']['output'];
+};
+
+export type EntryConnection = {
+  __typename?: 'EntryConnection';
+  edges: Array<EntryEdge>;
+  endCursor?: Maybe<Scalars['String']['output']>;
+  hasNextPage: Scalars['Boolean']['output'];
+};
+
+export type EntryEdge = {
+  __typename?: 'EntryEdge';
+  cursor: Scalars['String']['output'];
+  node: Entry;
+};
+
+export type EntryFilter = {
+  highlights?: InputMaybe<HighlightsFilterInput>;
+  savedItems?: InputMaybe<SavedItemsFilterInput>;
+};
+
+export type EntrySort = {
+  highlight?: InputMaybe<HighlightSort>;
+  savedItem?: InputMaybe<SavedItemSort>;
+};
+
+/** Types of user content */
+export enum EntryType {
+  Article = 'ARTICLE',
+  Highlight = 'HIGHLIGHT',
+  Newsletter = 'NEWSLETTER'
+}
+
+export type GetEntriesInput = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  filter?: InputMaybe<EntryFilter>;
+  first: Scalars['Float']['input'];
+  sort?: InputMaybe<EntrySort>;
+  types?: InputMaybe<Array<EntryType>>;
+};
+
 export type GetSavedItemInput = {
   id: Scalars['String']['input'];
 };
 
-export type GetSavedItemsInput = {
-  after?: InputMaybe<Scalars['String']['input']>;
-  first: Scalars['Float']['input'];
-  labelId?: InputMaybe<Scalars['String']['input']>;
-  sort?: InputMaybe<SavedItemSort>;
-  status?: InputMaybe<SavedItemStatus>;
-  type?: InputMaybe<SavedItemType>;
-};
-
-export type Highlight = {
+export type Highlight = Entry & {
   __typename?: 'Highlight';
   createdAt: Scalars['DateTime']['output'];
   id: Scalars['String']['output'];
-  segments: Array<HighlightSegment>;
+  savedItem?: Maybe<SavedItem>;
+  segments?: Maybe<Array<HighlightSegment>>;
 };
 
 export type HighlightSegment = {
@@ -95,6 +134,21 @@ export type HighlightSegment = {
   startOffset: Scalars['Float']['output'];
   text?: Maybe<Scalars['String']['output']>;
   xpath: Scalars['String']['output'];
+};
+
+export type HighlightSort = {
+  direction: SortDirection;
+  field: HighlightSortField;
+};
+
+/** Properties by which highlight can be sorted. */
+export enum HighlightSortField {
+  CreatedAt = 'createdAt',
+  Title = 'title'
+}
+
+export type HighlightsFilterInput = {
+  sort?: InputMaybe<HighlightSort>;
 };
 
 export type InboundEmailAddress = {
@@ -120,7 +174,7 @@ export type Mutation = {
   createInboundEmailAddress: InboundEmailAddress;
   createLabel: Label;
   deleteAccount: Void;
-  deleteHighlight: Void;
+  deleteHighlights: Void;
   deleteInboundEmailAddress: Void;
   deleteLabel: Void;
   permanentlyDeleteSavedItems: Void;
@@ -158,8 +212,8 @@ export type MutationDeleteAccountArgs = {
 };
 
 
-export type MutationDeleteHighlightArgs = {
-  data: DeleteHighlightInput;
+export type MutationDeleteHighlightsArgs = {
+  data: DeleteHighlightsInput;
 };
 
 
@@ -246,21 +300,21 @@ export type PermanentlyDeleteSavedItemsInput = {
 
 export type Query = {
   __typename?: 'Query';
+  entries: EntryConnection;
   inboundEmailAddresses?: Maybe<Array<InboundEmailAddress>>;
   labels?: Maybe<Array<Label>>;
   me?: Maybe<User>;
   savedItem?: Maybe<SavedItem>;
-  savedItems: SavedItemConnection;
+};
+
+
+export type QueryEntriesArgs = {
+  query: GetEntriesInput;
 };
 
 
 export type QuerySavedItemArgs = {
   query: GetSavedItemInput;
-};
-
-
-export type QuerySavedItemsArgs = {
-  query: GetSavedItemsInput;
 };
 
 export type RequestPasswordRecoveryInput = {
@@ -273,7 +327,7 @@ export type ResetPasswordInput = {
   password: Scalars['String']['input'];
 };
 
-export type SavedItem = {
+export type SavedItem = Entry & {
   __typename?: 'SavedItem';
   article?: Maybe<Article>;
   author?: Maybe<Scalars['String']['output']>;
@@ -292,19 +346,6 @@ export type SavedItem = {
   wordCount: Scalars['Float']['output'];
 };
 
-export type SavedItemConnection = {
-  __typename?: 'SavedItemConnection';
-  edges: Array<SavedItemEdge>;
-  endCursor?: Maybe<Scalars['String']['output']>;
-  hasNextPage: Scalars['Boolean']['output'];
-};
-
-export type SavedItemEdge = {
-  __typename?: 'SavedItemEdge';
-  cursor: Scalars['String']['output'];
-  node: SavedItem;
-};
-
 export type SavedItemSort = {
   direction: SortDirection;
   field: SavedItemSortField;
@@ -315,6 +356,13 @@ export enum SavedItemSortField {
   CreatedAt = 'createdAt',
   Title = 'title'
 }
+
+export type SavedItemsFilterInput = {
+  labelId?: InputMaybe<Scalars['String']['input']>;
+  sort?: InputMaybe<SavedItemSort>;
+  status?: InputMaybe<SavedItemStatus>;
+  type?: InputMaybe<SavedItemType>;
+};
 
 export type SetSavedItemLabelsInput = {
   id: Scalars['String']['input'];
@@ -411,7 +459,13 @@ export type SavedItemLabelsFragmentFragment = { __typename?: 'SavedItem', id: st
 
 export type NewsletterFragmentFragment = { __typename?: 'Newsletter', contentHtml: string, contentText: string, subscription?: { __typename?: 'NewsletterSubscription', id: string, createdAt: string, name: string, status: NewsletterSubscriptionStatus, lastReceivedAt?: string | null, unsubscribeUrl?: string | null, unsubscribeAttemptedAt?: string | null } | null };
 
-export type HighlightFragmentFragment = { __typename?: 'Highlight', id: string, createdAt: string, segments: Array<{ __typename?: 'HighlightSegment', id: string, xpath: string, beforeText: string, startOffset: number, endOffset: number, afterText: string, text?: string | null }> };
+export type HighlightFragmentFragment = { __typename?: 'Highlight', id: string, createdAt: string, savedItem?: { __typename?: 'SavedItem', id: string, title: string } | null, segments?: Array<{ __typename?: 'HighlightSegment', id: string, xpath: string, beforeText: string, startOffset: number, endOffset: number, afterText: string, text?: string | null }> | null };
+
+type EntryFragment_Highlight_Fragment = { __typename: 'Highlight', id: string, createdAt: string, savedItem?: { __typename?: 'SavedItem', id: string, title: string } | null, segments?: Array<{ __typename?: 'HighlightSegment', id: string, xpath: string, beforeText: string, startOffset: number, endOffset: number, afterText: string, text?: string | null }> | null };
+
+type EntryFragment_SavedItem_Fragment = { __typename: 'SavedItem', id: string, createdAt: string, title: string, originalUrl?: string | null, sourceDomain?: string | null, description?: string | null, leadImage?: string | null, wordCount: number, author?: string | null, type: SavedItemType, status: SavedItemStatus, labels?: Array<{ __typename?: 'Label', createdAt: string, id: string, name: string, color: string }> | null };
+
+export type EntryFragmentFragment = EntryFragment_Highlight_Fragment | EntryFragment_SavedItem_Fragment;
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -423,24 +477,24 @@ export type LabelsQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type LabelsQuery = { __typename?: 'Query', labels?: Array<{ __typename?: 'Label', id: string, createdAt: string, name: string, color: string }> | null };
 
-export type SavedItemsQueryVariables = Exact<{
-  query: GetSavedItemsInput;
-}>;
-
-
-export type SavedItemsQuery = { __typename?: 'Query', savedItems: { __typename?: 'SavedItemConnection', endCursor?: string | null, hasNextPage: boolean, edges: Array<{ __typename?: 'SavedItemEdge', cursor: string, node: { __typename?: 'SavedItem', id: string, createdAt: string, title: string, originalUrl?: string | null, sourceDomain?: string | null, description?: string | null, leadImage?: string | null, wordCount: number, author?: string | null, type: SavedItemType, status: SavedItemStatus, labels?: Array<{ __typename?: 'Label', id: string, createdAt: string, name: string, color: string }> | null, article?: { __typename?: 'Article', contentHtml: string, contentText: string } | null, newsletter?: { __typename?: 'Newsletter', contentHtml: string, contentText: string, subscription?: { __typename?: 'NewsletterSubscription', id: string, createdAt: string, name: string, status: NewsletterSubscriptionStatus, lastReceivedAt?: string | null, unsubscribeUrl?: string | null, unsubscribeAttemptedAt?: string | null } | null } | null } }> } };
-
 export type SavedItemQueryVariables = Exact<{
   query: GetSavedItemInput;
 }>;
 
 
-export type SavedItemQuery = { __typename?: 'Query', savedItem?: { __typename?: 'SavedItem', id: string, createdAt: string, title: string, originalUrl?: string | null, sourceDomain?: string | null, description?: string | null, leadImage?: string | null, wordCount: number, author?: string | null, type: SavedItemType, status: SavedItemStatus, labels?: Array<{ __typename?: 'Label', id: string, createdAt: string, name: string, color: string }> | null, article?: { __typename?: 'Article', contentHtml: string, contentText: string } | null, newsletter?: { __typename?: 'Newsletter', contentHtml: string, contentText: string, subscription?: { __typename?: 'NewsletterSubscription', id: string, createdAt: string, name: string, status: NewsletterSubscriptionStatus, lastReceivedAt?: string | null, unsubscribeUrl?: string | null, unsubscribeAttemptedAt?: string | null } | null } | null, highlights?: Array<{ __typename?: 'Highlight', id: string, createdAt: string, segments: Array<{ __typename?: 'HighlightSegment', id: string, xpath: string, beforeText: string, startOffset: number, endOffset: number, afterText: string, text?: string | null }> }> | null } | null };
+export type SavedItemQuery = { __typename?: 'Query', savedItem?: { __typename?: 'SavedItem', id: string, createdAt: string, title: string, originalUrl?: string | null, sourceDomain?: string | null, description?: string | null, leadImage?: string | null, wordCount: number, author?: string | null, type: SavedItemType, status: SavedItemStatus, labels?: Array<{ __typename?: 'Label', id: string, createdAt: string, name: string, color: string }> | null, article?: { __typename?: 'Article', contentHtml: string, contentText: string } | null, newsletter?: { __typename?: 'Newsletter', contentHtml: string, contentText: string, subscription?: { __typename?: 'NewsletterSubscription', id: string, createdAt: string, name: string, status: NewsletterSubscriptionStatus, lastReceivedAt?: string | null, unsubscribeUrl?: string | null, unsubscribeAttemptedAt?: string | null } | null } | null, highlights?: Array<{ __typename?: 'Highlight', id: string, createdAt: string, savedItem?: { __typename?: 'SavedItem', id: string, title: string } | null, segments?: Array<{ __typename?: 'HighlightSegment', id: string, xpath: string, beforeText: string, startOffset: number, endOffset: number, afterText: string, text?: string | null }> | null }> | null } | null };
 
 export type InboundEmailAddressesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type InboundEmailAddressesQuery = { __typename?: 'Query', inboundEmailAddresses?: Array<{ __typename?: 'InboundEmailAddress', id: string, createdAt: string, fullAddress: string, subscriptions?: Array<{ __typename?: 'NewsletterSubscription', id: string, createdAt: string, name: string, status: NewsletterSubscriptionStatus, lastReceivedAt?: string | null, unsubscribeUrl?: string | null, unsubscribeAttemptedAt?: string | null }> | null }> | null };
+
+export type EntriesQueryVariables = Exact<{
+  query: GetEntriesInput;
+}>;
+
+
+export type EntriesQuery = { __typename?: 'Query', entries: { __typename?: 'EntryConnection', hasNextPage: boolean, endCursor?: string | null, edges: Array<{ __typename?: 'EntryEdge', cursor: string, node: { __typename: 'Highlight', id: string, createdAt: string, savedItem?: { __typename?: 'SavedItem', id: string, title: string } | null, segments?: Array<{ __typename?: 'HighlightSegment', id: string, xpath: string, beforeText: string, startOffset: number, endOffset: number, afterText: string, text?: string | null }> | null } | { __typename: 'SavedItem', id: string, createdAt: string, title: string, originalUrl?: string | null, sourceDomain?: string | null, description?: string | null, leadImage?: string | null, wordCount: number, author?: string | null, type: SavedItemType, status: SavedItemStatus, labels?: Array<{ __typename?: 'Label', createdAt: string, id: string, name: string, color: string }> | null } }> } };
 
 export type SignInMutationVariables = Exact<{
   data: SignInInput;
@@ -569,24 +623,25 @@ export type CreateHighlightMutationVariables = Exact<{
 
 export type CreateHighlightMutation = { __typename?: 'Mutation', createHighlight: { __typename?: 'Highlight', id: string } };
 
-export type DeleteHighlightMutationVariables = Exact<{
-  data: DeleteHighlightInput;
+export type DeleteHighlightsMutationVariables = Exact<{
+  data: DeleteHighlightsInput;
 }>;
 
 
-export type DeleteHighlightMutation = { __typename?: 'Mutation', deleteHighlight: { __typename?: 'Void', success: boolean } };
+export type DeleteHighlightsMutation = { __typename?: 'Mutation', deleteHighlights: { __typename?: 'Void', success: boolean } };
 
 export const UserFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"UserFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"emailAddress"}},{"kind":"Field","name":{"kind":"Name","value":"isEmailVerified"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"pendingEmailAddress"}},{"kind":"Field","name":{"kind":"Name","value":"plan"}},{"kind":"Field","name":{"kind":"Name","value":"labelsCount"}},{"kind":"Field","name":{"kind":"Name","value":"inboundEmailAddressesCount"}}]}}]} as unknown as DocumentNode<UserFragmentFragment, unknown>;
-export const SavedItemFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"SavedItemFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"SavedItem"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"originalUrl"}},{"kind":"Field","name":{"kind":"Name","value":"sourceDomain"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"leadImage"}},{"kind":"Field","name":{"kind":"Name","value":"wordCount"}},{"kind":"Field","name":{"kind":"Name","value":"author"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}}]} as unknown as DocumentNode<SavedItemFragmentFragment, unknown>;
 export const SavedItemLabelFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"SavedItemLabelFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Label"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"color"}}]}}]} as unknown as DocumentNode<SavedItemLabelFragmentFragment, unknown>;
 export const SavedItemLabelsFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"SavedItemLabelsFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"SavedItem"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"labels"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"SavedItemLabelFragment"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"SavedItemLabelFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Label"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"color"}}]}}]} as unknown as DocumentNode<SavedItemLabelsFragmentFragment, unknown>;
 export const NewsletterFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"NewsletterFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Newsletter"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"contentHtml"}},{"kind":"Field","name":{"kind":"Name","value":"contentText"}},{"kind":"Field","name":{"kind":"Name","value":"subscription"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"lastReceivedAt"}},{"kind":"Field","name":{"kind":"Name","value":"unsubscribeUrl"}},{"kind":"Field","name":{"kind":"Name","value":"unsubscribeAttemptedAt"}}]}}]}}]} as unknown as DocumentNode<NewsletterFragmentFragment, unknown>;
-export const HighlightFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"HighlightFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Highlight"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"segments"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"xpath"}},{"kind":"Field","name":{"kind":"Name","value":"beforeText"}},{"kind":"Field","name":{"kind":"Name","value":"startOffset"}},{"kind":"Field","name":{"kind":"Name","value":"endOffset"}},{"kind":"Field","name":{"kind":"Name","value":"afterText"}},{"kind":"Field","name":{"kind":"Name","value":"text"}}]}}]}}]} as unknown as DocumentNode<HighlightFragmentFragment, unknown>;
+export const SavedItemFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"SavedItemFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"SavedItem"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"originalUrl"}},{"kind":"Field","name":{"kind":"Name","value":"sourceDomain"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"leadImage"}},{"kind":"Field","name":{"kind":"Name","value":"wordCount"}},{"kind":"Field","name":{"kind":"Name","value":"author"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}}]} as unknown as DocumentNode<SavedItemFragmentFragment, unknown>;
+export const HighlightFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"HighlightFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Highlight"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"savedItem"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}},{"kind":"Field","name":{"kind":"Name","value":"segments"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"xpath"}},{"kind":"Field","name":{"kind":"Name","value":"beforeText"}},{"kind":"Field","name":{"kind":"Name","value":"startOffset"}},{"kind":"Field","name":{"kind":"Name","value":"endOffset"}},{"kind":"Field","name":{"kind":"Name","value":"afterText"}},{"kind":"Field","name":{"kind":"Name","value":"text"}}]}}]}}]} as unknown as DocumentNode<HighlightFragmentFragment, unknown>;
+export const EntryFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"EntryFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Entry"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"SavedItem"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"SavedItemFragment"}},{"kind":"Field","name":{"kind":"Name","value":"labels"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"SavedItemLabelFragment"}}]}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Highlight"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"HighlightFragment"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"SavedItemFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"SavedItem"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"originalUrl"}},{"kind":"Field","name":{"kind":"Name","value":"sourceDomain"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"leadImage"}},{"kind":"Field","name":{"kind":"Name","value":"wordCount"}},{"kind":"Field","name":{"kind":"Name","value":"author"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"SavedItemLabelFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Label"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"color"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"HighlightFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Highlight"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"savedItem"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}},{"kind":"Field","name":{"kind":"Name","value":"segments"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"xpath"}},{"kind":"Field","name":{"kind":"Name","value":"beforeText"}},{"kind":"Field","name":{"kind":"Name","value":"startOffset"}},{"kind":"Field","name":{"kind":"Name","value":"endOffset"}},{"kind":"Field","name":{"kind":"Name","value":"afterText"}},{"kind":"Field","name":{"kind":"Name","value":"text"}}]}}]}}]} as unknown as DocumentNode<EntryFragmentFragment, unknown>;
 export const MeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"UserFragment"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"UserFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"emailAddress"}},{"kind":"Field","name":{"kind":"Name","value":"isEmailVerified"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"pendingEmailAddress"}},{"kind":"Field","name":{"kind":"Name","value":"plan"}},{"kind":"Field","name":{"kind":"Name","value":"labelsCount"}},{"kind":"Field","name":{"kind":"Name","value":"inboundEmailAddressesCount"}}]}}]} as unknown as DocumentNode<MeQuery, MeQueryVariables>;
 export const LabelsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"labels"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"labels"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"SavedItemLabelFragment"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"SavedItemLabelFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Label"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"color"}}]}}]} as unknown as DocumentNode<LabelsQuery, LabelsQueryVariables>;
-export const SavedItemsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"savedItems"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"query"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GetSavedItemsInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"savedItems"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"query"},"value":{"kind":"Variable","name":{"kind":"Name","value":"query"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"SavedItemFragment"}},{"kind":"Field","name":{"kind":"Name","value":"labels"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"SavedItemLabelFragment"}}]}},{"kind":"Field","name":{"kind":"Name","value":"article"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"contentHtml"}},{"kind":"Field","name":{"kind":"Name","value":"contentText"}}]}},{"kind":"Field","name":{"kind":"Name","value":"newsletter"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"NewsletterFragment"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"cursor"}}]}},{"kind":"Field","name":{"kind":"Name","value":"endCursor"}},{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"SavedItemFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"SavedItem"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"originalUrl"}},{"kind":"Field","name":{"kind":"Name","value":"sourceDomain"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"leadImage"}},{"kind":"Field","name":{"kind":"Name","value":"wordCount"}},{"kind":"Field","name":{"kind":"Name","value":"author"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"SavedItemLabelFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Label"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"color"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"NewsletterFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Newsletter"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"contentHtml"}},{"kind":"Field","name":{"kind":"Name","value":"contentText"}},{"kind":"Field","name":{"kind":"Name","value":"subscription"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"lastReceivedAt"}},{"kind":"Field","name":{"kind":"Name","value":"unsubscribeUrl"}},{"kind":"Field","name":{"kind":"Name","value":"unsubscribeAttemptedAt"}}]}}]}}]} as unknown as DocumentNode<SavedItemsQuery, SavedItemsQueryVariables>;
-export const SavedItemDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"savedItem"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"query"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GetSavedItemInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"savedItem"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"query"},"value":{"kind":"Variable","name":{"kind":"Name","value":"query"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"SavedItemFragment"}},{"kind":"Field","name":{"kind":"Name","value":"labels"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"SavedItemLabelFragment"}}]}},{"kind":"Field","name":{"kind":"Name","value":"article"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"contentHtml"}},{"kind":"Field","name":{"kind":"Name","value":"contentText"}}]}},{"kind":"Field","name":{"kind":"Name","value":"newsletter"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"NewsletterFragment"}}]}},{"kind":"Field","name":{"kind":"Name","value":"highlights"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"HighlightFragment"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"SavedItemFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"SavedItem"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"originalUrl"}},{"kind":"Field","name":{"kind":"Name","value":"sourceDomain"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"leadImage"}},{"kind":"Field","name":{"kind":"Name","value":"wordCount"}},{"kind":"Field","name":{"kind":"Name","value":"author"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"SavedItemLabelFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Label"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"color"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"NewsletterFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Newsletter"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"contentHtml"}},{"kind":"Field","name":{"kind":"Name","value":"contentText"}},{"kind":"Field","name":{"kind":"Name","value":"subscription"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"lastReceivedAt"}},{"kind":"Field","name":{"kind":"Name","value":"unsubscribeUrl"}},{"kind":"Field","name":{"kind":"Name","value":"unsubscribeAttemptedAt"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"HighlightFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Highlight"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"segments"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"xpath"}},{"kind":"Field","name":{"kind":"Name","value":"beforeText"}},{"kind":"Field","name":{"kind":"Name","value":"startOffset"}},{"kind":"Field","name":{"kind":"Name","value":"endOffset"}},{"kind":"Field","name":{"kind":"Name","value":"afterText"}},{"kind":"Field","name":{"kind":"Name","value":"text"}}]}}]}}]} as unknown as DocumentNode<SavedItemQuery, SavedItemQueryVariables>;
+export const SavedItemDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"savedItem"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"query"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GetSavedItemInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"savedItem"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"query"},"value":{"kind":"Variable","name":{"kind":"Name","value":"query"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"SavedItemFragment"}},{"kind":"Field","name":{"kind":"Name","value":"labels"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"SavedItemLabelFragment"}}]}},{"kind":"Field","name":{"kind":"Name","value":"article"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"contentHtml"}},{"kind":"Field","name":{"kind":"Name","value":"contentText"}}]}},{"kind":"Field","name":{"kind":"Name","value":"newsletter"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"NewsletterFragment"}}]}},{"kind":"Field","name":{"kind":"Name","value":"highlights"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"HighlightFragment"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"SavedItemFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"SavedItem"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"originalUrl"}},{"kind":"Field","name":{"kind":"Name","value":"sourceDomain"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"leadImage"}},{"kind":"Field","name":{"kind":"Name","value":"wordCount"}},{"kind":"Field","name":{"kind":"Name","value":"author"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"SavedItemLabelFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Label"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"color"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"NewsletterFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Newsletter"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"contentHtml"}},{"kind":"Field","name":{"kind":"Name","value":"contentText"}},{"kind":"Field","name":{"kind":"Name","value":"subscription"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"lastReceivedAt"}},{"kind":"Field","name":{"kind":"Name","value":"unsubscribeUrl"}},{"kind":"Field","name":{"kind":"Name","value":"unsubscribeAttemptedAt"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"HighlightFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Highlight"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"savedItem"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}},{"kind":"Field","name":{"kind":"Name","value":"segments"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"xpath"}},{"kind":"Field","name":{"kind":"Name","value":"beforeText"}},{"kind":"Field","name":{"kind":"Name","value":"startOffset"}},{"kind":"Field","name":{"kind":"Name","value":"endOffset"}},{"kind":"Field","name":{"kind":"Name","value":"afterText"}},{"kind":"Field","name":{"kind":"Name","value":"text"}}]}}]}}]} as unknown as DocumentNode<SavedItemQuery, SavedItemQueryVariables>;
 export const InboundEmailAddressesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"inboundEmailAddresses"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"inboundEmailAddresses"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"fullAddress"}},{"kind":"Field","name":{"kind":"Name","value":"subscriptions"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"lastReceivedAt"}},{"kind":"Field","name":{"kind":"Name","value":"unsubscribeUrl"}},{"kind":"Field","name":{"kind":"Name","value":"unsubscribeAttemptedAt"}}]}}]}}]}}]} as unknown as DocumentNode<InboundEmailAddressesQuery, InboundEmailAddressesQueryVariables>;
+export const EntriesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"entries"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"query"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GetEntriesInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"entries"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"query"},"value":{"kind":"Variable","name":{"kind":"Name","value":"query"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"EntryFragment"}}]}},{"kind":"Field","name":{"kind":"Name","value":"cursor"}}]}},{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}},{"kind":"Field","name":{"kind":"Name","value":"endCursor"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"SavedItemFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"SavedItem"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"originalUrl"}},{"kind":"Field","name":{"kind":"Name","value":"sourceDomain"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"leadImage"}},{"kind":"Field","name":{"kind":"Name","value":"wordCount"}},{"kind":"Field","name":{"kind":"Name","value":"author"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"SavedItemLabelFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Label"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"color"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"HighlightFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Highlight"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"savedItem"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}},{"kind":"Field","name":{"kind":"Name","value":"segments"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"xpath"}},{"kind":"Field","name":{"kind":"Name","value":"beforeText"}},{"kind":"Field","name":{"kind":"Name","value":"startOffset"}},{"kind":"Field","name":{"kind":"Name","value":"endOffset"}},{"kind":"Field","name":{"kind":"Name","value":"afterText"}},{"kind":"Field","name":{"kind":"Name","value":"text"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"EntryFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Entry"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"SavedItem"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"SavedItemFragment"}},{"kind":"Field","name":{"kind":"Name","value":"labels"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"SavedItemLabelFragment"}}]}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Highlight"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"HighlightFragment"}}]}}]}}]} as unknown as DocumentNode<EntriesQuery, EntriesQueryVariables>;
 export const SignInDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"signIn"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"SignInInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"signIn"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}}]}}]}}]} as unknown as DocumentNode<SignInMutation, SignInMutationVariables>;
 export const SignOutDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"signOut"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"signOut"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}}]}}]}}]} as unknown as DocumentNode<SignOutMutation, SignOutMutationVariables>;
 export const CreateAccountDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"createAccount"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateAccountInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createAccount"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}}]}}]}}]} as unknown as DocumentNode<CreateAccountMutation, CreateAccountMutationVariables>;
@@ -606,4 +661,4 @@ export const CreateInboundEmailAddressDocument = {"kind":"Document","definitions
 export const DeleteInboundEmailAddressDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"deleteInboundEmailAddress"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DeleteInboundEmailAddressInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteInboundEmailAddress"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}}]}}]}}]} as unknown as DocumentNode<DeleteInboundEmailAddressMutation, DeleteInboundEmailAddressMutationVariables>;
 export const UpdateNewsletterSubscriptionStatusDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"updateNewsletterSubscriptionStatus"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateNewsletterSubscriptionStatusInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateNewsletterSubscriptionStatus"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}}]}}]}}]} as unknown as DocumentNode<UpdateNewsletterSubscriptionStatusMutation, UpdateNewsletterSubscriptionStatusMutationVariables>;
 export const CreateHighlightDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"createHighlight"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateHighlightInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createHighlight"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<CreateHighlightMutation, CreateHighlightMutationVariables>;
-export const DeleteHighlightDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteHighlight"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DeleteHighlightInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteHighlight"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}}]}}]}}]} as unknown as DocumentNode<DeleteHighlightMutation, DeleteHighlightMutationVariables>;
+export const DeleteHighlightsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteHighlights"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DeleteHighlightsInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteHighlights"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}}]}}]}}]} as unknown as DocumentNode<DeleteHighlightsMutation, DeleteHighlightsMutationVariables>;

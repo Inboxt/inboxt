@@ -1,0 +1,17 @@
+.highlight {
+	border: 0 solid var(--mantine-color-gray-4);
+	border-bottom-width: 1px;
+	cursor: pointer;
+
+	@mixin dark {
+		border-color: var(--mantine-color-dark-4);
+	}
+}
+
+.text {
+	color: var(--mantine-color-dark-5);
+	
+	@mixin dark {
+		color: var(--mantine-color-dark-2);
+	}
+}

@@ -23,6 +23,7 @@ import { InboundEmailAddressModule } from '../inbound-email-address/inbound-emai
 import { SavedItemManagerModule } from '../../managers/saved-item-manager/saved-item-manager.module';
 import { ScheduleTasksModule } from '../schedule/schedule-tasks.module';
 import { HighlightModule } from '../highlight/highlight.module';
+import { EntryManagerModule } from '../../managers/entry-manager/entry-manager.module';
 
 @Module({
 	imports: [
@@ -74,6 +75,7 @@ import { HighlightModule } from '../highlight/highlight.module';
 		InboundEmailAddressModule,
 		SavedItemManagerModule,
 		HighlightModule,
+		EntryManagerModule,
 	],
 	providers: [
 		PrismaService,

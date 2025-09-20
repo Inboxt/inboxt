@@ -2,15 +2,10 @@ import { Field, InputType } from '@nestjs/graphql';
 import { SavedItemStatus } from '../../../enums/saved-item-status.enum';
 import { SavedItemType } from 'src/enums/saved-item-type.enum';
 import { SavedItemSort } from './saved-item-sort.input';
+import { PaginationInput } from '../../../common/dto/pagination.input';
 
 @InputType()
-export class GetSavedItemsInput {
-	@Field()
-	first!: number;
-
-	@Field({ nullable: true })
-	after?: string;
-
+export class GetSavedItemsInput extends PaginationInput {
 	@Field(() => SavedItemStatus, { nullable: true })
 	status?: SavedItemStatus;
 
@@ -21,5 +16,5 @@ export class GetSavedItemsInput {
 	sort?: SavedItemSort;
 
 	@Field({ nullable: true })
-	labelId: string;
+	labelId?: string;
 }

@@ -146,7 +146,6 @@ model highlight_segment {
   highlight   highlight @relation(fields: [highlightId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@index([highlightId], map: "highlight_segment_highlightId_index")
-  @@index([xpath, startOffset, endOffset], map: "highlight_segment_xpath_startOffset_endOffset_index")
 }
 
 enum saved_item_status {

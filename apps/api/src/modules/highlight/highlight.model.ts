@@ -1,9 +1,15 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { BaseModel } from '../../models/base.model';
-import { HighlightSegment } from './highlight-segment.model';
+import { SavedItem } from '../saved-item/saved-item.model';
+import { Entry } from '../../managers/entry-manager/entry.model';
 
-@ObjectType()
-export class Highlight extends BaseModel {
-	@Field(() => [HighlightSegment])
-	segments?: HighlightSegment[];
+@ObjectType({ implements: [Entry] })
+export class Highlight implements Entry {
+	@Field()
+	id!: string;
+
+	@Field(() => Date)
+	createdAt!: Date;
+
+	@Field(() => SavedItem, { nullable: true })
+	savedItem?: SavedItem;
 }

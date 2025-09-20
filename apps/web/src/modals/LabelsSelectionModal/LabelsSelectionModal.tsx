@@ -5,10 +5,10 @@ import { useEffect, useState } from 'react';
 
 import { SelectableLabel } from '~components/SelectableLabel';
 import {
+	ENTRIES,
 	LABELS,
 	SAVED_ITEM,
 	SAVED_ITEM_LABELS_FRAGMENT,
-	SAVED_ITEMS,
 	SET_SAVED_ITEM_LABELS,
 } from '~lib/graphql';
 import { modals } from '~modals/modals';
@@ -18,6 +18,7 @@ export const LabelsSelectionModal = ({
 	context,
 	innerProps,
 }: ContextModalProps<{ itemId: string }>) => {
+	const pathname = window.location.pathname;
 	const { data } = useQuery(LABELS);
 	const { complete, data: itemLabels } = useFragment({
 		fragment: SAVED_ITEM_LABELS_FRAGMENT,
@@ -27,7 +28,7 @@ export const LabelsSelectionModal = ({
 
 	const [value, setValue] = useState<string[]>([]);
 	const [setSavedItemLabels, { loading }] = useMutation(SET_SAVED_ITEM_LABELS, {
-		refetchQueries: [SAVED_ITEMS, SAVED_ITEM],
+		refetchQueries: [pathname.startsWith('/r') ? SAVED_ITEM : ENTRIES],
 	});
 
 	useEffect(() => {

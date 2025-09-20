@@ -1,31 +1,82 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 
 import { Prisma } from '../../../prisma/client';
 
 import { PrismaService } from '../../services/prisma.service';
 import { CreateHighlightInput } from './dto/create-highlight.input';
-import { DeleteHighlightInput } from './dto/delete-highlight.input';
+import { DeleteHighlightsInput } from './dto/delete-highlights.input';
 import { AppException } from '../../utils/app-exception';
+import { GetHighlightsInput } from './dto/get-highlights.input';
+import { HighlightSortField } from './dto/highlight-sort.input';
 
 @Injectable()
 export class HighlightService {
 	constructor(private prisma: PrismaService) {}
 
-	async get(query: Prisma.highlightFindFirstArgs) {
-		return this.prisma.highlight.findFirst(query);
+	async get(userId: string, query: Prisma.highlightFindFirstArgs) {
+		return this.prisma.highlight.findFirst({ ...query, where: { ...query.where, userId } });
 	}
 
-	async getMany(query: Prisma.highlightFindManyArgs) {
-		return this.prisma.highlight.findMany(query);
+	async getMany(userId: string, query: Prisma.highlightFindManyArgs) {
+		return this.prisma.highlight.findMany({ ...query, where: { ...query.where, userId } });
 	}
 
-	async getSegments(id: string) {
+	async getSegments(userId: string, id: string) {
+		const highlight = await this.get(userId, { where: { id } });
+		if (!highlight) {
+			throw new AppException('Highlight segments not found', HttpStatus.NOT_FOUND);
+		}
+
 		return this.prisma.highlight_segment.findMany({
 			where: { highlightId: id },
 		});
 	}
 
-	async create(data: CreateHighlightInput, userId: string) {
+	async getPaginated(userId: string, query: GetHighlightsInput) {
+		const prismaWhere: Prisma.highlightWhereInput = {
+			userId,
+		};
+
+		const prismaQuery: Prisma.highlightFindManyArgs = {
+			where: prismaWhere,
+			take: query.first + 1,
+			orderBy: { createdAt: 'desc' },
+		};
+
+		if (query.sort?.field && query.sort?.direction) {
+			if (query.sort.field === HighlightSortField.title) {
+				prismaQuery.orderBy = {
+					saved_item: {
+						title: query.sort.direction,
+					},
+				};
+			} else {
+				prismaQuery.orderBy = { [query.sort.field]: query.sort.direction };
+			}
+		}
+
+		if (query.after) {
+			prismaQuery.cursor = { id: query.after };
+			prismaQuery.skip = 1;
+		}
+
+		const items = await this.getMany(userId, {
+			...prismaQuery,
+		});
+
+		const edges = items.slice(0, query.first).map((node) => ({
+			node,
+			cursor: node.id,
+		}));
+
+		return {
+			edges,
+			endCursor: edges.length ? edges[edges.length - 1].cursor : null,
+			hasNextPage: items.length > query.first,
+		};
+	}
+
+	async create(userId: string, data: CreateHighlightInput) {
 		return this.prisma.$transaction(async (prisma) => {
 			const highlight = await prisma.highlight.create({
 				data: {
@@ -52,18 +103,32 @@ export class HighlightService {
 		});
 	}
 
-	async delete(data: DeleteHighlightInput, userId: string) {
-		const existingHighlight = await this.get({ where: { id: data.id } });
-		if (
-			!existingHighlight ||
-			existingHighlight.userId !== userId ||
-			existingHighlight.savedItemId !== data.savedItemId
-		) {
-			throw new AppException(
-				'Highlight not found or you do not have permission to delete it',
-			);
-		}
+	async delete(userId: string, data: DeleteHighlightsInput) {
+		for (const item of data.items) {
+			const existingHighlight = await this.get(userId, { where: { id: item.id } });
 
-		await this.prisma.highlight.delete({ where: { id: data.id } });
+			if (!existingHighlight) {
+				throw new AppException('Highlight not found', HttpStatus.NOT_FOUND);
+			}
+
+			if (existingHighlight.userId !== userId) {
+				throw new AppException(
+					'You do not have permission to delete highlight',
+					HttpStatus.FORBIDDEN,
+				);
+			}
+
+			if (
+				existingHighlight.savedItemId &&
+				existingHighlight.savedItemId !== item.savedItemId
+			) {
+				throw new AppException(
+					'Highlight does not belong to the specified saved item',
+					HttpStatus.BAD_REQUEST,
+				);
+			}
+
+			await this.prisma.highlight.delete({ where: { id: item.id } });
+		}
 	}
 }
