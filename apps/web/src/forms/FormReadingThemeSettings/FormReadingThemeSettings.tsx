@@ -1,60 +1,35 @@
 import { Group, Stack, Text, Title, Radio, SimpleGrid, Box } from '@mantine/core';
 
+import { READER_THEMES, ReaderTheme } from '@inbox-reader/common';
+
+import { useReaderSettings } from '~hooks/useReaderSettings.tsx';
+
 import classes from './FormReadingThemeSettings.module.css';
 
-// todo: move to an enum? constants?
-const readerThemes = [
-	{
-		name: 'Auto',
-		colors: {
-			background: 'auto',
-			text: 'auto',
-			highlights: '#FFF9B0',
-		},
-	},
-	{
-		name: 'Light',
-		colors: {
-			background: '#fff',
-			text: 'red',
-			highlights: '#FFF9B0',
-		},
-	},
-	{
-		name: 'Dark',
-		colors: {
-			background: '#1A1B1E',
-			text: 'red',
-			highlights: '#FFF9B0',
-		},
-	},
-	{
-		name: 'Sepia',
-		colors: {
-			background: '#f4ecd8',
-			text: 'red',
-			highlights: '#FFF9B0',
-		},
-	},
-];
-
 export const FormReadingThemeSettings = () => {
-	const cards = readerThemes.map((item) => (
-		<Radio.Card className={classes.root} radius="sm" value={item.name} key={item.name}>
-			<Group wrap="nowrap" align="flex-start">
-				<Box
-					style={{
-						background:
-							item.colors.background === 'auto'
-								? 'linear-gradient(90deg, #fff 50%, #1A1B1E 50%)'
-								: item.colors.background,
-					}}
-					className={classes.icon}
-				/>
-				<Text className={classes.label}>{item.name}</Text>
-			</Group>
-		</Radio.Card>
-	));
+	const { theme, setReaderTheme } = useReaderSettings();
+
+	const themeOptions: ReaderTheme[] = [
+		'auto',
+		...(Object.keys(READER_THEMES) as (keyof typeof READER_THEMES)[]),
+	];
+
+	const cards = themeOptions.map((value) => {
+		const label = value.charAt(0).toUpperCase() + value.slice(1);
+		const bg =
+			value === 'auto'
+				? 'linear-gradient(90deg, #ffffff 50%, #1A1B1E 50%)'
+				: READER_THEMES[value].background;
+
+		return (
+			<Radio.Card className={classes.root} radius="sm" value={value} key={value}>
+				<Group wrap="nowrap" align="flex-start">
+					<Box bg={bg} className={classes.icon} />
+					<Text className={classes.label}>{label}</Text>
+				</Group>
+			</Radio.Card>
+		);
+	});
 
 	return (
 		<Stack>
@@ -62,7 +37,7 @@ export const FormReadingThemeSettings = () => {
 				Theme
 			</Title>
 
-			<Radio.Group>
+			<Radio.Group value={theme} onChange={(value) => setReaderTheme(value as ReaderTheme)}>
 				<SimpleGrid cols={2} spacing="xxs">
 					{cards}
 				</SimpleGrid>

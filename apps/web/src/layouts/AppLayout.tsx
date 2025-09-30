@@ -26,7 +26,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
 	useDocumentTitle('Inbox Reader');
 
 	return (
-		<>
+		<Box className={classes.layoutRoot}>
 			<UnverifiedEmailAlert user={routeData.user} />
 
 			<Center className={classes.layout}>
@@ -45,6 +45,6 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
 					<Footer visibleFrom="lg" />
 				</Flex>
 			</Center>
-		</>
+		</Box>
 	);
 };

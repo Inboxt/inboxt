@@ -24,30 +24,105 @@ import {
 	IconViewportWide,
 } from '@tabler/icons-react';
 
+import {
+	MAX_READER_CONTENT_WIDTH,
+	MAX_READER_FONT_SIZE,
+	MAX_READER_LETTER_SPACING,
+	MAX_READER_LINE_HEIGHT,
+	MAX_READER_WORD_SPACING,
+	MIN_READER_CONTENT_WIDTH,
+	MIN_READER_FONT_SIZE,
+	MIN_READER_LETTER_SPACING,
+	MIN_READER_LINE_HEIGHT,
+	MIN_READER_WORD_SPACING,
+	READER_CONTENT_WIDTHS,
+	READER_DEFAULT_SETTINGS,
+	READER_FONT_FAMILIES,
+	READER_FONT_WEIGHTS,
+	READER_LETTER_SPACING,
+	READER_LINE_HEIGHTS,
+	READER_WORD_SPACING,
+	ReaderContentSettings,
+} from '@inbox-reader/common';
+
+import { useReaderSettings } from '~hooks/useReaderSettings.tsx';
+
 import classes from './FormReadingSettings.module.css';
 
 export const FormReadingSettings = () => {
+	const { contentSettings, setContentSettings } = useReaderSettings();
+
 	return (
 		<Stack>
 			<Title order={4} visibleFrom="xs">
 				Text
 			</Title>
+
 			<Group justify="space-between">
-				<Text>Text size</Text>
+				<Text>Text size ({contentSettings.textSize}px)</Text>
 				<Group gap={4}>
-					<ActionIcon variant="light" color="black" size="lg">
+					<ActionIcon
+						variant="light"
+						color="text"
+						size="lg"
+						onClick={() =>
+							setContentSettings({
+								...contentSettings,
+								textSize: Math.max(
+									MIN_READER_FONT_SIZE,
+									contentSettings.textSize - 1,
+								),
+							})
+						}
+					>
 						<IconMinus size={16} />
 					</ActionIcon>
 
-					<ActionIcon variant="light" color="black" size="lg">
+					<ActionIcon
+						variant="light"
+						color="text"
+						size="lg"
+						onClick={() =>
+							setContentSettings({
+								...contentSettings,
+								textSize: Math.min(
+									MAX_READER_FONT_SIZE,
+									contentSettings.textSize + 1,
+								),
+							})
+						}
+					>
 						<IconPlus size={16} />
 					</ActionIcon>
 				</Group>
 			</Group>
 
 			<Group w="100%">
-				<NativeSelect label="Font" data={['React', 'Angular', 'Vue']} flex={1} />
-				<NativeSelect label="Font weight" data={['Regular', 'Light', 'Bold']} flex={1} />
+				<NativeSelect
+					label="Font"
+					data={READER_FONT_FAMILIES}
+					value={contentSettings.font}
+					onChange={(e) =>
+						setContentSettings({
+							...contentSettings,
+							font: e.currentTarget.value as (typeof READER_FONT_FAMILIES)[number],
+						})
+					}
+					flex={1}
+				/>
+				<NativeSelect
+					label="Font weight"
+					data={READER_FONT_WEIGHTS}
+					value={contentSettings.fontWeight}
+					onChange={(e) =>
+						setContentSettings({
+							...contentSettings,
+							fontWeight: e.currentTarget
+								.value as (typeof READER_FONT_WEIGHTS)[number],
+						})
+					}
+					flex={1}
+				/>
 			</Group>
 
 			<Divider w="100%" />
@@ -60,46 +135,36 @@ export const FormReadingSettings = () => {
 			</Group>
 			<Slider
 				color="blue"
-				defaultValue={37}
+				value={contentSettings.contentWidth}
+				onChange={(value) =>
+					setContentSettings({
+						...contentSettings,
+						contentWidth: value as (typeof READER_CONTENT_WIDTHS)[number],
+					})
+				}
 				restrictToMarks
-				min={20}
-				max={60}
-				label={null}
-				marks={[
-					{ value: 20 },
-					{ value: 25 },
-					{ value: 30 },
-					{ value: 37 },
-					{ value: 45 },
-					{ value: 50 },
-					{ value: 55 },
-					{ value: 60 },
-				]} // todo: better way to list it? an enum or something?
+				min={MIN_READER_CONTENT_WIDTH}
+				max={MAX_READER_CONTENT_WIDTH}
+				marks={READER_CONTENT_WIDTHS.map((v) => ({ value: v }))}
 			/>
 
 			<Group gap="xs">
 				<IconLineHeight size={18} />
-				<Text>Line spacing</Text>
+				<Text>Line height</Text>
 			</Group>
 			<Slider
 				color="blue"
-				defaultValue={1.6}
-				restrictToMarks
-				min={1}
-				max={2.6}
-				step={0.2}
-				label={null}
-				marks={[
-					{ value: 1 },
-					{ value: 1.2 },
-					{ value: 1.4 },
-					{ value: 1.6 },
-					{ value: 1.8 },
-					{ value: 2 },
-					{ value: 2.2 },
-					{ value: 2.4 },
-					{ value: 2.6 },
-				]} // todo: better way to list it? an enum or something?
+				value={contentSettings.lineHeight}
+				onChange={(value) =>
+					setContentSettings({
+						...contentSettings,
+						lineHeight: value as (typeof READER_LINE_HEIGHTS)[number],
+					})
+				}
+				min={MIN_READER_LINE_HEIGHT}
+				max={MAX_READER_LINE_HEIGHT}
+				step={0.05}
+				marks={[{ value: READER_DEFAULT_SETTINGS.lineHeight }]}
 			/>
 
 			<Accordion
@@ -121,22 +186,16 @@ export const FormReadingSettings = () => {
 							</Group>
 							<Slider
 								color="blue"
-								defaultValue={0}
-								restrictToMarks
-								min={0}
-								max={0.24}
-								label={null}
-								marks={[
-									{ value: 0 },
-									{ value: 0.03 },
-									{ value: 0.06 },
-									{ value: 0.09 },
-									{ value: 0.12 },
-									{ value: 0.15 },
-									{ value: 0.18 },
-									{ value: 0.21 },
-									{ value: 0.24 },
-								]} // todo: better way to list it? an enum or something?
+								value={contentSettings.letterSpacing}
+								onChange={(value) =>
+									setContentSettings({
+										...contentSettings,
+										letterSpacing:
+											value as (typeof READER_LETTER_SPACING)[number],
+									})
+								}
+								min={MIN_READER_LETTER_SPACING}
+								max={MAX_READER_LETTER_SPACING}
 								step={0.03}
 								mb="md"
 							/>
@@ -147,22 +206,15 @@ export const FormReadingSettings = () => {
 							</Group>
 							<Slider
 								color="blue"
-								defaultValue={0}
-								restrictToMarks
-								min={0}
-								max={0.24}
-								label={null}
-								marks={[
-									{ value: 0 },
-									{ value: 0.03 },
-									{ value: 0.06 },
-									{ value: 0.09 },
-									{ value: 0.12 },
-									{ value: 0.15 },
-									{ value: 0.18 },
-									{ value: 0.21 },
-									{ value: 0.24 },
-								]} // todo: better way to list it? an enum or something?
+								value={contentSettings.wordSpacing}
+								onChange={(value) =>
+									setContentSettings({
+										...contentSettings,
+										wordSpacing: value as (typeof READER_WORD_SPACING)[number],
+									})
+								}
+								min={MIN_READER_WORD_SPACING}
+								max={MAX_READER_WORD_SPACING}
 								step={0.03}
 								mb="md"
 							/>
@@ -170,38 +222,50 @@ export const FormReadingSettings = () => {
 							<Text>Text alignment</Text>
 							<SegmentedControl
 								color="blue"
+								value={contentSettings.alignment}
+								onChange={(value) =>
+									setContentSettings({
+										...contentSettings,
+										alignment: value as ReaderContentSettings['alignment'],
+									})
+								}
 								data={[
 									{
-										value: 'preview',
+										value: 'Left',
 										label: (
 											<>
 												<IconAlignLeft />
-												<VisuallyHidden>Preview</VisuallyHidden>
+												<VisuallyHidden>Left</VisuallyHidden>
 											</>
 										),
 									},
 									{
-										value: 'code',
+										value: 'Center',
 										label: (
 											<>
 												<IconAlignCenter />
-												<VisuallyHidden>Code</VisuallyHidden>
+												<VisuallyHidden>Center</VisuallyHidden>
 											</>
 										),
 									},
 									{
-										value: 'export',
+										value: 'Right',
 										label: (
 											<>
 												<IconAlignRight />
-												<VisuallyHidden>Export</VisuallyHidden>
+												<VisuallyHidden>Right</VisuallyHidden>
 											</>
 										),
 									},
 								]}
 							/>
 
-							<Button variant="transparent" color="blue" ml="auto">
+							<Button
+								variant="transparent"
+								color="blue"
+								ml="auto"
+								onClick={() => setContentSettings(READER_DEFAULT_SETTINGS)}
+							>
 								Reset to defaults
 							</Button>
 						</Stack>

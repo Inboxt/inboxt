@@ -89,7 +89,7 @@ export const HighlightableArticle = ({ content, data }: ArticleWithHighlightsPro
 
 	return (
 		<>
-			<Skeleton visible={applyingHighlights} height={560}>
+			<Skeleton visible={applyingHighlights} mih={560}>
 				<Box
 					ref={containerRef}
 					id="highlight-container"

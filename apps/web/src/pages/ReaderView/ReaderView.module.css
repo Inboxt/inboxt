@@ -10,8 +10,8 @@
 		transition: top 0.3s;
 		display: flex;
 		justify-content: space-between;
-		background-color: #fff;
-		border-bottom: 1px solid var(--mantine-color-gray-4);
+		background-color: var(--mantine-color-body);
+		border-bottom: 1px solid var(--reader-border-color);
 		margin: -16px -24px;
 		padding: 14px 24px 16px;
 		box-sizing: border-box;
@@ -32,27 +32,74 @@
 	padding-left: var(--mantine-spacing-xl);
 }
 
-.readerContent {}
+.readerView {
+	height: 100%;
+	background: var(--mantine-color-body);
+	color: var(--mantine-color-text);
+	flex: 1;
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+}
 
-.readerContent video {
+.readerContent {
+	font-size: var(--reader-font-size, 16px);
+	line-height: var(--reader-line-height, 1.55);
+	letter-spacing: var(--reader-letter-spacing, 0);
+	word-spacing: var(--reader-word-spacing, 0);
+	text-align: var(--reader-text-align, left);
+	font-family: var(--reader-font-family, var(--mantine-font-family));
+	font-weight: var(--reader-font-weight, 400);
+}
+
+.readerContent {
+	width: 100%;
+	max-width: var(--reader-content-width, 45em);
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.readerView a {
+	color: var(--reader-link-color);
+}
+
+[data-reader-theme='dark'] :global(.highlight) {
+	color: var(--mantine-color-body);
+}
+
+:global(.highlight) {
+	background-color: var(--reader-highlight-color);
+	cursor: pointer;
+}
+
+/* Adjust reader header on small screens to match theme */
+@media (max-width: $mantine-breakpoint-md) {
+	.readerView .headerContainer {
+		background: var(--mantine-color-body);
+		color: var(--mantine-color-text);
+	}
+}
+
+/* Media, headings, and content blocks remain the same */
+.readerView video {
 	display: block;
 	max-width: 100%;
 	max-height: 60vh;
 	height: auto;
 }
 
-.readerContent h1 a,
-.readerContent h2 a,
-.readerContent h3 a,
-.readerContent h4 a,
-.readerContent h5 a,
-.readerContent h6 a {
+.readerView h1 a,
+.readerView h2 a,
+.readerView h3 a,
+.readerView h4 a,
+.readerView h5 a,
+.readerView h6 a {
 	color: inherit;
 	text-decoration: none;
 }
 
 
-.readerContent img {
+.readerView img {
 	display: block;
 	max-width: 100%;
 	height: auto;
@@ -63,6 +110,6 @@
 	margin-bottom: var(--mantine-spacing-xs) !important;
 }
 
-.readerContent section:not(section section) {
+.readerView section:not(section section) {
 	margin-top: var(--mantine-spacing-lg);
 }

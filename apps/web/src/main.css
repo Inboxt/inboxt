@@ -1,16 +1,5 @@
-#root {
-	display: flex;
-	flex-direction: column;
-	height: 100vh;
-}
-
 .overflow-container {
 	overflow: auto;
-}
-
-.highlight {
-	background-color: var(--mantine-color-yellow-2);
-	cursor: pointer;
 }
 
 .highlight::selection {

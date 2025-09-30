@@ -31,3 +31,9 @@
 .container {
 	height: 100%;
 }
+
+.layoutRoot {
+	display: flex;
+	flex-direction: column;
+	height: 100vh;
+}
