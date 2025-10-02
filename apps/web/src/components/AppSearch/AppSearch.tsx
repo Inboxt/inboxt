@@ -1,4 +1,4 @@
-import { Combobox, TextInput } from '@mantine/core';
+import { TextInput } from '@mantine/core';
 import { IconSearch } from '@tabler/icons-react';
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import { useState, useEffect } from 'react';
