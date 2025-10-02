@@ -11,11 +11,10 @@ import {
 } from '@tabler/icons-react';
 import { clsx } from 'clsx';
 
-import { AppViews } from '@inbox-reader/common';
-
 import { AppNotifications } from '~components/AppNotifications';
 import { useScreenQuery } from '~hooks/useScreenQuery';
 import { LABELS } from '~lib/graphql';
+import { formatLabelForQuery } from '~utils/formatLabelForQuery.ts';
 
 import { FooterLinks } from '../FooterLinks';
 import { NavbarLink } from '../NavbarLink';
@@ -27,26 +26,31 @@ const NAV_LINKS = [
 		id: 'inbox',
 		label: 'Inbox',
 		icon: <IconHome size={21} />,
+		query: 'in:inbox type:article',
 	},
 	{
 		id: 'newsletters',
 		label: 'Newsletters',
 		icon: <IconMail size={21} />,
+		query: 'in:inbox type:newsletter',
 	},
 	{
 		id: 'highlights',
 		label: 'Highlights',
 		icon: <IconHighlight size={21} />,
+		query: 'type:highlight',
 	},
 	{
 		id: 'archive',
 		label: 'Archive',
 		icon: <IconArchive size={21} />,
+		query: 'in:archive',
 	},
 	{
 		id: 'trash',
 		label: 'Trash',
 		icon: <IconTrash size={21} />,
+		query: 'in:trash',
 	},
 ];
 
@@ -68,7 +72,7 @@ export const Navbar = ({ opened, toggle }: NavbarProps) => {
 					icon={link.icon}
 					opened={opened}
 					toggleDrawer={toggle}
-					view={link.id as AppViews}
+					query={link.query}
 				/>
 			))}
 
@@ -83,7 +87,7 @@ export const Navbar = ({ opened, toggle }: NavbarProps) => {
 						label={label.name}
 						icon={<IconLabelImportantFilled size={21} />}
 						opened={opened}
-						view={AppViews.LABEL}
+						query={`in:inbox ${formatLabelForQuery(label.name)}`}
 						color={label.color}
 						toggleDrawer={toggle}
 					/>

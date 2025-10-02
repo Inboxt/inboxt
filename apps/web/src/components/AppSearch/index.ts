@@ -1,1 +1,1 @@
-export { AppSearch } from './AppSearch';
+export { AppSearch } from './AppSearch.tsx';

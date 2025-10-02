@@ -1,13 +1,19 @@
-import { Field, InputType } from '@nestjs/graphql';
+import { Field, InputType, registerEnumType } from '@nestjs/graphql';
 
-import { HighlightSort } from '../../../modules/highlight/dto/highlight-sort.input';
-import { SavedItemSort } from '../../../modules/saved-item/dto/saved-item-sort.input';
+import { Sort } from '../../../common/dto/sort';
+
+export enum EntrySortField {
+	title = 'title',
+	createdAt = 'createdAt',
+}
+
+registerEnumType(EntrySortField, {
+	name: 'EntrySortField',
+	description: 'Properties by which entries can be sorted.',
+});
 
 @InputType()
-export class EntrySort {
-	@Field(() => HighlightSort, { nullable: true })
-	highlight?: HighlightSort;
-
-	@Field(() => SavedItemSort, { nullable: true })
-	savedItem?: SavedItemSort;
+export class EntrySort extends Sort {
+	@Field(() => EntrySortField)
+	field?: EntrySortField;
 }

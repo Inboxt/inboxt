@@ -1,47 +1,44 @@
-import { TextInput } from '@mantine/core';
+import { Combobox, TextInput } from '@mantine/core';
 import { IconSearch } from '@tabler/icons-react';
-import { useSearch } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
+import { useNavigate, useSearch } from '@tanstack/react-router';
+import { useState, useEffect } from 'react';
 
-import { AppViews } from '@inbox-reader/common';
+import { Route } from '~routes/_auth.index.tsx';
 
-import { Route } from '~routes/_auth.index';
-import { extractLabelName } from '~utils/extractLabelName';
-
-export const AppSearch = ({ variant = 'filled' }) => {
-	const { view } = useSearch({ from: Route.id });
-
-	const [search, setSearch] = useState('');
+export function AppSearch({ variant }: { variant: 'filled' | 'default' }) {
+	const navigate = useNavigate();
+	const search = useSearch({ from: Route.id });
+	const [input, setInput] = useState(search.q ?? '');
 
 	useEffect(() => {
-		let searchValue = '';
-		if (view && view !== AppViews.NEWSLETTERS && !view.startsWith(AppViews.LABEL)) {
-			searchValue = `in:${view}`;
-		}
+		setInput(search.q ?? '');
+	}, [search.q]);
 
-		if (view === AppViews.NEWSLETTERS) {
-			searchValue = 'is:newsletter';
-		}
-
-		if (view?.includes(AppViews.LABEL)) {
-			const labelName = extractLabelName(view);
-
-			if (labelName) {
-				searchValue = `label:${labelName}`;
+	useEffect(() => {
+		const timeout = setTimeout(() => {
+			if (input !== search.q) {
+				return navigate({
+					to: '.',
+					search: {
+						...search,
+						q: input || undefined,
+					},
+					replace: true,
+				});
 			}
-		}
+		}, 750);
 
-		setSearch(searchValue);
-	}, [view]);
+		return () => clearTimeout(timeout);
+	}, [input, search, navigate]);
 
 	return (
 		<TextInput
+			value={input}
+			onChange={(e) => setInput(e.currentTarget.value)}
 			variant={variant}
 			placeholder="Search for keywords or labels..."
 			leftSection={<IconSearch size={18} />}
 			flex="1"
-			value={search}
-			onChange={(e) => setSearch(e.currentTarget.value)}
 		/>
 	);
-};
+}

@@ -5,7 +5,7 @@ import { PrismaService } from '../../services/prisma.service';
 import { Prisma } from '../../../prisma/client';
 import { AppException } from '../../utils/app-exception';
 import { LabelService } from './entities/label/label.service';
-import { GetSavedItemsInput } from './dto/get-saved-items.input';
+import { GetSavedItemsQuery } from '../../common/types';
 
 @Injectable()
 export class SavedItemService {
@@ -22,48 +22,113 @@ export class SavedItemService {
 		return this.prisma.saved_item.findMany({ ...query, where: { ...query.where, userId } });
 	}
 
-	async getPaginated(userId: string, query: GetSavedItemsInput) {
-		const prismaWhere: Prisma.saved_itemWhereInput = {
+	async getPaginated(userId: string, query: GetSavedItemsQuery) {
+		let prismaWhere: Prisma.saved_itemWhereInput = {
 			userId,
-			status: query?.status || 'ACTIVE',
+			status: query?.status,
 		};
 
-		if (query?.type) {
-			prismaWhere.type = query.type;
-		}
-
-		if (query?.labelId) {
-			prismaWhere.saved_item_label = {
-				some: {
-					labelId: query.labelId,
+		// ---------- Free text ----------
+		if (query?.text) {
+			prismaWhere.OR = [
+				{ title: { contains: query.text, mode: 'insensitive' } },
+				{ description: { contains: query.text, mode: 'insensitive' } },
+				{ article: { is: { contentText: { contains: query.text, mode: 'insensitive' } } } },
+				{
+					newsletter: {
+						is: { contentText: { contains: query.text, mode: 'insensitive' } },
+					},
 				},
-			};
+			];
 		}
 
+		// ---------- Type ----------
+		if (query?.type) prismaWhere.type = query.type;
+
+		// ---------- Labels ----------
+		if (query.labels) {
+			const orClauses: Prisma.saved_itemWhereInput[] = [];
+
+			if (query.labels.and?.length) {
+				query.labels.and.forEach((orGroup) => {
+					if (orGroup.length === 1) {
+						orClauses.push({
+							saved_item_label: {
+								some: { label: { name: { equals: orGroup[0].toLowerCase() } } },
+							},
+						});
+					} else if (orGroup.length > 1) {
+						orClauses.push({
+							saved_item_label: {
+								some: {
+									label: { name: { in: orGroup.map((l) => l.toLowerCase()) } },
+								},
+							},
+						});
+					}
+				});
+			}
+
+			const notClauses: Prisma.saved_itemWhereInput[] = [];
+			if (query.labels.not?.length) {
+				notClauses.push({
+					saved_item_label: {
+						none: {
+							label: { name: { in: query.labels.not.map((l) => l.toLowerCase()) } },
+						},
+					},
+				});
+			}
+
+			prismaWhere.AND = [...orClauses, ...notClauses];
+		}
+
+		// ---------- Highlights ----------
+		if (query.hasHighlights === true) prismaWhere.highlight = { some: { userId } };
+		if (query.hasHighlights === false) prismaWhere.highlight = { none: { userId } };
+
+		// ---------- Saved date range ----------
+		if (query.saved) {
+			const createdAt: Prisma.DateTimeFilter = {};
+			if (query.saved.from) {
+				const from = dayjs(query.saved.from);
+				if (from.isValid()) createdAt.gte = from.toDate();
+			}
+			if (query.saved.to) {
+				const to = dayjs(query.saved.to);
+				if (to.isValid()) createdAt.lte = to.toDate();
+			}
+			if (Object.keys(createdAt).length) prismaWhere.createdAt = createdAt;
+		}
+
+		// ---------- Source ----------
+		if (query.source) {
+			prismaWhere.sourceDomain = { contains: query.source, mode: 'insensitive' };
+		}
+
+		// ---------- Pagination & Sorting ----------
+		const take = query.first ?? 20;
 		const prismaQuery: Prisma.saved_itemFindManyArgs = {
 			where: prismaWhere,
-			take: query.first + 1,
+			take: take + 1,
 		};
 
 		if (query.sort?.field && query.sort?.direction) {
 			prismaQuery.orderBy = { [query.sort.field]: query.sort.direction };
 		}
 
-		if (query?.after) {
+		if (query.after) {
 			prismaQuery.cursor = { id: query.after };
 			prismaQuery.skip = 1;
 		}
 
 		const items = await this.getMany(userId, prismaQuery);
-		const edges = items.slice(0, query.first).map((item) => ({
-			node: item,
-			cursor: item.id,
-		}));
+		const edges = items.slice(0, take).map((item) => ({ node: item, cursor: item.id }));
 
 		return {
 			edges,
 			endCursor: edges.length ? edges[edges.length - 1].cursor : null,
-			hasNextPage: items.length > query.first,
+			hasNextPage: items.length > take,
 		};
 	}
 

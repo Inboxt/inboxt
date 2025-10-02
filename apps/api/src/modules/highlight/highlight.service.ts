@@ -1,4 +1,5 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
+import dayjs from 'dayjs';
 
 import { Prisma } from '../../../prisma/client';
 
@@ -6,8 +7,7 @@ import { PrismaService } from '../../services/prisma.service';
 import { CreateHighlightInput } from './dto/create-highlight.input';
 import { DeleteHighlightsInput } from './dto/delete-highlights.input';
 import { AppException } from '../../utils/app-exception';
-import { GetHighlightsInput } from './dto/get-highlights.input';
-import { HighlightSortField } from './dto/highlight-sort.input';
+import { GetHighlightsQuery } from '../../common/types';
 
 @Injectable()
 export class HighlightService {
@@ -32,19 +32,73 @@ export class HighlightService {
 		});
 	}
 
-	async getPaginated(userId: string, query: GetHighlightsInput) {
+	async getPaginated(userId: string, query: GetHighlightsQuery) {
+		const first = query.first ?? 20;
 		const prismaWhere: Prisma.highlightWhereInput = {
 			userId,
 		};
 
+		// ---------- Free text search ----------
+		if (query.text) {
+			prismaWhere.saved_item = {
+				is: {
+					OR: [
+						{ title: { contains: query.text, mode: 'insensitive' } },
+						{ description: { contains: query.text, mode: 'insensitive' } },
+						{
+							article: {
+								is: { contentText: { contains: query.text, mode: 'insensitive' } },
+							},
+						},
+						{
+							newsletter: {
+								is: { contentText: { contains: query.text, mode: 'insensitive' } },
+							},
+						},
+					],
+				},
+			};
+		}
+
+		// ---------- Source filter ----------
+		if (query.source) {
+			prismaWhere.saved_item = prismaWhere.saved_item || { is: {} };
+			prismaWhere.saved_item.is = prismaWhere.saved_item.is || {};
+			prismaWhere.saved_item.is.sourceDomain = {
+				contains: query.source,
+				mode: 'insensitive',
+			};
+		}
+
+		// ---------- Saved date range ----------
+		if (query.saved) {
+			prismaWhere.saved_item = prismaWhere.saved_item || { is: {} };
+			prismaWhere.saved_item.is = prismaWhere.saved_item.is || {};
+			const createdAtFilter: Prisma.DateTimeFilter = {};
+
+			if (query.saved.from) {
+				const fromDate = dayjs(query.saved.from);
+				if (fromDate.isValid()) createdAtFilter.gte = fromDate.toDate();
+			}
+			if (query.saved.to) {
+				const toDate = dayjs(query.saved.to);
+				if (toDate.isValid()) createdAtFilter.lte = toDate.toDate();
+			}
+
+			if (Object.keys(createdAtFilter).length) {
+				prismaWhere.saved_item.is.createdAt = createdAtFilter;
+			}
+		}
+
+		// ---------- Pagination & Sorting ----------
 		const prismaQuery: Prisma.highlightFindManyArgs = {
 			where: prismaWhere,
-			take: query.first + 1,
+			take: first + 1,
 			orderBy: { createdAt: 'desc' },
 		};
 
 		if (query.sort?.field && query.sort?.direction) {
-			if (query.sort.field === HighlightSortField.title) {
+			if (query.sort.field === 'title') {
 				prismaQuery.orderBy = {
 					saved_item: {
 						title: query.sort.direction,
@@ -60,11 +114,8 @@ export class HighlightService {
 			prismaQuery.skip = 1;
 		}
 
-		const items = await this.getMany(userId, {
-			...prismaQuery,
-		});
-
-		const edges = items.slice(0, query.first).map((node) => ({
+		const items = await this.prisma.highlight.findMany(prismaQuery);
+		const edges = items.slice(0, first).map((node) => ({
 			node,
 			cursor: node.id,
 		}));
@@ -72,7 +123,7 @@ export class HighlightService {
 		return {
 			edges,
 			endCursor: edges.length ? edges[edges.length - 1].cursor : null,
-			hasNextPage: items.length > query.first,
+			hasNextPage: items.length > first,
 		};
 	}
 

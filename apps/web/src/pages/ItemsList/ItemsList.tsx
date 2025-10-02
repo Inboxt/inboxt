@@ -3,31 +3,32 @@ import { Alert, Button, Center, Group, Stack, Text } from '@mantine/core';
 import { useSearch } from '@tanstack/react-router';
 import { useEffect } from 'react';
 
-import { AppViews } from '@inbox-reader/common';
-
 import { useContentSelection } from '~context/content-selection';
 import { AppLayout } from '~layouts/AppLayout';
 import { PERMANENTLY_DELETE_SAVED_ITEMS, ENTRIES } from '~lib/graphql';
+import { EntrySortField, SortDirection } from '~lib/graphql/generated/graphql.ts';
 import { modals } from '~modals/modals';
 import { Route } from '~routes/_auth.index';
-import { entriesQueryBuilder } from '~utils/entriesQueryBuilder.ts';
-import { extractLabelName } from '~utils/extractLabelName';
-import { findLabelIdByName } from '~utils/findLabelIdByName';
-import { fromKebabCase } from '~utils/fromKebabCase';
 
 import { ItemRenderer } from './ItemRenderers';
 import classes from './ItemsList.module.css';
 
 export const ItemsList = () => {
-	const { view, sort } = useSearch({ from: Route.id });
+	const { q, sort } = useSearch({ from: Route.id });
 
-	const safeView = view ?? AppViews.INBOX;
-	const labelName = safeView.startsWith('label:') ? extractLabelName(safeView) : null;
-	const labelId = labelName ? findLabelIdByName(fromKebabCase(labelName)) : undefined;
-
-	const variables = entriesQueryBuilder(safeView, { pageSize: 20, sort, labelId });
+	const [field, dir] = (sort?.split('_') ?? 'date_desc') as [string, string];
+	const direction = dir === 'asc' ? SortDirection.Asc : SortDirection.Desc;
 	const { data, loading, error } = useQuery(ENTRIES, {
-		variables,
+		variables: {
+			query: {
+				q,
+				first: 20,
+				sort: {
+					field: field === 'date' ? EntrySortField.CreatedAt : (field as EntrySortField),
+					direction,
+				},
+			},
+		},
 		fetchPolicy: 'cache-and-network',
 	});
 
@@ -82,10 +83,15 @@ export const ItemsList = () => {
 		});
 	};
 
+	const hasDeletedItems = items.some((edge) => {
+		const node = edge.node as { status?: string };
+		return node.status === 'DELETED';
+	});
+
 	return (
 		<AppLayout>
 			<Stack gap={0} className={classes.items}>
-				{safeView === AppViews.TRASH && (
+				{hasDeletedItems && (
 					<Alert
 						variant="light"
 						color="yellow"

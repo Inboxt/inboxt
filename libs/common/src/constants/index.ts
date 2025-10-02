@@ -103,14 +103,3 @@ export const READER_DEFAULT_SETTINGS = {
 	wordSpacing: 0 as const,
 	alignment: 'Left' as const,
 };
-
-// ENUMS
-export enum AppViews {
-	INBOX = 'inbox',
-	NEWSLETTERS = 'newsletters',
-	HIGHLIGHTS = 'highlights',
-	ARCHIVE = 'archive',
-	TRASH = 'trash',
-	LABEL = 'label',
-	SEARCH = 'search',
-}

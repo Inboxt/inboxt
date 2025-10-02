@@ -1,12 +1,25 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { GetEntriesInput } from './dto/get-entries.input';
 import { SavedItemService } from '../../modules/saved-item/saved-item.service';
 import { HighlightService } from '../../modules/highlight/highlight.service';
 import { EntryEdge } from './entry-connection';
 import { SavedItemType } from '../../enums/saved-item-type.enum';
-import { EntryType } from '../../common/enums/entry-type.enum';
-import { GetSavedItemsInput } from '../../modules/saved-item/dto/get-saved-items.input';
-import { GetHighlightsInput } from '../../modules/highlight/dto/get-highlights.input';
+import { SavedItemStatus } from '../../enums/saved-item-status.enum';
+import { AppException } from '../../utils/app-exception';
+import { GetHighlightsQuery, GetSavedItemsQuery } from '../../common/types';
+
+interface ParsedQuery {
+	in?: string;
+	type?: string;
+	labels?: {
+		and?: string[][]; // array of OR-groups that must all exist (AND of ORs)
+		not?: string[]; // labels that must NOT exist
+	};
+	hasHighlights?: boolean;
+	text?: string;
+	site?: string;
+	saved?: { from?: string; to?: string };
+}
 
 @Injectable()
 export class EntryManagerService {
@@ -15,70 +28,173 @@ export class EntryManagerService {
 		private highlightService: HighlightService,
 	) {}
 
+	private parseQuery(q?: string): ParsedQuery {
+		if (!q) return {};
+
+		const result: ParsedQuery = {};
+		const freeText: string[] = [];
+
+		// split by spaces but respect quotes
+		const parts: string[] = [];
+		let buf = '';
+		let inQuotes = false;
+
+		for (let i = 0; i < q.length; i++) {
+			const ch = q[i];
+			if (ch === '"') {
+				inQuotes = !inQuotes;
+				buf += ch;
+			} else if (ch === ' ' && !inQuotes) {
+				if (buf.trim()) parts.push(buf);
+				buf = '';
+			} else {
+				buf += ch;
+			}
+		}
+		if (buf.trim()) parts.push(buf);
+
+		parts.forEach((part) => {
+			const [rawKey, ...rest] = part.split(':');
+			const isNegated = rawKey.startsWith('-');
+			const key = isNegated ? rawKey.slice(1) : rawKey;
+
+			if (rest.length) {
+				let value = rest.join(':').trim();
+
+				// remove surrounding quotes for entire value
+				if (value.startsWith('"') && value.endsWith('"') && value.length >= 2) {
+					value = value.slice(1, -1);
+				}
+
+				if (key === 'label') {
+					if (!result.labels) result.labels = { and: [], not: [] };
+
+					// split by commas, but respect quotes
+					const regex = /"([^"]+)"|([^,]+)/g;
+					const matches: string[] = [];
+					let m;
+					while ((m = regex.exec(value)) !== null) {
+						matches.push((m[1] || m[2]).trim());
+					}
+
+					if (isNegated) {
+						result.labels.not!.push(...matches);
+					} else {
+						result.labels.and!.push(matches);
+					}
+				} else if (key === 'has' && value === 'highlights') {
+					result.hasHighlights = !isNegated;
+				} else if (key === 'saved') {
+					const [from, to] = value.split(',');
+					const saved: { from?: string; to?: string } = {};
+					if (from && from !== '*') saved.from = from;
+					if (to && to !== '*') saved.to = to;
+					if (Object.keys(saved).length) result.saved = saved;
+				} else if (key === 'site') {
+					result.site = value.toLowerCase();
+				} else if (['in', 'type'].includes(key)) {
+					(result as any)[key] = value;
+				} else {
+					freeText.push(part);
+				}
+			} else {
+				freeText.push(part);
+			}
+		});
+
+		if (freeText.length) result.text = freeText.join(' ');
+
+		return result;
+	}
+
 	async getMany(userId: string, input: GetEntriesInput) {
-		const { filter, first, after, sort, types: inputTypes } = input;
-		const types = inputTypes || Object.values(EntryType);
+		const { q, sort } = input;
+
+		const first = input?.first ?? 20;
+		const after = input.after;
+
+		const parsed = this.parseQuery(q);
+		const {
+			type: typeRaw = 'all',
+			in: statusRaw,
+			labels,
+			hasHighlights,
+			text,
+			site,
+			saved,
+		} = parsed;
+
+		if (text && text?.length > 200) {
+			throw new AppException(
+				'Free text search is limited to 200 characters. Please try again with a shorter query.',
+				HttpStatus.BAD_REQUEST,
+			);
+		}
+
+		let savedItemsQuery: GetSavedItemsQuery | undefined;
+		if (typeRaw !== 'highlight') {
+			const status =
+				statusRaw === 'inbox'
+					? SavedItemStatus.ACTIVE
+					: statusRaw === 'archive'
+						? SavedItemStatus.ARCHIVED
+						: statusRaw === 'trash'
+							? SavedItemStatus.DELETED
+							: undefined;
+			const type =
+				typeRaw === 'article'
+					? SavedItemType.ARTICLE
+					: typeRaw === 'newsletter'
+						? SavedItemType.NEWSLETTER
+						: undefined;
+
+			savedItemsQuery = {
+				first,
+				after,
+				type,
+				status,
+				labels,
+				hasHighlights,
+				text,
+				source: site,
+				saved,
+				sort,
+			};
+		}
+
+		let highlightsQuery: GetHighlightsQuery | undefined;
+		if (typeRaw === 'highlight') {
+			highlightsQuery = {
+				first,
+				after,
+				text,
+				source: site,
+				saved,
+				sort,
+			};
+		}
 
 		const savedItems: EntryEdge[] = [];
 		const highlights: EntryEdge[] = [];
 
-		// Fetch saved items if needed
-		if (types.some((t) => t === EntryType.ARTICLE || t === EntryType.NEWSLETTER)) {
-			// Correct mapping to enums
-			let savedItemType: SavedItemType | undefined;
-			if (types.includes(EntryType.ARTICLE)) {
-				savedItemType = SavedItemType.ARTICLE;
-			} else if (types.includes(EntryType.NEWSLETTER)) {
-				savedItemType = SavedItemType.NEWSLETTER;
-			}
-
-			const savedItemsArgs: GetSavedItemsInput = {
-				first,
-				after,
-				type: savedItemType,
-				// Filter and sort fields for saved items
-				status: filter?.savedItems?.status,
-				labelId: filter?.savedItems?.labelId,
-				sort: sort?.savedItem,
-			};
-
+		if (savedItemsQuery) {
 			const savedItemsResult = await this.savedItemService.getPaginated(
 				userId,
-				savedItemsArgs,
+				savedItemsQuery,
 			);
-
-			savedItemsResult.edges.forEach((edge) => {
-				savedItems.push({
-					node: {
-						...edge.node,
-					},
-					cursor: edge.cursor,
-				});
-			});
+			savedItemsResult.edges.forEach((edge) =>
+				savedItems.push({ node: edge.node, cursor: edge.cursor }),
+			);
 		}
 
-		// Fetch highlights if needed
-		if (types.includes(EntryType.HIGHLIGHT)) {
-			const highlightsArgs: GetHighlightsInput = {
-				first,
-				after,
-				// Filter and sort fields for highlights
-				sort: sort?.highlight,
-			};
-
+		if (highlightsQuery) {
 			const highlightsResult = await this.highlightService.getPaginated(
 				userId,
-				highlightsArgs,
+				highlightsQuery,
 			);
-
-			highlightsResult.edges.forEach((edge) => {
-				highlights.push({
-					node: {
-						...edge.node,
-					},
-					cursor: edge.cursor,
-				});
-			});
+			highlightsResult.edges.forEach((edge) =>
+				highlights.push({ node: edge.node, cursor: edge.cursor }),
+			);
 		}
 
 		const allContent: EntryEdge[] = [...savedItems, ...highlights];

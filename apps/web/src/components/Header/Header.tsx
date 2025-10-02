@@ -17,13 +17,13 @@ import { useSearch, useRouter } from '@tanstack/react-router';
 
 import { SORT_OPTIONS } from '@inbox-reader/common';
 
+import { AppSearch } from '~components/AppSearch';
 import { useContentSelection } from '~context/content-selection';
 import { useScreenQuery } from '~hooks/useScreenQuery';
 import { modals } from '~modals/modals';
-import { Route } from '~routes/_auth.index';
+import { RouteSearchParams, Route } from '~routes/_auth.index';
 
 import { AppName } from '../AppName';
-import { AppSearch } from '../AppSearch';
 import { ItemsOptions } from '../ItemsOptions';
 import { ReaderCheckbox } from '../ReaderCheckbox';
 import { UserMenu } from '../UserMenu';
@@ -49,7 +49,7 @@ export const Header = ({ opened, toggle }: HeaderProps) => {
 		serialize: (value) => value || '',
 	});
 
-	const [sort, setSort] = useLocalStorage<(typeof searchParams)['sort']>({
+	const [sort, setSort] = useLocalStorage<RouteSearchParams['sort']>({
 		key: 'sort',
 		defaultValue: 'date_desc',
 		getInitialValueInEffect: false,
@@ -125,7 +125,7 @@ export const Header = ({ opened, toggle }: HeaderProps) => {
 			)}
 
 			<Flex gap="xs" align="center">
-				<AppSearch />
+				<AppSearch variant="filled" />
 				{!isBelowLgScreen && <UserMenu />}
 			</Flex>
 

@@ -55,7 +55,7 @@ export type DeleteAccountInput = {
 
 export type DeleteHighlightItemInput = {
   id: Scalars['String']['input'];
-  savedItemId: Scalars['String']['input'];
+  savedItemId?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type DeleteHighlightsInput = {
@@ -88,29 +88,22 @@ export type EntryEdge = {
   node: Entry;
 };
 
-export type EntryFilter = {
-  highlights?: InputMaybe<HighlightsFilterInput>;
-  savedItems?: InputMaybe<SavedItemsFilterInput>;
-};
-
 export type EntrySort = {
-  highlight?: InputMaybe<HighlightSort>;
-  savedItem?: InputMaybe<SavedItemSort>;
+  direction: SortDirection;
+  field: EntrySortField;
 };
 
-/** Types of user content */
-export enum EntryType {
-  Article = 'ARTICLE',
-  Highlight = 'HIGHLIGHT',
-  Newsletter = 'NEWSLETTER'
+/** Properties by which entries can be sorted. */
+export enum EntrySortField {
+  CreatedAt = 'createdAt',
+  Title = 'title'
 }
 
 export type GetEntriesInput = {
   after?: InputMaybe<Scalars['String']['input']>;
-  filter?: InputMaybe<EntryFilter>;
   first: Scalars['Float']['input'];
+  q?: InputMaybe<Scalars['String']['input']>;
   sort?: InputMaybe<EntrySort>;
-  types?: InputMaybe<Array<EntryType>>;
 };
 
 export type GetSavedItemInput = {
@@ -134,21 +127,6 @@ export type HighlightSegment = {
   startOffset: Scalars['Float']['output'];
   text?: Maybe<Scalars['String']['output']>;
   xpath: Scalars['String']['output'];
-};
-
-export type HighlightSort = {
-  direction: SortDirection;
-  field: HighlightSortField;
-};
-
-/** Properties by which highlight can be sorted. */
-export enum HighlightSortField {
-  CreatedAt = 'createdAt',
-  Title = 'title'
-}
-
-export type HighlightsFilterInput = {
-  sort?: InputMaybe<HighlightSort>;
 };
 
 export type InboundEmailAddress = {
@@ -344,24 +322,6 @@ export type SavedItem = Entry & {
   title: Scalars['String']['output'];
   type: SavedItemType;
   wordCount: Scalars['Float']['output'];
-};
-
-export type SavedItemSort = {
-  direction: SortDirection;
-  field: SavedItemSortField;
-};
-
-/** Properties by which saved items can be sorted. */
-export enum SavedItemSortField {
-  CreatedAt = 'createdAt',
-  Title = 'title'
-}
-
-export type SavedItemsFilterInput = {
-  labelId?: InputMaybe<Scalars['String']['input']>;
-  sort?: InputMaybe<SavedItemSort>;
-  status?: InputMaybe<SavedItemStatus>;
-  type?: InputMaybe<SavedItemType>;
 };
 
 export type SetSavedItemLabelsInput = {

@@ -1,7 +1,5 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
 
-import { AppViews } from '@inbox-reader/common';
-
 import { ACTIVE_USER } from '~lib/graphql';
 import { client } from '~lib/graphql/client';
 import { Auth } from '~pages/Auth';
@@ -26,7 +24,9 @@ export const Route = createFileRoute('/auth')({
 		});
 
 		if (data.me) {
-			throw redirect({ to: '/', search: { view: AppViews['INBOX'] } });
+			throw redirect({
+				to: '/',
+			});
 		}
 	},
 });
