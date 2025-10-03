@@ -3,6 +3,7 @@ import { useDisclosure, useDocumentTitle } from '@mantine/hooks';
 import { useRouteContext } from '@tanstack/react-router';
 import { ReactNode } from 'react';
 
+import { DemoAccountAlert } from '~components/DemoAccountAlert';
 import { Footer } from '~components/Footer';
 import { Header } from '~components/Header';
 import { Navbar } from '~components/Navbar';
@@ -28,6 +29,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
 	return (
 		<Box className={classes.layoutRoot}>
 			<UnverifiedEmailAlert user={routeData.user} />
+			<DemoAccountAlert user={routeData.user} />
 
 			<Center className={classes.layout}>
 				<Flex className={classes.container}>

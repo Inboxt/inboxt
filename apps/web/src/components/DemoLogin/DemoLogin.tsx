@@ -3,14 +3,14 @@ import { Anchor, Button, Divider, Group, List, Stack, Switch, Text } from '@mant
 import { useForm } from '@mantine/form';
 import { useNavigate } from '@tanstack/react-router';
 
-import { SIGN_IN } from '~lib/graphql';
+import { CREATE_DEMO_ACCOUNT } from '~lib/graphql';
 import { AuthViewProps } from '~pages/Auth/Auth';
 import { Route } from '~routes/auth.route';
 
 import { Form } from '../Form';
 
 export const DemoLogin = ({ handleChangeAuthMode }: AuthViewProps) => {
-	const [signIn, { loading, error }] = useMutation(SIGN_IN);
+	const [createDemoAccount, { loading, error }] = useMutation(CREATE_DEMO_ACCOUNT);
 	const navigate = useNavigate({ from: Route.id });
 
 	const form = useForm({
@@ -24,21 +24,13 @@ export const DemoLogin = ({ handleChangeAuthMode }: AuthViewProps) => {
 		},
 	});
 
-	const handleLoginToDemoAccount = async () => {
-		await signIn({
-			variables: {
-				data: {
-					emailAddress: 'demo@inbox-reader.com',
-					password: 'Password1@',
-				},
-			},
-		});
-
+	const handleCreateDemoAccount = async () => {
+		await createDemoAccount();
 		await navigate({ to: '/' });
 	};
 
 	return (
-		<Form onSubmit={form.onSubmit(handleLoginToDemoAccount)} error={error}>
+		<Form onSubmit={form.onSubmit(handleCreateDemoAccount)} error={error}>
 			{({ error }) => (
 				<Stack>
 					{error}

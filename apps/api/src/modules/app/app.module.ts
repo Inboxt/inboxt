@@ -24,6 +24,7 @@ import { SavedItemManagerModule } from '../../managers/saved-item-manager/saved-
 import { ScheduleTasksModule } from '../schedule/schedule-tasks.module';
 import { HighlightModule } from '../highlight/highlight.module';
 import { EntryManagerModule } from '../../managers/entry-manager/entry-manager.module';
+import { AccountGuard } from '../../guards/account.guard';
 
 @Module({
 	imports: [
@@ -80,10 +81,8 @@ import { EntryManagerModule } from '../../managers/entry-manager/entry-manager.m
 	providers: [
 		PrismaService,
 		AppService,
-		{
-			provide: APP_GUARD,
-			useClass: GqlAuthGuard,
-		},
+		{ provide: APP_GUARD, useClass: GqlAuthGuard },
+		{ provide: APP_GUARD, useClass: AccountGuard },
 		{
 			provide: APP_FILTER,
 			useClass: GlobalExceptionFilter,

@@ -7,11 +7,13 @@ import { ActiveUserMeta, ActiveUserMetaType } from '../../decorators/active-user
 import { Void } from '../../models/void.model';
 import { VOID_RESPONSE } from '../../constants/void';
 import { DeleteAccountInput } from './dto/delete-account.input';
+import { NonDemo, VerifiedOnly } from '../../decorators/account.decorator';
 
 @Resolver(() => User)
 export class UserResolver {
 	constructor(private userService: UserService) {}
 
+	@NonDemo()
 	@Mutation(() => User)
 	async updateAccount(
 		@ActiveUserMeta() activeUser: ActiveUserMetaType,
@@ -20,6 +22,7 @@ export class UserResolver {
 		return this.userService.update(activeUser.id, data);
 	}
 
+	@NonDemo()
 	@Mutation(() => Void)
 	async deleteAccount(
 		@ActiveUserMeta() activeUser: ActiveUserMetaType,
@@ -29,6 +32,7 @@ export class UserResolver {
 		return VOID_RESPONSE;
 	}
 
+	@NonDemo()
 	@Mutation(() => Void)
 	async resendVerificationEmail(@ActiveUserMeta() activeUser: ActiveUserMetaType) {
 		await this.userService.sendVerificationEmail(activeUser.id);

@@ -9,11 +9,13 @@ import {
 	ActiveUserMeta,
 	ActiveUserMetaType,
 } from '../../../../../decorators/active-user-meta.decorator';
+import { VerifiedOnly } from '../../../../../decorators/account.decorator';
 
 @Resolver(() => NewsletterSubscription)
 export class NewsletterSubscriptionResolver {
 	constructor(private newsletterSubscriptionService: NewsletterSubscriptionService) {}
 
+	@VerifiedOnly()
 	@Mutation(() => Void)
 	async updateNewsletterSubscriptionStatus(
 		@ActiveUserMeta() activeUser: ActiveUserMetaType,

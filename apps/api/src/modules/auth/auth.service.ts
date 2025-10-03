@@ -2,6 +2,7 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 import dayjs from 'dayjs';
 import { verify } from 'argon2';
+import crypto from 'crypto';
 
 import {
 	signInSchema,
@@ -27,6 +28,7 @@ import {
 } from '../../common/constants/email.constants';
 import { passwordResetTemplate } from '../../mail-templates/passwordResetTemplate';
 import { passwordChangedTemplate } from '../../mail-templates/passwordChangedTemplate';
+import { UserPlan } from '../../enums/user-plan.enum';
 
 @Injectable()
 export class AuthService {
@@ -177,6 +179,35 @@ export class AuthService {
 		await this.createTokens(user.emailAddress, context);
 	}
 
+	async createDemo(context: any) {
+		const demoId = crypto.randomUUID();
+		const username = `demo-${demoId.slice(0, 8)}`;
+		const emailAddress = `${username}@inbox-reader.com`;
+		const password = crypto.randomBytes(8).toString('hex');
+
+		// Check if a user with this email somehow exists (very unlikely)
+		const existingUser = await this.userService.get({ where: { emailAddress } });
+		if (existingUser) {
+			await this.createTokens(existingUser.emailAddress, context);
+			return existingUser;
+		}
+
+		const hashedPassword = await this.passwordService.hashPassword(password);
+
+		const user = await this.userService.createDemoAccount({
+			emailAddress,
+			password: hashedPassword,
+			isEmailVerified: true,
+			username,
+			plan: 'DEMO',
+		});
+
+		await this.savedItemManagerService.createDefaultItems(user.id);
+		await this.createTokens(user.emailAddress, context);
+
+		return user;
+	}
+
 	async requestPasswordRecovery(data: RequestPasswordRecoveryInput) {
 		/*----------  Validation  ----------*/
 		await requestPasswordRecoverySchema.parseAsync(data);
@@ -185,6 +216,10 @@ export class AuthService {
 		});
 
 		if (!existingUser) {
+			return;
+		}
+
+		if (existingUser.plan == UserPlan.DEMO) {
 			return;
 		}
 
@@ -208,7 +243,7 @@ export class AuthService {
 			where: { emailAddress: data.emailAddress },
 		});
 
-		if (!existingUser) {
+		if (!existingUser || existingUser.plan === UserPlan.DEMO) {
 			throw new AppException(
 				'Invalid or expired code, or no reset request was found for this email address',
 				HttpStatus.BAD_REQUEST,

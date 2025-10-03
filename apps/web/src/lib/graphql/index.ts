@@ -338,3 +338,11 @@ export const DELETE_HIGHLIGHTS = gql(`
 		}
 	}
 `);
+
+export const CREATE_DEMO_ACCOUNT = gql(`
+	mutation createDemoAccount {
+		createDemoAccount {
+			success
+		}
+	}
+`);

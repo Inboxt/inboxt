@@ -46,6 +46,7 @@ type Documents = {
     "\n\tmutation updateNewsletterSubscriptionStatus($data: UpdateNewsletterSubscriptionStatusInput!) {\n\t\tupdateNewsletterSubscriptionStatus(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": typeof types.UpdateNewsletterSubscriptionStatusDocument,
     "\n\tmutation createHighlight($data: CreateHighlightInput!) {\n\t\tcreateHighlight(data: $data) {\n\t\t\tid\n\t\t}\n\t}\n": typeof types.CreateHighlightDocument,
     "\n\tmutation DeleteHighlights($data: DeleteHighlightsInput!) {\n\t\tdeleteHighlights(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": typeof types.DeleteHighlightsDocument,
+    "\n\tmutation createDemoAccount {\n\t\tcreateDemoAccount {\n\t\t\tsuccess\n\t\t}\n\t}\n": typeof types.CreateDemoAccountDocument,
 };
 const documents: Documents = {
     "\n\tfragment UserFragment on User {\n\t\tid\n\t\tcreatedAt\n\t\temailAddress\n\t\tisEmailVerified\n\t\tusername\n\t\tpendingEmailAddress\n\t\tplan\n\t\tlabelsCount\n\t\tinboundEmailAddressesCount\n\t}\n": types.UserFragmentFragmentDoc,
@@ -80,6 +81,7 @@ const documents: Documents = {
     "\n\tmutation updateNewsletterSubscriptionStatus($data: UpdateNewsletterSubscriptionStatusInput!) {\n\t\tupdateNewsletterSubscriptionStatus(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": types.UpdateNewsletterSubscriptionStatusDocument,
     "\n\tmutation createHighlight($data: CreateHighlightInput!) {\n\t\tcreateHighlight(data: $data) {\n\t\t\tid\n\t\t}\n\t}\n": types.CreateHighlightDocument,
     "\n\tmutation DeleteHighlights($data: DeleteHighlightsInput!) {\n\t\tdeleteHighlights(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": types.DeleteHighlightsDocument,
+    "\n\tmutation createDemoAccount {\n\t\tcreateDemoAccount {\n\t\t\tsuccess\n\t\t}\n\t}\n": types.CreateDemoAccountDocument,
 };
 
 /**
@@ -224,6 +226,10 @@ export function gql(source: "\n\tmutation createHighlight($data: CreateHighlight
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n\tmutation DeleteHighlights($data: DeleteHighlightsInput!) {\n\t\tdeleteHighlights(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n"): (typeof documents)["\n\tmutation DeleteHighlights($data: DeleteHighlightsInput!) {\n\t\tdeleteHighlights(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n\tmutation createDemoAccount {\n\t\tcreateDemoAccount {\n\t\t\tsuccess\n\t\t}\n\t}\n"): (typeof documents)["\n\tmutation createDemoAccount {\n\t\tcreateDemoAccount {\n\t\t\tsuccess\n\t\t}\n\t}\n"];
 
 export function gql(source: string) {
   return (documents as any)[source] ?? {};

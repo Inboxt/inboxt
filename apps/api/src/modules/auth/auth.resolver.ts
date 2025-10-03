@@ -11,6 +11,7 @@ import { CreateAccountInput } from '../user/dto/create-account.input';
 import { ActiveUserMeta, ActiveUserMetaType } from '../../decorators/active-user-meta.decorator';
 import { RequestPasswordRecoveryInput } from './dto/request-password-recovery.input';
 import { ResetPasswordInput } from './dto/reset-password.input';
+import { NonDemo } from '../../decorators/account.decorator';
 
 @Resolver()
 export class AuthResolver {
@@ -40,6 +41,14 @@ export class AuthResolver {
 		return VOID_RESPONSE;
 	}
 
+	@Public()
+	@Mutation(() => Void)
+	async createDemoAccount(@Context() context: GqlContext) {
+		await this.authService.createDemo(context.req);
+		return VOID_RESPONSE;
+	}
+
+	@NonDemo()
 	@Mutation(() => Void)
 	async verifyEmail(
 		@ActiveUserMeta() activeUser: ActiveUserMetaType,

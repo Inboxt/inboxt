@@ -8,6 +8,7 @@ import { VOID_RESPONSE } from '../../constants/void';
 import { InboundEmailAddress } from './inbound-email-address.model';
 
 import { NewsletterSubscription } from '../saved-item/entities/newsletter/newsletter-subscription/newsletter-subscription.model';
+import { VerifiedOnly } from '../../decorators/account.decorator';
 
 @Resolver(() => InboundEmailAddress)
 export class InboundEmailAddressResolver {
@@ -22,6 +23,7 @@ export class InboundEmailAddressResolver {
 		});
 	}
 
+	@VerifiedOnly()
 	@Mutation(() => InboundEmailAddress)
 	async createInboundEmailAddress(@ActiveUserMeta() activeUser: ActiveUserMetaType) {
 		return this.inboundEmailAddressService.create(activeUser.id);

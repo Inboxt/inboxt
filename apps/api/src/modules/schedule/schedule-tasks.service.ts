@@ -18,15 +18,9 @@ export class ScheduleTasksService {
 		return this.scheduleTasksQueue.add('permanently-delete-saved-items', {});
 	}
 
-	@Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
-	async resetDemoAccount() {
-		return this.scheduleTasksQueue.add(
-			'reset-demo-account',
-			{},
-			{
-				priority: 0,
-			},
-		);
+	@Cron(CronExpression.EVERY_HOUR)
+	async deleteExpiredDemoAccounts() {
+		return this.scheduleTasksQueue.add('delete-expired-demo-accounts', {});
 	}
 
 	@Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)

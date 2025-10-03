@@ -3,7 +3,6 @@ import { Logger } from '@nestjs/common';
 import { Processor } from '@nestjs/bullmq';
 import dayjs from 'dayjs';
 import { PrismaService } from '../../services/prisma.service';
-import { SavedItemManagerService } from '../../managers/saved-item-manager/saved-item-manager.service';
 import { BaseQueueProcessor } from '../../common/processors/base-queue.processor';
 import { LogExecutionTime } from '../../decorators/log-execution-time.decorator';
 import { MailService } from '../mail/mail.service';
@@ -13,13 +12,13 @@ import {
 } from '../../common/constants/email.constants';
 import { accountDeletedTemplate } from '../../mail-templates/accountDeletedTemplate';
 import { verifyEmailReminderTemplate } from '../../mail-templates/verifyEmailReminderTemplate';
+import { UserPlan } from '../../enums/user-plan.enum';
 
 @Processor('schedule-tasks', { concurrency: 10 })
 export class ScheduleTasksProcessor extends BaseQueueProcessor {
 	protected readonly logger = new Logger(ScheduleTasksProcessor.name);
 	constructor(
 		private prisma: PrismaService,
-		private savedItemManagerService: SavedItemManagerService,
 		private mailService: MailService,
 	) {
 		super();
@@ -31,8 +30,8 @@ export class ScheduleTasksProcessor extends BaseQueueProcessor {
 				return this.deleteUnverifiedUsers();
 			case 'permanently-delete-saved-items':
 				return this.permanentlyDeleteSavedItems();
-			case 'reset-demo-account':
-				return this.resetDemoAccount();
+			case 'delete-expired-demo-accounts':
+				return this.deleteExpiredDemoAccounts();
 			case 'delete-expired-unsubscribed-newsletters':
 				return this.deleteExpiredUnsubscribedNewsletters();
 			case 'last-reminder-for-unverified-users':
@@ -97,22 +96,27 @@ export class ScheduleTasksProcessor extends BaseQueueProcessor {
 	}
 
 	@LogExecutionTime
-	private async resetDemoAccount() {
-		const demoEmail = 'demo@inbox-reader.com'; // todo: use user_plan rather that email address or a combination of both?
-		const user = await this.prisma.user.findFirst({
-			where: { emailAddress: demoEmail },
+	private async deleteExpiredDemoAccounts() {
+		const cutoff = dayjs().subtract(24, 'hour').toDate();
+		const expiredDemoUsers = await this.prisma.user.findMany({
+			where: {
+				plan: UserPlan.DEMO,
+				createdAt: { lte: cutoff },
+			},
+			select: { id: true, emailAddress: true },
 		});
-		if (!user) {
+
+		if (!expiredDemoUsers.length) {
+			this.logger.log('No expired demo accounts to delete');
 			return;
 		}
 
-		await this.prisma.saved_item.deleteMany({ where: { user: { emailAddress: demoEmail } } });
-		await this.prisma.label.deleteMany({ where: { user: { emailAddress: demoEmail } } });
+		const userIds = expiredDemoUsers.map((u) => u.id);
+		await this.prisma.user.deleteMany({ where: { id: { in: userIds } } });
 
-		// todo: default user account settings? like firstName/lastName?
-		await this.savedItemManagerService.createDefaultItems(user.id);
-
-		this.logger.log(`Demo account reset at ${new Date().toISOString()}`);
+		this.logger.log(
+			`Deleted ${userIds.length} expired demo accounts at ${new Date().toISOString()}`,
+		);
 	}
 
 	@LogExecutionTime

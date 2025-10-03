@@ -24,6 +24,7 @@ import {
 import { accountDeletedTemplate } from '../../mail-templates/accountDeletedTemplate';
 import { welcomeTemplate } from '../../mail-templates/welcomeTemplate';
 import { emailChangedTemplate } from '../../mail-templates/emailChangedTemplate';
+import { UserPlan } from '../../enums/user-plan.enum';
 
 @Injectable()
 export class UserService {
@@ -152,6 +153,12 @@ export class UserService {
 		return user;
 	}
 
+	async createDemoAccount(data: Prisma.userCreateInput) {
+		return this.prisma.user.create({
+			data,
+		});
+	}
+
 	async update(id: string, data: UpdateAccountInput) {
 		const { emailAddress, ...input } = data;
 		const parsedEmailAddress = emailAddress?.toLowerCase();
@@ -199,7 +206,7 @@ export class UserService {
 			where: { id: userId },
 		});
 
-		if (!existingUser || existingUser?.isEmailVerified) {
+		if (!existingUser || existingUser?.isEmailVerified || existingUser.plan === UserPlan.DEMO) {
 			throw new AppException(
 				'There was an issue with your email verification request',
 				HttpStatus.BAD_REQUEST,
