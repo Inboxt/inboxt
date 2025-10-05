@@ -25,7 +25,7 @@ type Documents = {
     "\n\tquery labels {\n\t\tlabels {\n\t\t\tid\n\t\t\t...SavedItemLabelFragment\n\t\t}\n\t}\n": typeof types.LabelsDocument,
     "\n\tquery savedItem($query: GetSavedItemInput!) {\n\t\tsavedItem(query: $query) {\n\t\t\tid\n\t\t\t...SavedItemFragment\n\t\t\tlabels {\n\t\t\t\tid\n\t\t\t\t...SavedItemLabelFragment\n\t\t\t}\n\t\t\tarticle {\n\t\t\t\tcontentHtml\n\t\t\t\tcontentText\n\t\t\t}\n\t\t\tnewsletter {\n\t\t\t\t...NewsletterFragment\n\t\t\t}\n\t\t\thighlights {\n\t\t\t\t...HighlightFragment\n\t\t\t}\n\t\t}\n\t}\n": typeof types.SavedItemDocument,
     "\n\tquery inboundEmailAddresses {\n\t\tinboundEmailAddresses {\n\t\t\tid\n\t\t\tcreatedAt\n\t\t\tfullAddress\n\t\t\tsubscriptions {\n\t\t\t\tid\n\t\t\t\tcreatedAt\n\t\t\t\tname\n\t\t\t\tstatus\n\t\t\t\tlastReceivedAt\n\t\t\t\tunsubscribeUrl\n\t\t\t\tunsubscribeAttemptedAt\n\t\t\t}\n\t\t}\n\t}\n": typeof types.InboundEmailAddressesDocument,
-    "\n\tquery entries($query: GetEntriesInput!) {\n\t\tentries(query: $query) {\n\t\t\tedges {\n\t\t\t\tnode {\n\t\t\t\t\t...EntryFragment\n\t\t\t\t}\n\t\t\t\tcursor\n\t\t\t}\n\t\t\thasNextPage\n\t\t\tendCursor\n\t\t}\n\t}\n": typeof types.EntriesDocument,
+    "\n\tquery entries($query: GetEntriesInput!) {\n\t\tentries(query: $query) {\n\t\t\tedges {\n\t\t\t\tnode {\n\t\t\t\t\t...EntryFragment\n\t\t\t\t}\n\t\t\t\tcursor\n\t\t\t}\n\t\t\tpageInfo {\n\t\t\t\thasNextPage\n\t\t\t\tendCursor\n\t\t\t}\n\t\t}\n\t}\n": typeof types.EntriesDocument,
     "\n\tmutation signIn($data: SignInInput!) {\n\t\tsignIn(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": typeof types.SignInDocument,
     "\n\tmutation signOut {\n\t\tsignOut {\n\t\t\tsuccess\n\t\t}\n\t}\n": typeof types.SignOutDocument,
     "\n\tmutation createAccount($data: CreateAccountInput!) {\n\t\tcreateAccount(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": typeof types.CreateAccountDocument,
@@ -60,7 +60,7 @@ const documents: Documents = {
     "\n\tquery labels {\n\t\tlabels {\n\t\t\tid\n\t\t\t...SavedItemLabelFragment\n\t\t}\n\t}\n": types.LabelsDocument,
     "\n\tquery savedItem($query: GetSavedItemInput!) {\n\t\tsavedItem(query: $query) {\n\t\t\tid\n\t\t\t...SavedItemFragment\n\t\t\tlabels {\n\t\t\t\tid\n\t\t\t\t...SavedItemLabelFragment\n\t\t\t}\n\t\t\tarticle {\n\t\t\t\tcontentHtml\n\t\t\t\tcontentText\n\t\t\t}\n\t\t\tnewsletter {\n\t\t\t\t...NewsletterFragment\n\t\t\t}\n\t\t\thighlights {\n\t\t\t\t...HighlightFragment\n\t\t\t}\n\t\t}\n\t}\n": types.SavedItemDocument,
     "\n\tquery inboundEmailAddresses {\n\t\tinboundEmailAddresses {\n\t\t\tid\n\t\t\tcreatedAt\n\t\t\tfullAddress\n\t\t\tsubscriptions {\n\t\t\t\tid\n\t\t\t\tcreatedAt\n\t\t\t\tname\n\t\t\t\tstatus\n\t\t\t\tlastReceivedAt\n\t\t\t\tunsubscribeUrl\n\t\t\t\tunsubscribeAttemptedAt\n\t\t\t}\n\t\t}\n\t}\n": types.InboundEmailAddressesDocument,
-    "\n\tquery entries($query: GetEntriesInput!) {\n\t\tentries(query: $query) {\n\t\t\tedges {\n\t\t\t\tnode {\n\t\t\t\t\t...EntryFragment\n\t\t\t\t}\n\t\t\t\tcursor\n\t\t\t}\n\t\t\thasNextPage\n\t\t\tendCursor\n\t\t}\n\t}\n": types.EntriesDocument,
+    "\n\tquery entries($query: GetEntriesInput!) {\n\t\tentries(query: $query) {\n\t\t\tedges {\n\t\t\t\tnode {\n\t\t\t\t\t...EntryFragment\n\t\t\t\t}\n\t\t\t\tcursor\n\t\t\t}\n\t\t\tpageInfo {\n\t\t\t\thasNextPage\n\t\t\t\tendCursor\n\t\t\t}\n\t\t}\n\t}\n": types.EntriesDocument,
     "\n\tmutation signIn($data: SignInInput!) {\n\t\tsignIn(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": types.SignInDocument,
     "\n\tmutation signOut {\n\t\tsignOut {\n\t\t\tsuccess\n\t\t}\n\t}\n": types.SignOutDocument,
     "\n\tmutation createAccount($data: CreateAccountInput!) {\n\t\tcreateAccount(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": types.CreateAccountDocument,
@@ -145,7 +145,7 @@ export function gql(source: "\n\tquery inboundEmailAddresses {\n\t\tinboundEmail
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n\tquery entries($query: GetEntriesInput!) {\n\t\tentries(query: $query) {\n\t\t\tedges {\n\t\t\t\tnode {\n\t\t\t\t\t...EntryFragment\n\t\t\t\t}\n\t\t\t\tcursor\n\t\t\t}\n\t\t\thasNextPage\n\t\t\tendCursor\n\t\t}\n\t}\n"): (typeof documents)["\n\tquery entries($query: GetEntriesInput!) {\n\t\tentries(query: $query) {\n\t\t\tedges {\n\t\t\t\tnode {\n\t\t\t\t\t...EntryFragment\n\t\t\t\t}\n\t\t\t\tcursor\n\t\t\t}\n\t\t\thasNextPage\n\t\t\tendCursor\n\t\t}\n\t}\n"];
+export function gql(source: "\n\tquery entries($query: GetEntriesInput!) {\n\t\tentries(query: $query) {\n\t\t\tedges {\n\t\t\t\tnode {\n\t\t\t\t\t...EntryFragment\n\t\t\t\t}\n\t\t\t\tcursor\n\t\t\t}\n\t\t\tpageInfo {\n\t\t\t\thasNextPage\n\t\t\t\tendCursor\n\t\t\t}\n\t\t}\n\t}\n"): (typeof documents)["\n\tquery entries($query: GetEntriesInput!) {\n\t\tentries(query: $query) {\n\t\t\tedges {\n\t\t\t\tnode {\n\t\t\t\t\t...EntryFragment\n\t\t\t\t}\n\t\t\t\tcursor\n\t\t\t}\n\t\t\tpageInfo {\n\t\t\t\thasNextPage\n\t\t\t\tendCursor\n\t\t\t}\n\t\t}\n\t}\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

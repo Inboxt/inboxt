@@ -109,7 +109,6 @@ export class EntryManagerService {
 
 	async getMany(userId: string, input: GetEntriesInput) {
 		const { q, sort } = input;
-
 		const first = input?.first ?? 20;
 		const after = input.after;
 
@@ -124,7 +123,7 @@ export class EntryManagerService {
 			saved,
 		} = parsed;
 
-		if (text && text?.length > 200) {
+		if (text && text.length > 200) {
 			throw new AppException(
 				'Free text search is limited to 200 characters. Please try again with a shorter query.',
 				HttpStatus.BAD_REQUEST,
@@ -132,7 +131,7 @@ export class EntryManagerService {
 		}
 
 		let savedItemsQuery: GetSavedItemsQuery | undefined;
-		if (typeRaw !== 'highlight') {
+		if (typeRaw === 'article' || typeRaw === 'newsletter' || typeRaw === 'all') {
 			const status =
 				statusRaw === 'inbox'
 					? SavedItemStatus.ACTIVE
@@ -141,6 +140,7 @@ export class EntryManagerService {
 						: statusRaw === 'trash'
 							? SavedItemStatus.DELETED
 							: undefined;
+
 			const type =
 				typeRaw === 'article'
 					? SavedItemType.ARTICLE
@@ -174,36 +174,23 @@ export class EntryManagerService {
 			};
 		}
 
-		const savedItems: EntryEdge[] = [];
-		const highlights: EntryEdge[] = [];
+		const savedItemsResult = savedItemsQuery
+			? await this.savedItemService.getPaginated(userId, savedItemsQuery)
+			: { edges: [] };
 
-		if (savedItemsQuery) {
-			const savedItemsResult = await this.savedItemService.getPaginated(
-				userId,
-				savedItemsQuery,
-			);
-			savedItemsResult.edges.forEach((edge) =>
-				savedItems.push({ node: edge.node, cursor: edge.cursor }),
-			);
-		}
+		const highlightsResult = highlightsQuery
+			? await this.highlightService.getPaginated(userId, highlightsQuery)
+			: { edges: [] };
 
-		if (highlightsQuery) {
-			const highlightsResult = await this.highlightService.getPaginated(
-				userId,
-				highlightsQuery,
-			);
-			highlightsResult.edges.forEach((edge) =>
-				highlights.push({ node: edge.node, cursor: edge.cursor }),
-			);
-		}
-
-		const allContent: EntryEdge[] = [...savedItems, ...highlights];
+		const allContent: EntryEdge[] = [...savedItemsResult.edges, ...highlightsResult.edges];
 		const edges = allContent.slice(0, first);
 
 		return {
 			edges,
-			hasNextPage: allContent.length > first,
-			endCursor: edges.length ? edges[edges.length - 1].cursor : undefined,
+			pageInfo: {
+				hasNextPage: allContent.length > first,
+				endCursor: edges.length ? edges[edges.length - 1].cursor : null,
+			},
 		};
 	}
 }

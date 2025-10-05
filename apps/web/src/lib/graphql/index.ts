@@ -171,8 +171,10 @@ export const ENTRIES = gql(`
 				}
 				cursor
 			}
-			hasNextPage
-			endCursor
+			pageInfo {
+				hasNextPage
+				endCursor
+			}
 		}
 	}
 `);

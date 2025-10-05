@@ -115,15 +115,13 @@ export class HighlightService {
 		}
 
 		const items = await this.prisma.highlight.findMany(prismaQuery);
-		const edges = items.slice(0, first).map((node) => ({
+		const edges = items.map((node) => ({
 			node,
 			cursor: node.id,
 		}));
 
 		return {
 			edges,
-			endCursor: edges.length ? edges[edges.length - 1].cursor : null,
-			hasNextPage: items.length > first,
 		};
 	}
 

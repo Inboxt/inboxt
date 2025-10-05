@@ -8,6 +8,7 @@ dotenv.config({
 
 import { PrismaClient } from '../prisma/client';
 import { UserPlan } from './enums/user-plan.enum';
+import { SavedItemType } from './enums/saved-item-type.enum';
 
 const prisma = new PrismaClient();
 
@@ -100,12 +101,40 @@ async function seedLabels(userId: string) {
 	logSuccess('Labels seeded');
 }
 
+async function seedSavedItems(userId: string) {
+	logStep('Seeding saved items...');
+
+	const count = Math.floor(Math.random() * 51) + 50;
+	const now = Date.now();
+
+	const items = Array.from({ length: count }).map((_, idx) => {
+		const createdAt = new Date(now - idx * 60_000);
+		return {
+			userId,
+			title: `Demo Article #${String(idx + 1)}`,
+			originalUrl: `https://example.com/demo-article-${String(idx + 1)}`,
+			type: SavedItemType.ARTICLE,
+			createdAt,
+			wordCount: 100,
+			description: `This is a demo article. It's number ${String(idx + 1)}.`,
+		};
+	});
+
+	await prisma.saved_item.createMany({
+		data: items,
+		skipDuplicates: true,
+	});
+
+	logSuccess(`Saved ${count} items`);
+}
+
 async function seed() {
 	logSection('🌱 Seeding started...');
 
 	await resetDatabase();
 	const users = await seedUsers();
 	await seedLabels(users.demo.id);
+	await seedSavedItems(users.demo.id);
 
 	logSection('🎉 Seeding complete!');
 }

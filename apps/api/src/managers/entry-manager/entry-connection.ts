@@ -11,13 +11,22 @@ export class EntryEdge {
 }
 
 @ObjectType()
-export class EntryConnection {
-	@Field(() => [EntryEdge])
-	edges: EntryEdge[];
-
+export class PageInfo {
 	@Field()
 	hasNextPage: boolean;
 
 	@Field({ nullable: true })
 	endCursor?: string;
+
+	@Field()
+	hasPreviousPage: boolean;
+}
+
+@ObjectType()
+export class EntryConnection {
+	@Field(() => [EntryEdge])
+	edges: EntryEdge[];
+
+	@Field(() => PageInfo)
+	pageInfo: PageInfo;
 }

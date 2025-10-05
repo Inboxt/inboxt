@@ -1,7 +1,8 @@
 import { useMutation, useQuery } from '@apollo/client';
-import { Alert, Button, Center, Group, Stack, Text } from '@mantine/core';
+import { Alert, Box, Button, Center, Group, Loader, Stack, Text } from '@mantine/core';
 import { useSearch } from '@tanstack/react-router';
-import { useEffect } from 'react';
+import { useVirtualizer } from '@tanstack/react-virtual';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useContentSelection } from '~context/content-selection';
 import { AppLayout } from '~layouts/AppLayout';
@@ -18,17 +19,21 @@ export const ItemsList = () => {
 
 	const [field, dir] = (sort?.split('_') ?? 'date_desc') as [string, string];
 	const direction = dir === 'asc' ? SortDirection.Asc : SortDirection.Desc;
-	const { data, loading, error } = useQuery(ENTRIES, {
-		variables: {
-			query: {
-				q,
-				first: 20,
-				sort: {
-					field: field === 'date' ? EntrySortField.CreatedAt : (field as EntrySortField),
-					direction,
-				},
+	const baseQuery = useMemo(
+		() => ({
+			q,
+			first: 20,
+			sort: {
+				field: field === 'date' ? EntrySortField.CreatedAt : (field as EntrySortField),
+				direction,
 			},
-		},
+		}),
+		[q, field, direction],
+	);
+
+	const { data, loading, error, fetchMore, variables } = useQuery(ENTRIES, {
+		variables: { query: baseQuery },
+		notifyOnNetworkStatusChange: true,
 		fetchPolicy: 'cache-and-network',
 	});
 
@@ -36,15 +41,64 @@ export const ItemsList = () => {
 		refetchQueries: [ENTRIES],
 	});
 
-	// TODO: infinite scrolling - make sure this part also works with it
+	const items = data?.entries.edges || [];
+	const hasNextPage = data?.entries.pageInfo.hasNextPage ?? false;
+	const endCursor = data?.entries.pageInfo.endCursor;
+
+	const parentRef = useRef<HTMLDivElement | null>(null);
+	const count = items.length + (hasNextPage ? 1 : 0);
+	const virtualizer = useVirtualizer({
+		count,
+		getScrollElement: () => parentRef.current,
+		estimateSize: () => 110,
+		overscan: 5,
+	});
+	const virtualItems = virtualizer.getVirtualItems();
+
+	const [isFetchingMore, setIsFetchingMore] = useState(false);
+	const loadMore = useCallback(async () => {
+		if (isFetchingMore || !hasNextPage || !endCursor) {
+			return;
+		}
+
+		setIsFetchingMore(true);
+		try {
+			await fetchMore({
+				variables: {
+					query: { ...(variables?.query ?? baseQuery), after: endCursor },
+				},
+			});
+		} finally {
+			setIsFetchingMore(false);
+		}
+	}, [isFetchingMore, hasNextPage, endCursor, fetchMore, variables?.query, baseQuery]);
+
+	useEffect(() => {
+		if (virtualItems.length === 0) {
+			return;
+		}
+
+		const last = virtualItems[virtualItems.length - 1];
+		if (last && last.index >= items.length) {
+			void loadMore();
+		}
+	}, [virtualItems, items.length, loadMore]);
+
 	const { setVisibleItems } = useContentSelection();
 	useEffect(() => {
-		if (data?.entries.edges.length) {
-			setVisibleItems(data.entries.edges.map(({ node }) => node));
+		if (!items.length) {
+			return;
 		}
-	}, [data?.entries]);
 
-	const items = data?.entries.edges || [];
+		const itemsNode = items.map((i) => i.node);
+		setVisibleItems(itemsNode);
+	}, [items]);
+
+	useEffect(() => {
+		if (q || sort) {
+			virtualizer.scrollToIndex(0);
+		}
+	}, [q, sort]);
 
 	const handlePermanentlyDeleteSavedItems = async () => {
 		const savedItemIds = items
@@ -90,7 +144,7 @@ export const ItemsList = () => {
 
 	return (
 		<AppLayout>
-			<Stack gap={0} className={classes.items}>
+			<Stack gap={0} className={classes.items} ref={parentRef}>
 				{hasDeletedItems && (
 					<Alert
 						variant="light"
@@ -124,8 +178,36 @@ export const ItemsList = () => {
 					</Center>
 				)}
 
-				{items.length > 0 &&
-					items.map(({ node }) => <ItemRenderer key={node.id} item={node} />)}
+				{items.length > 0 && (
+					<Box pos="relative" h={virtualizer.getTotalSize()}>
+						{virtualItems.map((virtualRow) => {
+							const index = virtualRow.index;
+							const isLoaderRow = index >= items.length;
+							return (
+								<Box
+									key={virtualRow.key}
+									pos="absolute"
+									top={0}
+									left={0}
+									w="100%"
+									style={{
+										transform: `translateY(${virtualRow.start}px)`,
+									}}
+									ref={virtualizer.measureElement}
+									data-index={index}
+								>
+									{isLoaderRow ? (
+										<Center py="md">
+											<Loader size="sm" />
+										</Center>
+									) : (
+										<ItemRenderer item={items[index]!.node} />
+									)}
+								</Box>
+							);
+						})}
+					</Box>
+				)}
 			</Stack>
 		</AppLayout>
 	);

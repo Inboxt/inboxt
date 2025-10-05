@@ -23,7 +23,7 @@ export class SavedItemService {
 	}
 
 	async getPaginated(userId: string, query: GetSavedItemsQuery) {
-		let prismaWhere: Prisma.saved_itemWhereInput = {
+		const prismaWhere: Prisma.saved_itemWhereInput = {
 			userId,
 			status: query?.status,
 		};
@@ -123,12 +123,10 @@ export class SavedItemService {
 		}
 
 		const items = await this.getMany(userId, prismaQuery);
-		const edges = items.slice(0, take).map((item) => ({ node: item, cursor: item.id }));
+		const edges = items.map((item) => ({ node: item, cursor: item.id }));
 
 		return {
 			edges,
-			endCursor: edges.length ? edges[edges.length - 1].cursor : null,
-			hasNextPage: items.length > take,
 		};
 	}
 
