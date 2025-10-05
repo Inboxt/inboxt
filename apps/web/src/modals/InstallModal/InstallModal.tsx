@@ -6,7 +6,6 @@ import {
 	Select,
 	Text,
 	Image,
-	Divider,
 	Title,
 	Flex,
 	SelectProps,
@@ -16,6 +15,8 @@ import { ContextModalProps } from '@mantine/modals';
 import { IconCheck, IconDeviceDesktopPlus, IconDownload } from '@tabler/icons-react';
 import { ReactNode } from 'react';
 import { usePWAInstall } from 'react-use-pwa-install';
+
+import { ButtonContainer } from '~components/ButtonContainer';
 
 type BrowserType = 'firefox' | 'chrome' | 'edge' | 'safari';
 const icons = {
@@ -65,47 +66,12 @@ const InstallOption = ({
 	</Flex>
 );
 
+// todo: PWA install, maybe better and responsive buttons/layout? Deleted install from android/ios store - double check for unused images...
 export const InstallModal = ({ id, context }: ContextModalProps) => {
 	const installPWA = usePWAInstall();
 
 	return (
-		<Stack gap="lg">
-			<InstallOption
-				imageSrc="/app-screenshot.png"
-				altText="Mobile app"
-				title="Install App for iOS and Android"
-				description="Use our mobile app to save any link, access your full library."
-			>
-				<a href="https://www.apple.com/app-store/" aria-label="Download on the App Store">
-					<Image src="/app-store-badge.png" height={41} alt="App Store badge" />
-				</a>
-				<a href="https://play.google.com/store" aria-label="Get it on Google Play">
-					<Image src="/play-store-badge.png" height={40} alt="Google Play badge" />
-				</a>
-			</InstallOption>
-
-			<Divider />
-
-			{installPWA && (
-				<>
-					<InstallOption
-						imageSrc="/app-screenshot.png"
-						altText="PWA app"
-						title="Access Anywhere with PWA"
-						description="Install our Progressive Web App on any device to save links and access your full library effortlessly."
-					>
-						<Button
-							leftSection={<IconDeviceDesktopPlus size={16} />}
-							onClick={() => void installPWA()}
-						>
-							Install PWA
-						</Button>
-					</InstallOption>
-
-					<Divider />
-				</>
-			)}
-
+		<Stack gap="xl" flex={1}>
 			<InstallOption
 				imageSrc="/app-screenshot.png"
 				altText="Browser extension"
@@ -137,9 +103,27 @@ export const InstallModal = ({ id, context }: ContextModalProps) => {
 				</Flex>
 			</InstallOption>
 
-			<Button onClick={() => context.closeModal(id)} ml="auto" variant="default">
-				Close
-			</Button>
+			{installPWA && (
+				<InstallOption
+					imageSrc="/app-screenshot.png"
+					altText="PWA app"
+					title="Access Anywhere with PWA"
+					description="Install our Progressive Web App on any device to save links and access your full library effortlessly."
+				>
+					<Button
+						leftSection={<IconDeviceDesktopPlus size={16} />}
+						onClick={() => void installPWA()}
+					>
+						Install PWA
+					</Button>
+				</InstallOption>
+			)}
+
+			<ButtonContainer mt="auto">
+				<Button onClick={() => context.closeModal(id)} variant="default">
+					Close
+				</Button>
+			</ButtonContainer>
 		</Stack>
 	);
 };

@@ -1,8 +1,9 @@
 import { useFragment, useMutation, useQuery } from '@apollo/client';
-import { Button, Checkbox, Group, Stack, Text } from '@mantine/core';
+import { Button, Checkbox, Stack, Text } from '@mantine/core';
 import { ContextModalProps } from '@mantine/modals';
 import { useEffect, useState } from 'react';
 
+import { ButtonContainer } from '~components/ButtonContainer';
 import { SelectableLabel } from '~components/SelectableLabel';
 import {
 	ENTRIES,
@@ -47,7 +48,7 @@ export const LabelsSelectionModal = ({
 	};
 
 	return (
-		<Stack>
+		<Stack gap="xl">
 			{data?.labels?.length ? (
 				<Checkbox.Group
 					value={value}
@@ -68,7 +69,7 @@ export const LabelsSelectionModal = ({
 				</Text>
 			)}
 
-			<Group justify="space-between" mt="md">
+			<ButtonContainer>
 				<Button variant="light" onClick={modals.openCreateLabelModal}>
 					Create new
 				</Button>
@@ -76,7 +77,7 @@ export const LabelsSelectionModal = ({
 				<Button onClick={() => void handleSelection()} loading={loading}>
 					Save & Close
 				</Button>
-			</Group>
+			</ButtonContainer>
 		</Stack>
 	);
 };

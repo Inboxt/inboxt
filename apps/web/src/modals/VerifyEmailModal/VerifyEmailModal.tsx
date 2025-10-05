@@ -1,5 +1,5 @@
 import { useMutation } from '@apollo/client';
-import { Button, Group, Stack, Text, TextInput } from '@mantine/core';
+import { Button, Stack, Text, TextInput } from '@mantine/core';
 import { useForm, zodResolver } from '@mantine/form';
 import { useInterval } from '@mantine/hooks';
 import { ContextModalProps } from '@mantine/modals';
@@ -7,6 +7,7 @@ import { useState } from 'react';
 
 import { verifyEmailSchema } from '@inbox-reader/common';
 
+import { ButtonContainer } from '~components/ButtonContainer';
 import { Form } from '~components/Form';
 import { ACTIVE_USER, RESEND_VERIFICATION_EMAIL, VERIFY_EMAIL } from '~lib/graphql';
 
@@ -60,7 +61,7 @@ export const VerifyEmailModal = ({ id, context }: ContextModalProps) => {
 	return (
 		<Form onSubmit={form.onSubmit(handleVerifyEmail)} error={verifyEmailError}>
 			{({ error }) => (
-				<Stack>
+				<Stack gap="xl">
 					<Stack gap="xs">
 						<Text>
 							We’ve sent you an email with a confirmation code. Please check your
@@ -77,7 +78,7 @@ export const VerifyEmailModal = ({ id, context }: ContextModalProps) => {
 
 					{error}
 
-					<Group justify="flex-end">
+					<ButtonContainer>
 						<Button
 							variant="light"
 							color="text"
@@ -94,7 +95,7 @@ export const VerifyEmailModal = ({ id, context }: ContextModalProps) => {
 						>
 							Confirm
 						</Button>
-					</Group>
+					</ButtonContainer>
 				</Stack>
 			)}
 		</Form>

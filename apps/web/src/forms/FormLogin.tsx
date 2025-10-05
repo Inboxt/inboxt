@@ -1,11 +1,12 @@
 import { useMutation } from '@apollo/client';
-import { Button, Group, PasswordInput, Stack, TextInput } from '@mantine/core';
+import { Button, PasswordInput, Stack, TextInput } from '@mantine/core';
 import { useForm, zodResolver } from '@mantine/form';
 import { IconAt, IconLock } from '@tabler/icons-react';
 import { useLocation, useNavigate } from '@tanstack/react-router';
 
 import { signInSchema } from '@inbox-reader/common';
 
+import { ButtonContainer } from '~components/ButtonContainer';
 import { Form } from '~components/Form';
 import { SIGN_IN } from '~lib/graphql';
 import { AuthViewProps } from '~pages/Auth/Auth';
@@ -79,7 +80,7 @@ export const FormLogin = ({ handleChangeAuthMode }: AuthViewProps) => {
 
 					{error}
 
-					<Group mt="xl" justify="space-between">
+					<ButtonContainer mt="xl">
 						<Button
 							variant="default"
 							size="md"
@@ -93,7 +94,7 @@ export const FormLogin = ({ handleChangeAuthMode }: AuthViewProps) => {
 						<Button size="md" type="submit" loading={loading}>
 							Sign in
 						</Button>
-					</Group>
+					</ButtonContainer>
 				</Stack>
 			)}
 		</Form>

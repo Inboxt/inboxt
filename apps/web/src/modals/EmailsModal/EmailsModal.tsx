@@ -1,11 +1,12 @@
 import { useMutation, useQuery } from '@apollo/client';
-import { Alert, Button, Group, Skeleton, Stack, Text } from '@mantine/core';
+import { Alert, Button, Skeleton, Stack, Text } from '@mantine/core';
 import { ContextModalProps } from '@mantine/modals';
 import { IconAlertTriangleFilled } from '@tabler/icons-react';
 import { useEffect } from 'react';
 
 import { USER_INBOUND_EMAIL_ADDRESS_LIMIT } from '@inbox-reader/common';
 
+import { ButtonContainer } from '~components/ButtonContainer';
 import { CREATE_INBOUND_EMAIL_ADDRESS, INBOUND_EMAIL_ADDRESSES } from '~lib/graphql';
 import { modals } from '~modals/modals';
 import { parseError } from '~utils/parse-error';
@@ -33,7 +34,7 @@ export const EmailsModal = ({ id, context }: ContextModalProps) => {
 	};
 
 	return (
-		<Stack gap="xl" className="overflow-container">
+		<Stack gap="xl" className="overflow-container" flex={1}>
 			<Alert color="gray">
 				You can use these email addresses to receive newsletters and other messages directly
 				within the app. When emails are sent to these addresses, we’ll do our best to
@@ -69,7 +70,8 @@ export const EmailsModal = ({ id, context }: ContextModalProps) => {
 					{parseError(error)?.message}
 				</Alert>
 			)}
-			<Group justify="space-between">
+
+			<ButtonContainer mt="auto">
 				<Button variant="default" onClick={() => context.closeModal(id)}>
 					Close
 				</Button>
@@ -81,7 +83,7 @@ export const EmailsModal = ({ id, context }: ContextModalProps) => {
 				>
 					Create Email Address
 				</Button>
-			</Group>
+			</ButtonContainer>
 		</Stack>
 	);
 };

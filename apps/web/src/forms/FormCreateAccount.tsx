@@ -1,20 +1,12 @@
 import { useMutation } from '@apollo/client';
-import {
-	Anchor,
-	Button,
-	Divider,
-	Group,
-	PasswordInput,
-	Stack,
-	Text,
-	TextInput,
-} from '@mantine/core';
+import { Anchor, Button, Divider, PasswordInput, Stack, Text, TextInput } from '@mantine/core';
 import { useForm, zodResolver } from '@mantine/form';
 import { IconAt, IconLock, IconMail } from '@tabler/icons-react';
 import { useLocation, useNavigate } from '@tanstack/react-router';
 
 import { createAccountSchema } from '@inbox-reader/common';
 
+import { ButtonContainer } from '~components/ButtonContainer';
 import { Form } from '~components/Form';
 import { CREATE_ACCOUNT } from '~lib/graphql';
 import { AuthViewProps } from '~pages/Auth/Auth';
@@ -80,7 +72,7 @@ export const FormCreateAccount = ({ handleChangeAuthMode }: AuthViewProps) => {
 						<Anchor fz="sm">Privacy Policy</Anchor>.
 					</Text>
 
-					<Group mt="xl" justify="space-between">
+					<ButtonContainer mt="xl">
 						<Button
 							variant="default"
 							size="md"
@@ -91,14 +83,15 @@ export const FormCreateAccount = ({ handleChangeAuthMode }: AuthViewProps) => {
 						>
 							Back
 						</Button>
+
 						<Button size="md" type="submit" loading={loadingCreateAccount}>
 							Create account
 						</Button>
-					</Group>
+					</ButtonContainer>
 
 					<Divider my="xxs" />
 
-					<Text fz="sm">
+					<Text fz="sm" ta="center">
 						Having trouble? <Anchor fz="sm">Contact support</Anchor>
 					</Text>
 				</Stack>

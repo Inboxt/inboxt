@@ -6,3 +6,25 @@
 	background: transparent;
 	color: inherit;
 }
+
+/* Really custom fullscreen modal, as Mantine doesn't support it for context modals. Not sure how many possible issues this might cause, but it works for now. */
+@media (max-width: 768px) {
+	.fullscreen-modal .mantine-Modal-content {
+		border-radius: 0 !important;
+		max-height: 100dvh !important;
+		height: 100dvh !important;
+		width: 100dvw !important;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.fullscreen-modal .mantine-Modal-inner {
+		padding: 0 !important;
+	}
+	
+	.fullscreen-modal .mantine-Modal-body {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+	}
+}

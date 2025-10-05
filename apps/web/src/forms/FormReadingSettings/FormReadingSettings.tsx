@@ -129,11 +129,12 @@ export const FormReadingSettings = () => {
 
 			<Title order={4}>Layout</Title>
 
-			<Group gap="xs">
+			<Group gap="xs" visibleFrom="xs">
 				<IconViewportWide size={18} />
 				<Text>Content width</Text>
 			</Group>
 			<Slider
+				visibleFrom="xs"
 				color="blue"
 				value={contentSettings.contentWidth}
 				onChange={(value) =>

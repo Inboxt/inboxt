@@ -1,0 +1,7 @@
+.container {
+	flex-direction: row;
+
+	@media (max-width: $mantine-breakpoint-xs) {
+		flex-direction: column-reverse;
+	}
+}

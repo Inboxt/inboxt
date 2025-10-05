@@ -8,6 +8,7 @@ export const modals = {
 			centered: true,
 			title: 'Install on Other Devices',
 			innerProps: {},
+			className: 'fullscreen-modal',
 		});
 	},
 
@@ -42,6 +43,7 @@ export const modals = {
 			centered: true,
 			title: 'Profile',
 			innerProps: {},
+			className: 'fullscreen-modal',
 		});
 	},
 
@@ -62,6 +64,7 @@ export const modals = {
 			size: 540,
 			title: 'Verify Email',
 			innerProps: {},
+			className: 'fullscreen-modal',
 		});
 	},
 
@@ -72,6 +75,7 @@ export const modals = {
 			title: 'Emails',
 			centered: true,
 			innerProps: {},
+			className: 'fullscreen-modal',
 		});
 	},
 
@@ -90,6 +94,7 @@ export const modals = {
 			modal: 'addContent',
 			size: 540,
 			title: 'Add',
+			centered: true,
 			innerProps: {},
 		});
 	},

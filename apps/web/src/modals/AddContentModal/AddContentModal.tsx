@@ -1,10 +1,11 @@
-import { Button, Group, Stack, TextInput } from '@mantine/core';
+import { Button, Stack, TextInput } from '@mantine/core';
 import { useForm, zodResolver } from '@mantine/form';
 import { ContextModalProps } from '@mantine/modals';
 import { useState } from 'react';
 
 import { addItemFromUrlSchema } from '@inbox-reader/common';
 
+import { ButtonContainer } from '~components/ButtonContainer';
 import { Form } from '~components/Form';
 import { LabelsMultiSelect } from '~components/LabelsMultiSelect';
 import { ENTRIES } from '~lib/graphql';
@@ -56,7 +57,7 @@ export const AddContentModal = ({ id, context }: ContextModalProps) => {
 	return (
 		<Form onSubmit={form.onSubmit(handleAddContent)} error={error} setErrors={form.setErrors}>
 			{({ error }) => (
-				<Stack>
+				<Stack gap="xl">
 					<TextInput
 						placeholder="https://example.com/"
 						{...form.getInputProps('url')}
@@ -67,7 +68,7 @@ export const AddContentModal = ({ id, context }: ContextModalProps) => {
 
 					{error}
 
-					<Group justify="flex-end" mt="md">
+					<ButtonContainer>
 						<Button
 							variant="default"
 							loading={loading}
@@ -79,7 +80,7 @@ export const AddContentModal = ({ id, context }: ContextModalProps) => {
 						<Button type="submit" loading={loading}>
 							Add
 						</Button>
-					</Group>
+					</ButtonContainer>
 				</Stack>
 			)}
 		</Form>

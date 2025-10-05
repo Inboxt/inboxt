@@ -1,8 +1,9 @@
 import { useQuery } from '@apollo/client';
-import { Button, Group, Stack } from '@mantine/core';
+import { Button, Stack } from '@mantine/core';
 import { ContextModalProps } from '@mantine/modals';
 import { useEffect, useState } from 'react';
 
+import { ButtonContainer } from '~components/ButtonContainer';
 import { EditableLabelItem } from '~components/EditableLabelItem';
 import { LABELS } from '~lib/graphql';
 import { modals } from '~modals/modals';
@@ -26,7 +27,7 @@ export const LabelsModal = ({ id, context }: ContextModalProps) => {
 	}, [editingLabelId, id]);
 
 	return (
-		<Stack>
+		<Stack gap="xl" justify="space-between" flex={1}>
 			<Stack gap="sm" mah={300} className="overflow-container">
 				{data?.labels?.map((label) => (
 					<EditableLabelItem
@@ -38,13 +39,13 @@ export const LabelsModal = ({ id, context }: ContextModalProps) => {
 				))}
 			</Stack>
 
-			<Group justify="space-between" mt="md">
-				<Button variant="light" onClick={modals.openCreateLabelModal}>
-					Create new
+			<ButtonContainer>
+				<Button onClick={() => context.closeModal(id)} variant="default">
+					Close
 				</Button>
 
-				<Button onClick={() => context.closeModal(id)}>Save & Close</Button>
-			</Group>
+				<Button onClick={modals.openCreateLabelModal}>Create Label</Button>
+			</ButtonContainer>
 		</Stack>
 	);
 };

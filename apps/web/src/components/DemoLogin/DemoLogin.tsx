@@ -1,8 +1,9 @@
 import { useMutation } from '@apollo/client';
-import { Anchor, Button, Divider, Group, List, Stack, Switch, Text } from '@mantine/core';
+import { Anchor, Button, Divider, List, Stack, Switch, Text } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useNavigate } from '@tanstack/react-router';
 
+import { ButtonContainer } from '~components/ButtonContainer';
 import { CREATE_DEMO_ACCOUNT } from '~lib/graphql';
 import { AuthViewProps } from '~pages/Auth/Auth';
 import { Route } from '~routes/auth.route';
@@ -40,7 +41,7 @@ export const DemoLogin = ({ handleChangeAuthMode }: AuthViewProps) => {
 						following in mind:
 					</Text>
 
-					<List type="ordered">
+					<List type="ordered" style={{ listStylePosition: 'outside' }}>
 						<List.Item>
 							<b>Shared Access</b>: The demo account is public, meaning it’s
 							accessible to other users. We strongly advise against sharing or saving
@@ -89,11 +90,10 @@ export const DemoLogin = ({ handleChangeAuthMode }: AuthViewProps) => {
 						})}
 					/>
 
-					<Group justify="space-between">
+					<ButtonContainer mt="md">
 						<Button
 							variant="default"
 							size="md"
-							mt="md"
 							onClick={() => void handleChangeAuthMode(undefined)}
 						>
 							Back
@@ -102,7 +102,7 @@ export const DemoLogin = ({ handleChangeAuthMode }: AuthViewProps) => {
 						<Button size="md" type="submit" loading={loading}>
 							Continue
 						</Button>
-					</Group>
+					</ButtonContainer>
 
 					<Divider my="xxs" />
 

@@ -95,7 +95,7 @@ export const Header = ({ opened, toggle }: HeaderProps) => {
 							size="header"
 						/>
 
-						<Group gap="md" ml="auto">
+						<Group gap={0} ml="auto">
 							<ItemsOptions
 								mode={
 									selectedItems.length > 0 &&

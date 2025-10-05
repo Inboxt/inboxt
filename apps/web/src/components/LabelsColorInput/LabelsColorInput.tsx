@@ -1,6 +1,8 @@
 import { ColorInput } from '@mantine/core';
 import { useUncontrolled } from '@mantine/hooks';
 
+import { useScreenQuery } from '~hooks/useScreenQuery.tsx';
+
 import { labelColors } from '../../theme/labelColors.ts';
 
 type LabelsColorInputProps = {
@@ -18,6 +20,7 @@ export const LabelsColorInput = ({
 	label,
 	className,
 }: LabelsColorInputProps) => {
+	const isBelowSmScreen = useScreenQuery('sm', 'below');
 	const [_value, handleChange] = useUncontrolled({
 		value,
 		defaultValue,
@@ -28,7 +31,7 @@ export const LabelsColorInput = ({
 		<ColorInput
 			value={_value}
 			onChange={(fieldValue) => handleChange(fieldValue)}
-			maw={110}
+			maw={isBelowSmScreen ? undefined : 120}
 			swatches={labelColors}
 			withPicker={false}
 			disallowInput

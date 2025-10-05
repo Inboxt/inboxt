@@ -1,10 +1,11 @@
 import { useMutation } from '@apollo/client';
-import { Button, Text, Group, Stack, TextInput } from '@mantine/core';
+import { Button, Text, Stack, TextInput } from '@mantine/core';
 import { useForm, zodResolver } from '@mantine/form';
 import { ContextModalProps } from '@mantine/modals';
 
 import { deleteAccountSchema } from '@inbox-reader/common';
 
+import { ButtonContainer } from '~components/ButtonContainer';
 import { Form } from '~components/Form';
 import { DELETE_ACCOUNT } from '~lib/graphql';
 import { client } from '~lib/graphql/client';
@@ -28,9 +29,9 @@ export const DeleteAccountModal = ({ id, context }: ContextModalProps) => {
 	};
 
 	return (
-		<Form onSubmit={form.onSubmit(handleDeleteAccount)} error={error}>
+		<Form onSubmit={form.onSubmit(handleDeleteAccount)} error={error} style={{ flex: 1 }}>
 			{({ error }) => (
-				<Stack>
+				<Stack flex={1}>
 					<Text>Are you sure you want to delete your account?</Text>
 					<Text>
 						This action is{' '}
@@ -54,7 +55,7 @@ export const DeleteAccountModal = ({ id, context }: ContextModalProps) => {
 
 					{error}
 
-					<Group justify="flex-end" mt="md">
+					<ButtonContainer>
 						<Button
 							variant="default"
 							onClick={() => context.closeModal(id)}
@@ -66,7 +67,7 @@ export const DeleteAccountModal = ({ id, context }: ContextModalProps) => {
 						<Button color="red" type="submit" loading={loading}>
 							Delete Account
 						</Button>
-					</Group>
+					</ButtonContainer>
 				</Stack>
 			)}
 		</Form>

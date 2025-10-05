@@ -60,8 +60,20 @@ async function seedUsers() {
 		data: demoAccountData,
 	});
 
+	const freeAccountData = {
+		emailAddress: 'free@inbox-reader.com',
+		password: await hash('Password1@'),
+		isEmailVerified: false,
+		username: 'free',
+		plan: UserPlan.FREE,
+	};
+
+	const free = await prisma.user.create({
+		data: freeAccountData,
+	});
+
 	logSuccess('Users seeded');
-	return { demo };
+	return { demo, free };
 }
 
 async function seedLabels(userId: string) {
@@ -133,8 +145,12 @@ async function seed() {
 
 	await resetDatabase();
 	const users = await seedUsers();
+
 	await seedLabels(users.demo.id);
 	await seedSavedItems(users.demo.id);
+
+	await seedLabels(users.free.id);
+	await seedSavedItems(users.free.id);
 
 	logSection('🎉 Seeding complete!');
 }

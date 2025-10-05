@@ -4,7 +4,6 @@ import {
 	Stack,
 	TextInput,
 	Button,
-	Group,
 	Progress,
 	Text,
 	SegmentedControl,
@@ -16,6 +15,8 @@ import {
 	useMantineColorScheme,
 	useComputedColorScheme,
 	MantineColorScheme,
+	Box,
+	Flex,
 } from '@mantine/core';
 import { useForm, zodResolver } from '@mantine/form';
 import { ContextModalProps } from '@mantine/modals';
@@ -30,6 +31,8 @@ import {
 } from '@inbox-reader/common';
 
 import { Form } from '~components/Form';
+import { ButtonContainer } from '~components/ButtonContainer';
+import { useScreenQuery } from '~hooks/useScreenQuery.tsx';
 import { ACTIVE_USER, UPDATE_ACCOUNT } from '~lib/graphql';
 import { modals } from '~modals/modals';
 import { formatBytes } from '~utils/formatBytes.ts';
@@ -39,6 +42,7 @@ import { router } from '../../main';
 export const ProfileModal = ({ id, context }: ContextModalProps) => {
 	const { setColorScheme, colorScheme } = useMantineColorScheme();
 	const computedColorScheme = useComputedColorScheme();
+	const isBelowXsScreen = useScreenQuery('xs', 'below');
 
 	const { data, loading } = useQuery(ACTIVE_USER, { fetchPolicy: 'cache-and-network' });
 	const [updateProfile, { loading: updateProfileLoading, error: updateProfileError }] =
@@ -95,6 +99,7 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 								<TextInput label="Name" {...form.getInputProps('username')} />
 								<TextInput label="Email" {...form.getInputProps('emailAddress')} />
 							</SimpleGrid>
+
 							{data?.me?.pendingEmailAddress && (
 								<Alert color="yellow" icon={<IconBell />} mt="sm">
 									Verification email sent to <b>{data.me.pendingEmailAddress}</b>.
@@ -102,7 +107,8 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 								</Alert>
 							)}
 						</Skeleton>
-						{error}
+
+						{error && <Box mt="sm">{error}</Box>}
 					</Card>
 
 					<Card withBorder radius="md">
@@ -122,8 +128,13 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 					</Card>
 
 					<Card withBorder radius="md">
-						<Group justify="space-between">
-							<Stack gap="xxxs" maw="60%">
+						<Flex
+							justify="space-between"
+							align={{ base: 'stretch', xs: 'center' }}
+							gap="md"
+							direction={{ base: 'column', xs: 'row' }}
+						>
+							<Stack gap="xxxs" maw={isBelowXsScreen ? '100%' : '60%'}>
 								<Title order={5}>Email Addresses</Title>
 
 								<Text size="xs" c="dimmed">
@@ -139,12 +150,17 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 							<Button size="xs" variant="light" onClick={modals.openEmailsModal}>
 								Manage
 							</Button>
-						</Group>
+						</Flex>
 					</Card>
 
 					<Card withBorder radius="md">
 						<Skeleton visible={loading}>
-							<Group justify="space-between">
+							<Flex
+								justify="space-between"
+								align={{ base: 'stretch', xs: 'center' }}
+								gap="md"
+								direction={{ base: 'column', xs: 'row' }}
+							>
 								<Stack gap="xxxs">
 									<Title order={5}>Labels</Title>
 									<Text
@@ -165,7 +181,7 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 								>
 									Manage
 								</Button>
-							</Group>
+							</Flex>
 
 							{labelsUsed >= USER_LABELS_LIMIT && (
 								<Alert color="red" icon={<IconTag />} mt="sm">
@@ -208,46 +224,51 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 										Download link will be valid for 24 hours.
 									</Text>
 
-									<Group grow>
+									<Flex gap="md" direction={{ base: 'column', xs: 'row' }}>
 										<Button
 											leftSection={<IconDatabase size={16} />}
 											variant="default"
+											fullWidth
 										>
 											Export Full Account Data
 										</Button>
+
 										<Button
 											leftSection={<IconHighlight size={16} />}
 											variant="default"
+											fullWidth
 										>
 											Export Highlights
 										</Button>
-									</Group>
+									</Flex>
 								</Stack>
 							</Accordion.Panel>
 						</Accordion.Item>
 					</Accordion>
 
-					<Group justify="space-between">
+					<ButtonContainer>
 						<Button
-							variant="outline"
-							color="red"
-							onClick={modals.openDeleteAccountModal}
+							variant="default"
+							onClick={() => context.closeModal(id)}
+							loading={updateProfileLoading}
 						>
-							Delete Account
+							Cancel
 						</Button>
-						<Group>
+
+						<Flex gap="md" direction={{ base: 'column', xs: 'row' }}>
 							<Button
-								variant="default"
-								onClick={() => context.closeModal(id)}
-								loading={updateProfileLoading}
+								variant="light"
+								color="red"
+								onClick={modals.openDeleteAccountModal}
 							>
-								Cancel
+								Delete Account
 							</Button>
+
 							<Button type="submit" loading={updateProfileLoading}>
 								Save
 							</Button>
-						</Group>
-					</Group>
+						</Flex>
+					</ButtonContainer>
 				</Stack>
 			)}
 		</Form>
