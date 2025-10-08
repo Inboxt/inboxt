@@ -41,7 +41,7 @@ export const AppNotificationItem = ({ item }: { item: AppNotificationItem }) => 
 	}
 
 	const anchorProps = item.link
-		? { href: item.link, c: itemColor || 'black', target: '_blank' }
+		? { href: item.link, c: itemColor || 'var(--mantine-color-text)', target: '_blank' }
 		: {};
 
 	const timeAgo = item.date ? dayjs(item.date).fromNow() : '';

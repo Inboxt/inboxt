@@ -10,6 +10,7 @@ import {
 	Stack,
 	Text,
 	Title,
+	useComputedColorScheme,
 	VisuallyHidden,
 } from '@mantine/core';
 import {
@@ -50,6 +51,7 @@ import { useReaderSettings } from '~hooks/useReaderSettings.tsx';
 import classes from './FormReadingSettings.module.css';
 
 export const FormReadingSettings = () => {
+	const computedColorScheme = useComputedColorScheme();
 	const { contentSettings, setContentSettings } = useReaderSettings();
 
 	return (
@@ -64,6 +66,7 @@ export const FormReadingSettings = () => {
 					<ActionIcon
 						variant="light"
 						color="text"
+						bg={computedColorScheme === 'dark' ? 'dark' : undefined}
 						size="lg"
 						onClick={() =>
 							setContentSettings({
@@ -81,6 +84,7 @@ export const FormReadingSettings = () => {
 					<ActionIcon
 						variant="light"
 						color="text"
+						bg={computedColorScheme === 'dark' ? 'dark' : undefined}
 						size="lg"
 						onClick={() =>
 							setContentSettings({
@@ -222,7 +226,7 @@ export const FormReadingSettings = () => {
 
 							<Text>Text alignment</Text>
 							<SegmentedControl
-								color="blue"
+								color={computedColorScheme === 'dark' ? undefined : 'dark'}
 								value={contentSettings.alignment}
 								onChange={(value) =>
 									setContentSettings({

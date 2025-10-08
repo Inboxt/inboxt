@@ -58,7 +58,6 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 					<Box style={{ position: 'relative' }}>
 						<Box
 							style={{
-								backgroundColor: 'red',
 								height: 90,
 								width: 90,
 								overflow: 'hidden',
@@ -72,7 +71,8 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 										height: '100%',
 										width: '100%',
 										objectFit: 'cover',
-										backgroundColor: 'white',
+										backgroundColor: 'var(--mantine-color-dark-5)',
+										borderRadius: 4,
 									}}
 								/>
 							) : (
@@ -80,7 +80,8 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 									style={{
 										height: '100%',
 										width: '100%',
-										backgroundColor: 'white',
+										backgroundColor: 'var(--mantine-color-dark-5)',
+										borderRadius: 4,
 									}}
 								>
 									<IconPhotoOff size={36} color="#ccc" />

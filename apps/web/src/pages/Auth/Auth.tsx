@@ -65,7 +65,7 @@ export const Auth = () => {
 						<Anchor
 							variant="transparent"
 							size="compact-md"
-							c="dark"
+							c="dimmed"
 							mt="xs"
 							onClick={() => void handleChangeAuthMode('demo')}
 							component="button"
