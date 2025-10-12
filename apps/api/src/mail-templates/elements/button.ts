@@ -1,3 +1,5 @@
+import { APP_PRIMARY_COLOR } from '@inbox-reader/common';
+
 interface ButtonProps {
 	text: string;
 	url: string;
@@ -6,7 +8,7 @@ interface ButtonProps {
 export default ({ text, url }: ButtonProps): string => `
 <mj-button
 	href="${url}"
-	background-color="#228be6"
+	background-color="${APP_PRIMARY_COLOR}"
 	border-radius="4px"
 	color="white"
 	font-family="Helvetica, Arial, sans-serif"

@@ -1,12 +1,14 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
 
 import { addItemFromUrlSchema } from '@inbox-reader/common';
+import { APP_PRIMARY_COLOR } from '@inbox-reader/common';
+
 import { AppException } from '../../utils/app-exception';
 import { Prisma } from '../../../prisma/client';
 import { UserService } from 'src/modules/user/user.service';
 import { LabelService } from '../../modules/saved-item/entities/label/label.service';
-import { InjectQueue } from '@nestjs/bullmq';
-import { Queue } from 'bullmq';
 import { SavedItemService } from '../../modules/saved-item/saved-item.service';
 import { SavedItemType } from '../../enums/saved-item-type.enum';
 import { ArticleService } from '../../modules/saved-item/entities/article/article.service';
@@ -99,7 +101,7 @@ export class SavedItemManagerService {
 	async createDefaultItems(userId: string) {
 		const defaultLabel = await this.labelService.create(userId, {
 			name: 'Getting Started',
-			color: '#1c7ed6',
+			color: APP_PRIMARY_COLOR,
 		});
 
 		await this.addArticleFromUrl(

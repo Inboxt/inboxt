@@ -125,10 +125,10 @@ export const Auth = () => {
 		<Flex mih="100vh">
 			<Box p={42} pb={160} className={classes.headerContainer} visibleFrom="sm">
 				<Stack justify="flex-end" align="flex-end" ta="end" gap="xs">
-					<Title size={54} c="blue" fw={800}>
+					<Title size={54} c="primary" fw={800}>
 						{title}
 					</Title>
-					<Text fz="lg" fw={500} c="gray.7">
+					<Text fz="lg" fw={500} c="dimmed">
 						{description}
 					</Text>
 				</Stack>
@@ -136,7 +136,7 @@ export const Auth = () => {
 
 			<Box className={classes.formContainer}>
 				<Stack maw={560} w="100%">
-					<Title order={2} c="blue" hiddenFrom="sm">
+					<Title order={2} c="primary" hiddenFrom="sm">
 						{title}
 					</Title>
 

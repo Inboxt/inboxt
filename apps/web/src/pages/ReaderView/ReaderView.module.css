@@ -59,10 +59,6 @@
 	margin-right: auto;
 }
 
-.readerView a {
-	color: var(--reader-link-color);
-}
-
 [data-reader-theme='dark'] :global(.highlight) {
 	color: var(--mantine-color-body);
 }

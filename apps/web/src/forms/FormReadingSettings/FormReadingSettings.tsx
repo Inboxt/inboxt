@@ -10,7 +10,6 @@ import {
 	Stack,
 	Text,
 	Title,
-	useComputedColorScheme,
 	VisuallyHidden,
 } from '@mantine/core';
 import {
@@ -51,7 +50,6 @@ import { useReaderSettings } from '~hooks/useReaderSettings.tsx';
 import classes from './FormReadingSettings.module.css';
 
 export const FormReadingSettings = () => {
-	const computedColorScheme = useComputedColorScheme();
 	const { contentSettings, setContentSettings } = useReaderSettings();
 
 	return (
@@ -65,8 +63,7 @@ export const FormReadingSettings = () => {
 				<Group gap={4}>
 					<ActionIcon
 						variant="light"
-						color="text"
-						bg={computedColorScheme === 'dark' ? 'dark' : undefined}
+						color="var(--mantine-color-text)"
 						size="lg"
 						onClick={() =>
 							setContentSettings({
@@ -83,8 +80,7 @@ export const FormReadingSettings = () => {
 
 					<ActionIcon
 						variant="light"
-						color="text"
-						bg={computedColorScheme === 'dark' ? 'dark' : undefined}
+						color="var(--mantine-color-text)"
 						size="lg"
 						onClick={() =>
 							setContentSettings({
@@ -139,7 +135,7 @@ export const FormReadingSettings = () => {
 			</Group>
 			<Slider
 				visibleFrom="xs"
-				color="blue"
+				color="var(--mantine-color-text)"
 				value={contentSettings.contentWidth}
 				onChange={(value) =>
 					setContentSettings({
@@ -158,7 +154,7 @@ export const FormReadingSettings = () => {
 				<Text>Line height</Text>
 			</Group>
 			<Slider
-				color="blue"
+				color="var(--mantine-color-text)"
 				value={contentSettings.lineHeight}
 				onChange={(value) =>
 					setContentSettings({
@@ -190,7 +186,7 @@ export const FormReadingSettings = () => {
 								<Text>Character spacing</Text>
 							</Group>
 							<Slider
-								color="blue"
+								color="var(--mantine-color-text)"
 								value={contentSettings.letterSpacing}
 								onChange={(value) =>
 									setContentSettings({
@@ -210,7 +206,7 @@ export const FormReadingSettings = () => {
 								<Text>Word spacing</Text>
 							</Group>
 							<Slider
-								color="blue"
+								color="var(--mantine-color-text)"
 								value={contentSettings.wordSpacing}
 								onChange={(value) =>
 									setContentSettings({
@@ -226,7 +222,7 @@ export const FormReadingSettings = () => {
 
 							<Text>Text alignment</Text>
 							<SegmentedControl
-								color={computedColorScheme === 'dark' ? undefined : 'dark'}
+								color="dark.5"
 								value={contentSettings.alignment}
 								onChange={(value) =>
 									setContentSettings({
@@ -267,7 +263,7 @@ export const FormReadingSettings = () => {
 
 							<Button
 								variant="transparent"
-								color="blue"
+								color="primary"
 								ml="auto"
 								onClick={() => setContentSettings(READER_DEFAULT_SETTINGS)}
 							>

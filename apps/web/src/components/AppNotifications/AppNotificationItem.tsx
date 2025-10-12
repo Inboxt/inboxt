@@ -25,7 +25,7 @@ export const AppNotificationItem = ({ item }: { item: AppNotificationItem }) => 
 		case 'UPDATE':
 			badgeText = item.badge || 'UPDATE';
 			buttonText = "See what's new";
-			itemColor = 'blue';
+			itemColor = 'primary';
 			break;
 		case 'ALERT':
 			badgeText = 'IMPORTANT';
@@ -41,7 +41,7 @@ export const AppNotificationItem = ({ item }: { item: AppNotificationItem }) => 
 	}
 
 	const anchorProps = item.link
-		? { href: item.link, c: itemColor || 'var(--mantine-color-text)', target: '_blank' }
+		? { href: item.link, c: itemColor || 'primary', target: '_blank' }
 		: {};
 
 	const timeAgo = item.date ? dayjs(item.date).fromNow() : '';

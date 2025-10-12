@@ -70,7 +70,6 @@ export const UserMenu = () => {
 				color="initials"
 				allowedInitialsColors={['primary']}
 				radius={4}
-				className="mantine-active"
 				style={{ cursor: 'pointer' }}
 			/>
 		</MenuDrawer>

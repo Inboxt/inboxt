@@ -1,3 +1,5 @@
+import { APP_PRIMARY_COLOR } from '@inbox-reader/common';
+
 export default () => `
 <mj-attributes>
 	<mj-all font-family="Helvetica, Arial, sans-serif" />
@@ -9,7 +11,7 @@ export default () => `
 <mj-style>
 	a {
 		text-decoration: none;
-		color: #228be6;
+		color: ${APP_PRIMARY_COLOR};
 	}
 </mj-style>
 `;

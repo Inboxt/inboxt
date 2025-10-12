@@ -31,7 +31,7 @@ export const AppName = ({ size = 'sm', variant = 'full' }: AppNameProps) => {
 		<Group gap="xs">
 			<IconInbox size={iconSize} />
 			{variant === 'full' && (
-				<Title order={titleSize} c="blue.6">
+				<Title order={titleSize} c="primary">
 					Inbox Reader
 				</Title>
 			)}

@@ -71,7 +71,8 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 										height: '100%',
 										width: '100%',
 										objectFit: 'cover',
-										backgroundColor: 'var(--mantine-color-dark-5)',
+										backgroundColor:
+											'light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-5))',
 										borderRadius: 4,
 									}}
 								/>
@@ -80,11 +81,12 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 									style={{
 										height: '100%',
 										width: '100%',
-										backgroundColor: 'var(--mantine-color-dark-5)',
+										backgroundColor:
+											'light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-5))',
 										borderRadius: 4,
 									}}
 								>
-									<IconPhotoOff size={36} color="#ccc" />
+									<IconPhotoOff size={36} color="var(--mantine-color-dimmed)" />
 								</Center>
 							)}
 						</Box>

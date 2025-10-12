@@ -44,11 +44,10 @@ type Option = {
 	modes: ItemsOptionsMode[];
 	visible?: () => boolean;
 	onClick: () => boolean | Promise<boolean | undefined> | undefined;
-	clearsSelection?: boolean; // default: true
-	runsOnActionComplete?: boolean; // default: true
+	clearsSelection?: boolean;
+	runsOnActionComplete?: boolean;
 };
 
-// Narrowed item types for stronger typing inside options
 type SavedSelectable = Extract<SelectableItem, { __typename: 'SavedItem' }>;
 type HighlightSelectable = Extract<SelectableItem, { __typename: 'Highlight' }>;
 
@@ -91,7 +90,7 @@ export const ItemsOptions = ({ items, mode, size = 'md', onActionComplete }: Ite
 				centered: true,
 				children: <Text>{opts.message}</Text>,
 				labels: { confirm: opts.confirmLabel ?? 'Confirm', cancel: 'Cancel' },
-				confirmProps: { color: opts.confirmColor ?? 'blue' },
+				confirmProps: { color: opts.confirmColor ?? 'primary' },
 				onConfirm: () => resolve(true),
 				onCancel: () => resolve(false),
 			});

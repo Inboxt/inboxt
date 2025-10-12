@@ -1,5 +1,7 @@
 import { DEFAULT_THEME, MantineColor } from '@mantine/core';
 
+import { APP_PRIMARY_COLOR } from '@inbox-reader/common';
+
 const colorNames: MantineColor[] = [
 	'red',
 	'pink',
@@ -19,8 +21,4 @@ const swatches = colorNames
 	.map((name) => DEFAULT_THEME.colors[name]?.[7])
 	.filter((color): color is string => Boolean(color));
 
-export const labelColors = [
-	DEFAULT_THEME.colors.dark[9],
-	DEFAULT_THEME.colors.gray[9],
-	...swatches,
-];
+export const labelColors = ['#373A40', APP_PRIMARY_COLOR, ...swatches];

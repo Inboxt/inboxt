@@ -200,7 +200,7 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 									value={storagePercentage}
 									size="sm"
 									radius="md"
-									color="blue"
+									color="primary"
 								/>
 								<Text size="xs" c="dimmed">
 									{`${formatBytes(usedStorage)} of ${formatBytes(USER_MAX_STORAGE)} used`}

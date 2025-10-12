@@ -29,7 +29,7 @@ export const UnverifiedEmailAlert = ({ user }: UnverifiedEmailAlertProps) => {
 		? `You have ${daysLeft} day${daysLeft === 1 ? '' : 's'} left to verify your email before your account is automatically deleted.`
 		: `Your account is scheduled for deletion soon due to unverified email.`;
 
-	const color = daysLeft <= 3 ? 'red' : daysLeft <= 10 ? 'orange' : 'blue';
+	const color = daysLeft <= 3 ? 'red' : daysLeft <= 10 ? 'orange' : 'primary';
 
 	return (
 		<Alert radius={0} p="xxs" color={color}>

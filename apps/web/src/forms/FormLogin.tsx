@@ -1,7 +1,8 @@
 import { useMutation } from '@apollo/client';
-import { Button, PasswordInput, Stack, TextInput } from '@mantine/core';
+import { ActionIcon, Button, Group, PasswordInput, Stack, TextInput } from '@mantine/core';
 import { useForm, zodResolver } from '@mantine/form';
-import { IconAt, IconLock } from '@tabler/icons-react';
+import { useDisclosure } from '@mantine/hooks';
+import { IconAt, IconEye, IconEyeOff, IconLock } from '@tabler/icons-react';
 import { useLocation, useNavigate } from '@tanstack/react-router';
 
 import { signInSchema } from '@inbox-reader/common';
@@ -13,6 +14,7 @@ import { AuthViewProps } from '~pages/Auth/Auth';
 import { Route } from '~routes/auth.route';
 
 export const FormLogin = ({ handleChangeAuthMode }: AuthViewProps) => {
+	const [showPassword, { toggle }] = useDisclosure(false);
 	const [signIn, { loading, error }] = useMutation(SIGN_IN);
 	const location = useLocation();
 	const state = location.state as { emailAddress?: string } | undefined;
@@ -49,30 +51,44 @@ export const FormLogin = ({ handleChangeAuthMode }: AuthViewProps) => {
 						size="md"
 						{...form.getInputProps('emailAddress')}
 					/>
-
 					<PasswordInput
-						type="password"
 						label="Password"
 						placeholder="Password"
 						leftSectionPointerEvents="none"
 						leftSection={<IconLock size={16} />}
 						rightSectionPointerEvents="auto"
 						rightSectionWidth="auto"
+						visible={showPassword}
+						onVisibilityChange={toggle}
 						rightSection={
-							<Button
-								variant="subtle"
-								color="gray"
-								size="compact-xs"
-								mr="xs"
-								onClick={() =>
-									void handleChangeAuthMode(
-										'forgot-password',
-										form.getValues().emailAddress,
-									)
-								}
-							>
-								Forgot?
-							</Button>
+							<Group gap="xxxs" wrap="nowrap" mr="xxs">
+								<Button
+									variant="subtle"
+									color="gray"
+									size="xs"
+									onClick={() =>
+										void handleChangeAuthMode(
+											'forgot-password',
+											form.getValues().emailAddress,
+										)
+									}
+								>
+									Forgot?
+								</Button>
+
+								<ActionIcon
+									variant="subtle"
+									color="gray"
+									onClick={toggle}
+									aria-label={showPassword ? 'Hide password' : 'Show password'}
+								>
+									{showPassword ? (
+										<IconEyeOff size={16} />
+									) : (
+										<IconEye size={16} />
+									)}
+								</ActionIcon>
+							</Group>
 						}
 						{...form.getInputProps('password')}
 						size="md"

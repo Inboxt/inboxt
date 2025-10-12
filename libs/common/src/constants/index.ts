@@ -22,6 +22,7 @@ export const SORT_VALUES = SORT_OPTIONS.map((option) => option.value);
 /** User max storage, saved in bytes  */
 export const USER_MAX_STORAGE = 104857600;
 
+export const APP_PRIMARY_COLOR = '#55a57e';
 // READER VIEW SETTINGS
 /** theme settings */
 export type ReaderThemeName = 'light' | 'dark' | 'sepia';
@@ -31,7 +32,7 @@ export type ReaderThemeTokens = {
 	background: string;
 	text: string;
 	border: string;
-	link: string;
+	link: string | null;
 	highlight: string;
 };
 
@@ -40,21 +41,21 @@ export const READER_THEMES: Record<ReaderThemeName, ReaderThemeTokens> = {
 		background: '#ffffff',
 		text: '#000000',
 		border: 'var(--mantine-color-gray-4)',
-		link: '#228be6',
+		link: null,
 		highlight: '#FFF9B0',
 	},
 	dark: {
 		background: '#1A1B1E',
 		text: '#C1C2C5',
 		border: '#373A40',
-		link: '#228be6',
+		link: null,
 		highlight: '#FFF9B0',
 	},
 	sepia: {
 		background: '#f4ecd8',
 		text: '#3b3a36',
 		border: '#e3d7b9',
-		link: '#228be6',
+		link: null,
 		highlight: '#ffec99',
 	},
 };

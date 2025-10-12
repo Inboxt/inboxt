@@ -209,12 +209,7 @@ export const Header = ({ opened, toggle }: HeaderProps) => {
 							className={classes.newLinkButtonWrapper}
 						>
 							{!selectedItems.length && (
-								<Button
-									size="xs"
-									variant="light"
-									onClick={modals.openAddContentModal}
-									fullWidth
-								>
+								<Button size="xs" onClick={modals.openAddContentModal} fullWidth>
 									Add Link
 								</Button>
 							)}

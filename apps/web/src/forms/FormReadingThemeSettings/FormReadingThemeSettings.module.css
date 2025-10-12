@@ -4,7 +4,13 @@
 	transition: border-color 150ms ease;
 
 	&[data-checked] {
-		border-color: var(--mantine-primary-color-filled);
+		@mixin light {
+			border-color: var(--mantine-color-text);
+		}
+		
+		@mixin dark {
+			border-color: var(--mantine-color-dark-2);
+		}
 	}
 
 	@mixin hover {
@@ -13,7 +19,7 @@
 		}
 
 		@mixin dark {
-			background-color: var(--mantine-color-dark-6);
+			background-color: var(--mantine-color-dark-5);
 		}
 	}
 }
