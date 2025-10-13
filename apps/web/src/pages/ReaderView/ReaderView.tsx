@@ -22,7 +22,7 @@ import { useCanGoBack, useNavigate, useParams, useRouter } from '@tanstack/react
 import dayjs from 'dayjs';
 import { useEffect } from 'react';
 
-import { READER_THEMES } from '@inbox-reader/common';
+import { READER_THEMES } from '@inboxt/common';
 
 import { AppName } from '~components/AppName';
 import { HighlightableArticle } from '~components/HighlightableArticle';
@@ -68,7 +68,7 @@ export const ReaderView = () => {
 	const savedItem = data?.savedItem;
 	const title = savedItem?.title || '';
 	const trimmedTitle = title.length > 50 ? title.slice(0, 50).trimEnd() + '...' : title;
-	useDocumentTitle(trimmedTitle ? `${trimmedTitle} | Inbox Reader` : 'Inbox Reader');
+	useDocumentTitle(trimmedTitle ? `${trimmedTitle} | Inboxt` : 'Inboxt');
 
 	const { selectedText, highlightSelection, rangeRect, hasValidSelection } = useTextHighlighting(
 		undefined,

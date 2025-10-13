@@ -14,7 +14,7 @@ import { IconAt, IconLock } from '@tabler/icons-react';
 import { useLocation, useNavigate } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 
-import { resetPasswordSchema, requestPasswordRecoverySchema } from '@inbox-reader/common';
+import { resetPasswordSchema, requestPasswordRecoverySchema } from '@inboxt/common';
 
 import { Form } from '~components/Form';
 import { REQUEST_PASSWORD_RECOVERY, RESET_PASSWORD } from '~lib/graphql';

@@ -10,7 +10,7 @@ import {
 	requestPasswordRecoverySchema,
 	resetPasswordSchema,
 	verifyEmailSchema,
-} from '@inbox-reader/common';
+} from '@inboxt/common';
 
 import { UserService } from '../user/user.service';
 import { GqlContext } from '../../types/graphql-context';
@@ -182,7 +182,7 @@ export class AuthService {
 	async createDemo(context: any) {
 		const demoId = crypto.randomUUID();
 		const username = `demo-${demoId.slice(0, 8)}`;
-		const emailAddress = `${username}@inbox-reader.com`;
+		const emailAddress = `${username}@demo.inboxt.app`;
 		const password = crypto.randomBytes(8).toString('hex');
 
 		// Check if a user with this email somehow exists (very unlikely)

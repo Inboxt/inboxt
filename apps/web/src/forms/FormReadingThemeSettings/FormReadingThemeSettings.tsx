@@ -1,6 +1,6 @@
 import { Group, Stack, Text, Title, Radio, SimpleGrid, Box } from '@mantine/core';
 
-import { READER_THEMES, ReaderTheme } from '@inbox-reader/common';
+import { READER_THEMES, ReaderTheme } from '@inboxt/common';
 
 import { useReaderSettings } from '~hooks/useReaderSettings.tsx';
 

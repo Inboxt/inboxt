@@ -7,7 +7,7 @@ import { Logger } from '@nestjs/common';
 import { Prisma } from '../../../../../prisma/client';
 import { PrismaService } from '../../../../services/prisma.service';
 import { InboundEmailAddressService } from '../../../inbound-email-address/inbound-email-address.service';
-import { MAX_NEWSLETTER_WORD_COUNT, MIN_NEWSLETTER_WORD_COUNT } from '@inbox-reader/common';
+import { MAX_NEWSLETTER_WORD_COUNT, MIN_NEWSLETTER_WORD_COUNT } from '@inboxt/common';
 
 @Injectable()
 export class NewsletterService {

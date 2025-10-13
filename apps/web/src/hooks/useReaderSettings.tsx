@@ -7,7 +7,7 @@ import {
 	ReaderTheme,
 	ReaderThemeName,
 	ReaderThemeTokens,
-} from '@inbox-reader/common';
+} from '@inboxt/common';
 
 function mapFontFamily(font: ReaderContentSettings['font']) {
 	if (font === 'Serif') {

@@ -1,4 +1,4 @@
-import { APP_PRIMARY_COLOR } from '@inbox-reader/common';
+import { APP_PRIMARY_COLOR } from '@inboxt/common';
 
 interface ButtonProps {
 	text: string;

@@ -32,7 +32,7 @@ export default defineConfig(({ mode }) => {
 			},
 		},
 		optimizeDeps: {
-			include: ['@inbox-reader/common'],
+			include: ['@inboxt/common'],
 		},
 	};
 });

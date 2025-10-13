@@ -22,7 +22,7 @@ export const verifyEmailReminderTemplate = ({ daysRemaining }: { daysRemaining: 
 				${header('⚠️ Verify your email soon')}
 				
 				<mj-text>
-					We noticed that you created an Inbox Reader account but haven't verified your email address yet.
+					We noticed that you created an Inboxt account but haven't verified your email address yet.
 				</mj-text>
 				
 				<mj-text>
@@ -40,7 +40,7 @@ export const verifyEmailReminderTemplate = ({ daysRemaining }: { daysRemaining: 
 				</mj-text>
 				
 				<mj-text  align="center" font-size="14px" padding-top="20px">
-					If you no longer wish to use Inbox Reader, no action is required—your account will be automatically deleted.
+					If you no longer wish to use Inboxt, no action is required—your account will be automatically deleted.
 				</mj-text>
 			</mj-column>
 		</mj-section>

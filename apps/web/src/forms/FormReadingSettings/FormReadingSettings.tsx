@@ -43,7 +43,7 @@ import {
 	READER_LINE_HEIGHTS,
 	READER_WORD_SPACING,
 	ReaderContentSettings,
-} from '@inbox-reader/common';
+} from '@inboxt/common';
 
 import { useReaderSettings } from '~hooks/useReaderSettings.tsx';
 

@@ -49,7 +49,7 @@ async function seedUsers() {
 
 	// Demo account
 	const demoAccountData = {
-		emailAddress: 'demo@inbox-reader.com',
+		emailAddress: 'demo@inboxt.app',
 		password: await hash('Password1@'),
 		isEmailVerified: true,
 		username: 'demo',
@@ -61,7 +61,7 @@ async function seedUsers() {
 	});
 
 	const freeAccountData = {
-		emailAddress: 'free@inbox-reader.com',
+		emailAddress: 'free@inboxt.app',
 		password: await hash('Password1@'),
 		isEmailVerified: false,
 		username: 'free',

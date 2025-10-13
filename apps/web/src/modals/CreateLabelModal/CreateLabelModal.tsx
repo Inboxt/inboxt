@@ -3,7 +3,7 @@ import { Stack, TextInput, Button, Flex } from '@mantine/core';
 import { useForm, zodResolver } from '@mantine/form';
 import { ContextModalProps } from '@mantine/modals';
 
-import { createLabelSchema } from '@inbox-reader/common';
+import { createLabelSchema } from '@inboxt/common';
 
 import { ButtonContainer } from '~components/ButtonContainer';
 import { Form } from '~components/Form';

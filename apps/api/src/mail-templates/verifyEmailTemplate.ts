@@ -29,7 +29,7 @@ export const verifyEmailTemplate = ({
 					${
 						isEmailChange
 							? 'Please verify your new email address using the code below to complete the change and continue using all features.'
-							: 'Thanks for joining Inbox Reader! Please verify your email using the code below to unlock all features.'
+							: 'Thanks for joining Inboxt! Please verify your email using the code below to unlock all features.'
 					}
 				</mj-text>
 				

@@ -28,7 +28,7 @@ import {
 	USER_INBOUND_EMAIL_ADDRESS_LIMIT,
 	USER_LABELS_LIMIT,
 	USER_MAX_STORAGE,
-} from '@inbox-reader/common';
+} from '@inboxt/common';
 
 import { Form } from '~components/Form';
 import { ButtonContainer } from '~components/ButtonContainer';
@@ -143,7 +143,7 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 
 								<Text size="xs" c="dimmed">
 									Create private email addresses to receive newsletters and other
-									messages directly in Inbox-Reader.
+									messages directly in Inboxt.
 								</Text>
 							</Stack>
 

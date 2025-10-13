@@ -4,7 +4,7 @@ import { ContextModalProps } from '@mantine/modals';
 import { IconAlertTriangleFilled } from '@tabler/icons-react';
 import { useEffect } from 'react';
 
-import { USER_INBOUND_EMAIL_ADDRESS_LIMIT } from '@inbox-reader/common';
+import { USER_INBOUND_EMAIL_ADDRESS_LIMIT } from '@inboxt/common';
 
 import { ButtonContainer } from '~components/ButtonContainer';
 import { CREATE_INBOUND_EMAIL_ADDRESS, INBOUND_EMAIL_ADDRESSES } from '~lib/graphql';

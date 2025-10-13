@@ -2,7 +2,7 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import dayjs from 'dayjs';
 import { hash } from 'argon2';
 
-import { updateAccountSchema, deleteAccountSchema } from '@inbox-reader/common';
+import { updateAccountSchema, deleteAccountSchema } from '@inboxt/common';
 
 import { PrismaService } from '../../services/prisma.service';
 import { Prisma } from '../../../prisma/client';

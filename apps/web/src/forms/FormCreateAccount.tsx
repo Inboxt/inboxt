@@ -4,7 +4,7 @@ import { useForm, zodResolver } from '@mantine/form';
 import { IconAt, IconLock, IconMail } from '@tabler/icons-react';
 import { useLocation, useNavigate } from '@tanstack/react-router';
 
-import { createAccountSchema } from '@inbox-reader/common';
+import { createAccountSchema } from '@inboxt/common';
 
 import { ButtonContainer } from '~components/ButtonContainer';
 import { Form } from '~components/Form';

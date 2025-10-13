@@ -5,11 +5,12 @@ import * as cheerio from 'cheerio';
 import { fetch } from 'undici';
 import DOMPurify from 'dompurify';
 
+import { MAX_ARTICLE_WORD_COUNT } from '@inboxt/common';
+
 import { Prisma } from '../../../../../prisma/client';
 import { PrismaService } from '../../../../services/prisma.service';
 import { AppException } from '../../../../utils/app-exception';
 import { applyArticleDomainFilter } from '../../../../filters/articleDomainFilters';
-import { MAX_ARTICLE_WORD_COUNT } from '@inbox-reader/common';
 
 @Injectable()
 export class ArticleService {

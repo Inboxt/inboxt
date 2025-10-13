@@ -1,5 +1,5 @@
 {
-	"name": "inbox-reader",
+	"name": "inboxt",
 	"private": true,
 	"workspaces": [
 		"apps/*",

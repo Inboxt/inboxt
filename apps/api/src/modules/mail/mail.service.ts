@@ -28,7 +28,7 @@ export class MailService {
 				htmlContent,
 			},
 			headers: {
-				'X-Inbox-Reader-Forwarded': 'true',
+				'X-Inboxt-Forwarded': 'true',
 				'X-Original-From': from,
 				'X-Original-To': payload.headers?.To?.[0] || '',
 				'X-Original-Subject': subject,

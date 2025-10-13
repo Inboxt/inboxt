@@ -21,7 +21,7 @@ export const accountDeletedTemplate = ({ timestamp }: { timestamp: string }) => 
 				${header('🔒 Account deleted')}
 				
 				<mj-text>
-					As requested, your Inbox Reader account has been permanently deleted on ${timestamp}.
+					As requested, your Inboxt account has been permanently deleted on ${timestamp}.
 				</mj-text>
 				
 				<mj-text>
@@ -38,7 +38,7 @@ export const accountDeletedTemplate = ({ timestamp }: { timestamp: string }) => 
 				</mj-text>
 				
 				<mj-text>
-					If you deleted your account by mistake or wish to create a new account in the future, you can always register again at <a href="${process.env.WEB_URL as string}">inbox-reader.app</a>.
+					If you deleted your account by mistake or wish to create a new account in the future, you can always register again at <a href="${process.env.WEB_URL as string}">inboxt.app</a>.
 				</mj-text>
 				
 				${button({

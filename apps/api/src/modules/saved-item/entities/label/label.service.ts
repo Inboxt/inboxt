@@ -1,6 +1,6 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 
-import { createLabelSchema, updateLabelSchema, USER_LABELS_LIMIT } from '@inbox-reader/common';
+import { createLabelSchema, updateLabelSchema, USER_LABELS_LIMIT } from '@inboxt/common';
 
 import { Prisma } from '../../../../../prisma/client';
 import { PrismaService } from '../../../../services/prisma.service';

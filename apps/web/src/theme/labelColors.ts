@@ -1,6 +1,6 @@
 import { DEFAULT_THEME, MantineColor } from '@mantine/core';
 
-import { APP_PRIMARY_COLOR } from '@inbox-reader/common';
+import { APP_PRIMARY_COLOR } from '@inboxt/common';
 
 const colorNames: MantineColor[] = [
 	'red',

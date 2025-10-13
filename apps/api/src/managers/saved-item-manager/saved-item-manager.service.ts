@@ -2,8 +2,8 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 
-import { addItemFromUrlSchema } from '@inbox-reader/common';
-import { APP_PRIMARY_COLOR } from '@inbox-reader/common';
+import { addItemFromUrlSchema } from '@inboxt/common';
+import { APP_PRIMARY_COLOR } from '@inboxt/common';
 
 import { AppException } from '../../utils/app-exception';
 import { Prisma } from '../../../prisma/client';
@@ -109,11 +109,11 @@ export class SavedItemManagerService {
 			`${process.env.WEB_URL}/getting-started.html`,
 			[defaultLabel.id],
 			{
-				author: 'Inbox Reader Team',
+				author: 'Inboxt Team',
 				originalUrl: null,
 				sourceDomain: null,
 				description:
-					'Welcome to Inbox Reader! This guide introduces the core features, support channels, and ways to contribute or self-host.',
+					'Welcome to Inboxt! This guide introduces the core features, support channels, and ways to contribute or self-host.',
 			},
 			{ skipQueue: true },
 		);
@@ -123,11 +123,11 @@ export class SavedItemManagerService {
 			`${process.env.WEB_URL}/tips-and-tricks.html`,
 			[defaultLabel.id],
 			{
-				author: 'Inbox Reader Team',
+				author: 'Inboxt Team',
 				originalUrl: null,
 				sourceDomain: null,
 				description:
-					'Discover handy shortcuts, expert tips, and clever ways to organize and save content in Inbox Reader. Learn what’s possible (and what’s coming soon) to boost your productivity and reading experience.',
+					'Discover handy shortcuts, expert tips, and clever ways to organize and save content in Inboxt. Learn what’s possible (and what’s coming soon) to boost your productivity and reading experience.',
 			},
 			{ skipQueue: true },
 		);

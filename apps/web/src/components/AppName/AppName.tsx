@@ -32,7 +32,7 @@ export const AppName = ({ size = 'sm', variant = 'full' }: AppNameProps) => {
 			<IconInbox size={iconSize} />
 			{variant === 'full' && (
 				<Title order={titleSize} c="primary">
-					Inbox Reader
+					Inboxt
 				</Title>
 			)}
 		</Group>

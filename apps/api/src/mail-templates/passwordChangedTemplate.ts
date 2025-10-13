@@ -19,7 +19,7 @@ export const passwordChangedTemplate = ({ timestamp }: { timestamp: string }) =>
 				${header('🔒 Password changed successfully')}
 				
 				<mj-text>
-					The password for your Inbox Reader account was successfully changed on ${timestamp}.
+					The password for your Inboxt account was successfully changed on ${timestamp}.
 				</mj-text>
 				
 				<mj-text>

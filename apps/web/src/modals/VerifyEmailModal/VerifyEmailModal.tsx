@@ -5,7 +5,7 @@ import { useInterval } from '@mantine/hooks';
 import { ContextModalProps } from '@mantine/modals';
 import { useState } from 'react';
 
-import { verifyEmailSchema } from '@inbox-reader/common';
+import { verifyEmailSchema } from '@inboxt/common';
 
 import { ButtonContainer } from '~components/ButtonContainer';
 import { Form } from '~components/Form';

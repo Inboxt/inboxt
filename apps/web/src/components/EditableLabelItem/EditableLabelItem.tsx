@@ -10,7 +10,7 @@ import {
 } from '@tabler/icons-react';
 import { useEffect } from 'react';
 
-import { updateLabelSchema } from '@inbox-reader/common';
+import { updateLabelSchema } from '@inboxt/common';
 
 import { useScreenQuery } from '~hooks/useScreenQuery';
 import { DELETE_LABEL, ENTRIES, LABELS, UPDATE_LABEL } from '~lib/graphql';

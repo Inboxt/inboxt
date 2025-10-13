@@ -24,7 +24,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
 	const isAboveLgScreen = useScreenQuery('lg', 'above');
 	const [opened, { toggle }] = useDisclosure(isAboveLgScreen);
 	const { selectedItems } = useContentSelection();
-	useDocumentTitle('Inbox Reader');
+	useDocumentTitle('Inboxt');
 
 	return (
 		<Box className={classes.layoutRoot}>

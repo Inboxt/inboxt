@@ -29,7 +29,7 @@ export const emailChangedTemplate = ({
 				${header('📧 Email address changed')}
 				
 				<mj-text>
-				  The email address for your Inbox Reader account was successfully changed on ${timestamp}.
+				  The email address for your Inboxt account was successfully changed on ${timestamp}.
 				</mj-text>
 				
 				${alert({

@@ -15,7 +15,7 @@ import { useLocalStorage } from '@mantine/hooks';
 import { IconArrowLeft, IconList, IconPhoto } from '@tabler/icons-react';
 import { useSearch, useRouter } from '@tanstack/react-router';
 
-import { SORT_OPTIONS } from '@inbox-reader/common';
+import { SORT_OPTIONS } from '@inboxt/common';
 
 import { AppSearch } from '~components/AppSearch';
 import { useContentSelection } from '~context/content-selection';

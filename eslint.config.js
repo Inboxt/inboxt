@@ -71,7 +71,7 @@ export default tseslint.config(
 					'newlines-between': 'always',
 					pathGroups: [
 						{
-							pattern: '@inbox-reader/**',
+							pattern: '@inboxt/**',
 							group: 'internal',
 							position: 'after',
 						},

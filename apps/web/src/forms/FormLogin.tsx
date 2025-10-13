@@ -5,7 +5,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { IconAt, IconEye, IconEyeOff, IconLock } from '@tabler/icons-react';
 import { useLocation, useNavigate } from '@tanstack/react-router';
 
-import { signInSchema } from '@inbox-reader/common';
+import { signInSchema } from '@inboxt/common';
 
 import { ButtonContainer } from '~components/ButtonContainer';
 import { Form } from '~components/Form';

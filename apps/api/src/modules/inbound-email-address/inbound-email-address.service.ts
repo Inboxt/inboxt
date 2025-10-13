@@ -2,7 +2,7 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import dayjs from 'dayjs';
 import { randomBytes } from 'crypto';
 
-import { USER_INBOUND_EMAIL_ADDRESS_LIMIT } from '@inbox-reader/common';
+import { USER_INBOUND_EMAIL_ADDRESS_LIMIT } from '@inboxt/common';
 
 import { Prisma } from '../../../prisma/client';
 

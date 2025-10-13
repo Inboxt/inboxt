@@ -3,7 +3,7 @@ import { Button, Text, Stack, TextInput } from '@mantine/core';
 import { useForm, zodResolver } from '@mantine/form';
 import { ContextModalProps } from '@mantine/modals';
 
-import { deleteAccountSchema } from '@inbox-reader/common';
+import { deleteAccountSchema } from '@inboxt/common';
 
 import { ButtonContainer } from '~components/ButtonContainer';
 import { Form } from '~components/Form';

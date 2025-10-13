@@ -12,7 +12,7 @@ import {
 import { IconLabelImportantFilled } from '@tabler/icons-react';
 import { useState } from 'react';
 
-import { MAX_VISIBLE_SELECTED_LABELS } from '@inbox-reader/common';
+import { MAX_VISIBLE_SELECTED_LABELS } from '@inboxt/common';
 
 import { LABELS } from '~lib/graphql';
 

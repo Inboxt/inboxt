@@ -25,7 +25,7 @@ export class MailProcessor extends BaseQueueProcessor {
 	@LogExecutionTime
 	private async sendEmail(mailOptions: any) {
 		await this.mailerService.sendMail({
-			from: '"Inbox Reader" <no-reply@inbox-reader.com>',
+			from: '"Inboxt" <no-reply@inboxt.app>',
 			...mailOptions,
 		});
 	}

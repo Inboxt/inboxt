@@ -10,7 +10,7 @@ export default () => `
 <mj-section padding="0 24px">
 	<mj-column width="90%" padding="0">
 		<mj-text color="#666666" font-size="14px" padding="0" align="left">
-			© ${dayjs().year()} Inbox Reader. All rights reserved.
+			© ${dayjs().year()} Inboxt. All rights reserved.
 		</mj-text>
 	</mj-column>
 		

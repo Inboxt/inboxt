@@ -1,7 +1,7 @@
 import { readLocalStorageValue } from '@mantine/hooks';
 import { createFileRoute } from '@tanstack/react-router';
 
-import { SORT_VALUES } from '@inbox-reader/common';
+import { SORT_VALUES } from '@inboxt/common';
 
 import { ItemsList } from '~pages/ItemsList';
 

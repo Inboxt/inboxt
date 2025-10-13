@@ -33,7 +33,7 @@ export const forwardedEmailTemplate = ({
 			<mj-column>
 				${header('📨 Forwarded Newsletter')}
 				
-				<mj-text>This email couldn’t be displayed in Inbox Reader, so we’ve forwarded it to you.</mj-text>
+				<mj-text>This email couldn’t be displayed in Inboxt, so we’ve forwarded it to you.</mj-text>
 				
 				${alert({
 					content: [
