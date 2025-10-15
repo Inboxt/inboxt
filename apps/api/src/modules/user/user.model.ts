@@ -18,4 +18,7 @@ export class User extends BaseModel {
 
 	@Field(() => UserPlan)
 	plan: UserPlan;
+
+	@Field(() => Date, { nullable: true })
+	lastExportAt?: Date;
 }

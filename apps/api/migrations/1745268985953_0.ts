@@ -34,6 +34,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 		resetPasswordCode: 'text',
 		resetPasswordExpiry: 'timestamp',
 		plan: { type: 'user_plan', notNull: true, default: 'FREE' },
+		lastExportAt: 'timestamp',
 	});
 
 	pgm.createTable('saved_item', {

@@ -79,6 +79,7 @@ model user {
   resetPasswordCode     String?
   resetPasswordExpiry   DateTime?               @db.Timestamp(6)
   plan                  user_plan               @default(FREE)
+  lastExportAt          DateTime?               @db.Timestamp(6)
   highlight             highlight[]
   inbound_email_address inbound_email_address[]
   label                 label[]

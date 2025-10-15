@@ -43,3 +43,9 @@ export const EMAIL_WELCOME = {
 	description:
 		'Explore your new account and see how Inboxt helps you save and read content distraction-free.',
 };
+
+export const EMAIL_EXPORT_READY = {
+	subject: 'Your Inboxt data export is ready',
+	description:
+		'Download your ZIP archive. The link will expire in 24 hours. The file will be automatically deleted from our servers after 3 days.',
+};

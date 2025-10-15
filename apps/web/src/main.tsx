@@ -22,6 +22,7 @@ import { VerifyEmailModal } from '~modals/VerifyEmailModal';
 
 import { routeTree } from './routeTree.gen';
 import { theme } from './theme';
+import { ExportDataModal } from '~modals/ExportDataModal';
 
 export const router = createRouter({
 	routeTree,
@@ -61,6 +62,7 @@ if (!rootElement.innerHTML) {
 								emails: EmailsModal,
 								deleteAccount: DeleteAccountModal,
 								addContent: AddContentModal,
+								exportData: ExportDataModal,
 							}}
 						>
 							<RouterProvider router={router} />

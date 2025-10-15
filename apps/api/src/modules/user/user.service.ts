@@ -224,6 +224,15 @@ export class UserService {
 		});
 	}
 
+	async recordExportRequest(id: string, timestamp: Date | null) {
+		return this.prisma.user.update({
+			where: { id },
+			data: {
+				lastExportAt: timestamp,
+			},
+		});
+	}
+
 	async delete(id: string, data: DeleteAccountInput) {
 		/*----------  Validation  ----------*/
 		await deleteAccountSchema.parseAsync(data);

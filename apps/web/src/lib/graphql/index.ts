@@ -12,6 +12,7 @@ export const USER_FRAGMENT = gql(`
 		plan
 		labelsCount
 		inboundEmailAddressesCount
+		lastExportAt
 	}
 `);
 
@@ -346,5 +347,11 @@ export const CREATE_DEMO_ACCOUNT = gql(`
 		createDemoAccount {
 			success
 		}
+	}
+`);
+
+export const REQUEST_EXPORT = gql(`
+	mutation requestExport($data: RequestExportInput!) {
+		requestExport(data: $data)
 	}
 `);

@@ -1,5 +1,7 @@
 import { modals as mantineModals } from '@mantine/modals';
 
+import { ExportDataModalProps } from '~modals/ExportDataModal/ExportDataModal.tsx';
+
 export const modals = {
 	openInstallModal: () => {
 		return mantineModals.openContextModal({
@@ -101,6 +103,18 @@ export const modals = {
 
 	openConfirmModal: (payload: Record<string, unknown>) => {
 		return mantineModals.openConfirmModal({ size: 540, ...payload });
+	},
+
+	openExportDataModal: ({ type }: ExportDataModalProps) => {
+		return mantineModals.openContextModal({
+			modal: 'exportData',
+			size: 540,
+			centered: true,
+			title: 'Confirm Export Request',
+			innerProps: {
+				type,
+			},
+		});
 	},
 
 	closeAll: () => {

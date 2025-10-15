@@ -18,8 +18,8 @@ export default () => `
 		<mj-image
 			padding="0"
 			width="20px"
-			src=""
-			alt=""
+			src="${process.env.STORAGE_S3_URL}/github-mark.svg"
+			alt="GitHub mark"
 			href="https://github.com/repo"
 			rel="noopener noreferrer"
 			align="right"

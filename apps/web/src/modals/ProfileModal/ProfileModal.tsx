@@ -1,27 +1,33 @@
 import { useMutation, useQuery } from '@apollo/client';
 import {
-	Card,
-	Stack,
-	TextInput,
-	Button,
-	Progress,
-	Text,
-	SegmentedControl,
-	Title,
 	Accordion,
 	Alert,
+	Box,
+	Button,
+	Card,
+	Flex,
+	MantineColorScheme,
+	Progress,
+	SegmentedControl,
 	SimpleGrid,
 	Skeleton,
-	useMantineColorScheme,
+	Stack,
+	Text,
+	TextInput,
+	Title,
 	useComputedColorScheme,
-	MantineColorScheme,
-	Box,
-	Flex,
+	useMantineColorScheme,
 } from '@mantine/core';
 import { useForm, zodResolver } from '@mantine/form';
 import { ContextModalProps } from '@mantine/modals';
 import { IconBell, IconDatabase, IconHighlight, IconTag } from '@tabler/icons-react';
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+import utc from 'dayjs/plugin/utc';
 import { useEffect } from 'react';
+
+dayjs.extend(duration);
+dayjs.extend(utc);
 
 import {
 	updateAccountSchema,
@@ -30,10 +36,11 @@ import {
 	USER_MAX_STORAGE,
 } from '@inboxt/common';
 
-import { Form } from '~components/Form';
 import { ButtonContainer } from '~components/ButtonContainer';
+import { Form } from '~components/Form';
 import { useScreenQuery } from '~hooks/useScreenQuery.tsx';
 import { ACTIVE_USER, UPDATE_ACCOUNT } from '~lib/graphql';
+import { ExportType } from '~lib/graphql/generated/graphql.ts';
 import { modals } from '~modals/modals';
 import { formatBytes } from '~utils/formatBytes.ts';
 
@@ -88,6 +95,13 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 	const storagePercentage = Math.min(Math.round((usedStorage / USER_MAX_STORAGE) * 100), 100);
 	const labelsUsed = data?.me?.labelsCount ?? 0;
 	const inboundEmailAddressesUsed = data?.me?.inboundEmailAddressesCount ?? 0;
+
+	const lastExportAt = data?.me?.lastExportAt;
+	const now = dayjs();
+	const last = lastExportAt ? dayjs(lastExportAt) : null;
+	const isBlocked = !!last && now.diff(last, 'hour') < 24;
+	const msLeft = isBlocked ? dayjs.duration(24, 'hour').asMilliseconds() - now.diff(last) : 0;
+	const duration = dayjs.duration(msLeft);
 
 	return (
 		<Form onSubmit={form.onSubmit(handleUpdateProfile)} error={updateProfileError}>
@@ -209,42 +223,60 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 						</Skeleton>
 					</Card>
 
-					<Accordion variant="separated" radius="md">
-						<Accordion.Item value="export">
-							<Accordion.Control>Export Your Data</Accordion.Control>
-							<Accordion.Panel>
-								<Stack gap="xs">
-									<Text size="sm">
-										You can request data export once per day. The export will be
-										sent to your registered email address and should arrive
-										within an hour.
-									</Text>
+					{loading ? (
+						<Skeleton visible={loading} height={48} />
+					) : (
+						<Accordion variant="separated" radius="md">
+							<Accordion.Item value="export">
+								<Accordion.Control>Export Your Data</Accordion.Control>
+								<Accordion.Panel>
+									<Stack gap="xs">
+										<Text size="sm">
+											Choose how to export your data: full account export
+											(once every 24 hours, sent by email) or highlights only
+											(unlimited, downloads in your browser; large files may
+											be emailed).
+										</Text>
 
-									<Text size="xs" c="dimmed">
-										Download link will be valid for 24 hours.
-									</Text>
+										<Flex gap="md" direction={{ base: 'column', xs: 'row' }}>
+											<Button
+												leftSection={<IconDatabase size={16} />}
+												variant="default"
+												fullWidth
+												onClick={() =>
+													modals.openExportDataModal({
+														type: ExportType.All,
+													})
+												}
+												disabled={isBlocked}
+											>
+												Export Full Account Data
+											</Button>
 
-									<Flex gap="md" direction={{ base: 'column', xs: 'row' }}>
-										<Button
-											leftSection={<IconDatabase size={16} />}
-											variant="default"
-											fullWidth
-										>
-											Export Full Account Data
-										</Button>
+											<Button
+												leftSection={<IconHighlight size={16} />}
+												variant="default"
+												fullWidth
+												onClick={() =>
+													modals.openExportDataModal({
+														type: ExportType.Highlights,
+													})
+												}
+											>
+												Export Highlights
+											</Button>
+										</Flex>
 
-										<Button
-											leftSection={<IconHighlight size={16} />}
-											variant="default"
-											fullWidth
-										>
-											Export Highlights
-										</Button>
-									</Flex>
-								</Stack>
-							</Accordion.Panel>
-						</Accordion.Item>
-					</Accordion>
+										{isBlocked && (
+											<Text size="xs" c="dimmed" ta="center">
+												{`You recently requested a full export. You can request another full export in ${duration.hours()}h ${duration.minutes()}m.`}
+											</Text>
+										)}
+									</Stack>
+								</Accordion.Panel>
+							</Accordion.Item>
+						</Accordion>
+					)}
 
 					<ButtonContainer>
 						<Button
