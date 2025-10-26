@@ -1,13 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { Readability } from '@mozilla/readability';
-import { JSDOM, VirtualConsole } from 'jsdom';
-import DOMPurify from 'dompurify';
+import { JSDOM } from 'jsdom';
 import { Logger } from '@nestjs/common';
 
 import { Prisma } from '../../../../../prisma/client';
 import { PrismaService } from '../../../../services/prisma.service';
 import { InboundEmailAddressService } from '../../../inbound-email-address/inbound-email-address.service';
 import { MAX_NEWSLETTER_WORD_COUNT, MIN_NEWSLETTER_WORD_COUNT } from '@inboxt/common';
+import { ContentExtractionService } from '../../../../services/content-extraction.service';
 
 @Injectable()
 export class NewsletterService {
@@ -15,6 +14,7 @@ export class NewsletterService {
 	constructor(
 		private prisma: PrismaService,
 		private inboundEmailAddressService: InboundEmailAddressService,
+		private contentExtractionService: ContentExtractionService,
 	) {}
 
 	private extractUnsubscribeUrl(payload: any): string | null {
@@ -77,7 +77,7 @@ export class NewsletterService {
 
 	async create(
 		savedItemId: string,
-		inboundEmailAddressId: string,
+		inboundEmailAddressId: string | null | undefined,
 		data: Omit<
 			Prisma.newsletterCreateInput,
 			| 'savedItemId'
@@ -167,23 +167,24 @@ export class NewsletterService {
 			};
 		}
 
-		const virtualConsole = new VirtualConsole();
-		const dom = new JSDOM(strippedHtml, { virtualConsole });
-		const window = dom.window;
-		const doc = dom.window.document;
-		const purify = DOMPurify(window);
+		let contentHtml: string | null = strippedHtml as string;
+		let description: string | null = null;
+		let withReadability = true;
 
-		const allText = doc?.body?.textContent || '';
-		const allTextLength = allText.split(/\s+/).length;
-		if (allTextLength > MAX_NEWSLETTER_WORD_COUNT) {
-			this.logger.warn('Email body exceeds word limit. Skipping.');
-			return {
-				success: false,
-				shouldForward: true,
-				userId: inboundEmailAddress.userId,
-			};
-		} else if (allTextLength < MIN_NEWSLETTER_WORD_COUNT) {
-			this.logger.warn('Email body is too short. Skipping.');
+		try {
+			const readerRes = this.contentExtractionService.extractReadableContent(
+				strippedHtml as string,
+				{
+					maxWords: MAX_NEWSLETTER_WORD_COUNT,
+					minWords: MIN_NEWSLETTER_WORD_COUNT,
+				},
+			);
+
+			contentHtml = readerRes?.contentHtml || null;
+			description = readerRes?.description || null;
+			withReadability = readerRes.withReadability;
+		} catch (error) {
+			this.logger.warn(`Error parsing newsletter: ${error}`);
 			return {
 				success: false,
 				shouldForward: true,
@@ -191,17 +192,10 @@ export class NewsletterService {
 			};
 		}
 
-		let rawHtml: string = strippedHtml;
-		let description: string | null = null;
-
-		try {
-			const readerRes = new Readability(doc).parse();
-			if (readerRes?.content) {
-				rawHtml = readerRes.content;
-				description = readerRes.excerpt ?? null;
-			}
-		} catch {
-			this.logger.warn('Readability failed to parse email. Using stripped HTML as fallback.');
+		if (!withReadability) {
+			this.logger.warn(
+				'Readability failed to parse email. Using stripped and sanitized HTML as fallback.',
+			);
 		}
 
 		// Fallback description handler
@@ -222,11 +216,6 @@ export class NewsletterService {
 			description = fallbackLines.slice(0, 2).join(' ') || null;
 		}
 
-		const sanitizedHtml = purify.sanitize(rawHtml, {
-			FORBID_TAGS: ['style', 'iframe', 'object', 'embed'],
-			FORBID_ATTR: ['onerror', 'onclick', 'onload', 'style'],
-		});
-
 		this.logger.log(
 			`Finished parsing newsletter: ${payload.headers?.Subject?.[0] || '[No Subject]'}`,
 		);
@@ -238,7 +227,7 @@ export class NewsletterService {
 				messageId,
 				inboundEmailAddressId: inboundEmailAddress.id,
 				title: payload.headers?.Subject?.[0] || '',
-				contentHtml: sanitizedHtml,
+				contentHtml: contentHtml,
 				contentText: strippedText,
 				description,
 				wordCount: strippedText?.split(/\s+/)?.length || 0,

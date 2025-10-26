@@ -12,6 +12,12 @@ import { LabelService } from '../../modules/saved-item/entities/label/label.serv
 import { SavedItemService } from '../../modules/saved-item/saved-item.service';
 import { SavedItemType } from '../../enums/saved-item-type.enum';
 import { ArticleService } from '../../modules/saved-item/entities/article/article.service';
+import {
+	DEFAULT_PROCESSED_ITEM_CONTENT,
+	DEFAULT_PROCESSED_ITEM_TITLE,
+	ITEM_PROCESSING_CONTENT,
+	ITEM_PROCESSING_TITLE,
+} from '../../common/constants/content-extraction.constants';
 
 @Injectable()
 export class SavedItemManagerService {
@@ -32,19 +38,20 @@ export class SavedItemManagerService {
 			Omit<Prisma.saved_itemCreateInput, 'user' | 'saved_item_label' | 'article' | 'id'>
 		>,
 	) {
+		const { title: prismaTitle, ...data } = prismaData || {};
 		const parsed = await this.articleService.parse(url);
 		const updatedItem = await this.savedItemService.update(userId, savedItemId, {
 			description: parsed.description,
-			title: parsed.title || 'Untitled Article',
+			title: prismaTitle || parsed.title || DEFAULT_PROCESSED_ITEM_TITLE,
 			leadImage: parsed.leadImage,
 			wordCount: parsed.wordCount,
 			author: parsed.author,
-			...prismaData,
+			...data,
 		});
 
 		await this.articleService.update(updatedItem.id, userId, {
-			contentHtml: parsed.contentHtml || 'Sorry, we were unable to parse the content.',
-			contentText: parsed.contentText || 'Sorry, we were unable to parse the content.',
+			contentHtml: parsed.contentHtml || DEFAULT_PROCESSED_ITEM_CONTENT,
+			contentText: parsed.contentText || DEFAULT_PROCESSED_ITEM_CONTENT,
 		});
 	}
 
@@ -66,20 +73,19 @@ export class SavedItemManagerService {
 
 		/*----------  Processing  ----------*/
 		const domain = new URL(url).hostname.replace(/^www\./, '');
-		const description = `Your article from ${domain} is being prepared for your reading library. We're removing ads, formatting content, and optimizing for readability. Once processing is complete, you'll be able to read it offline, highlight important sections, and add notes.`;
 		const placeholderItem = await this.savedItemService.create(userId, {
 			originalUrl: url,
 			sourceDomain: new URL(url).hostname.replace(/^www\./, ''),
-			title: 'Processing...',
-			description,
+			title: ITEM_PROCESSING_TITLE(url),
+			description: ITEM_PROCESSING_CONTENT(domain),
 			type: SavedItemType.ARTICLE,
 			wordCount: 0,
 			...prismaData,
 		});
 
 		await this.articleService.create(placeholderItem.id, {
-			contentHtml: description,
-			contentText: description,
+			contentHtml: ITEM_PROCESSING_CONTENT(domain),
+			contentText: ITEM_PROCESSING_CONTENT(domain),
 		});
 
 		if (labelIds?.length) {

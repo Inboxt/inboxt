@@ -105,15 +105,25 @@ export const modals = {
 		return mantineModals.openConfirmModal({ size: 540, ...payload });
 	},
 
-	openExportDataModal: ({ type }: ExportDataModalProps) => {
+	openExportDataModal: ({ title, type }: ExportDataModalProps & { title: string }) => {
 		return mantineModals.openContextModal({
 			modal: 'exportData',
-			size: 540,
+			size: 640,
 			centered: true,
-			title: 'Confirm Export Request',
+			title: title,
 			innerProps: {
 				type,
 			},
+		});
+	},
+
+	openImportModal: () => {
+		return mantineModals.openContextModal({
+			modal: 'import',
+			size: 640,
+			centered: true,
+			title: 'Import Data',
+			innerProps: {},
 		});
 	},
 

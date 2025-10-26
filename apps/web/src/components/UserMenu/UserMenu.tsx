@@ -47,9 +47,9 @@ export const UserMenu = () => {
 			action: modals.openLabelsModal,
 		},
 		{
-			label: 'Import Data',
+			label: 'Import',
 			icon: <IconCloudUpload />,
-			action: () => console.log('Import'),
+			action: modals.openImportModal,
 		},
 		{
 			label: 'Install',

@@ -5,6 +5,7 @@ import { NewsletterResolver } from './newsletter.resolver';
 import { InboundEmailAddressModule } from '../../../inbound-email-address/inbound-email-address.module';
 import { NewsletterSubscriptionService } from './newsletter-subscription/newsletter-subscription.service';
 import { NewsletterSubscriptionResolver } from './newsletter-subscription/newsletter-subscription.resolver';
+import { ContentExtractionService } from '../../../../services/content-extraction.service';
 
 @Module({
 	imports: [InboundEmailAddressModule],
@@ -14,6 +15,7 @@ import { NewsletterSubscriptionResolver } from './newsletter-subscription/newsle
 		NewsletterSubscriptionService,
 		NewsletterResolver,
 		NewsletterSubscriptionResolver,
+		ContentExtractionService,
 	],
 	exports: [NewsletterService, NewsletterSubscriptionService],
 })

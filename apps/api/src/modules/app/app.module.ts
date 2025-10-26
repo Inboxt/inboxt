@@ -26,6 +26,7 @@ import { HighlightModule } from '../highlight/highlight.module';
 import { EntryManagerModule } from '../../managers/entry-manager/entry-manager.module';
 import { AccountGuard } from '../../guards/account.guard';
 import { ExportModule } from '../export/export.module';
+import { ImportModule } from '../import/import.module';
 
 @Module({
 	imports: [
@@ -79,6 +80,7 @@ import { ExportModule } from '../export/export.module';
 		HighlightModule,
 		EntryManagerModule,
 		ExportModule,
+		ImportModule,
 	],
 	providers: [
 		PrismaService,

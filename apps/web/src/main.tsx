@@ -14,6 +14,8 @@ import { AddContentModal } from '~modals/AddContentModal';
 import { CreateLabelModal } from '~modals/CreateLabelModal';
 import { DeleteAccountModal } from '~modals/DeleteAccountModal';
 import { EmailsModal } from '~modals/EmailsModal/EmailsModal';
+import { ExportDataModal } from '~modals/ExportDataModal';
+import { ImportModal } from '~modals/ImportModal';
 import { InstallModal } from '~modals/InstallModal';
 import { LabelsModal } from '~modals/LabelsModal';
 import { LabelsSelectionModal } from '~modals/LabelsSelectionModal';
@@ -22,7 +24,6 @@ import { VerifyEmailModal } from '~modals/VerifyEmailModal';
 
 import { routeTree } from './routeTree.gen';
 import { theme } from './theme';
-import { ExportDataModal } from '~modals/ExportDataModal';
 
 export const router = createRouter({
 	routeTree,
@@ -63,6 +64,7 @@ if (!rootElement.innerHTML) {
 								deleteAccount: DeleteAccountModal,
 								addContent: AddContentModal,
 								exportData: ExportDataModal,
+								import: ImportModal,
 							}}
 						>
 							<RouterProvider router={router} />

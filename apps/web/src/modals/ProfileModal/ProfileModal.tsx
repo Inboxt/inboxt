@@ -245,6 +245,7 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 												fullWidth
 												onClick={() =>
 													modals.openExportDataModal({
+														title: 'Export Full Account Data',
 														type: ExportType.All,
 													})
 												}
@@ -259,6 +260,7 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 												fullWidth
 												onClick={() =>
 													modals.openExportDataModal({
+														title: 'Export Highlights',
 														type: ExportType.Highlights,
 													})
 												}

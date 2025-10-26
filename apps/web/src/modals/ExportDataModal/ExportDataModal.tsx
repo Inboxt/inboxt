@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@apollo/client';
-import { Alert, Button, SegmentedControl, Skeleton, Stack, Text, TextInput } from '@mantine/core';
+import { Button, Card, SegmentedControl, Skeleton, Stack, Text, TextInput } from '@mantine/core';
 import { ContextModalProps } from '@mantine/modals';
 import { useState } from 'react';
 
@@ -47,39 +47,43 @@ export const ExportDataModal = ({
 
 	return (
 		<Stack gap="xl">
-			<Alert color="gray">
-				{type === ExportType.All
-					? 'You can request a full data export once per day. It includes your saved items, highlights, labels, and metadata. The export will be prepared and sent to your email. Keep in mind that the export can take a long time to complete.'
-					: 'Export your highlights instantly in your chosen format. The file will download in your browser.'}
-			</Alert>
+			<Card withBorder radius="md">
+				<Stack gap="md">
+					<Text size="sm">
+						{type === ExportType.All
+							? 'Request a full account export once per day. It includes your saved items, highlights, labels, and metadata. The export will be prepared and sent to your email address. Large exports can take a while to complete.'
+							: 'Export your highlights instantly in your chosen format. The file will download directly in your browser.'}
+					</Text>
 
-			{type === ExportType.All && loading && <Skeleton height={80} />}
-			{type === ExportType.All && !loading && (
-				<TextInput
-					variant="filled"
-					label="Email Address"
-					value={data?.me?.emailAddress}
-					readOnly
-					description="If this is not correct, please update it in your profile settings."
-				/>
-			)}
+					{type === ExportType.All && loading && <Skeleton height={80} />}
+					{type === ExportType.All && !loading && (
+						<TextInput
+							variant="filled"
+							label="E	mail Address"
+							value={data?.me?.emailAddress}
+							readOnly
+							description="If this address is incorrect, please update it in your profile."
+						/>
+					)}
 
-			<Stack gap={0}>
-				<Text size="sm" fw={500} mb={3}>
-					Highlights Format
-				</Text>
+					<Stack gap={4}>
+						<Text size="sm" fw={500}>
+							{type === ExportType.All ? 'Highlights Format' : 'Format'}
+						</Text>
 
-				<SegmentedControl
-					color="dark.5"
-					value={formatForHighlights}
-					onChange={setFormatForHighlights}
-					data={[
-						{ label: 'HTML', value: ExportHighlightsFormat.Html },
-						{ label: 'Markdown', value: ExportHighlightsFormat.Markdown },
-						{ label: 'Text', value: ExportHighlightsFormat.Text },
-					]}
-				/>
-			</Stack>
+						<SegmentedControl
+							color="dark.5"
+							value={formatForHighlights}
+							onChange={setFormatForHighlights}
+							data={[
+								{ label: 'HTML', value: ExportHighlightsFormat.Html },
+								{ label: 'Markdown', value: ExportHighlightsFormat.Markdown },
+								{ label: 'Text', value: ExportHighlightsFormat.Text },
+							]}
+						/>
+					</Stack>
+				</Stack>
+			</Card>
 
 			<ButtonContainer>
 				<Button
@@ -91,7 +95,7 @@ export const ExportDataModal = ({
 				</Button>
 
 				<Button onClick={handleRequestExport} loading={loadingRequestExport}>
-					{`Export ${type === ExportType.All ? 'All Data' : 'Highlights'}`}
+					Export {type === ExportType.All ? 'All Data' : 'Highlights'}
 				</Button>
 			</ButtonContainer>
 		</Stack>

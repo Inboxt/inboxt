@@ -1,20 +1,20 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { Readability, isProbablyReaderable } from '@mozilla/readability';
-import { JSDOM, VirtualConsole } from 'jsdom';
 import * as cheerio from 'cheerio';
 import { fetch } from 'undici';
-import DOMPurify from 'dompurify';
 
 import { MAX_ARTICLE_WORD_COUNT } from '@inboxt/common';
 
 import { Prisma } from '../../../../../prisma/client';
 import { PrismaService } from '../../../../services/prisma.service';
 import { AppException } from '../../../../utils/app-exception';
-import { applyArticleDomainFilter } from '../../../../filters/articleDomainFilters';
+import { ContentExtractionService } from '../../../../services/content-extraction.service';
 
 @Injectable()
 export class ArticleService {
-	constructor(private readonly prismaService: PrismaService) {}
+	constructor(
+		private readonly prismaService: PrismaService,
+		private contentExtractionService: ContentExtractionService,
+	) {}
 
 	/* ------------ Private Helpers ------------ */
 	private async fetchHtml(url: string) {
@@ -44,37 +44,6 @@ export class ArticleService {
 		} catch {
 			return raw;
 		}
-	}
-
-	private preprocessDom(dom) {
-		// Fix to make sure that headers are included in the final content from @mozilla/readability
-		const document = dom.window.document;
-		const headers = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
-
-		// Remove anchor links from the article
-		headers.forEach((header) => {
-			header.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-				while (anchor.firstChild) {
-					header.insertBefore(anchor.firstChild, anchor);
-				}
-				anchor.remove();
-			});
-		});
-
-		// Fixes for missing images in the content of @mozilla/readability
-		document.querySelectorAll('[data-testid="ImageGraphicContainer"]').forEach((container) => {
-			const img = container.querySelector('img');
-			const nextFigcaption = container.nextElementSibling;
-
-			if (img && nextFigcaption && nextFigcaption.tagName === 'FIGCAPTION') {
-				const figure = document.createElement('figure');
-				figure.appendChild(img.cloneNode(true));
-				figure.appendChild(nextFigcaption.cloneNode(true));
-				container.parentNode?.insertBefore(figure, container);
-				container.remove();
-				nextFigcaption.remove();
-			}
-		});
 	}
 
 	async get(userId: string, query: Prisma.articleFindFirstArgs) {
@@ -123,49 +92,14 @@ export class ArticleService {
 		const html = await this.fetchHtml(url);
 		const ogImage = this.extractOgImage(html, url);
 
-		const virtualConsole = new VirtualConsole();
-		const dom = new JSDOM(html, { url, virtualConsole });
-		this.preprocessDom(dom);
-
-		const doc = dom.window.document;
-		const host = new URL(url).hostname;
-		applyArticleDomainFilter(host, doc);
-
-		const allText = doc?.body?.textContent || '';
-		if (allText.split(/\s+/).length > MAX_ARTICLE_WORD_COUNT) {
-			throw new AppException(
-				'The article you tried to add is too large for processing. \n If you believe this is an error, please contact support for further assistance.',
-				HttpStatus.BAD_REQUEST,
-			);
-		}
-
-		const isReadable = isProbablyReaderable(doc);
-		if (!isReadable) {
-			throw new AppException(
-				'Could not extract the article content. \n The page might be unsupported or does not contain a readable article. Please check the URL and try again. \n\n If this issue persists, please contact support for further assistance.',
-				HttpStatus.BAD_REQUEST,
-			);
-		}
-
-		const readerRes = new Readability(doc).parse();
-		if (!readerRes) {
-			throw new AppException(
-				'Could not extract the article content. \n The page might be unsupported or does not contain a readable article. Please check the URL and try again. \n\n If this issue persists, please contact support for further assistance.',
-				HttpStatus.BAD_REQUEST,
-			);
-		}
-
-		const window = dom.window;
-		const purify = DOMPurify(window);
+		const result = this.contentExtractionService.extractReadableContent(html, {
+			url,
+			maxWords: MAX_ARTICLE_WORD_COUNT,
+		});
 
 		return {
-			title: readerRes.title,
-			contentHtml: readerRes?.content ? purify.sanitize(readerRes.content) : null,
-			contentText: readerRes.textContent,
-			description: readerRes.excerpt,
 			leadImage: ogImage,
-			wordCount: readerRes.textContent?.split(/\s+/)?.length || 0,
-			author: readerRes.byline,
+			...result,
 		};
 	}
 }

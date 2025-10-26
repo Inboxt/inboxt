@@ -65,7 +65,7 @@ export const MenuDrawer = ({ items, children, label, height = 300 }: MenuDrawerP
 
 	if (isAboveXsScreen) {
 		return (
-			<Menu shadow="md" offset={4} withArrow>
+			<Menu shadow="md" offset={4} withArrow width={150}>
 				<Menu.Target>{children}</Menu.Target>
 
 				<Menu.Dropdown>{renderMenuItems()}</Menu.Dropdown>

@@ -23,7 +23,13 @@ type HighlightWithRelations = Prisma.highlightGetPayload<{
 }>;
 
 type SavedItemWithRelations = Prisma.saved_itemGetPayload<{
-	include: { article: true; newsletter: true; saved_item_label: { include: { label: true } } };
+	include: {
+		article: true;
+		newsletter: {
+			include: { newsletter_subscription: true };
+		};
+		saved_item_label: { include: { label: true } };
+	};
 }>;
 
 @Injectable()
@@ -44,8 +50,8 @@ export class ExportService {
 			this.savedItemService.getMany(userId, {
 				include: {
 					article: true,
-					newsletter: true,
 					saved_item_label: { include: { label: true } },
+					newsletter: { include: { newsletter_subscription: true } },
 				},
 			}) as Promise<SavedItemWithRelations[]>,
 			this.labelService.getMany(userId, {}),
@@ -93,6 +99,9 @@ export class ExportService {
 				savedItem.article?.contentHtml || savedItem.newsletter?.contentHtml || null,
 			contentText:
 				savedItem.article?.contentText || savedItem.newsletter?.contentText || null,
+			messageId: savedItem.newsletter?.messageId ?? null,
+			inboundEmailAddressId: savedItem.newsletter?.inboundEmailAddressId ?? null,
+			subscription: savedItem.newsletter?.newsletter_subscription?.name ?? null,
 		}));
 
 		const labelsJson = labels.map((label) => ({
@@ -162,6 +171,7 @@ export class ExportService {
 					return `${header}\n${highlight.text}\n`;
 				})
 				.join('\n---\n\n');
+
 			return {
 				filename: `highlights_${ts}.txt`,
 				mime: 'text/plain; charset=utf-8',
@@ -179,6 +189,7 @@ export class ExportService {
 					return `${titleLine}\n_${date}_\n\n> ${highlight.text.replace(/\n/g, '\n> ')}\n`;
 				})
 				.join('\n---\n\n');
+
 			return {
 				filename: `highlights_${ts}.md`,
 				mime: 'text/markdown; charset=utf-8',
@@ -263,6 +274,34 @@ export class ExportService {
 			name: 'saved_items/saved_items.json',
 		});
 
+		// saved_items.csv (flat export for CSV import)
+		{
+			const header = ['name', 'url', 'description', 'date', 'labels'];
+			const escapeCsv = (v: string) => {
+				const needsQuotes = /[",\n]/.test(v);
+				const escaped = v.replace(/"/g, '""');
+				return needsQuotes ? `"${escaped}"` : escaped;
+			};
+			const toCsvLine = (cols: string[]) => cols.map((c) => escapeCsv(c ?? '')).join(',');
+
+			const rows: string[] = [];
+			rows.push(header.join(','));
+			for (const savedItem of data.savedItemsJson) {
+				const name = savedItem.title ?? '';
+				const url = savedItem.originalUrl ?? '';
+				const description = savedItem.description ?? '';
+				const date = savedItem.createdAt ? dayjs(savedItem.createdAt).toISOString() : '';
+				const labels = (savedItem.labels ?? [])
+					.map((l: { name: string }) => l?.name?.trim())
+					.filter(Boolean)
+					.join(',');
+				rows.push(toCsvLine([name, url, description, date, labels]));
+			}
+
+			const csvContent = rows.join('\n');
+			archive.append(csvContent, { name: 'saved_items/saved-items.csv' });
+		}
+
 		// saved_items/<id>/*
 		for (const savedItem of data.savedItems) {
 			const dir = `saved_items/${savedItem.id}`;
@@ -289,6 +328,9 @@ export class ExportService {
 					savedItem.article?.contentHtml || savedItem.newsletter?.contentHtml || null,
 				contentText:
 					savedItem.article?.contentText || savedItem.newsletter?.contentText || null,
+				messageId: savedItem.newsletter?.messageId ?? null,
+				inboundEmailAddressId: savedItem.newsletter?.inboundEmailAddressId ?? null,
+				subscription: savedItem.newsletter?.newsletter_subscription?.name ?? null,
 			};
 
 			// json

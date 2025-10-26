@@ -203,7 +203,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 		},
 		contentHtml: { type: 'text', notNull: true },
 		contentText: { type: 'text', notNull: true },
-		messageId: { type: 'text', notNull: true },
+		messageId: 'text',
 		subscriptionId: {
 			type: 'uuid',
 			notNull: false,
