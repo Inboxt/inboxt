@@ -4,8 +4,9 @@ import { ContextModalProps } from '@mantine/modals';
 import { useState } from 'react';
 
 import { ButtonContainer } from '~components/ButtonContainer';
+import { toastInfo } from '~components/Toast';
 import { ACTIVE_USER, REQUEST_EXPORT } from '~lib/graphql';
-import { ExportHighlightsFormat, ExportType } from '~lib/graphql/generated/graphql.ts';
+import { ExportHighlightsFormat, ExportType } from '~lib/graphql/generated/graphql';
 
 export type ExportDataModalProps = {
 	type: ExportType;
@@ -28,6 +29,11 @@ export const ExportDataModal = ({
 		const res = await requestExport({ variables: { data: { type, formatForHighlights } } });
 		const dataUrl = res.data?.requestExport as string;
 		if (!dataUrl || !dataUrl?.startsWith('data:')) {
+			toastInfo({
+				title: 'Export requested',
+				description: 'We’ll email you a download link when it’s ready.',
+			});
+
 			context.closeModal(id);
 			return;
 		}

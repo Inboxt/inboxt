@@ -8,6 +8,7 @@ import { addItemFromUrlSchema } from '@inboxt/common';
 import { ButtonContainer } from '~components/ButtonContainer';
 import { Form } from '~components/Form';
 import { LabelsMultiSelect } from '~components/LabelsMultiSelect';
+import { toastInfo } from '~components/Toast';
 import { ENTRIES } from '~lib/graphql';
 import { client } from '~lib/graphql/client';
 
@@ -43,6 +44,11 @@ export const AddContentModal = ({ id, context }: ContextModalProps) => {
 				setError(error.message || 'Internal server error');
 				return;
 			}
+
+			toastInfo({
+				title: 'Link added for processing',
+				description: 'We’re fetching and analyzing it in the background.',
+			});
 
 			await client.refetchQueries({ include: [ENTRIES] });
 			context.closeModal(id);

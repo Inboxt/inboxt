@@ -4,6 +4,7 @@ import { useSearch } from '@tanstack/react-router';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { toastSuccess } from '~components/Toast';
 import { useContentSelection } from '~context/content-selection';
 import { AppLayout } from '~layouts/AppLayout';
 import { PERMANENTLY_DELETE_SAVED_ITEMS, ENTRIES } from '~lib/graphql';
@@ -132,8 +133,16 @@ export const ItemsList = () => {
 			return;
 		}
 
+		// todo: delete all in trash not only ones that are currently visible on frontend
 		await permanentlyDeleteSavedItems({
 			variables: { data: { ids: savedItemIds } },
+		});
+
+		toastSuccess({
+			title:
+				count > 1
+					? `${count} items were deleted permanently`
+					: 'Item was deleted permanently',
 		});
 	};
 

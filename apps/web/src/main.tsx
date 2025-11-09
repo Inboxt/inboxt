@@ -7,6 +7,7 @@ import { ModalsProvider } from '@mantine/modals';
 import { RouterProvider, createRouter } from '@tanstack/react-router';
 import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
+import { Toaster } from 'sonner';
 
 import { ContentSelectionProvider } from '~context/content-selection';
 import { client } from '~lib/graphql/client';
@@ -68,6 +69,7 @@ if (!rootElement.innerHTML) {
 							}}
 						>
 							<RouterProvider router={router} />
+							<Toaster position="bottom-left" />
 						</ModalsProvider>
 					</ContentSelectionProvider>
 				</MantineProvider>

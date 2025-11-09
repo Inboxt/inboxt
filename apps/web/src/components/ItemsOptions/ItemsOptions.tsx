@@ -16,6 +16,7 @@ import {
 import { useNavigate } from '@tanstack/react-router';
 import React, { useMemo } from 'react';
 
+import { toastSuccess } from '~components/Toast';
 import { SelectableItem, useContentSelection } from '~context/content-selection';
 import {
 	PERMANENTLY_DELETE_SAVED_ITEMS,
@@ -96,6 +97,43 @@ export const ItemsOptions = ({ items, mode, size = 'md', onActionComplete }: Ite
 			});
 		});
 
+	const createUndoAction = (
+		affectedIds: string[],
+		previousById: Map<string, SavedItemStatus>,
+	) => ({
+		label: 'Undo',
+		onClick: async () => {
+			const idsByStatus: Record<SavedItemStatus, string[]> = {
+				[SavedItemStatus.Active]: [],
+				[SavedItemStatus.Archived]: [],
+				[SavedItemStatus.Deleted]: [],
+			};
+
+			for (const id of affectedIds) {
+				const prev = previousById.get(id);
+				if (prev) {
+					idsByStatus[prev].push(id);
+				}
+			}
+
+			const ops: Promise<unknown>[] = [];
+			for (const status of Object.values(SavedItemStatus)) {
+				const ids = idsByStatus[status];
+				if (ids?.length) {
+					ops.push(
+						updateStatus({
+							variables: { data: { ids, status: status } },
+						}),
+					);
+				}
+			}
+
+			if (ops.length) {
+				await Promise.all(ops);
+			}
+		},
+	});
+
 	const OPTIONS: Option[] = [
 		{
 			label: 'Edit labels',
@@ -130,6 +168,7 @@ export const ItemsOptions = ({ items, mode, size = 'md', onActionComplete }: Ite
 					savedItems,
 					(s) => s !== SavedItemStatus.Active,
 				);
+
 				if (savedItemIds.length === 0) {
 					return undefined;
 				}
@@ -139,6 +178,14 @@ export const ItemsOptions = ({ items, mode, size = 'md', onActionComplete }: Ite
 						data: { ids: savedItemIds, status: SavedItemStatus.Active },
 					},
 				});
+
+				toastSuccess({
+					title:
+						savedItems.length > 1
+							? `${savedItems.length} items were restored.`
+							: 'Item was restored.',
+				});
+
 				return undefined;
 			},
 		},
@@ -154,15 +201,27 @@ export const ItemsOptions = ({ items, mode, size = 'md', onActionComplete }: Ite
 					savedItems,
 					(s) => s !== SavedItemStatus.Archived,
 				);
+
 				if (savedItemIds.length === 0) {
 					return undefined;
 				}
+
+				const previousById = new Map(savedItems.map((i) => [i.id, i.status]));
 
 				await updateStatus({
 					variables: {
 						data: { ids: savedItemIds, status: SavedItemStatus.Archived },
 					},
 				});
+
+				toastSuccess({
+					title:
+						savedItems.length > 1
+							? `${savedItems.length} items were archived.`
+							: 'Item was archived.',
+					action: createUndoAction(savedItemIds, previousById),
+				});
+
 				return undefined;
 			},
 		},
@@ -178,15 +237,27 @@ export const ItemsOptions = ({ items, mode, size = 'md', onActionComplete }: Ite
 					savedItems,
 					(s) => s !== SavedItemStatus.Deleted,
 				);
+
 				if (savedItemIds.length === 0) {
 					return undefined;
 				}
+
+				const previousById = new Map(savedItems.map((i) => [i.id, i.status]));
 
 				await updateStatus({
 					variables: {
 						data: { ids: savedItemIds, status: SavedItemStatus.Deleted },
 					},
 				});
+
+				toastSuccess({
+					title:
+						savedItems.length > 1
+							? `${savedItems.length} items were moved to trash.`
+							: 'Item was moved to trash.',
+					action: createUndoAction(savedItemIds, previousById),
+				});
+
 				return undefined;
 			},
 		},
@@ -226,6 +297,14 @@ export const ItemsOptions = ({ items, mode, size = 'md', onActionComplete }: Ite
 				await permanentlyDeleteSavedItems({
 					variables: { data: { ids: savedItemIds } },
 				});
+
+				toastSuccess({
+					title:
+						count > 1
+							? `${count} items were deleted permanently`
+							: 'Item was deleted permanently',
+				});
+
 				return true;
 			},
 		},
@@ -301,6 +380,13 @@ export const ItemsOptions = ({ items, mode, size = 'md', onActionComplete }: Ite
 							})),
 						},
 					},
+				});
+
+				toastSuccess({
+					title:
+						count > 1
+							? `${count} highlights were deleted permanently`
+							: 'Highlight was deleted permanently',
 				});
 
 				return true;

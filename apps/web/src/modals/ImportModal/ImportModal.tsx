@@ -4,6 +4,7 @@ import { IconCsv, IconZip } from '@tabler/icons-react';
 import { ReactNode, useState } from 'react';
 
 import { ButtonContainer } from '~components/ButtonContainer';
+import { toastInfo } from '~components/Toast';
 
 type ImportType = 'CSV' | 'ZIP_ARCHIVE';
 
@@ -74,6 +75,11 @@ export const ImportModal = ({ id, context }: ContextModalProps<ImportModalProps>
 				setError(error.message || 'Failed to upload file.');
 				return;
 			}
+
+			toastInfo({
+				title: 'Import started',
+				description: 'You’ll receive an email when it’s finished.',
+			});
 
 			context.closeModal(id);
 		} catch (err) {

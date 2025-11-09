@@ -1,0 +1,15 @@
+.container {
+	background-color: var(--mantine-color-body);
+	color: var(--mantine-color-text);
+	box-shadow: 0 4px 12px rgba(0,0,0,.1);
+
+	@mixin dark {
+		background-color: var(--mantine-color-dark-5);
+	}
+
+	@media (max-width: 400px) {
+		max-width: 100% !important;
+		width: 100% !important;
+		min-width: 100% !important;
+	}
+}
