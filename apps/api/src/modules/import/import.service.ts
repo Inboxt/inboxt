@@ -8,28 +8,12 @@ import unzipper from 'unzipper';
 import fg from 'fast-glob';
 import crypto from 'crypto';
 
-import { APP_PRIMARY_COLOR, USER_LABELS_LIMIT, MAX_ARTICLE_WORD_COUNT } from '@inboxt/common';
+import { APP_PRIMARY_COLOR, USER_LABELS_LIMIT } from '@inboxt/common';
 
-import { SavedItemService } from '../saved-item/saved-item.service';
 import { LabelService } from '../saved-item/entities/label/label.service';
 import { ImportType } from '../../common/enums/import-type.enum';
-import { MAX_NEWSLETTER_WORD_COUNT, MIN_NEWSLETTER_WORD_COUNT } from '@inboxt/common';
-import {
-	DEFAULT_PROCESSED_ITEM_CONTENT,
-	DEFAULT_PROCESSED_ITEM_TITLE,
-	IMPORT_PROCESSED_ARTICLE_CONTENT,
-	IMPORT_PROCESSED_NEWSLETTER_CONTENT,
-	ITEM_PROCESSING_BASE_TITLE,
-	ITEM_PROCESSING_TITLE,
-} from '../../common/constants/content-extraction.constants';
-import { MailService } from '../mail/mail.service';
 import { UserService } from '../user/user.service';
 import { SavedItemManagerService } from '../../managers/saved-item-manager/saved-item-manager.service';
-import { ArticleService } from '../saved-item/entities/article/article.service';
-import { ContentExtractionService } from '../../services/content-extraction.service';
-import { NewsletterService } from '../saved-item/entities/newsletter/newsletter.service';
-import { EMAIL_IMPORT_COMPLETED } from '../../common/constants/email.constants';
-import { importCompletedTemplate } from '../../mail-templates/importCompletedTemplate';
 
 type DiskSource = {
 	kind: 'disk';
@@ -43,14 +27,9 @@ type DiskSource = {
 export class ImportService {
 	protected readonly logger = new Logger(ImportService.name);
 	constructor(
-		private mail: MailService,
 		private userService: UserService,
-		private savedItemManagerService: SavedItemManagerService,
 		private labelService: LabelService,
-		private articleService: ArticleService,
-		private savedItemService: SavedItemService,
-		private contentExtractionService: ContentExtractionService,
-		private newsletterService: NewsletterService,
+		private savedItemManagerService: SavedItemManagerService,
 		@InjectQueue('import') private readonly importQueue: Queue,
 	) {}
 
@@ -128,8 +107,6 @@ export class ImportService {
 		const byName = new Map(existing.map((l) => [l.name, l.id]));
 
 		let count = existing.length;
-		let createdCount = 0;
-		let failedCount = 0;
 		const map = new Map<string, string>(byName);
 
 		for (const l of labelsFromExport) {
@@ -139,7 +116,6 @@ export class ImportService {
 
 			if (count >= USER_LABELS_LIMIT) {
 				this.logger.warn(`Label limit reached. Skipping label: ${name}`);
-				failedCount += 1;
 				continue;
 			}
 
@@ -148,62 +124,11 @@ export class ImportService {
 				color: l.color || APP_PRIMARY_COLOR,
 			});
 
-			createdCount += 1;
 			count += 1;
 			map.set(name, created.id);
 		}
 
-		return {
-			map,
-			createdCount,
-			failedCount,
-		};
-	}
-
-	private async addArticleFromHtml(userId: string, savedItemId: string, html: string, data: any) {
-		const parsed = this.contentExtractionService.extractReadableContent(html, {
-			maxWords: MAX_ARTICLE_WORD_COUNT,
-			url: data?.originalUrl || undefined,
-			allowUnreadable: true,
-		});
-
-		await this.articleService.create(savedItemId, {
-			contentHtml: parsed.contentHtml || DEFAULT_PROCESSED_ITEM_CONTENT,
-			contentText: parsed.contentText || DEFAULT_PROCESSED_ITEM_CONTENT,
-		});
-
-		await this.savedItemService.update(userId, savedItemId, {
-			title: data?.title || parsed.title || DEFAULT_PROCESSED_ITEM_TITLE,
-			description: data?.description ?? parsed.description ?? null,
-			wordCount: typeof data?.wordCount === 'number' ? data?.wordCount : parsed.wordCount,
-			author: data?.author ?? parsed.author ?? null,
-		});
-	}
-
-	private async addNewsletterFromHtml(
-		userId: string,
-		savedItemId: string,
-		html: string,
-		data: any,
-	) {
-		const parsed = this.contentExtractionService.extractReadableContent(html, {
-			minWords: MIN_NEWSLETTER_WORD_COUNT,
-			maxWords: MAX_NEWSLETTER_WORD_COUNT,
-			allowUnreadable: true,
-		});
-
-		await this.savedItemService.update(userId, savedItemId, {
-			title: data?.title || parsed.title || DEFAULT_PROCESSED_ITEM_TITLE,
-			description: data?.description ?? parsed.description ?? null,
-			wordCount: typeof data?.wordCount === 'number' ? data?.wordCount : parsed.wordCount,
-			author: data?.author ?? parsed.author ?? null,
-			type: 'NEWSLETTER',
-		});
-
-		await this.newsletterService.create(savedItemId, null, {
-			contentHtml: parsed.contentHtml,
-			contentText: parsed.contentText,
-		});
+		return map;
 	}
 
 	private async importSingleSavedItem(params: {
@@ -220,60 +145,49 @@ export class ImportService {
 			return { created: false };
 		}
 
-		const createdItem = await this.savedItemService.create(userId, {
-			title: itemJson.title || ITEM_PROCESSING_TITLE(itemJson.originalUrl || 'unknown url'),
-			originalUrl: itemJson.originalUrl ?? null,
-			sourceDomain: itemJson.sourceDomain ?? null,
-			description: itemJson.description ?? null,
-			leadImage: itemJson.leadImage ?? null,
-			wordCount: typeof itemJson.wordCount === 'number' ? itemJson.wordCount : 0,
-			author: itemJson.author ?? null,
-			type,
-			status: itemJson.status || 'ACTIVE',
-			createdAt: itemJson.createdAt ? new Date(itemJson.createdAt) : undefined,
-			deletedSince: itemJson.deletedSince ? new Date(itemJson.deletedSince) : null,
-		});
-
 		// Labels
 		const labels = Array.isArray(itemJson.labels) ? itemJson.labels : [];
-		if (labels.length) {
-			const ids = labels
-				.map((l) => labelNameToId.get(l.name.trim()))
-				.filter(Boolean) as string[];
-			if (ids.length) {
-				await this.savedItemService.setLabels(userId, createdItem.id, ids);
-			}
-		}
+		const labelIds = labels
+			.map((l) => labelNameToId.get(l.name.trim()))
+			.filter(Boolean) as string[];
 
 		// Content
 		const htmlPath = `${itemDir}/content.html`;
-		let html: string | null = null;
+		let html;
 
 		try {
 			html = await fs.readFile(htmlPath, 'utf8');
 		} catch {}
 
 		if (type === 'ARTICLE') {
-			if (html) {
-				await this.addArticleFromHtml(userId, createdItem.id, html, itemJson);
-			} else {
-				await this.articleService.create(createdItem.id, {
-					contentHtml: IMPORT_PROCESSED_ARTICLE_CONTENT,
-					contentText: IMPORT_PROCESSED_ARTICLE_CONTENT,
-				});
-			}
+			await this.savedItemManagerService.processAndCreateArticle(userId, { html }, labelIds, {
+				title: itemJson.title ?? undefined,
+				originalUrl: itemJson.originalUrl ?? undefined,
+				sourceDomain: itemJson.sourceDomain ?? undefined,
+				description: itemJson.description ?? undefined,
+				leadImage: itemJson.leadImage ?? undefined,
+				wordCount: typeof itemJson.wordCount === 'number' ? itemJson.wordCount : undefined,
+				author: itemJson.author ?? undefined,
+				status: itemJson.status || 'ACTIVE',
+				createdAt: itemJson.createdAt ? new Date(itemJson.createdAt) : undefined,
+			});
 		} else {
-			if (html) {
-				await this.addNewsletterFromHtml(userId, createdItem.id, html, itemJson);
-			} else {
-				await this.newsletterService.create(createdItem.id, null, {
-					contentHtml: IMPORT_PROCESSED_NEWSLETTER_CONTENT,
-					contentText: IMPORT_PROCESSED_NEWSLETTER_CONTENT,
-				});
-			}
+			await this.savedItemManagerService.processAndCreateNewsletter(
+				userId,
+				null,
+				null,
+				{
+					html,
+				},
+				{
+					title: itemJson?.title ?? undefined,
+					description: itemJson?.description ?? undefined,
+					wordCount:
+						typeof itemJson?.wordCount === 'number' ? itemJson?.wordCount : undefined,
+					author: itemJson?.author ?? undefined,
+				},
+			);
 		}
-
-		return { created: true, newSavedItemId: createdItem.id, importedType: type };
 	}
 
 	// ======================== IMPORTS =========================
@@ -316,9 +230,6 @@ export class ImportService {
 			}),
 		);
 
-		let articlesImportedCount = 0;
-		let skippedCount = 0;
-
 		let uniqueLabelNames = new Set<string>();
 		const rows: any[] = [];
 		for await (const row of parser) {
@@ -333,20 +244,16 @@ export class ImportService {
 			uniqueLabelNames = this.extractCsvLabels(row);
 		}
 
-		const {
-			map: nameToId,
-			createdCount: labelsCreatedCount,
-			failedCount: labelsFailedCount,
-		} = await this.ensureLabels(
+		const nameToId = await this.ensureLabels(
 			data.userId,
 			[...uniqueLabelNames].map((name) => ({ name, color: APP_PRIMARY_COLOR })),
 		);
 
 		for (const row of rows) {
-			const url = row.url?.toString()?.trim() || row.URL?.toString()?.toString() || null;
+			const url: string | null =
+				row.url?.toString()?.trim() || row.URL?.toString()?.toString() || null;
 			const readwiseChangelog = url?.includes('docs.readwise.io/changelog');
 			if (!url || readwiseChangelog) {
-				skippedCount++;
 				continue;
 			}
 
@@ -381,23 +288,7 @@ export class ImportService {
 				title,
 				createdAt: parsedDate,
 			});
-
-			articlesImportedCount++;
 		}
-
-		await this.mail.sendTemplate({
-			to: user.emailAddress,
-			subject: EMAIL_IMPORT_COMPLETED.subject,
-			template: importCompletedTemplate,
-			templateData: {
-				source: 'CSV file',
-				articlesImportedCount,
-				newslettersImportedCount: 0,
-				skippedCount,
-				labelsCreatedCount,
-				labelsFailedCount,
-			},
-		});
 
 		await this.randomDelay();
 		this.logger.log(`CSV import completed for user ${data.userId} from ${data.originalName}`);
@@ -421,11 +312,7 @@ export class ImportService {
 				'json/labels.json',
 			)) || [];
 
-		const {
-			map: labelNameToId,
-			createdCount: labelsCreatedCount,
-			failedCount: labelsFailedCount,
-		} = await this.ensureLabels(
+		const labelNameToId = await this.ensureLabels(
 			data.userId,
 			labelsJson.map((l) => ({ name: l.name, color: l.color || undefined })),
 		);
@@ -440,10 +327,6 @@ export class ImportService {
 				}>
 			>(baseDir, 'saved_items/saved_items.json')) || [];
 
-		let articlesImportedCount = 0;
-		let newslettersImportedCount = 0;
-		let skippedCount = 0;
-
 		for (const listing of itemsList) {
 			const oldId = listing.id;
 			const itemDir = `${baseDir}/saved_items/${oldId}`;
@@ -451,30 +334,18 @@ export class ImportService {
 
 			if (!itemJson) {
 				this.logger.warn(`Missing item.json for saved_items/${oldId}, skipping`);
-				skippedCount++;
 				continue;
 			}
 
 			try {
-				const res = await this.importSingleSavedItem({
+				await this.importSingleSavedItem({
 					userId: data.userId,
 					itemDir,
 					itemJson,
 					labelNameToId,
 				});
-
-				if (res.created && res.newSavedItemId) {
-					if (res.importedType === 'ARTICLE') {
-						articlesImportedCount += 1;
-					} else {
-						newslettersImportedCount += 1;
-					}
-				} else {
-					skippedCount++;
-				}
 			} catch (e: any) {
 				this.logger.error(`Failed to import item ${oldId}: ${e?.message || e}`);
-				skippedCount++;
 			}
 		}
 
@@ -490,33 +361,34 @@ export class ImportService {
 
 			for (const htmlPath of allHtmlFiles) {
 				try {
-					const htmlContent = await fs.readFile(htmlPath, 'utf-8');
+					const html = await fs.readFile(htmlPath, 'utf-8');
 					const fileName = htmlPath.split('/').pop() || 'Imported.html';
 					const baseName = fileName.replace(/\.html?$/i, '');
 					const looksLikeNewsletter = /newsletter|email/i.test(baseName);
 
-					const title = baseName || fileName || ITEM_PROCESSING_BASE_TITLE;
-					const createdItem = await this.savedItemService.create(data.userId, {
-						title,
-						type: 'ARTICLE',
-						status: 'ACTIVE',
-					});
-
+					const title = baseName || fileName;
 					if (looksLikeNewsletter) {
-						await this.addNewsletterFromHtml(data.userId, createdItem.id, htmlContent, {
-							title,
-						});
-
-						newslettersImportedCount += 1;
+						await this.savedItemManagerService.processAndCreateNewsletter(
+							data.userId,
+							null,
+							null,
+							{ html },
+							{
+								title,
+							},
+						);
 					} else {
-						await this.addArticleFromHtml(data.userId, createdItem.id, htmlContent, {
-							title,
-						});
-						articlesImportedCount += 1;
+						await this.savedItemManagerService.processAndCreateArticle(
+							data.userId,
+							{ html },
+							[],
+							{
+								title,
+							},
+						);
 					}
 				} catch (err: any) {
 					this.logger.error(`Failed to process HTML file ${htmlPath}: ${err.message}`);
-					skippedCount++;
 				}
 			}
 		}
@@ -525,20 +397,6 @@ export class ImportService {
 		try {
 			await fs.rm(baseDir, { recursive: true, force: true });
 		} catch {}
-
-		await this.mail.sendTemplate({
-			to: user.emailAddress,
-			subject: EMAIL_IMPORT_COMPLETED.subject,
-			template: importCompletedTemplate,
-			templateData: {
-				source: 'Zip Archive',
-				articlesImportedCount,
-				newslettersImportedCount,
-				skippedCount,
-				labelsCreatedCount,
-				labelsFailedCount,
-			},
-		});
 
 		this.logger.log(
 			`Zip archive import completed for user ${data.userId} from ${data.originalName}`,

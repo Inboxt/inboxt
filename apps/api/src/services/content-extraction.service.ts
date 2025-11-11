@@ -88,7 +88,7 @@ export class ContentExtractionService {
 		});
 	}
 
-	prepareDom = (html: string, url?: string) => {
+	private prepareDom = (html: string, url?: string) => {
 		const virtualConsole = new VirtualConsole();
 		const dom = new JSDOM(html, { url, virtualConsole });
 		this.preprocessDom(dom);
@@ -106,12 +106,41 @@ export class ContentExtractionService {
 		};
 	};
 
-	purifyAndSanitizeHtml = (html: string, window: WindowLike) => {
+	private purifyAndSanitizeHtml = (html: string, window: WindowLike) => {
 		const purify = DOMPurify(window);
 		return purify.sanitize(html, {
 			FORBID_TAGS: ['style', 'iframe', 'object', 'embed'],
 			FORBID_ATTR: ['onerror', 'onclick', 'onload', 'style'],
 		});
+	};
+
+	private buildFallbackDescription(text: string, maxLen = 160): string | null {
+		const cleaned = (text || '')
+			.replace(/\s+/g, ' ')
+			.replace(/\u00A0/g, ' ')
+			.trim();
+		if (!cleaned) return null;
+
+		// Prefer up to the end of the first sentence that fits
+		const sentenceEnd = cleaned.search(/([.!?])\s/);
+		if (sentenceEnd !== -1 && sentenceEnd + 1 <= maxLen) {
+			const firstSentence = cleaned.slice(0, sentenceEnd + 1).trim();
+			if (firstSentence.length >= 40) return firstSentence; // avoid too-short snippets
+		}
+
+		// Otherwise trim to maxLen without cutting a word
+		if (cleaned.length <= maxLen) return cleaned;
+		const slice = cleaned.slice(0, maxLen + 1);
+		const lastSpace = slice.lastIndexOf(' ');
+		const clipped = (
+			lastSpace > 60 ? slice.slice(0, lastSpace) : cleaned.slice(0, maxLen)
+		).trim();
+		return clipped.endsWith('.') ? clipped : `${clipped}…`;
+	}
+
+	isProbablyReaderable = (html: string) => {
+		const { doc } = this.prepareDom(html);
+		return isProbablyReaderable(doc);
 	};
 
 	extractReadableContent(
@@ -120,7 +149,6 @@ export class ContentExtractionService {
 			url?: string;
 			maxWords?: number;
 			minWords?: number;
-			allowUnreadable?: boolean;
 		} = {},
 	) {
 		const { window, doc } = this.prepareDom(html, options.url);
@@ -131,6 +159,7 @@ export class ContentExtractionService {
 			throw new AppException(
 				'This content is too large to process safely. \n If you believe this is an error, please contact support for further assistance.',
 				HttpStatus.BAD_REQUEST,
+				'TOO_LARGE',
 			);
 		}
 
@@ -138,46 +167,37 @@ export class ContentExtractionService {
 			throw new AppException(
 				'This content does not contain enough readable text to be processed. \n If you believe this is an error, please contact support for further assistance.',
 				HttpStatus.BAD_REQUEST,
+				'TOO_SMALL',
 			);
 		}
 
-		let readerRes;
-		let withReadability = true;
-
-		try {
-			if (!options.allowUnreadable && !isProbablyReaderable(doc)) {
-				throw new AppException(
-					'We were unable to extract the readable portion of this content. \n The page or document may not contain structured text, or it may be unsupported. \n\n Please check the source and try again. If the issue persists, contact support for assistance.',
-					HttpStatus.BAD_REQUEST,
-				);
-			}
-
-			readerRes = new Readability(doc).parse();
-		} catch (_err) {
-			if (!options.allowUnreadable) {
-				throw new AppException(
-					'We were unable to extract the readable portion of this content. \n The page or document may not contain structured text, or it may be unsupported. \n\n Please check the source and try again. If the issue persists, contact support for assistance.',
-					HttpStatus.BAD_REQUEST,
-				);
-			}
-
-			readerRes = null;
-			withReadability = false;
+		if (!isProbablyReaderable(doc)) {
+			throw new AppException(
+				'We were unable to extract the readable portion of this content. \n The page or document may not contain structured text, or it may be unsupported. \n\n Please check the source and try again. If the issue persists, contact support for assistance.',
+				HttpStatus.BAD_REQUEST,
+				'NOT_READABLE',
+			);
 		}
 
+		const readabilityResult = new Readability(doc).parse();
 		const sanitizedHtml = this.purifyAndSanitizeHtml(
-			(readerRes?.content as string) || html,
+			(readabilityResult?.content as string) || html,
 			window,
 		);
 
+		const fallbackBaseText = readabilityResult?.textContent || allText?.trim() || '';
+		const description =
+			readabilityResult?.excerpt ||
+			this.buildFallbackDescription(fallbackBaseText, 160) ||
+			null;
+
 		return {
-			title: readerRes?.title || DEFAULT_PROCESSED_ITEM_TITLE,
+			title: readabilityResult?.title || DEFAULT_PROCESSED_ITEM_TITLE,
 			contentHtml: sanitizedHtml,
-			contentText: readerRes?.textContent || null,
-			description: readerRes?.excerpt || null,
-			author: readerRes?.byline || null,
+			contentText: readabilityResult?.textContent || null,
+			description,
+			author: readabilityResult?.byline || null,
 			wordCount,
-			withReadability,
 		};
 	}
 }

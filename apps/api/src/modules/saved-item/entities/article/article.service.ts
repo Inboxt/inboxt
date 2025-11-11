@@ -9,6 +9,11 @@ import { PrismaService } from '../../../../services/prisma.service';
 import { AppException } from '../../../../utils/app-exception';
 import { ContentExtractionService } from '../../../../services/content-extraction.service';
 
+export type ProcessArticleInput =
+	| { url: string; html?: string }
+	| { url?: string; html: string }
+	| { url: string; html: string };
+
 @Injectable()
 export class ArticleService {
 	constructor(
@@ -27,7 +32,15 @@ export class ArticleService {
 				Referer: 'https://www.google.com/',
 			},
 		});
-		if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
+
+		if (!res.ok) {
+			throw new AppException(
+				`Fetch failed: ${res.status}`,
+				HttpStatus.BAD_REQUEST,
+				'FETCH_FAILED',
+			);
+		}
+
 		return res.text();
 	}
 
@@ -61,8 +74,10 @@ export class ArticleService {
 	async create(
 		savedItemId: string,
 		data: Omit<Prisma.articleCreateInput, 'savedItemId' | 'saved_item'>,
+		tx?: Prisma.TransactionClient,
 	) {
-		return this.prismaService.article.create({
+		const client = tx ?? this.prismaService;
+		return client.article.create({
 			data: {
 				...data,
 				savedItemId,
@@ -88,14 +103,21 @@ export class ArticleService {
 		});
 	}
 
-	async parse(url: string) {
-		const html = await this.fetchHtml(url);
-		const ogImage = this.extractOgImage(html, url);
+	async parse(input: ProcessArticleInput) {
+		let htmlFromUrl;
+		let ogImage: string | null = null;
+		if (input.url) {
+			htmlFromUrl = await this.fetchHtml(input.url);
+			ogImage = this.extractOgImage(htmlFromUrl, input.url);
+		}
 
-		const result = this.contentExtractionService.extractReadableContent(html, {
-			url,
-			maxWords: MAX_ARTICLE_WORD_COUNT,
-		});
+		const result = this.contentExtractionService.extractReadableContent(
+			input.html || htmlFromUrl,
+			{
+				url: input.url,
+				maxWords: MAX_ARTICLE_WORD_COUNT,
+			},
+		);
 
 		return {
 			leadImage: ogImage,

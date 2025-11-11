@@ -78,7 +78,7 @@ export const ImportModal = ({ id, context }: ContextModalProps<ImportModalProps>
 
 			toastInfo({
 				title: 'Import started',
-				description: 'You’ll receive an email when it’s finished.',
+				description: 'Your items will appear as they are processed.',
 			});
 
 			context.closeModal(id);
@@ -95,8 +95,8 @@ export const ImportModal = ({ id, context }: ContextModalProps<ImportModalProps>
 			{!selectedType && (
 				<Alert color="gray">
 					You can import your saved items using a CSV file or a ZIP archive. CSV imports
-					might take a bit longer to finish. When the import is complete, you’ll get an
-					email with a summary of how many items and labels were added or skipped.
+					might take a bit longer to finish. Items will appear in your library as they are
+					processed in the background.
 				</Alert>
 			)}
 

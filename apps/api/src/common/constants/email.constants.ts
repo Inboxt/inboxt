@@ -49,9 +49,3 @@ export const EMAIL_EXPORT_READY = {
 	description:
 		'Download your ZIP archive. The link will expire in 24 hours. The file will be automatically deleted from our servers after 3 days.',
 };
-
-export const EMAIL_IMPORT_COMPLETED = {
-	subject: 'Your Inboxt import is complete',
-	description:
-		'Your recent import has finished processing. All imported items are now available in your library.',
-};

@@ -14,8 +14,13 @@ export class SavedItemService {
 		private labelService: LabelService,
 	) {}
 
-	async get(userId: string, query: Prisma.saved_itemFindUniqueArgs) {
-		return this.prisma.saved_item.findUnique({ ...query, where: { ...query.where, userId } });
+	async get(
+		userId: string,
+		query: Prisma.saved_itemFindUniqueArgs,
+		tx?: Prisma.TransactionClient,
+	) {
+		const client = tx ?? this.prisma;
+		return client.saved_item.findUnique({ ...query, where: { ...query.where, userId } });
 	}
 
 	async getMany(userId: string, query: Prisma.saved_itemFindManyArgs) {
@@ -141,13 +146,15 @@ export class SavedItemService {
 		userId: string,
 		id: string,
 		data: Omit<Prisma.saved_itemUpdateArgs['data'], 'id' | 'userId'>,
+		tx?: Prisma.TransactionClient,
 	) {
+		const client = tx ?? this.prisma;
 		const existingItem = await this.get(userId, { where: { id } });
 		if (!existingItem) {
 			throw new AppException('Item not found', HttpStatus.NOT_FOUND);
 		}
 
-		return this.prisma.saved_item.update({ where: { id, userId }, data });
+		return client.saved_item.update({ where: { id, userId }, data });
 	}
 
 	async updateStatus(userId: string, id: string, status: Prisma.saved_itemUpdateInput['status']) {

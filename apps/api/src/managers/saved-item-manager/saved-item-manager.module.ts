@@ -9,8 +9,9 @@ import { ArticleModule } from '../../modules/saved-item/entities/article/article
 import { UserModule } from '../../modules/user/user.module';
 import { SavedItemManagerController } from './saved-item-manager.controller';
 import { MailModule } from '../../modules/mail/mail.module';
-import { SavedItemArticleProcessor } from './processors/saved-item-article.processor';
-import { SavedItemNewsletterProcessor } from './processors/saved-item-newsletter.processor';
+import { InboundEmailAddressModule } from '../../modules/inbound-email-address/inbound-email-address.module';
+import { PrismaService } from '../../services/prisma.service';
+import { SavedItemManagerProcessor } from './saved-item-manager.processor';
 
 @Module({
 	imports: [
@@ -20,26 +21,13 @@ import { SavedItemNewsletterProcessor } from './processors/saved-item-newsletter
 		NewsletterModule,
 		UserModule,
 		MailModule,
+		InboundEmailAddressModule,
+		NewsletterModule,
 		BullModule.registerQueue({
-			name: 'article-processing',
-			defaultJobOptions: {
-				removeOnComplete: 100,
-				removeOnFail: 50,
-				attempts: 3,
-				backoff: { type: 'exponential', delay: 30000 },
-			},
-		}),
-		BullModule.registerQueue({
-			name: 'newsletter-processing',
-			defaultJobOptions: {
-				removeOnComplete: 100,
-				removeOnFail: 50,
-				attempts: 2,
-				backoff: { type: 'fixed', delay: 30000 },
-			},
+			name: 'saved-item-processing',
 		}),
 	],
-	providers: [SavedItemManagerService, SavedItemArticleProcessor, SavedItemNewsletterProcessor],
+	providers: [SavedItemManagerService, PrismaService, SavedItemManagerProcessor],
 	controllers: [SavedItemManagerController],
 	exports: [SavedItemManagerService],
 })
