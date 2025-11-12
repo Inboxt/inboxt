@@ -12,6 +12,7 @@ import { SavedItemType } from '../../enums/saved-item-type.enum';
 import {
 	DEFAULT_PROCESSED_ITEM_CONTENT,
 	DEFAULT_PROCESSED_ITEM_TITLE,
+	ITEM_PROCESSING_BASE_TITLE,
 	ITEM_PROCESSING_CONTENT,
 	ITEM_PROCESSING_TITLE,
 	NEWSLETTER_PROCESSING_CONTENT,
@@ -102,17 +103,21 @@ export class SavedItemManagerService {
 			domain = new URL(input.url).hostname.replace(/^www\./, '');
 		}
 
-		const created = await this.savedItemService.create(userId, {
-			type: SavedItemType.ARTICLE,
-			title:
-				prismaData?.title ||
-				ITEM_PROCESSING_TITLE(prismaData?.originalUrl ?? input.url ?? ''),
-			description:
-				prismaData?.description ||
-				ITEM_PROCESSING_CONTENT(prismaData?.sourceDomain ?? domain ?? ''),
-			wordCount: prismaData?.wordCount ?? 0,
-			...prismaData,
-		});
+		const created = await this.savedItemService.create(
+			userId,
+			{
+				type: SavedItemType.ARTICLE,
+				title:
+					prismaData?.title ||
+					ITEM_PROCESSING_TITLE(prismaData?.originalUrl ?? input.url ?? ''),
+				description:
+					prismaData?.description ||
+					ITEM_PROCESSING_CONTENT(prismaData?.sourceDomain ?? domain ?? ''),
+				wordCount: prismaData?.wordCount ?? 0,
+				...prismaData,
+			},
+			{ skipQuota: true },
+		);
 
 		if (labelIds?.length) {
 			await this.savedItemService.setLabels(userId, created.id, labelIds);
@@ -122,6 +127,10 @@ export class SavedItemManagerService {
 	}
 
 	async createFailedItem(userId: string, savedItemId: string, error: any) {
+		this.logger.warn(
+			`Processing of item failed after all retries. Creating failed item: ${savedItemId} for user: ${userId}`,
+		);
+
 		const existing = await this.savedItemService.get(userId, {
 			where: { id: savedItemId },
 		});
@@ -137,25 +146,65 @@ export class SavedItemManagerService {
 			message =
 				'We couldn’t fetch this page to prepare it for reading. The site may be blocking requests or temporarily unavailable. Please try again later, or try saving a different link. You can also import a ZIP that contains the page’s HTML.';
 		} else if (code === 'TOO_LARGE') {
-			message = `This article is too large for us to process right now. Try saving a shorter section.`;
+			message =
+				'This article is too large for us to process right now. Try saving a shorter section.';
+		} else if (code === 'STORAGE_QUOTA_EXCEEDED') {
+			message =
+				'You’ve reached your storage limit, so we couldn’t save this item. Delete items you no longer need to free up space.';
 		}
 
-		const title = `Failed to process: ${existing.title || DEFAULT_PROCESSED_ITEM_TITLE}`;
-		await this.savedItemService.update(userId, savedItemId, {
-			title,
-			description: message,
-		});
+		const isArticleProcessing = existing.title.startsWith(ITEM_PROCESSING_BASE_TITLE);
+		const isNewsletterProcessing = existing.title.startsWith(NEWSLETTER_PROCESSING_TITLE);
+
+		let existingTitle = existing.title;
+		if (isArticleProcessing) {
+			const prefix = `${ITEM_PROCESSING_BASE_TITLE} from `;
+			let cleaned = existingTitle.startsWith(prefix)
+				? existingTitle.slice(prefix.length)
+				: existingTitle;
+
+			if (cleaned.endsWith('...')) {
+				cleaned = cleaned.slice(0, -3).trim();
+			}
+
+			existingTitle = cleaned.trim() || DEFAULT_PROCESSED_ITEM_TITLE;
+		} else if (isNewsletterProcessing) {
+			existingTitle = DEFAULT_PROCESSED_ITEM_TITLE;
+		}
+
+		const title = `Failed to process: ${existingTitle}`;
+		await this.savedItemService.update(
+			userId,
+			savedItemId,
+			{
+				title,
+				description: message,
+			},
+			undefined,
+			{ skipQuota: true },
+		);
 
 		if (existing.type === SavedItemType.ARTICLE) {
-			await this.articleService.create(savedItemId, {
-				contentHtml: message,
-				contentText: message,
-			});
+			await this.articleService.create(
+				savedItemId,
+				{
+					contentHtml: message,
+					contentText: message,
+				},
+				undefined,
+				{ skipQuota: true },
+			);
 		} else {
-			await this.newsletterService.create(savedItemId, null, {
-				contentHtml: message,
-				contentText: message,
-			});
+			await this.newsletterService.create(
+				savedItemId,
+				null,
+				{
+					contentHtml: message,
+					contentText: message,
+				},
+				undefined,
+				{ skipQuota: true },
+			);
 		}
 	}
 
@@ -256,13 +305,17 @@ export class SavedItemManagerService {
 			Omit<Prisma.saved_itemCreateInput, 'user' | 'saved_item_label' | 'newsletter' | 'id'>
 		>,
 	) {
-		return this.savedItemService.create(userId, {
-			type: SavedItemType.NEWSLETTER,
-			title: prismaData?.title ?? NEWSLETTER_PROCESSING_TITLE,
-			wordCount: prismaData?.wordCount || 0,
-			description: prismaData?.description ?? NEWSLETTER_PROCESSING_CONTENT,
-			...prismaData,
-		});
+		return this.savedItemService.create(
+			userId,
+			{
+				type: SavedItemType.NEWSLETTER,
+				title: prismaData?.title ?? NEWSLETTER_PROCESSING_TITLE,
+				wordCount: prismaData?.wordCount || 0,
+				description: prismaData?.description ?? NEWSLETTER_PROCESSING_CONTENT,
+				...prismaData,
+			},
+			{ skipQuota: true },
+		);
 	}
 
 	async processNewsletter(

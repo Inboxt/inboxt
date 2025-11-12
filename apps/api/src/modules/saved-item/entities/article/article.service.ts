@@ -8,6 +8,7 @@ import { Prisma } from '../../../../../prisma/client';
 import { PrismaService } from '../../../../services/prisma.service';
 import { AppException } from '../../../../utils/app-exception';
 import { ContentExtractionService } from '../../../../services/content-extraction.service';
+import { QuotaOptions, StorageQuotaService } from '../../../storage/storage-quota.service';
 
 export type ProcessArticleInput =
 	| { url: string; html?: string }
@@ -19,6 +20,7 @@ export class ArticleService {
 	constructor(
 		private readonly prismaService: PrismaService,
 		private contentExtractionService: ContentExtractionService,
+		private storageQuota: StorageQuotaService,
 	) {}
 
 	/* ------------ Private Helpers ------------ */
@@ -75,32 +77,46 @@ export class ArticleService {
 		savedItemId: string,
 		data: Omit<Prisma.articleCreateInput, 'savedItemId' | 'saved_item'>,
 		tx?: Prisma.TransactionClient,
+		opts?: QuotaOptions,
 	) {
-		const client = tx ?? this.prismaService;
-		return client.article.create({
-			data: {
-				...data,
-				savedItemId,
-			},
-		});
-	}
+		const skipQuota = opts?.skipQuota ?? false;
+		const run = async (client: Prisma.TransactionClient) => {
+			const owner = await client.saved_item.findUnique({
+				where: { id: savedItemId },
+				select: { id: true, userId: true },
+			});
 
-	async update(
-		id: string,
-		userId: string,
-		data: Omit<Prisma.articleUpdateInput, 'savedItemId' | 'saved_item' | 'id'>,
-	) {
-		const existingArticle = await this.get(userId, { where: { savedItemId: id } });
-		if (!existingArticle) {
-			throw new AppException('Article not found', HttpStatus.NOT_FOUND);
+			if (!owner) {
+				throw new AppException('Saved item not found', HttpStatus.NOT_FOUND);
+			}
+
+			const sizeBytes = skipQuota
+				? 0n
+				: this.storageQuota.computeSizeBytes({
+						contentHtml: data.contentHtml,
+						contentText: data.contentText,
+					});
+
+			if (!skipQuota) {
+				await this.storageQuota.ensureWithinQuota(owner.userId, sizeBytes);
+			}
+
+			const created = await client.article.create({
+				data: { ...data, savedItemId, sizeBytes },
+			});
+
+			if (!skipQuota) {
+				await this.storageQuota.incrementUsage(client, owner.userId, sizeBytes);
+			}
+
+			return created;
+		};
+
+		if (tx) {
+			return run(tx);
 		}
 
-		return this.prismaService.article.update({
-			where: {
-				savedItemId: id,
-			},
-			data,
-		});
+		return this.prismaService.$transaction(async (client) => run(client));
 	}
 
 	async parse(input: ProcessArticleInput) {

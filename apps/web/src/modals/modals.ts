@@ -114,6 +114,7 @@ export const modals = {
 			innerProps: {
 				type,
 			},
+			className: 'fullscreen-modal',
 		});
 	},
 
@@ -124,6 +125,18 @@ export const modals = {
 			centered: true,
 			title: 'Import Data',
 			innerProps: {},
+			className: 'fullscreen-modal',
+		});
+	},
+
+	openStorageHelpModal: () => {
+		return mantineModals.openContextModal({
+			modal: 'storageHelp',
+			size: 540,
+			centered: true,
+			title: 'Free Up Storage',
+			innerProps: {},
+			className: 'fullscreen-modal',
 		});
 	},
 

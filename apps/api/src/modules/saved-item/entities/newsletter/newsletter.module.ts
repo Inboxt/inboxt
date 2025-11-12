@@ -6,9 +6,10 @@ import { InboundEmailAddressModule } from '../../../inbound-email-address/inboun
 import { NewsletterSubscriptionService } from './newsletter-subscription/newsletter-subscription.service';
 import { NewsletterSubscriptionResolver } from './newsletter-subscription/newsletter-subscription.resolver';
 import { ContentExtractionService } from '../../../../services/content-extraction.service';
+import { StorageModule } from '../../../storage/storage.module';
 
 @Module({
-	imports: [InboundEmailAddressModule],
+	imports: [InboundEmailAddressModule, StorageModule],
 	providers: [
 		PrismaService,
 		NewsletterService,

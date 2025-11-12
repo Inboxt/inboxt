@@ -19,8 +19,6 @@ export const SORT_OPTIONS = [
 	{ value: 'title_desc', label: 'Title (Z–A)' },
 ] as const;
 export const SORT_VALUES = SORT_OPTIONS.map((option) => option.value);
-/** User max storage, saved in bytes  */
-export const USER_MAX_STORAGE = 104857600;
 
 export const APP_PRIMARY_COLOR = '#55a57e';
 // READER VIEW SETTINGS

@@ -32,4 +32,14 @@ export class ScheduleTasksService {
 	async lastReminderForUnverifiedUsers() {
 		return this.scheduleTasksQueue.add('last-reminder-for-unverified-users', {});
 	}
+
+	@Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+	async reconcileStorageUsage() {
+		return this.scheduleTasksQueue.add('reconcile-storage-usage', {}, { priority: 5 });
+	}
+
+	@Cron(CronExpression.EVERY_HOUR)
+	async notifyStorageThresholds() {
+		return this.scheduleTasksQueue.add('notify-storage-thresholds', {}, { priority: 5 });
+	}
 }

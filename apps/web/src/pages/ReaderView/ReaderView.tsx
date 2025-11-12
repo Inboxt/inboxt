@@ -237,14 +237,20 @@ export const ReaderView = () => {
 								</>
 							)}
 
-							{!error && savedItem ? (
+							{!error && savedItem && !content && (
+								<Text ta="center">{savedItem.description ?? ''}</Text>
+							)}
+
+							{!error && savedItem && content && (
 								<TypographyStylesProvider className={classes.typography}>
 									<HighlightableArticle
 										content={content || null}
 										data={savedItem}
 									/>
 								</TypographyStylesProvider>
-							) : (
+							)}
+
+							{(error || !savedItem) && (
 								<Text ta="center">
 									Something went wrong, and the article content couldn't be
 									loaded. Please try again or contact support.

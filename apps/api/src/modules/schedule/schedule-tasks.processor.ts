@@ -8,11 +8,14 @@ import { LogExecutionTime } from '../../decorators/log-execution-time.decorator'
 import { MailService } from '../mail/mail.service';
 import {
 	EMAIL_ACCOUNT_DELETED,
+	EMAIL_STORAGE_APPROACHING_LIMIT,
+	EMAIL_STORAGE_LIMIT_REACHED,
 	EMAIL_VERIFY_REMINDER,
 } from '../../common/constants/email.constants';
 import { accountDeletedTemplate } from '../../mail-templates/accountDeletedTemplate';
 import { verifyEmailReminderTemplate } from '../../mail-templates/verifyEmailReminderTemplate';
 import { UserPlan } from '../../enums/user-plan.enum';
+import { storageThresholdTemplate } from '../../mail-templates/storageThresholdTemplate';
 
 @Processor('schedule-tasks', { concurrency: 10 })
 export class ScheduleTasksProcessor extends BaseQueueProcessor {
@@ -36,6 +39,10 @@ export class ScheduleTasksProcessor extends BaseQueueProcessor {
 				return this.deleteExpiredUnsubscribedNewsletters();
 			case 'last-reminder-for-unverified-users':
 				return this.lastReminderForUnverifiedUsers();
+			case 'reconcile-storage-usage':
+				return this.reconcileStorageUsage();
+			case 'notify-storage-thresholds':
+				return this.notifyStorageThresholds();
 			default:
 				throw new Error(`Unknown job type: ${job.name}`);
 		}
@@ -166,5 +173,135 @@ export class ScheduleTasksProcessor extends BaseQueueProcessor {
 		}
 
 		this.logger.log(`Sent reminder emails to ${users.length} unverified users`);
+	}
+
+	@LogExecutionTime
+	private async reconcileStorageUsage() {
+		const pageSize = 250;
+		let corrected = 0;
+		let scanned = 0;
+
+		while (true) {
+			const users = await this.prisma.user.findMany({
+				select: { id: true, storageUsageBytes: true },
+				orderBy: { id: 'asc' },
+				take: pageSize,
+				skip: scanned,
+			});
+
+			if (!users.length) break;
+
+			for (const u of users) {
+				const [savedItemAgg, articleAgg, newsletterAgg, highlightAgg] = await Promise.all([
+					this.prisma.saved_item.aggregate({
+						where: { userId: u.id },
+						_sum: { sizeBytes: true },
+					}),
+					this.prisma.article.aggregate({
+						where: { saved_item: { userId: u.id } },
+						_sum: { sizeBytes: true },
+					}),
+					this.prisma.newsletter.aggregate({
+						where: { saved_item: { userId: u.id } },
+						_sum: { sizeBytes: true },
+					}),
+					this.prisma.highlight_segment.aggregate({
+						where: { highlight: { userId: u.id } },
+						_sum: { sizeBytes: true },
+					}),
+				]);
+
+				const actual =
+					(savedItemAgg._sum.sizeBytes ?? 0n) +
+					(articleAgg._sum.sizeBytes ?? 0n) +
+					(newsletterAgg._sum.sizeBytes ?? 0n) +
+					(highlightAgg._sum.sizeBytes ?? 0n);
+
+				const stored = u.storageUsageBytes;
+
+				if (actual !== stored) {
+					await this.prisma.user.update({
+						where: { id: u.id },
+						data: { storageUsageBytes: actual },
+					});
+
+					corrected++;
+					this.logger.warn(
+						`Reconciled storage for user ${u.id}: stored:${stored}, actual:${actual}`,
+					);
+				}
+			}
+
+			scanned += users.length;
+			if (users.length < pageSize) break;
+		}
+
+		this.logger.log(`Reconcile storage usage done. scanned:${scanned}, corrected:${corrected}`);
+	}
+
+	private async notifyStorageThresholds() {
+		const thresholds = [80, 100]; // should be sorted from low to high
+		const pageSize = 250;
+		let scanned = 0;
+		let sent = 0;
+
+		while (true) {
+			const users = await this.prisma.user.findMany({
+				orderBy: { id: 'asc' },
+				take: pageSize,
+				skip: scanned,
+			});
+			if (!users.length) break;
+
+			for (const u of users) {
+				const quota = u.storageQuotaBytes;
+				if (quota <= 0n) continue;
+
+				const usage = u.storageUsageBytes;
+				const percent = Number((usage * 100n) / quota);
+
+				if (u.lastNotifiedStorageThreshold && percent < thresholds[0]) {
+					await this.prisma.user.update({
+						where: { id: u.id },
+						data: { lastNotifiedStorageThreshold: 0 },
+					});
+					u.lastNotifiedStorageThreshold = 0;
+				}
+
+				const crossed = thresholds.filter((t) => percent >= t).sort((a, b) => b - a)[0];
+				if (!crossed) continue;
+
+				if (u.lastNotifiedStorageThreshold >= crossed) continue;
+
+				const isExceeded = crossed >= 100;
+
+				await this.mailService.sendTemplate({
+					to: u.emailAddress,
+					subject: isExceeded
+						? EMAIL_STORAGE_LIMIT_REACHED.subject
+						: EMAIL_STORAGE_APPROACHING_LIMIT.subject,
+					template: storageThresholdTemplate,
+					templateData: {
+						usageBytes: usage,
+						quotaBytes: quota,
+						isExceeded,
+					},
+				});
+
+				await this.prisma.user.update({
+					where: { id: u.id },
+					data: { lastNotifiedStorageThreshold: crossed },
+				});
+
+				sent++;
+			}
+
+			scanned += users.length;
+			if (users.length < pageSize) break;
+		}
+
+		this.logger.log(
+			`notifyStorageThresholds finished. scanned=${scanned}, sent=${sent}, thresholds=[${thresholds.join(', ')}]`,
+		);
 	}
 }

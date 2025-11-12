@@ -6,12 +6,14 @@ import { Prisma } from '../../../prisma/client';
 import { AppException } from '../../utils/app-exception';
 import { LabelService } from './entities/label/label.service';
 import { GetSavedItemsQuery } from '../../common/types';
+import { QuotaOptions, StorageQuotaService } from '../storage/storage-quota.service';
 
 @Injectable()
 export class SavedItemService {
 	constructor(
 		private prisma: PrismaService,
 		private labelService: LabelService,
+		private storageQuota: StorageQuotaService,
 	) {}
 
 	async get(
@@ -138,8 +140,31 @@ export class SavedItemService {
 	async create(
 		userId: string,
 		data: Omit<Prisma.saved_itemCreateArgs['data'], 'userId' | 'user'>,
+		opts?: QuotaOptions,
 	) {
-		return this.prisma.saved_item.create({ data: { ...data, userId } });
+		const skipQuota = opts?.skipQuota ?? false;
+		const sizeBytes = skipQuota
+			? 0n
+			: this.storageQuota.computeSizeBytes({
+					title: data.title,
+					description: data.description ?? '',
+				});
+
+		return this.prisma.$transaction(async (tx) => {
+			if (!skipQuota) {
+				await this.storageQuota.ensureWithinQuota(userId, sizeBytes);
+			}
+
+			const created = await tx.saved_item.create({
+				data: { ...data, userId, sizeBytes },
+			});
+
+			if (!skipQuota) {
+				await this.storageQuota.incrementUsage(tx, userId, sizeBytes);
+			}
+
+			return created;
+		});
 	}
 
 	async update(
@@ -147,14 +172,56 @@ export class SavedItemService {
 		id: string,
 		data: Omit<Prisma.saved_itemUpdateArgs['data'], 'id' | 'userId'>,
 		tx?: Prisma.TransactionClient,
+		opts?: QuotaOptions,
 	) {
-		const client = tx ?? this.prisma;
-		const existingItem = await this.get(userId, { where: { id } });
-		if (!existingItem) {
-			throw new AppException('Item not found', HttpStatus.NOT_FOUND);
+		const skipQuota = opts?.skipQuota ?? false;
+
+		const run = async (client: Prisma.TransactionClient) => {
+			const existingItem = await this.get(userId, { where: { id } }, client);
+			if (!existingItem) {
+				throw new AppException('Item not found', HttpStatus.NOT_FOUND);
+			}
+
+			const newSizeBytes = skipQuota
+				? existingItem.sizeBytes
+				: this.storageQuota.computeSizeBytes({
+						title:
+							data.title !== undefined ? (data.title as string) : existingItem.title,
+						description:
+							data.description !== undefined
+								? (data.description as string)
+								: (existingItem.description ?? ''),
+					});
+
+			const delta = skipQuota ? 0n : newSizeBytes - existingItem.sizeBytes;
+			if (!skipQuota && delta > 0n) {
+				await this.storageQuota.ensureWithinQuota(userId, delta);
+			}
+
+			const updated = await client.saved_item.update({
+				where: { id, userId },
+				data: {
+					...data,
+					sizeBytes: newSizeBytes,
+				},
+			});
+
+			if (!skipQuota) {
+				if (delta > 0n) {
+					await this.storageQuota.incrementUsage(client, userId, delta);
+				} else if (delta < 0n) {
+					await this.storageQuota.decrementUsage(client, userId, -delta);
+				}
+			}
+
+			return updated;
+		};
+
+		if (tx) {
+			return run(tx);
 		}
 
-		return client.saved_item.update({ where: { id, userId }, data });
+		return this.prisma.$transaction(async (client) => run(client));
 	}
 
 	async updateStatus(userId: string, id: string, status: Prisma.saved_itemUpdateInput['status']) {
@@ -241,8 +308,34 @@ export class SavedItemService {
 		}
 
 		/*----------  Processing  ----------*/
-		return this.prisma.saved_item.delete({
-			where: { id },
+		return this.prisma.$transaction(async (tx) => {
+			const article = await tx.article.findUnique({
+				where: { savedItemId: id },
+				select: { sizeBytes: true },
+			});
+
+			const newsletter = await tx.newsletter.findUnique({
+				where: { savedItemId: id },
+				select: { sizeBytes: true },
+			});
+
+			const highlightSegmentsAgg = await tx.highlight_segment.aggregate({
+				where: { highlight: { savedItemId: id } },
+				_sum: { sizeBytes: true },
+			});
+
+			const savedItemSize = savedItem.sizeBytes;
+			const articleSize = article?.sizeBytes ?? 0n;
+			const newsletterSize = newsletter?.sizeBytes ?? 0n;
+			const highlightsSize = highlightSegmentsAgg._sum.sizeBytes ?? 0n;
+			const total = savedItemSize + articleSize + newsletterSize + highlightsSize;
+
+			await tx.saved_item.delete({ where: { id } });
+			if (total > 0n) {
+				await this.storageQuota.decrementUsage(tx, userId, total);
+			}
+
+			return { id };
 		});
 	}
 }

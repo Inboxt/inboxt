@@ -23,6 +23,7 @@ import {
 	UPDATE_SAVED_ITEM_STATUS,
 	DELETE_HIGHLIGHTS,
 	ENTRIES,
+	ACTIVE_USER,
 } from '~lib/graphql';
 import { SavedItem, SavedItemStatus, Highlight } from '~lib/graphql/generated/graphql';
 import { modals } from '~modals/modals';
@@ -58,10 +59,10 @@ export const ItemsOptions = ({ items, mode, size = 'md', onActionComplete }: Ite
 		refetchQueries: [ENTRIES],
 	});
 	const [deleteHighlights, { loading: deleteLoading }] = useMutation(DELETE_HIGHLIGHTS, {
-		refetchQueries: [ENTRIES],
+		refetchQueries: [ENTRIES, ACTIVE_USER],
 	});
 	const [permanentlyDeleteSavedItems] = useMutation(PERMANENTLY_DELETE_SAVED_ITEMS, {
-		refetchQueries: [ENTRIES],
+		refetchQueries: [ENTRIES, ACTIVE_USER],
 	});
 	const { setSelectedItems } = useContentSelection();
 	const navigate = useNavigate();

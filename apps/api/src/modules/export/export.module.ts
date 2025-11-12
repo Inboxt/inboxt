@@ -10,8 +10,8 @@ import { LabelModule } from '../saved-item/entities/label/label.module';
 import { NewsletterModule } from '../saved-item/entities/newsletter/newsletter.module';
 import { BullModule } from '@nestjs/bullmq';
 import { ExportProcessor } from './export.processor';
-import { StorageService } from '../../services/storage.service';
 import { MailModule } from '../mail/mail.module';
+import { StorageModule } from '../storage/storage.module';
 
 @Module({
 	imports: [
@@ -31,8 +31,9 @@ import { MailModule } from '../mail/mail.module';
 		LabelModule,
 		NewsletterModule,
 		MailModule,
+		StorageModule,
 	],
-	providers: [ExportService, ExportResolver, ExportProcessor, StorageService],
+	providers: [ExportService, ExportResolver, ExportProcessor],
 	exports: [ExportService],
 })
 export class ExportModule {}

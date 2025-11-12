@@ -30,10 +30,10 @@ dayjs.extend(duration);
 dayjs.extend(utc);
 
 import {
+	formatBytes,
 	updateAccountSchema,
 	USER_INBOUND_EMAIL_ADDRESS_LIMIT,
 	USER_LABELS_LIMIT,
-	USER_MAX_STORAGE,
 } from '@inboxt/common';
 
 import { ButtonContainer } from '~components/ButtonContainer';
@@ -43,7 +43,7 @@ import { useScreenQuery } from '~hooks/useScreenQuery.tsx';
 import { ACTIVE_USER, UPDATE_ACCOUNT } from '~lib/graphql';
 import { ExportType } from '~lib/graphql/generated/graphql.ts';
 import { modals } from '~modals/modals';
-import { formatBytes } from '~utils/formatBytes.ts';
+import { getUserStorage } from '~utils/userStorage.ts';
 
 import { router } from '../../main';
 
@@ -53,6 +53,8 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 	const isBelowXsScreen = useScreenQuery('xs', 'below');
 
 	const { data, loading } = useQuery(ACTIVE_USER, { fetchPolicy: 'cache-and-network' });
+	const { storageQuota, storagePercentage, usedStorage } = getUserStorage(data?.me);
+
 	const [updateProfile, { loading: updateProfileLoading, error: updateProfileError }] =
 		useMutation(UPDATE_ACCOUNT);
 
@@ -98,8 +100,6 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 		context.closeModal(id);
 	};
 
-	const usedStorage = 19000680; // todo: from backend...
-	const storagePercentage = Math.min(Math.round((usedStorage / USER_MAX_STORAGE) * 100), 100);
 	const labelsUsed = data?.me?.labelsCount ?? 0;
 	const inboundEmailAddressesUsed = data?.me?.inboundEmailAddressesCount ?? 0;
 
@@ -224,7 +224,7 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 									color="primary"
 								/>
 								<Text size="xs" c="dimmed">
-									{`${formatBytes(usedStorage)} of ${formatBytes(USER_MAX_STORAGE)} used`}
+									{`${formatBytes(usedStorage)} of ${formatBytes(storageQuota)} used`}
 								</Text>
 							</Stack>
 						</Skeleton>

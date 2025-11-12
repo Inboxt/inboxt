@@ -8,10 +8,14 @@ import { CreateHighlightInput } from './dto/create-highlight.input';
 import { DeleteHighlightsInput } from './dto/delete-highlights.input';
 import { AppException } from '../../utils/app-exception';
 import { GetHighlightsQuery } from '../../common/types';
+import { StorageQuotaService } from '../storage/storage-quota.service';
 
 @Injectable()
 export class HighlightService {
-	constructor(private prisma: PrismaService) {}
+	constructor(
+		private prisma: PrismaService,
+		private storageQuota: StorageQuotaService,
+	) {}
 
 	async get(userId: string, query: Prisma.highlightFindFirstArgs) {
 		return this.prisma.highlight.findFirst({ ...query, where: { ...query.where, userId } });
@@ -134,18 +138,39 @@ export class HighlightService {
 				},
 			});
 
-			const segmentsData = data.segments.map((s) => ({
-				highlightId: highlight.id,
-				xpath: s.xpath,
-				startOffset: s.startOffset,
-				endOffset: s.endOffset,
-				text: s.text ?? null,
-				beforeText: s.beforeText,
-				afterText: s.afterText,
-			}));
+			let totalDelta = 0n;
+			const segmentsData = data.segments.map((s) => {
+				const sizeBytes = this.storageQuota.computeSizeBytes({
+					xpath: s.xpath,
+					beforeText: s.beforeText,
+					afterText: s.afterText,
+					text: s.text ?? '',
+				});
+
+				totalDelta += sizeBytes;
+
+				return {
+					highlightId: highlight.id,
+					xpath: s.xpath,
+					startOffset: s.startOffset,
+					endOffset: s.endOffset,
+					text: s.text ?? null,
+					beforeText: s.beforeText,
+					afterText: s.afterText,
+					sizeBytes,
+				};
+			});
+
+			if (totalDelta > 0n) {
+				await this.storageQuota.ensureWithinQuota(userId, totalDelta);
+			}
 
 			if (segmentsData.length) {
 				await prisma.highlight_segment.createMany({ data: segmentsData });
+			}
+
+			if (totalDelta > 0n) {
+				await this.storageQuota.incrementUsage(prisma, userId, totalDelta);
 			}
 
 			return highlight;
@@ -177,7 +202,19 @@ export class HighlightService {
 				);
 			}
 
-			await this.prisma.highlight.delete({ where: { id: item.id } });
+			await this.prisma.$transaction(async (tx) => {
+				const sum = await tx.highlight_segment.aggregate({
+					where: { highlightId: item.id },
+					_sum: { sizeBytes: true },
+				});
+
+				const total = sum._sum.sizeBytes || 0n;
+				await tx.highlight.delete({ where: { id: item.id } });
+
+				if (total > 0n) {
+					await this.storageQuota.decrementUsage(tx, userId, total);
+				}
+			});
 		}
 	}
 }

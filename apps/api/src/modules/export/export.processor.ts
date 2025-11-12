@@ -6,7 +6,7 @@ import dayjs from 'dayjs';
 import { BaseQueueProcessor } from '../../common/processors/base-queue.processor';
 import { ExportService } from './export.service';
 import { MailService } from '../mail/mail.service';
-import { StorageService } from '../../services/storage.service';
+import { S3StorageService } from '../storage/s3-storage.service';
 import { exportReadyTemplate } from '../../mail-templates/exportReadyTemplate';
 import { EMAIL_EXPORT_READY } from '../../common/constants/email.constants';
 import { LogExecutionTime } from '../../decorators/log-execution-time.decorator';
@@ -18,7 +18,7 @@ export class ExportProcessor extends BaseQueueProcessor {
 	protected readonly logger = new Logger(ExportProcessor.name);
 	constructor(
 		private exportService: ExportService,
-		private storage: StorageService,
+		private s3StorageService: S3StorageService,
 		private mail: MailService,
 		private userService: UserService,
 	) {
@@ -53,14 +53,14 @@ export class ExportProcessor extends BaseQueueProcessor {
 			formatForHighlights: data.formatForHighlights,
 		});
 
-		await this.storage.upload({
+		await this.s3StorageService.upload({
 			key,
 			body: zip,
 			contentType: 'application/zip',
 			acl: 'private',
 		});
 
-		const url = await this.storage.getSignedDownloadUrl(key);
+		const url = await this.s3StorageService.getSignedDownloadUrl(key);
 		await this.mail.sendTemplate({
 			to: data.email,
 			subject: EMAIL_EXPORT_READY.subject,

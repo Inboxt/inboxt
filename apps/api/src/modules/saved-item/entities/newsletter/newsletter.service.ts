@@ -1,10 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { JSDOM } from 'jsdom';
 
 import { Prisma } from '../../../../../prisma/client';
 import { PrismaService } from '../../../../services/prisma.service';
 import { MAX_NEWSLETTER_WORD_COUNT, MIN_NEWSLETTER_WORD_COUNT } from '@inboxt/common';
 import { ContentExtractionService } from '../../../../services/content-extraction.service';
+import { AppException } from '../../../../utils/app-exception';
+import { QuotaOptions, StorageQuotaService } from '../../../storage/storage-quota.service';
 
 export type ProcessNewsletterInput = {
 	html: string;
@@ -16,6 +18,7 @@ export class NewsletterService {
 	constructor(
 		private prisma: PrismaService,
 		private contentExtractionService: ContentExtractionService,
+		private storageQuota: StorageQuotaService,
 	) {}
 
 	extractUnsubscribeUrl(payload: any): string | null {
@@ -88,15 +91,51 @@ export class NewsletterService {
 			| 'newsletter_subscription'
 		>,
 		tx?: Prisma.TransactionClient,
+		opts?: QuotaOptions,
 	) {
-		const client = tx ?? this.prisma;
-		return client.newsletter.create({
-			data: {
-				...data,
-				savedItemId,
-				inboundEmailAddressId,
-			},
-		});
+		const skipQuota = opts?.skipQuota ?? false;
+		const run = async (client: Prisma.TransactionClient) => {
+			const owner = await client.saved_item.findUnique({
+				where: { id: savedItemId },
+				select: { userId: true },
+			});
+
+			if (!owner) {
+				throw new AppException('Saved item not found', HttpStatus.NOT_FOUND);
+			}
+
+			const sizeBytes = skipQuota
+				? 0n
+				: this.storageQuota.computeSizeBytes({
+						contentHtml: data.contentHtml,
+						contentText: data.contentText,
+					});
+
+			if (!skipQuota) {
+				await this.storageQuota.ensureWithinQuota(owner.userId, sizeBytes);
+			}
+
+			const created = await client.newsletter.create({
+				data: {
+					...data,
+					savedItemId,
+					inboundEmailAddressId: inboundEmailAddressId ?? null,
+					sizeBytes,
+				},
+			});
+
+			if (!skipQuota) {
+				await this.storageQuota.incrementUsage(client, owner.userId, sizeBytes);
+			}
+
+			return created;
+		};
+
+		if (tx) {
+			return run(tx);
+		}
+
+		return this.prisma.$transaction((client) => run(client));
 	}
 
 	isPossiblyUnreadable(html: string) {

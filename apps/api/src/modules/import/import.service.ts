@@ -257,7 +257,6 @@ export class ImportService {
 				continue;
 			}
 
-			// Saved item fields
 			const title =
 				row.title?.toString()?.trim() ||
 				row.name?.toString()?.trim() ||
@@ -317,7 +316,6 @@ export class ImportService {
 			labelsJson.map((l) => ({ name: l.name, color: l.color || undefined })),
 		);
 
-		// saved_items/saved_items.json gives the list
 		const itemsList =
 			(await this.readJson<
 				Array<{
@@ -349,7 +347,7 @@ export class ImportService {
 			}
 		}
 
-		// Other html files in zip archive
+		// Standalone HTML files
 		const allHtmlFiles = await fg('**/*.html', {
 			cwd: baseDir,
 			absolute: true,

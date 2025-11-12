@@ -21,4 +21,10 @@ export class User extends BaseModel {
 
 	@Field(() => Date, { nullable: true })
 	lastExportAt?: Date;
+
+	@Field(() => String)
+	storageUsageBytes: string;
+
+	@Field(() => String)
+	storageQuotaBytes: string;
 }

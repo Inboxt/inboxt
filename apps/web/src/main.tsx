@@ -21,6 +21,7 @@ import { InstallModal } from '~modals/InstallModal';
 import { LabelsModal } from '~modals/LabelsModal';
 import { LabelsSelectionModal } from '~modals/LabelsSelectionModal';
 import { ProfileModal } from '~modals/ProfileModal';
+import { StorageHelpModal } from '~modals/StorageHelpModal';
 import { VerifyEmailModal } from '~modals/VerifyEmailModal';
 
 import { routeTree } from './routeTree.gen';
@@ -66,6 +67,7 @@ if (!rootElement.innerHTML) {
 								addContent: AddContentModal,
 								exportData: ExportDataModal,
 								import: ImportModal,
+								storageHelp: StorageHelpModal,
 							}}
 						>
 							<RouterProvider router={router} />

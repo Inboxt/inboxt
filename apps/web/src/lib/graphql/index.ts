@@ -13,6 +13,8 @@ export const USER_FRAGMENT = gql(`
 		labelsCount
 		inboundEmailAddressesCount
 		lastExportAt
+		storageUsageBytes
+		storageQuotaBytes
 	}
 `);
 

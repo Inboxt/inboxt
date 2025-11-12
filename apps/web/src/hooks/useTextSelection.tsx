@@ -2,7 +2,9 @@ import { useMutation } from '@apollo/client';
 import { useTextSelection } from '@mantine/hooks';
 import { RefObject, useMemo, useState, useEffect, useRef } from 'react';
 
+import { toastError } from '~components/Toast';
 import { CREATE_HIGHLIGHT, DELETE_HIGHLIGHTS } from '~lib/graphql';
+import { parseError } from '~utils/parse-error.ts';
 
 import {
 	createHighlightsFromSelection,
@@ -26,7 +28,7 @@ export function useTextHighlighting(
 
 	const hoverClearTimeout = useRef<number | null>(null);
 
-	const [createHighlight] = useMutation(CREATE_HIGHLIGHT);
+	const [createHighlight, { error }] = useMutation(CREATE_HIGHLIGHT);
 	const [deleteHighlights] = useMutation(DELETE_HIGHLIGHTS);
 
 	// clear any hovered highlight when the user starts a new text selection
@@ -128,6 +130,18 @@ export function useTextHighlighting(
 			}
 		};
 	}, [containerRef, selectedText]);
+
+	useEffect(() => {
+		if (error) {
+			const parsedError = parseError(error);
+			if (parsedError) {
+				toastError({
+					title: "Couldn't create highlight",
+					description: parsedError.message,
+				});
+			}
+		}
+	}, [error]);
 
 	function selectionOverlapsHighlight(range: Range, container: HTMLElement): boolean {
 		const highlights = container.querySelectorAll('.highlight');

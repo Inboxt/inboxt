@@ -49,3 +49,15 @@ export const EMAIL_EXPORT_READY = {
 	description:
 		'Download your ZIP archive. The link will expire in 24 hours. The file will be automatically deleted from our servers after 3 days.',
 };
+
+export const EMAIL_STORAGE_APPROACHING_LIMIT = {
+	subject: 'You’re nearing your Inboxt storage limit',
+	description:
+		'You have used most of your storage quota. Consider freeing up space to avoid interruptions.',
+};
+
+export const EMAIL_STORAGE_LIMIT_REACHED = {
+	subject: 'You’ve reached your Inboxt storage limit',
+	description:
+		'Your storage quota has been fully used. Some actions may be restricted until you free up space.',
+};
