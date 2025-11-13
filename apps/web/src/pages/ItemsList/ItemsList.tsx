@@ -4,6 +4,7 @@ import { useSearch } from '@tanstack/react-router';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { ConfirmWithAlert } from '~components/ConfirmWithAlert/ConfirmWithAlert.tsx';
 import { toastSuccess } from '~components/Toast';
 import { useContentSelection } from '~context/content-selection';
 import { AppLayout } from '~layouts/AppLayout';
@@ -116,11 +117,12 @@ export const ItemsList = () => {
 				title: 'Delete Permanently',
 				centered: true,
 				children: (
-					<Text>
-						Are you sure you want to permanently delete{' '}
-						{count > 1 ? `${count} items` : 'this item'}? <br />
-						This action cannot be undone.
-					</Text>
+					<ConfirmWithAlert
+						lines={[
+							`Are you sure you want to permanently delete ${count > 1 ? `${count} items` : 'this item'}?`,
+							'This action cannot be undone.',
+						]}
+					/>
 				),
 				labels: { confirm: 'Delete permanently', cancel: 'Cancel' },
 				confirmProps: { color: 'red' },

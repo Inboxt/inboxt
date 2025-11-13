@@ -28,7 +28,7 @@ export const ExportDataModal = ({
 	const handleRequestExport = async () => {
 		const res = await requestExport({ variables: { data: { type, formatForHighlights } } });
 		const dataUrl = res.data?.requestExport as string;
-		if (!dataUrl || !dataUrl?.startsWith('data:')) {
+		if (!dataUrl || !dataUrl.startsWith('data:')) {
 			toastInfo({
 				title: 'Export requested',
 				description: 'We’ll email you a download link when it’s ready.',
@@ -53,7 +53,7 @@ export const ExportDataModal = ({
 
 	return (
 		<Stack gap="xl">
-			<Card withBorder radius="md">
+			<Card>
 				<Stack gap="md">
 					<Text size="sm">
 						{type === ExportType.All

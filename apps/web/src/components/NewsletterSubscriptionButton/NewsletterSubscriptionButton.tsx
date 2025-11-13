@@ -1,6 +1,7 @@
 import { useMutation } from '@apollo/client';
-import { Button, Text } from '@mantine/core';
+import { Button } from '@mantine/core';
 
+import { ConfirmWithAlert } from '~components/ConfirmWithAlert/ConfirmWithAlert.tsx';
 import { useScreenQuery } from '~hooks/useScreenQuery';
 import {
 	INBOUND_EMAIL_ADDRESSES,
@@ -80,21 +81,14 @@ export const NewsletterSubscriptionButton = ({ subscription }: NewsletterSubscri
 					title: 'Unsubscribe from this newsletter?',
 					size: 640,
 					children: (
-						<Text size="sm">
-							You’ll be redirected to the sender’s website to complete the unsubscribe
-							process.
-							<br />
-							<br />
-							We’ll mark this subscription as unsubscribed in your account. If no new
-							emails arrive from this sender in the next 90 days, it will be
-							automatically removed.
-							<br />
-							<br />
-							You can undo this later if you change your mind.
-							<br />
-							<br />
-							Do you want to continue?
-						</Text>
+						<ConfirmWithAlert
+							lines={[
+								'You’ll be redirected to the sender’s website to complete the unsubscribe process.',
+								'We’ll mark this subscription as unsubscribed in your account. If no new emails arrive from this sender in the next 90 days, it will be automatically removed.',
+								'You can undo this later if you change your mind.',
+								'Do you want to continue?',
+							]}
+						/>
 					),
 					labels: {
 						confirm: 'Unsubscribe',

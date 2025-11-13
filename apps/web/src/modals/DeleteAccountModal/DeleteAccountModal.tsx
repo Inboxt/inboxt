@@ -1,7 +1,8 @@
 import { useMutation } from '@apollo/client';
-import { Button, Text, Stack, TextInput } from '@mantine/core';
+import { Button, Text, Stack, TextInput, Card, Alert } from '@mantine/core';
 import { useForm, zodResolver } from '@mantine/form';
 import { ContextModalProps } from '@mantine/modals';
+import { IconAlertTriangleFilled } from '@tabler/icons-react';
 
 import { deleteAccountSchema } from '@inboxt/common';
 
@@ -31,29 +32,25 @@ export const DeleteAccountModal = ({ id, context }: ContextModalProps) => {
 	return (
 		<Form onSubmit={form.onSubmit(handleDeleteAccount)} error={error} style={{ flex: 1 }}>
 			{({ error }) => (
-				<Stack flex={1}>
-					<Text>Are you sure you want to delete your account?</Text>
-					<Text>
-						This action is{' '}
-						<Text span fw={700} td="underline">
-							irreversible
-						</Text>{' '}
-						and will{' '}
-						<Text span fw={700} td="underline">
-							instantly and permanently delete
-						</Text>{' '}
-						all your data. You will not be able to recover your account once this is
-						done.
-					</Text>
+				<Stack gap="xl" flex={1}>
+					<Alert color="red" icon={<IconAlertTriangleFilled />} variant="light">
+						This action is <strong>irreversible</strong> and will{' '}
+						<strong>instantly and permanently delete</strong> all your data. You will
+						not be able to recover your account once this is done.
+					</Alert>
 
-					<Text>To confirm, please enter your email address:</Text>
+					<Card>
+						<Stack gap="md">
+							<Text size="sm">To confirm, please enter your email address:</Text>
 
-					<TextInput
-						placeholder="Enter your email address"
-						{...form.getInputProps('emailAddress')}
-					/>
+							<TextInput
+								placeholder="Enter your email address"
+								{...form.getInputProps('emailAddress')}
+							/>
+						</Stack>
 
-					{error}
+						{error}
+					</Card>
 
 					<ButtonContainer>
 						<Button

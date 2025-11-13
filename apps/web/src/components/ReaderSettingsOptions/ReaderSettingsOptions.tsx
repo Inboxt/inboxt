@@ -65,7 +65,7 @@ export const ReaderSettingsOptions = ({
 			{variant === 'full' && (
 				<>
 					<Divider
-						color="var(--mantine-color-text)"
+						color="var(--reader-border-color)"
 						orientation={direction === 'column' ? 'horizontal' : 'vertical'}
 					/>
 

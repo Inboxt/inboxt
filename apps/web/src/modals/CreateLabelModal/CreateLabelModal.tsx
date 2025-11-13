@@ -1,5 +1,5 @@
 import { useMutation } from '@apollo/client';
-import { Stack, TextInput, Button, Flex } from '@mantine/core';
+import { Stack, TextInput, Button, Flex, Card } from '@mantine/core';
 import { useForm, zodResolver } from '@mantine/form';
 import { ContextModalProps } from '@mantine/modals';
 
@@ -33,16 +33,18 @@ export const CreateLabelModal = ({ id, context }: ContextModalProps) => {
 		<Form onSubmit={form.onSubmit(handleCreateLabel)} error={error} setErrors={form.setErrors}>
 			{({ error }) => (
 				<Stack gap="xl">
-					<Flex gap="md" direction={{ base: 'column', xs: 'row' }}>
-						<TextInput label="Name" flex={1} {...form.getInputProps('name')} />
-						<LabelsColorInput
-							label="Color"
-							{...form.getInputProps('color')}
-							key={form.key('color')}
-						/>
-					</Flex>
+					<Card>
+						<Flex gap="md" direction={{ base: 'column', xs: 'row' }}>
+							<TextInput label="Name" flex={1} {...form.getInputProps('name')} />
+							<LabelsColorInput
+								label="Color"
+								{...form.getInputProps('color')}
+								key={form.key('color')}
+							/>
+						</Flex>
 
-					{error}
+						{error}
+					</Card>
 
 					<ButtonContainer>
 						<Button

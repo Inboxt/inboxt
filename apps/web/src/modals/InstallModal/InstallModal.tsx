@@ -10,6 +10,7 @@ import {
 	Flex,
 	SelectProps,
 	ActionIcon,
+	Card,
 } from '@mantine/core';
 import { ContextModalProps } from '@mantine/modals';
 import { IconCheck, IconDeviceDesktopPlus, IconDownload } from '@tabler/icons-react';
@@ -51,19 +52,21 @@ const InstallOption = ({
 	description: string;
 	children?: ReactNode;
 }) => (
-	<Flex
-		align={{ base: 'flex-start', sm: 'center' }}
-		gap={{ base: 'xs', sm: 'xl' }}
-		wrap="nowrap"
-		direction={{ base: 'column', sm: 'row' }}
-	>
-		<Image src={imageSrc} alt={altText} w="auto" h={116} radius="sm" />
-		<Box>
-			<Title order={5}>{title}</Title>
-			<Text>{description}</Text>
-			{children && <Group mt="sm">{children}</Group>}
-		</Box>
-	</Flex>
+	<Card>
+		<Flex
+			align={{ base: 'flex-start', sm: 'center' }}
+			gap={{ base: 'xs', sm: 'xl' }}
+			wrap="nowrap"
+			direction={{ base: 'column', sm: 'row' }}
+		>
+			<Image src={imageSrc} alt={altText} w="auto" h={116} radius="sm" />
+			<Box>
+				<Title order={5}>{title}</Title>
+				<Text size="sm">{description}</Text>
+				{children && <Group mt="sm">{children}</Group>}
+			</Box>
+		</Flex>
+	</Card>
 );
 
 // todo: PWA install, maybe better and responsive buttons/layout? Deleted install from android/ios store - double check for unused images...

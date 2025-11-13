@@ -13,7 +13,7 @@ export const StorageHelpModal = ({ id, context }: ContextModalProps) => {
 				functionality.
 			</Alert>
 
-			<Card withBorder radius="md">
+			<Card>
 				<Stack gap="sm">
 					<Text size="sm">Running low on storage? Try these steps:</Text>
 

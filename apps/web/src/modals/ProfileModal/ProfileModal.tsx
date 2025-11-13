@@ -114,7 +114,7 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 		<Form onSubmit={form.onSubmit(handleUpdateProfile)} error={updateProfileError}>
 			{({ error }) => (
 				<Stack gap="xl">
-					<Card withBorder radius="md">
+					<Card>
 						<Skeleton visible={loading}>
 							<SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
 								<TextInput label="Name" {...form.getInputProps('username')} />
@@ -132,7 +132,7 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 						{error && <Box mt="sm">{error}</Box>}
 					</Card>
 
-					<Card withBorder radius="md">
+					<Card>
 						<Title order={5}>Theme</Title>
 						<SegmentedControl
 							fullWidth
@@ -148,7 +148,7 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 						/>
 					</Card>
 
-					<Card withBorder radius="md">
+					<Card>
 						<Flex
 							justify="space-between"
 							align={{ base: 'stretch', xs: 'center' }}
@@ -174,7 +174,7 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 						</Flex>
 					</Card>
 
-					<Card withBorder radius="md">
+					<Card>
 						<Skeleton visible={loading}>
 							<Flex
 								justify="space-between"
@@ -213,7 +213,7 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 						</Skeleton>
 					</Card>
 
-					<Card withBorder radius="md">
+					<Card>
 						<Skeleton visible={loading}>
 							<Title order={5}>Storage Usage</Title>
 							<Stack gap="xs" mt="sm">

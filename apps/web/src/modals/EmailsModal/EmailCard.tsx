@@ -20,7 +20,7 @@ export const EmailCard = ({ email }: EmailCardProps) => {
 	);
 
 	return (
-		<Card withBorder radius="md">
+		<Card>
 			<Stack>
 				<Stack gap={0}>
 					<Title order={5}>Email Address:</Title>

@@ -105,8 +105,6 @@ export const ImportModal = ({ id, context }: ContextModalProps<ImportModalProps>
 					{importOptions.map((opt) => (
 						<Card
 							key={opt.type}
-							withBorder
-							radius="md"
 							onClick={() => setSelectedType(opt.type)}
 							style={{ cursor: 'pointer' }}
 						>
@@ -125,7 +123,7 @@ export const ImportModal = ({ id, context }: ContextModalProps<ImportModalProps>
 			)}
 
 			{selectedType && (
-				<Card withBorder radius="md">
+				<Card>
 					<Stack gap="sm">
 						<Flex justify="space-between" align="center">
 							<Title order={5}>{selectedOption?.label}</Title>

@@ -90,7 +90,7 @@ export const HighlightItem = ({ highlight }: HighlightItemProps) => {
 						)}
 					</Group>
 
-					<Text lineClamp={2} fz="md" maw="90%">
+					<Text lineClamp={20} fz="md" maw="90%">
 						{highlight?.segments
 							?.slice()
 							.reverse()

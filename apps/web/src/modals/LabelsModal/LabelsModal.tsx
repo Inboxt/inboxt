@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client';
-import { Button, Stack } from '@mantine/core';
+import { Button, Card, Stack, Text } from '@mantine/core';
 import { ContextModalProps } from '@mantine/modals';
 import { useEffect, useState } from 'react';
 
@@ -24,20 +24,33 @@ export const LabelsModal = ({ id, context }: ContextModalProps) => {
 		};
 		document.addEventListener('keydown', handleKeyDown, true);
 		return () => document.removeEventListener('keydown', handleKeyDown, true);
-	}, [editingLabelId, id]);
+	}, [editingLabelId, id, context]);
+
+	const labels = data?.labels ?? [];
+	const hasLabels = labels.length > 0;
 
 	return (
 		<Stack gap="xl" justify="space-between" flex={1}>
-			<Stack gap="sm" mah={300} className="overflow-container">
-				{data?.labels?.map((label) => (
-					<EditableLabelItem
-						key={label.id}
-						label={label}
-						isEditing={editingLabelId === label.id}
-						setIsEditing={(isEditing) => setEditingLabelId(isEditing ? label.id : null)}
-					/>
-				))}
-			</Stack>
+			{hasLabels ? (
+				<Card>
+					<Stack gap="sm" mah={300} className="overflow-container">
+						{labels.map((label) => (
+							<EditableLabelItem
+								key={label.id}
+								label={label}
+								isEditing={editingLabelId === label.id}
+								setIsEditing={(isEditing) =>
+									setEditingLabelId(isEditing ? label.id : null)
+								}
+							/>
+						))}
+					</Stack>
+				</Card>
+			) : (
+				<Text size="sm" c="dimmed">
+					No labels yet.
+				</Text>
+			)}
 
 			<ButtonContainer>
 				<Button onClick={() => context.closeModal(id)} variant="default">

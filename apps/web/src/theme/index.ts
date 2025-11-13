@@ -1,4 +1,4 @@
-import { Checkbox, createTheme, Modal, SegmentedControl } from '@mantine/core';
+import { Card, Checkbox, createTheme, Modal, SegmentedControl } from '@mantine/core';
 
 import { fontSizes } from './fontSizes';
 import { spacing } from './spacing';
@@ -50,5 +50,11 @@ export const theme = createTheme({
 			},
 		}),
 		Checkbox: Checkbox.extend({ classNames: classes }),
+		Card: Card.extend({
+			defaultProps: {
+				withBorder: true,
+				radius: 'md',
+			},
+		}),
 	},
 });

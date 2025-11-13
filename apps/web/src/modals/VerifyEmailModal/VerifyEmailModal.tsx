@@ -1,5 +1,5 @@
 import { useMutation } from '@apollo/client';
-import { Button, Stack, Text, TextInput } from '@mantine/core';
+import { Button, Card, Stack, Text, TextInput } from '@mantine/core';
 import { useForm, zodResolver } from '@mantine/form';
 import { useInterval } from '@mantine/hooks';
 import { ContextModalProps } from '@mantine/modals';
@@ -62,21 +62,23 @@ export const VerifyEmailModal = ({ id, context }: ContextModalProps) => {
 		<Form onSubmit={form.onSubmit(handleVerifyEmail)} error={verifyEmailError}>
 			{({ error }) => (
 				<Stack gap="xl">
-					<Stack gap="xs">
-						<Text>
-							We’ve sent you an email with a confirmation code. Please check your
-							inbox and spam folder. Enter the code below to verify your email
-							address.
-						</Text>
+					<Card>
+						<Stack gap="md">
+							<Text size="sm">
+								We've sent you an email with a confirmation code. Please check your
+								inbox and spam folder. Enter the code below to verify your email
+								address.
+							</Text>
 
-						<TextInput
-							label="Confirmation Code"
-							placeholder="XXXXX-XXXXX"
-							{...form.getInputProps('code')}
-						/>
-					</Stack>
+							<TextInput
+								label="Confirmation Code"
+								placeholder="XXXXX-XXXXX"
+								{...form.getInputProps('code')}
+							/>
+						</Stack>
 
-					{error}
+						{error}
+					</Card>
 
 					<ButtonContainer>
 						<Button

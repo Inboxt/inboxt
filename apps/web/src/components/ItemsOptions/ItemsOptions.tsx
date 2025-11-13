@@ -1,5 +1,5 @@
 import { useMutation } from '@apollo/client';
-import { ActionIcon, Text, Tooltip } from '@mantine/core';
+import { ActionIcon, Tooltip } from '@mantine/core';
 import {
 	IconArchive,
 	IconArrowBackUp,
@@ -16,6 +16,7 @@ import {
 import { useNavigate } from '@tanstack/react-router';
 import React, { useMemo } from 'react';
 
+import { ConfirmWithAlert } from '~components/ConfirmWithAlert/ConfirmWithAlert.tsx';
 import { toastSuccess } from '~components/Toast';
 import { SelectableItem, useContentSelection } from '~context/content-selection';
 import {
@@ -82,7 +83,7 @@ export const ItemsOptions = ({ items, mode, size = 'md', onActionComplete }: Ite
 
 	const confirm = (opts: {
 		title: string;
-		message: React.ReactNode;
+		message: string[];
 		confirmLabel?: string;
 		confirmColor?: string;
 	}) =>
@@ -90,7 +91,7 @@ export const ItemsOptions = ({ items, mode, size = 'md', onActionComplete }: Ite
 			modals.openConfirmModal({
 				title: opts.title,
 				centered: true,
-				children: <Text>{opts.message}</Text>,
+				children: <ConfirmWithAlert lines={opts.message} />,
 				labels: { confirm: opts.confirmLabel ?? 'Confirm', cancel: 'Cancel' },
 				confirmProps: { color: opts.confirmColor ?? 'primary' },
 				onConfirm: () => resolve(true),
@@ -281,13 +282,10 @@ export const ItemsOptions = ({ items, mode, size = 'md', onActionComplete }: Ite
 				const count = savedItemIds.length;
 				const confirmed = await confirm({
 					title: 'Delete Permanently',
-					message: (
-						<>
-							Are you sure you want to permanently delete{' '}
-							{count > 1 ? `${count} items` : 'this item'}? <br />
-							This action cannot be undone.
-						</>
-					),
+					message: [
+						`Are you sure you want to permanently delete ${count > 1 ? `${count} items` : 'this item'}?`,
+						'This action cannot be undone.',
+					],
 					confirmLabel: 'Delete permanently',
 					confirmColor: 'red',
 				});
@@ -357,13 +355,10 @@ export const ItemsOptions = ({ items, mode, size = 'md', onActionComplete }: Ite
 				const count = highlightItems.length;
 				const confirmed = await confirm({
 					title: `Delete Highlight${count > 1 ? 's' : ''}`,
-					message: (
-						<>
-							Are you sure you want to permanently delete{' '}
-							{count > 1 ? `${count} highlights` : 'this highlight'}? <br />
-							This action cannot be undone.
-						</>
-					),
+					message: [
+						`Are you sure you want to permanently delete ${count > 1 ? `${count} highlights` : 'this highlight'}?`,
+						'This action cannot be undone.',
+					],
 					confirmLabel: 'Delete permanently',
 					confirmColor: 'red',
 				});

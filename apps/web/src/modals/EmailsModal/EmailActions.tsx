@@ -1,7 +1,8 @@
 import { useMutation } from '@apollo/client';
-import { ActionIcon, Button, Group, Stack, Text, Tooltip } from '@mantine/core';
+import { ActionIcon, Button, Group, Stack, Tooltip } from '@mantine/core';
 import { IconCopy, IconTrash } from '@tabler/icons-react';
 
+import { ConfirmWithAlert } from '~components/ConfirmWithAlert/ConfirmWithAlert.tsx';
 import { DELETE_INBOUND_EMAIL_ADDRESS, INBOUND_EMAIL_ADDRESSES } from '~lib/graphql';
 import { InboundEmailAddress } from '~lib/graphql/generated/graphql';
 import { modals } from '~modals/modals';
@@ -32,17 +33,13 @@ export const EmailActions = ({ email }: EmailActionsProps) => {
 			title: 'Delete email address?',
 			size: 640,
 			children: (
-				<Text size="sm">
-					This email address will be permanently disabled and cannot be used again with
-					the app.
-					<br />
-					<br />
-					All future emails sent to this address will be ignored, and your existing
-					content will remain untouched.
-					<br />
-					<br />
-					Are you sure you want to proceed?
-				</Text>
+				<ConfirmWithAlert
+					lines={[
+						'This email address will be permanently disabled and cannot be used again with the app.',
+						'All future emails sent to this address will be ignored, and your existing content will remain untouched.',
+						'Are you sure you want to proceed?',
+					]}
+				/>
 			),
 			labels: {
 				confirm: 'Delete email',

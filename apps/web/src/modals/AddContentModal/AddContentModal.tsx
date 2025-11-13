@@ -1,4 +1,4 @@
-import { Button, Stack, TextInput } from '@mantine/core';
+import { Button, Card, Stack, TextInput } from '@mantine/core';
 import { useForm, zodResolver } from '@mantine/form';
 import { ContextModalProps } from '@mantine/modals';
 import { useState } from 'react';
@@ -64,15 +64,22 @@ export const AddContentModal = ({ id, context }: ContextModalProps) => {
 		<Form onSubmit={form.onSubmit(handleAddContent)} error={error} setErrors={form.setErrors}>
 			{({ error }) => (
 				<Stack gap="xl">
-					<TextInput
-						placeholder="https://example.com/"
-						{...form.getInputProps('url')}
-						label="	Page URL"
-					/>
+					<Card>
+						<Stack gap="md">
+							<TextInput
+								placeholder="https://example.com/"
+								{...form.getInputProps('url')}
+								label="Page URL"
+							/>
 
-					<LabelsMultiSelect key={form.key('labels')} {...form.getInputProps('labels')} />
+							<LabelsMultiSelect
+								key={form.key('labels')}
+								{...form.getInputProps('labels')}
+							/>
+						</Stack>
 
-					{error}
+						{error}
+					</Card>
 
 					<ButtonContainer>
 						<Button
