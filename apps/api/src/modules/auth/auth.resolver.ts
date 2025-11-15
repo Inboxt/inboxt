@@ -12,6 +12,8 @@ import { ActiveUserMeta, ActiveUserMetaType } from '../../decorators/active-user
 import { RequestPasswordRecoveryInput } from './dto/request-password-recovery.input';
 import { ResetPasswordInput } from './dto/reset-password.input';
 import { NonDemo } from '../../decorators/account.decorator';
+import { RateLimit } from '../../decorators/rate-limit.decorator';
+import { HOURLY_RATE_LIMIT } from '../../common/constants/rate-limit.constants';
 
 @Resolver()
 export class AuthResolver {
@@ -19,6 +21,7 @@ export class AuthResolver {
 
 	@Public()
 	@Mutation(() => Void)
+	@RateLimit(HOURLY_RATE_LIMIT)
 	async signIn(
 		@Args('data') { emailAddress, password }: SignInInput,
 		@Context() context: GqlContext,
@@ -29,13 +32,14 @@ export class AuthResolver {
 	}
 
 	@Mutation(() => Void)
-	async signOut(@Context() context: GqlContext) {
+	signOut(@Context() context: GqlContext) {
 		this.authService.signOut(context);
 		return VOID_RESPONSE;
 	}
 
 	@Public()
 	@Mutation(() => Void)
+	@RateLimit(HOURLY_RATE_LIMIT)
 	async createAccount(@Args('data') data: CreateAccountInput, @Context() context: GqlContext) {
 		await this.authService.createUser(data, context.req);
 		return VOID_RESPONSE;
@@ -43,6 +47,7 @@ export class AuthResolver {
 
 	@Public()
 	@Mutation(() => Void)
+	@RateLimit(HOURLY_RATE_LIMIT)
 	async createDemoAccount(@Context() context: GqlContext) {
 		await this.authService.createDemo(context.req);
 		return VOID_RESPONSE;
@@ -50,6 +55,7 @@ export class AuthResolver {
 
 	@NonDemo()
 	@Mutation(() => Void)
+	@RateLimit(HOURLY_RATE_LIMIT)
 	async verifyEmail(
 		@ActiveUserMeta() activeUser: ActiveUserMetaType,
 		@Args('data') data: VerifyEmailInput,
@@ -60,6 +66,7 @@ export class AuthResolver {
 
 	@Public()
 	@Mutation(() => Void)
+	@RateLimit(HOURLY_RATE_LIMIT)
 	async requestPasswordRecovery(@Args('data') data: RequestPasswordRecoveryInput) {
 		await this.authService.requestPasswordRecovery(data);
 		return VOID_RESPONSE;
@@ -67,6 +74,7 @@ export class AuthResolver {
 
 	@Public()
 	@Mutation(() => Void)
+	@RateLimit(HOURLY_RATE_LIMIT)
 	async resetPassword(@Args('data') data: ResetPasswordInput) {
 		await this.authService.resetPassword(data);
 		return VOID_RESPONSE;

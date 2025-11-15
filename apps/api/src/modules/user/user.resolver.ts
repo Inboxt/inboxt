@@ -8,6 +8,7 @@ import { Void } from '../../models/void.model';
 import { VOID_RESPONSE } from '../../constants/void';
 import { DeleteAccountInput } from './dto/delete-account.input';
 import { NonDemo } from '../../decorators/account.decorator';
+import { RateLimit } from '../../decorators/rate-limit.decorator';
 
 @Resolver(() => User)
 export class UserResolver {
@@ -15,6 +16,7 @@ export class UserResolver {
 
 	@NonDemo()
 	@Mutation(() => User)
+	@RateLimit({ user: { points: 30, duration: 60 * 60 } })
 	async updateAccount(
 		@ActiveUserMeta() activeUser: ActiveUserMetaType,
 		@Args('data') data: UpdateAccountInput,

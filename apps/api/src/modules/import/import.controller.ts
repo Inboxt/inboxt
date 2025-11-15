@@ -19,6 +19,7 @@ import { VerifiedOnly } from '../../decorators/account.decorator';
 import { ImportType } from '../../common/enums/import-type.enum';
 import { AppException } from '../../utils/app-exception';
 import { VOID_RESPONSE } from '../../constants/void';
+import { RateLimit } from '../../decorators/rate-limit.decorator';
 
 const storage = diskStorage({
 	destination: (req, file, cb) => cb(null, '/tmp'),
@@ -40,6 +41,9 @@ export class ImportController {
 			limits: { fileSize: 50 * 1024 * 1024 }, // 50MB
 		}),
 	)
+	@RateLimit({
+		user: { points: 15, duration: 60 * 60 },
+	})
 	async uploadImportFile(
 		@ActiveUserMeta() activeUser: ActiveUserMetaType,
 		@UploadedFile() file: Express.Multer.File,

@@ -27,6 +27,8 @@ import { EntryManagerModule } from '../../managers/entry-manager/entry-manager.m
 import { AccountGuard } from '../../guards/account.guard';
 import { ExportModule } from '../export/export.module';
 import { ImportModule } from '../import/import.module';
+import { GqlRateLimitGuard } from '../../guards/rate-limit.guard';
+import { RateLimitService } from '../../services/rate-limit.service';
 
 @Module({
 	imports: [
@@ -85,7 +87,9 @@ import { ImportModule } from '../import/import.module';
 	providers: [
 		PrismaService,
 		AppService,
+		RateLimitService,
 		{ provide: APP_GUARD, useClass: GqlAuthGuard },
+		{ provide: APP_GUARD, useClass: GqlRateLimitGuard },
 		{ provide: APP_GUARD, useClass: AccountGuard },
 		{
 			provide: APP_FILTER,
