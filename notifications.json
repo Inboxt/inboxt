@@ -10,6 +10,6 @@
       "type": "ALERT",
       "date": "2025-11-02",
       "text": "API service degradation affecting article syncing",
-      "link": "/breaking-change"
+      "link": "/breaking-change-2"
     }
 ]
