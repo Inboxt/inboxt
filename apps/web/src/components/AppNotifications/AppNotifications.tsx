@@ -1,53 +1,70 @@
 import { Text, Group, Stack, ActionIcon, Button, Collapse, Skeleton } from '@mantine/core';
 import { IconChevronDown, IconChevronUp } from '@tabler/icons-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { AppNotificationItem } from './AppNotificationItem';
 import classes from './AppNotifications.module.css';
 
-// todo: get it from the backend
-const updates = [
-	{
-		id: 1,
-		type: 'UPDATE',
-		badge: 'v1.2.0',
-		date: 'August 20, 2025',
-		text: 'Dark mode available',
-		link: '/changelog',
-	},
-	{
-		id: 2,
-		type: 'ALERT',
-		text: 'API service degradation affecting article syncing',
-		link: '/breaking-change',
-		date: 'August 18, 2025',
-	},
-	{
-		id: 3,
-		type: 'NEWS',
-		text: 'iOS app coming next month',
-		link: '/roadmap',
-	},
-	{
-		id: 4,
-		type: 'SURVEY',
-		text: 'Help us improve: rate new article parsing',
-		link: '/feedback',
-	},
-	{
-		id: 5,
-		type: 'UPDATE',
-		badge: 'v1.1.0',
-		date: 'July 15, 2025',
-		text: 'New label management features',
-		link: '/changelog',
-	},
-];
+type RemoteNotification = {
+	type: 'UPDATE' | 'ALERT' | 'NEWS' | 'SURVEY';
+	badge?: string;
+	date?: string;
+	text: string;
+	link?: string;
+};
+
+type NotificationWithId = RemoteNotification & { id: number };
 
 export const AppNotifications = () => {
-	const [notificationList, setNotificationList] = useState(updates);
+	const [notificationList, setNotificationList] = useState<NotificationWithId[]>([]);
 	const [expanded, setExpanded] = useState(false);
-	const [isLoading, setIsLoading] = useState(false);
+	const [isLoading, setIsLoading] = useState(true);
+	const [error, setError] = useState<string | null>(null);
+
+	useEffect(() => {
+		let isMounted = true;
+
+		const loadNotifications = async () => {
+			try {
+				setIsLoading(true);
+				setError(null);
+
+				const res = await fetch(`${process.env.API_URL}/notifications`, {
+					cache: 'no-store',
+				});
+				if (!res.ok) {
+					throw new Error(`Failed to load notifications (status ${res.status})`);
+				}
+
+				const data: RemoteNotification[] = await res.json();
+
+				// Preserve the order from JSON, add synthetic IDs for React keys
+				const withIds: NotificationWithId[] = (data || []).map((item, index) => ({
+					...item,
+					id: index + 1,
+				}));
+
+				if (isMounted) {
+					setNotificationList(withIds);
+				}
+			} catch (err) {
+				if (isMounted) {
+					setError('Unable to load updates right now.');
+					setNotificationList([]);
+				}
+			} finally {
+				if (isMounted) {
+					setIsLoading(false);
+				}
+			}
+		};
+
+		void loadNotifications();
+
+		return () => {
+			isMounted = false;
+		};
+	}, []);
 
 	const latestNotification = notificationList[0];
 	const remainingNotifications = notificationList.slice(1);
@@ -63,6 +80,19 @@ export const AppNotifications = () => {
 				<Stack gap="xs">
 					<Skeleton height={18} radius="sm" width="100%" animate={true} />
 				</Stack>
+			</Stack>
+		);
+	}
+
+	if (error) {
+		return (
+			<Stack my="sm" gap="xxxs">
+				<Text fz="xs" fw={600} c="dimmed" tt="uppercase" lts={0.5}>
+					Updates
+				</Text>
+				<Text size="xs" c="red">
+					{error}
+				</Text>
 			</Stack>
 		);
 	}
