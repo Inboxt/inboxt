@@ -8,3 +8,4 @@ export { deleteAccountSchema } from './deleteAccount';
 export { addItemFromUrlSchema } from './addItemFromUrl';
 export { createLabelSchema } from './createLabel';
 export { updateLabelSchema } from './updateLabel';
+export { createApiTokenSchema } from './createApiToken';

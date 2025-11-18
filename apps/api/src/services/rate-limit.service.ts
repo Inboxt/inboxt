@@ -12,6 +12,7 @@ export class RateLimitService implements OnModuleDestroy {
 	private readonly buckets: Record<AuthState, RateLimitBucket> = {
 		guest: { points: 30, duration: 60 }, // 30 requests / minute
 		user: { points: 300, duration: 60 }, // 300 requests / minute
+		api_token: { points: 600, duration: 60 }, // 600 requests / minute
 	};
 
 	private readonly limiters: Record<AuthState, RateLimiterValkey>;
@@ -36,6 +37,12 @@ export class RateLimitService implements OnModuleDestroy {
 				keyPrefix: 'rl:user',
 				points: this.buckets.user.points,
 				duration: this.buckets.user.duration,
+			}),
+			api_token: new RateLimiterValkey({
+				storeClient: this.valkeyClient,
+				keyPrefix: 'rl:api_token',
+				points: this.buckets.api_token.points,
+				duration: this.buckets.api_token.duration,
 			}),
 		};
 	}

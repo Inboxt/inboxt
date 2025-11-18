@@ -11,11 +11,13 @@ import { UpdateLabelInput } from './dto/update-label.input';
 import { DeleteLabelInput } from './dto/delete-label.input';
 import { Void } from '../../../../models/void.model';
 import { VOID_RESPONSE } from '../../../../constants/void';
+import { ApiTokenAllowed } from '../../../../decorators/api-token.decorator';
 
 @Resolver(() => Label)
 export class LabelResolver {
 	constructor(private labelService: LabelService) {}
 
+	@ApiTokenAllowed()
 	@Mutation(() => Label)
 	async createLabel(
 		@ActiveUserMeta() activeUser: ActiveUserMetaType,
@@ -24,6 +26,7 @@ export class LabelResolver {
 		return this.labelService.create(activeUser.id, data);
 	}
 
+	@ApiTokenAllowed()
 	@Mutation(() => Label)
 	async updateLabel(
 		@ActiveUserMeta() activeUser: ActiveUserMetaType,
@@ -42,6 +45,7 @@ export class LabelResolver {
 		return VOID_RESPONSE;
 	}
 
+	@ApiTokenAllowed()
 	@Query(() => [Label], { nullable: true })
 	async labels(@ActiveUserMeta() activeUser: ActiveUserMetaType) {
 		return this.labelService.getMany(activeUser.id, {});

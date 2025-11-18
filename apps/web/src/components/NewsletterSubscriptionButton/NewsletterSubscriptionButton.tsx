@@ -1,7 +1,7 @@
 import { useMutation } from '@apollo/client';
 import { Button } from '@mantine/core';
 
-import { ConfirmWithAlert } from '~components/ConfirmWithAlert/ConfirmWithAlert.tsx';
+import { ConfirmWithAlert } from '~components/ConfirmWithAlert';
 import { useScreenQuery } from '~hooks/useScreenQuery';
 import {
 	INBOUND_EMAIL_ADDRESSES,

@@ -9,6 +9,7 @@ import { HighlightSegment } from './highlight-segment.model';
 import { DeleteHighlightsInput } from './dto/delete-highlights.input';
 import { SavedItemService } from '../saved-item/saved-item.service';
 import { SavedItem } from '../saved-item/saved-item.model';
+import { ApiTokenAllowed } from '../../decorators/api-token.decorator';
 
 @Resolver(() => Highlight)
 export class HighlightResolver {
@@ -17,6 +18,7 @@ export class HighlightResolver {
 		private savedItemService: SavedItemService,
 	) {}
 
+	@ApiTokenAllowed()
 	@Mutation(() => Highlight)
 	async createHighlight(
 		@ActiveUserMeta() activeUser: ActiveUserMetaType,

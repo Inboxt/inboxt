@@ -5,12 +5,17 @@ import { ActiveUserMeta, ActiveUserMetaType } from '../../decorators/active-user
 import { Public } from '../../decorators/public.decorator';
 import { SavedItemManagerService } from './saved-item-manager.service';
 import { RateLimit } from '../../decorators/rate-limit.decorator';
+import { ApiTokenAllowed } from '../../decorators/api-token.decorator';
 
 @Controller('inbox/items')
 export class SavedItemManagerController {
 	constructor(private savedItemManagerService: SavedItemManagerService) {}
 
-	@RateLimit({ user: { points: 150, duration: 60 * 60 } })
+	@ApiTokenAllowed()
+	@RateLimit({
+		user: { points: 150, duration: 60 * 60 },
+		api_token: { points: 300, duration: 60 * 60 },
+	})
 	@Post('from-url')
 	async addArticleFromUrl(
 		@ActiveUserMeta() activeUser: ActiveUserMetaType,

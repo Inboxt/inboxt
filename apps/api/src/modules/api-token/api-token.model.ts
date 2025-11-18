@@ -1,0 +1,23 @@
+import { Field, ObjectType } from '@nestjs/graphql';
+import { BaseModel } from '../../models/base.model';
+
+@ObjectType()
+export class ApiToken extends BaseModel {
+	@Field({ nullable: true })
+	lastUsedAt?: Date;
+
+	@Field()
+	name: string;
+
+	@Field({ nullable: true })
+	expiresAt?: Date;
+}
+
+@ObjectType()
+export class CreatedApiToken {
+	@Field(() => ApiToken)
+	token: ApiToken;
+
+	@Field()
+	secret: string;
+}

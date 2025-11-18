@@ -1,0 +1,1 @@
+export { ConfirmWithAlert } from './ConfirmWithAlert';

@@ -4,12 +4,14 @@ import { ActiveUserMeta, ActiveUserMetaType } from '../../decorators/active-user
 import { UserService } from '../user/user.service';
 import { Public } from '../../decorators/public.decorator';
 import { User } from '../user/user.model';
+import { ApiTokenAllowed } from '../../decorators/api-token.decorator';
 
 @Public()
 @Resolver(() => User)
 export class ActiveUserResolver {
 	constructor(private userService: UserService) {}
 
+	@ApiTokenAllowed()
 	@Query(() => User, { nullable: true })
 	async me(@ActiveUserMeta() activeUser: ActiveUserMetaType) {
 		if (!activeUser?.id) {

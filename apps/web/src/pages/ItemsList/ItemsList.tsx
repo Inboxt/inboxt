@@ -4,7 +4,7 @@ import { useSearch } from '@tanstack/react-router';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { ConfirmWithAlert } from '~components/ConfirmWithAlert/ConfirmWithAlert.tsx';
+import { ConfirmWithAlert } from '~components/ConfirmWithAlert';
 import { toastSuccess } from '~components/Toast';
 import { useContentSelection } from '~context/content-selection';
 import { AppLayout } from '~layouts/AppLayout';

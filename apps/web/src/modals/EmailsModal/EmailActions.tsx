@@ -2,7 +2,7 @@ import { useMutation } from '@apollo/client';
 import { ActionIcon, Button, Group, Stack, Tooltip } from '@mantine/core';
 import { IconCopy, IconTrash } from '@tabler/icons-react';
 
-import { ConfirmWithAlert } from '~components/ConfirmWithAlert/ConfirmWithAlert.tsx';
+import { ConfirmWithAlert } from '~components/ConfirmWithAlert';
 import { DELETE_INBOUND_EMAIL_ADDRESS, INBOUND_EMAIL_ADDRESSES } from '~lib/graphql';
 import { InboundEmailAddress } from '~lib/graphql/generated/graphql';
 import { modals } from '~modals/modals';

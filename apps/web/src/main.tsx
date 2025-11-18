@@ -12,6 +12,8 @@ import { Toaster } from 'sonner';
 import { ContentSelectionProvider } from '~context/content-selection';
 import { client } from '~lib/graphql/client';
 import { AddContentModal } from '~modals/AddContentModal';
+import { ApiTokensModal } from '~modals/ApiTokensModal';
+import { CreateApiTokenModal } from '~modals/CreateApiTokenModal';
 import { CreateLabelModal } from '~modals/CreateLabelModal';
 import { DeleteAccountModal } from '~modals/DeleteAccountModal';
 import { EmailsModal } from '~modals/EmailsModal/EmailsModal';
@@ -68,6 +70,8 @@ if (!rootElement.innerHTML) {
 								exportData: ExportDataModal,
 								import: ImportModal,
 								storageHelp: StorageHelpModal,
+								apiTokens: ApiTokensModal,
+								createApiToken: CreateApiTokenModal,
 							}}
 						>
 							<RouterProvider router={router} />

@@ -14,6 +14,7 @@ import { Label } from './entities/label/label.model';
 import { PermanentlyDeleteSavedItemsInput } from './dto/permanently-delete-saved-items.input';
 import { Newsletter } from './entities/newsletter/newsletter.model';
 import { NewsletterService } from './entities/newsletter/newsletter.service';
+import { ApiTokenAllowed } from '../../decorators/api-token.decorator';
 
 @Resolver(() => SavedItem)
 export class SavedItemResolver {
@@ -23,6 +24,7 @@ export class SavedItemResolver {
 		private newsletterService: NewsletterService,
 	) {}
 
+	@ApiTokenAllowed()
 	@Query(() => SavedItem, { nullable: true })
 	async savedItem(
 		@ActiveUserMeta() activeUser: ActiveUserMetaType,
@@ -33,6 +35,7 @@ export class SavedItemResolver {
 		});
 	}
 
+	@ApiTokenAllowed()
 	@Mutation(() => Void)
 	async updateSavedItemStatus(
 		@ActiveUserMeta() activeUser: ActiveUserMetaType,
@@ -46,6 +49,7 @@ export class SavedItemResolver {
 		return VOID_RESPONSE;
 	}
 
+	@ApiTokenAllowed()
 	@Mutation(() => Void)
 	async setSavedItemLabels(
 		@ActiveUserMeta() activeUser: ActiveUserMetaType,

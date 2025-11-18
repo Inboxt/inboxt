@@ -9,11 +9,13 @@ import { InboundEmailAddress } from './inbound-email-address.model';
 
 import { NewsletterSubscription } from '../saved-item/entities/newsletter/newsletter-subscription/newsletter-subscription.model';
 import { VerifiedOnly } from '../../decorators/account.decorator';
+import { ApiTokenAllowed } from '../../decorators/api-token.decorator';
 
 @Resolver(() => InboundEmailAddress)
 export class InboundEmailAddressResolver {
 	constructor(private inboundEmailAddressService: InboundEmailAddressService) {}
 
+	@ApiTokenAllowed()
 	@Query(() => [InboundEmailAddress], { nullable: true })
 	async inboundEmailAddresses(@ActiveUserMeta() activeUser: ActiveUserMetaType) {
 		return this.inboundEmailAddressService.getMany(activeUser.id, {

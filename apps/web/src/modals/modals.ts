@@ -102,7 +102,13 @@ export const modals = {
 	},
 
 	openConfirmModal: (payload: Record<string, unknown>) => {
-		return mantineModals.openConfirmModal({ size: 540, ...payload });
+		return mantineModals.openConfirmModal({
+			size: 540,
+			groupProps: {
+				justify: 'space-between',
+			},
+			...payload,
+		});
 	},
 
 	openExportDataModal: ({ title, type }: ExportDataModalProps & { title: string }) => {
@@ -136,6 +142,28 @@ export const modals = {
 			centered: true,
 			title: 'Free Up Storage',
 			innerProps: {},
+			className: 'fullscreen-modal',
+		});
+	},
+
+	openApiTokensModal: () => {
+		return mantineModals.openContextModal({
+			modal: 'apiTokens',
+			size: 640,
+			title: 'API Tokens',
+			centered: true,
+			innerProps: {},
+			className: 'fullscreen-modal',
+		});
+	},
+
+	openCreateApiTokenModal: (innerProps: { onCreated?: () => void } = {}) => {
+		return mantineModals.openContextModal({
+			modal: 'createApiToken',
+			size: 640,
+			title: 'Create API Token',
+			centered: true,
+			innerProps,
 			className: 'fullscreen-modal',
 		});
 	},

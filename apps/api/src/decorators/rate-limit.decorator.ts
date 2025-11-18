@@ -5,7 +5,7 @@ export interface RateLimitBucket {
 	duration: number; // in seconds
 }
 
-export type AuthState = 'guest' | 'user';
+export type AuthState = 'guest' | 'user' | 'api_token';
 export const RATE_LIMIT_META_KEY = 'rate-limit';
 
 export type RateLimitOptions = Partial<Record<AuthState, Partial<RateLimitBucket>>>;

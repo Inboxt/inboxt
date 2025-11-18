@@ -88,6 +88,14 @@ export class GqlRateLimitGuard implements CanActivate {
 	}
 
 	private getAuthStateAndKey(req: any): { authState: AuthState; key: string } {
+		// API Token
+		if (req?.apiToken?.id) {
+			return {
+				authState: 'api_token',
+				key: `api_token:${req.apiToken.id}`,
+			};
+		}
+
 		// Authenticated user
 		if (req?.user?.id) {
 			return {

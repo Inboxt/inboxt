@@ -3,6 +3,7 @@ import { Avatar } from '@mantine/core';
 import {
 	IconCloudUpload,
 	IconDownload,
+	IconKey,
 	IconLogout,
 	IconMail,
 	IconSettings,
@@ -57,6 +58,11 @@ export const UserMenu = () => {
 			action: modals.openInstallModal,
 		},
 		{
+			label: 'API Tokens',
+			icon: <IconKey />,
+			action: modals.openApiTokensModal,
+		},
+		{
 			label: 'Log Out',
 			icon: <IconLogout />,
 			action: () => void handleSignOut(),
@@ -64,7 +70,7 @@ export const UserMenu = () => {
 	];
 
 	return (
-		<MenuDrawer items={USER_MENU_ITEMS} label="Quick Actions" height={352}>
+		<MenuDrawer items={USER_MENU_ITEMS} label="Quick Actions" height={386}>
 			<Avatar
 				name={data?.me?.username || 'User'}
 				color="initials"

@@ -17,6 +17,13 @@ export class GqlAuthGuard extends AuthGuard('jwt') {
 			context.getClass(),
 		]);
 
+		const ctx = GqlExecutionContext.create(context);
+		const req = ctx.getContext().req;
+
+		if (req.user) {
+			return true;
+		}
+
 		try {
 			const result = await super.canActivate(context);
 			return result as boolean;

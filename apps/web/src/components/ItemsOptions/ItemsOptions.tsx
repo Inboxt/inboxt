@@ -16,7 +16,7 @@ import {
 import { useNavigate } from '@tanstack/react-router';
 import React, { useMemo } from 'react';
 
-import { ConfirmWithAlert } from '~components/ConfirmWithAlert/ConfirmWithAlert.tsx';
+import { ConfirmWithAlert } from '~components/ConfirmWithAlert';
 import { toastSuccess } from '~components/Toast';
 import { SelectableItem, useContentSelection } from '~context/content-selection';
 import {

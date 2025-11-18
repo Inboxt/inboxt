@@ -104,6 +104,16 @@ export const ENTRY_FRAGMENT = gql(`
 	}
 `);
 
+export const API_TOKEN_FRAGMENT = gql(`
+    fragment ApiTokenFragment on ApiToken {
+    	id
+    	createdAt
+    	lastUsedAt
+    	name
+    	expiresAt
+    }
+`);
+
 /*----------  Queries  ----------*/
 export const ACTIVE_USER = gql(`
 	query me {
@@ -180,6 +190,14 @@ export const ENTRIES = gql(`
 			}
 		}
 	}
+`);
+
+export const API_TOKENS = gql(`
+    query apiTokens { 
+    	apiTokens {
+    		...ApiTokenFragment
+    	}
+    }
 `);
 
 /*----------  Mutations  ----------*/
@@ -355,5 +373,24 @@ export const CREATE_DEMO_ACCOUNT = gql(`
 export const REQUEST_EXPORT = gql(`
 	mutation requestExport($data: RequestExportInput!) {
 		requestExport(data: $data)
+	}
+`);
+
+export const CREATE_API_TOKEN = gql(`
+    mutation createApiToken($data: CreateApiTokenInput!) {
+    	createApiToken(data: $data) {
+    		token {
+    			...ApiTokenFragment
+    		}
+    		secret
+    	}
+    }
+`);
+
+export const DELETE_API_TOKEN = gql(`
+	mutation deleteApiToken($data: DeleteApiTokenInput!) {
+		deleteApiToken(data: $data) {
+			success
+		}
 	}
 `);

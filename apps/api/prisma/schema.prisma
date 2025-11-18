@@ -85,6 +85,7 @@ model user {
   storageUsageBytes            BigInt                  @default(0)
   storageQuotaBytes            BigInt                  @default(104857600)
   lastNotifiedStorageThreshold Int                     @default(0)
+  api_token                    api_token[]
   highlight                    highlight[]
   inbound_email_address        inbound_email_address[]
   label                        label[]
@@ -154,6 +155,20 @@ model highlight_segment {
   highlight   highlight @relation(fields: [highlightId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@index([highlightId], map: "highlight_segment_highlightId_index")
+}
+
+model api_token {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt  DateTime  @default(now()) @db.Timestamp(6)
+  lastUsedAt DateTime? @db.Timestamp(6)
+  name       String
+  token      String?
+  userId     String    @db.Uuid
+  expiresAt  DateTime? @db.Timestamp(6)
+  user       user      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([token], map: "api_token_token_index")
+  @@index([userId], map: "api_token_userId_index")
 }
 
 enum saved_item_status {

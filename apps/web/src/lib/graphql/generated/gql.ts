@@ -21,11 +21,13 @@ type Documents = {
     "\n\tfragment NewsletterFragment on Newsletter {\n\t\tcontentHtml\n\t\tcontentText\n\t\tsubscription {\n\t\t\tid\n\t\t\tcreatedAt\n\t\t\tname\n\t\t\tstatus\n\t\t\tlastReceivedAt\n\t\t\tunsubscribeUrl\n\t\t\tunsubscribeAttemptedAt\n\t\t}\n\t}\n": typeof types.NewsletterFragmentFragmentDoc,
     "\n\tfragment HighlightFragment on Highlight {\n\t\tid\n\t\tcreatedAt\n\t\tsavedItem {\n        \tid\n            title\n        }\n\t\tsegments {\n\t\t\tid\n\t\t\txpath\n\t\t\tbeforeText\n\t\t\tstartOffset\n\t\t\tendOffset\n\t\t\tafterText\n\t\t\ttext\n\t\t}\n\t}\n": typeof types.HighlightFragmentFragmentDoc,
     "\n\tfragment EntryFragment on Entry {\n\t\t__typename\n\t\t... on SavedItem {\n\t\t\t...SavedItemFragment\n\t\t\tlabels {\n\t\t\t\t...SavedItemLabelFragment\n\t\t\t}\n\t\t}\n\t\t... on Highlight {\n\t\t\t...HighlightFragment\n\t\t}\n\t}\n": typeof types.EntryFragmentFragmentDoc,
+    "\n    fragment ApiTokenFragment on ApiToken {\n    \tid\n    \tcreatedAt\n    \tlastUsedAt\n    \tname\n    \texpiresAt\n    }\n": typeof types.ApiTokenFragmentFragmentDoc,
     "\n\tquery me {\n\t\tme {\n\t\t\tid\n\t\t\t...UserFragment\n\t\t}\n\t}\n": typeof types.MeDocument,
     "\n\tquery labels {\n\t\tlabels {\n\t\t\tid\n\t\t\t...SavedItemLabelFragment\n\t\t}\n\t}\n": typeof types.LabelsDocument,
     "\n\tquery savedItem($query: GetSavedItemInput!) {\n\t\tsavedItem(query: $query) {\n\t\t\tid\n\t\t\t...SavedItemFragment\n\t\t\tlabels {\n\t\t\t\tid\n\t\t\t\t...SavedItemLabelFragment\n\t\t\t}\n\t\t\tarticle {\n\t\t\t\tcontentHtml\n\t\t\t\tcontentText\n\t\t\t}\n\t\t\tnewsletter {\n\t\t\t\t...NewsletterFragment\n\t\t\t}\n\t\t\thighlights {\n\t\t\t\t...HighlightFragment\n\t\t\t}\n\t\t}\n\t}\n": typeof types.SavedItemDocument,
     "\n\tquery inboundEmailAddresses {\n\t\tinboundEmailAddresses {\n\t\t\tid\n\t\t\tcreatedAt\n\t\t\tfullAddress\n\t\t\tsubscriptions {\n\t\t\t\tid\n\t\t\t\tcreatedAt\n\t\t\t\tname\n\t\t\t\tstatus\n\t\t\t\tlastReceivedAt\n\t\t\t\tunsubscribeUrl\n\t\t\t\tunsubscribeAttemptedAt\n\t\t\t}\n\t\t}\n\t}\n": typeof types.InboundEmailAddressesDocument,
     "\n\tquery entries($query: GetEntriesInput!) {\n\t\tentries(query: $query) {\n\t\t\tedges {\n\t\t\t\tnode {\n\t\t\t\t\t...EntryFragment\n\t\t\t\t}\n\t\t\t\tcursor\n\t\t\t}\n\t\t\tpageInfo {\n\t\t\t\thasNextPage\n\t\t\t\tendCursor\n\t\t\t}\n\t\t}\n\t}\n": typeof types.EntriesDocument,
+    "\n    query apiTokens { \n    \tapiTokens {\n    \t\t...ApiTokenFragment\n    \t}\n    }\n": typeof types.ApiTokensDocument,
     "\n\tmutation signIn($data: SignInInput!) {\n\t\tsignIn(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": typeof types.SignInDocument,
     "\n\tmutation signOut {\n\t\tsignOut {\n\t\t\tsuccess\n\t\t}\n\t}\n": typeof types.SignOutDocument,
     "\n\tmutation createAccount($data: CreateAccountInput!) {\n\t\tcreateAccount(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": typeof types.CreateAccountDocument,
@@ -48,6 +50,8 @@ type Documents = {
     "\n\tmutation DeleteHighlights($data: DeleteHighlightsInput!) {\n\t\tdeleteHighlights(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": typeof types.DeleteHighlightsDocument,
     "\n\tmutation createDemoAccount {\n\t\tcreateDemoAccount {\n\t\t\tsuccess\n\t\t}\n\t}\n": typeof types.CreateDemoAccountDocument,
     "\n\tmutation requestExport($data: RequestExportInput!) {\n\t\trequestExport(data: $data)\n\t}\n": typeof types.RequestExportDocument,
+    "\n    mutation createApiToken($data: CreateApiTokenInput!) {\n    \tcreateApiToken(data: $data) {\n    \t\ttoken {\n    \t\t\t...ApiTokenFragment\n    \t\t}\n    \t\tsecret\n    \t}\n    }\n": typeof types.CreateApiTokenDocument,
+    "\n\tmutation deleteApiToken($data: DeleteApiTokenInput!) {\n\t\tdeleteApiToken(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": typeof types.DeleteApiTokenDocument,
 };
 const documents: Documents = {
     "\n\tfragment UserFragment on User {\n\t\tid\n\t\tcreatedAt\n\t\temailAddress\n\t\tisEmailVerified\n\t\tusername\n\t\tpendingEmailAddress\n\t\tplan\n\t\tlabelsCount\n\t\tinboundEmailAddressesCount\n\t\tlastExportAt\n\t\tstorageUsageBytes\n\t\tstorageQuotaBytes\n\t}\n": types.UserFragmentFragmentDoc,
@@ -57,11 +61,13 @@ const documents: Documents = {
     "\n\tfragment NewsletterFragment on Newsletter {\n\t\tcontentHtml\n\t\tcontentText\n\t\tsubscription {\n\t\t\tid\n\t\t\tcreatedAt\n\t\t\tname\n\t\t\tstatus\n\t\t\tlastReceivedAt\n\t\t\tunsubscribeUrl\n\t\t\tunsubscribeAttemptedAt\n\t\t}\n\t}\n": types.NewsletterFragmentFragmentDoc,
     "\n\tfragment HighlightFragment on Highlight {\n\t\tid\n\t\tcreatedAt\n\t\tsavedItem {\n        \tid\n            title\n        }\n\t\tsegments {\n\t\t\tid\n\t\t\txpath\n\t\t\tbeforeText\n\t\t\tstartOffset\n\t\t\tendOffset\n\t\t\tafterText\n\t\t\ttext\n\t\t}\n\t}\n": types.HighlightFragmentFragmentDoc,
     "\n\tfragment EntryFragment on Entry {\n\t\t__typename\n\t\t... on SavedItem {\n\t\t\t...SavedItemFragment\n\t\t\tlabels {\n\t\t\t\t...SavedItemLabelFragment\n\t\t\t}\n\t\t}\n\t\t... on Highlight {\n\t\t\t...HighlightFragment\n\t\t}\n\t}\n": types.EntryFragmentFragmentDoc,
+    "\n    fragment ApiTokenFragment on ApiToken {\n    \tid\n    \tcreatedAt\n    \tlastUsedAt\n    \tname\n    \texpiresAt\n    }\n": types.ApiTokenFragmentFragmentDoc,
     "\n\tquery me {\n\t\tme {\n\t\t\tid\n\t\t\t...UserFragment\n\t\t}\n\t}\n": types.MeDocument,
     "\n\tquery labels {\n\t\tlabels {\n\t\t\tid\n\t\t\t...SavedItemLabelFragment\n\t\t}\n\t}\n": types.LabelsDocument,
     "\n\tquery savedItem($query: GetSavedItemInput!) {\n\t\tsavedItem(query: $query) {\n\t\t\tid\n\t\t\t...SavedItemFragment\n\t\t\tlabels {\n\t\t\t\tid\n\t\t\t\t...SavedItemLabelFragment\n\t\t\t}\n\t\t\tarticle {\n\t\t\t\tcontentHtml\n\t\t\t\tcontentText\n\t\t\t}\n\t\t\tnewsletter {\n\t\t\t\t...NewsletterFragment\n\t\t\t}\n\t\t\thighlights {\n\t\t\t\t...HighlightFragment\n\t\t\t}\n\t\t}\n\t}\n": types.SavedItemDocument,
     "\n\tquery inboundEmailAddresses {\n\t\tinboundEmailAddresses {\n\t\t\tid\n\t\t\tcreatedAt\n\t\t\tfullAddress\n\t\t\tsubscriptions {\n\t\t\t\tid\n\t\t\t\tcreatedAt\n\t\t\t\tname\n\t\t\t\tstatus\n\t\t\t\tlastReceivedAt\n\t\t\t\tunsubscribeUrl\n\t\t\t\tunsubscribeAttemptedAt\n\t\t\t}\n\t\t}\n\t}\n": types.InboundEmailAddressesDocument,
     "\n\tquery entries($query: GetEntriesInput!) {\n\t\tentries(query: $query) {\n\t\t\tedges {\n\t\t\t\tnode {\n\t\t\t\t\t...EntryFragment\n\t\t\t\t}\n\t\t\t\tcursor\n\t\t\t}\n\t\t\tpageInfo {\n\t\t\t\thasNextPage\n\t\t\t\tendCursor\n\t\t\t}\n\t\t}\n\t}\n": types.EntriesDocument,
+    "\n    query apiTokens { \n    \tapiTokens {\n    \t\t...ApiTokenFragment\n    \t}\n    }\n": types.ApiTokensDocument,
     "\n\tmutation signIn($data: SignInInput!) {\n\t\tsignIn(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": types.SignInDocument,
     "\n\tmutation signOut {\n\t\tsignOut {\n\t\t\tsuccess\n\t\t}\n\t}\n": types.SignOutDocument,
     "\n\tmutation createAccount($data: CreateAccountInput!) {\n\t\tcreateAccount(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": types.CreateAccountDocument,
@@ -84,6 +90,8 @@ const documents: Documents = {
     "\n\tmutation DeleteHighlights($data: DeleteHighlightsInput!) {\n\t\tdeleteHighlights(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": types.DeleteHighlightsDocument,
     "\n\tmutation createDemoAccount {\n\t\tcreateDemoAccount {\n\t\t\tsuccess\n\t\t}\n\t}\n": types.CreateDemoAccountDocument,
     "\n\tmutation requestExport($data: RequestExportInput!) {\n\t\trequestExport(data: $data)\n\t}\n": types.RequestExportDocument,
+    "\n    mutation createApiToken($data: CreateApiTokenInput!) {\n    \tcreateApiToken(data: $data) {\n    \t\ttoken {\n    \t\t\t...ApiTokenFragment\n    \t\t}\n    \t\tsecret\n    \t}\n    }\n": types.CreateApiTokenDocument,
+    "\n\tmutation deleteApiToken($data: DeleteApiTokenInput!) {\n\t\tdeleteApiToken(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": types.DeleteApiTokenDocument,
 };
 
 /**
@@ -131,6 +139,10 @@ export function gql(source: "\n\tfragment EntryFragment on Entry {\n\t\t__typena
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function gql(source: "\n    fragment ApiTokenFragment on ApiToken {\n    \tid\n    \tcreatedAt\n    \tlastUsedAt\n    \tname\n    \texpiresAt\n    }\n"): (typeof documents)["\n    fragment ApiTokenFragment on ApiToken {\n    \tid\n    \tcreatedAt\n    \tlastUsedAt\n    \tname\n    \texpiresAt\n    }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function gql(source: "\n\tquery me {\n\t\tme {\n\t\t\tid\n\t\t\t...UserFragment\n\t\t}\n\t}\n"): (typeof documents)["\n\tquery me {\n\t\tme {\n\t\t\tid\n\t\t\t...UserFragment\n\t\t}\n\t}\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -148,6 +160,10 @@ export function gql(source: "\n\tquery inboundEmailAddresses {\n\t\tinboundEmail
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n\tquery entries($query: GetEntriesInput!) {\n\t\tentries(query: $query) {\n\t\t\tedges {\n\t\t\t\tnode {\n\t\t\t\t\t...EntryFragment\n\t\t\t\t}\n\t\t\t\tcursor\n\t\t\t}\n\t\t\tpageInfo {\n\t\t\t\thasNextPage\n\t\t\t\tendCursor\n\t\t\t}\n\t\t}\n\t}\n"): (typeof documents)["\n\tquery entries($query: GetEntriesInput!) {\n\t\tentries(query: $query) {\n\t\t\tedges {\n\t\t\t\tnode {\n\t\t\t\t\t...EntryFragment\n\t\t\t\t}\n\t\t\t\tcursor\n\t\t\t}\n\t\t\tpageInfo {\n\t\t\t\thasNextPage\n\t\t\t\tendCursor\n\t\t\t}\n\t\t}\n\t}\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n    query apiTokens { \n    \tapiTokens {\n    \t\t...ApiTokenFragment\n    \t}\n    }\n"): (typeof documents)["\n    query apiTokens { \n    \tapiTokens {\n    \t\t...ApiTokenFragment\n    \t}\n    }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -236,6 +252,14 @@ export function gql(source: "\n\tmutation createDemoAccount {\n\t\tcreateDemoAcc
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n\tmutation requestExport($data: RequestExportInput!) {\n\t\trequestExport(data: $data)\n\t}\n"): (typeof documents)["\n\tmutation requestExport($data: RequestExportInput!) {\n\t\trequestExport(data: $data)\n\t}\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n    mutation createApiToken($data: CreateApiTokenInput!) {\n    \tcreateApiToken(data: $data) {\n    \t\ttoken {\n    \t\t\t...ApiTokenFragment\n    \t\t}\n    \t\tsecret\n    \t}\n    }\n"): (typeof documents)["\n    mutation createApiToken($data: CreateApiTokenInput!) {\n    \tcreateApiToken(data: $data) {\n    \t\ttoken {\n    \t\t\t...ApiTokenFragment\n    \t\t}\n    \t\tsecret\n    \t}\n    }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n\tmutation deleteApiToken($data: DeleteApiTokenInput!) {\n\t\tdeleteApiToken(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n"): (typeof documents)["\n\tmutation deleteApiToken($data: DeleteApiTokenInput!) {\n\t\tdeleteApiToken(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n"];
 
 export function gql(source: string) {
   return (documents as any)[source] ?? {};

@@ -29,6 +29,8 @@ import { ExportModule } from '../export/export.module';
 import { ImportModule } from '../import/import.module';
 import { GqlRateLimitGuard } from '../../guards/rate-limit.guard';
 import { RateLimitService } from '../../services/rate-limit.service';
+import { ApiTokenModule } from '../api-token/api-token.module';
+import { ApiTokenGuard } from '../../guards/api-token.guard';
 
 @Module({
 	imports: [
@@ -83,11 +85,13 @@ import { RateLimitService } from '../../services/rate-limit.service';
 		EntryManagerModule,
 		ExportModule,
 		ImportModule,
+		ApiTokenModule,
 	],
 	providers: [
 		PrismaService,
 		AppService,
 		RateLimitService,
+		{ provide: APP_GUARD, useClass: ApiTokenGuard },
 		{ provide: APP_GUARD, useClass: GqlAuthGuard },
 		{ provide: APP_GUARD, useClass: GqlRateLimitGuard },
 		{ provide: APP_GUARD, useClass: AccountGuard },
