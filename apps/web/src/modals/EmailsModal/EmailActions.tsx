@@ -1,6 +1,6 @@
 import { useMutation } from '@apollo/client';
-import { ActionIcon, Button, Group, Stack, Tooltip } from '@mantine/core';
-import { IconCopy, IconTrash } from '@tabler/icons-react';
+import { ActionIcon, Button, CopyButton, Group, Stack, Tooltip } from '@mantine/core';
+import { IconCheck, IconCopy, IconTrash } from '@tabler/icons-react';
 
 import { ConfirmWithAlert } from '~components/ConfirmWithAlert';
 import { DELETE_INBOUND_EMAIL_ADDRESS, INBOUND_EMAIL_ADDRESSES } from '~lib/graphql';
@@ -21,10 +21,6 @@ export const EmailActions = ({ email }: EmailActionsProps) => {
 			variables: { data: { id: emailId } },
 			refetchQueries: [INBOUND_EMAIL_ADDRESSES],
 		});
-	};
-
-	const handleCopy = async (email: string) => {
-		await navigator.clipboard.writeText(email);
 	};
 
 	const openDeleteConfirmModal = () => {
@@ -53,15 +49,20 @@ export const EmailActions = ({ email }: EmailActionsProps) => {
 	return (
 		<>
 			<Group miw={128} justify="center" visibleFrom="xs">
-				<Tooltip label="Copy email">
-					<ActionIcon
-						variant="light"
-						size="lg"
-						onClick={() => void handleCopy(email.fullAddress)}
-					>
-						<IconCopy size={18} />
-					</ActionIcon>
-				</Tooltip>
+				<CopyButton value={email.fullAddress} timeout={2000}>
+					{({ copied, copy }) => (
+						<Tooltip label={copied ? 'Copied' : 'Copy email'}>
+							<ActionIcon
+								color={copied ? 'teal' : undefined}
+								variant="light"
+								size="lg"
+								onClick={copy}
+							>
+								{copied ? <IconCheck size={18} /> : <IconCopy size={18} />}
+							</ActionIcon>
+						</Tooltip>
+					)}
+				</CopyButton>
 
 				<Tooltip label="Delete email">
 					<ActionIcon
@@ -77,14 +78,19 @@ export const EmailActions = ({ email }: EmailActionsProps) => {
 			</Group>
 
 			<Stack hiddenFrom="xs" mt="xs" gap="xs">
-				<Button
-					variant="light"
-					leftSection={<IconCopy size={18} />}
-					onClick={() => void handleCopy(email.fullAddress)}
-					fullWidth
-				>
-					Copy Email
-				</Button>
+				<CopyButton value={email.fullAddress} timeout={2000}>
+					{({ copied, copy }) => (
+						<Button
+							color={copied ? 'teal' : undefined}
+							variant="light"
+							leftSection={copied ? <IconCheck size={18} /> : <IconCopy size={18} />}
+							onClick={copy}
+							fullWidth
+						>
+							{copied ? 'Copied' : 'Copy Email'}
+						</Button>
+					)}
+				</CopyButton>
 
 				<Button
 					color="red"
