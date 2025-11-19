@@ -24,7 +24,7 @@ model article {
 
 model label {
   id               String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  createdAt        DateTime           @default(now()) @db.Timestamp(6)
+  createdAt        DateTime           @default(now()) @db.Timestamptz(6)
   userId           String             @db.Uuid
   name             String
   color            String?
@@ -36,7 +36,7 @@ model label {
 
 model saved_item {
   id               String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  createdAt        DateTime           @default(now()) @db.Timestamp(6)
+  createdAt        DateTime           @default(now()) @db.Timestamptz(6)
   userId           String             @db.Uuid
   title            String
   originalUrl      String?
@@ -47,7 +47,7 @@ model saved_item {
   author           String?
   type             saved_item_type
   status           saved_item_status  @default(ACTIVE)
-  deletedSince     DateTime?          @db.Timestamp(6)
+  deletedSince     DateTime?          @db.Timestamptz(6)
   sizeBytes        BigInt             @default(0)
   article          article?
   highlight        highlight[]
@@ -68,20 +68,20 @@ model saved_item_label {
 
 model user {
   id                           String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  createdAt                    DateTime                @default(now()) @db.Timestamp(6)
+  createdAt                    DateTime                @default(now()) @db.Timestamptz(6)
   logins                       Int                     @default(0)
-  lastLogin                    DateTime?               @db.Timestamp(6)
+  lastLogin                    DateTime?               @db.Timestamptz(6)
   emailAddress                 String                  @unique
   pendingEmailAddress          String?
   password                     String?
   username                     String?
   isEmailVerified              Boolean                 @default(false)
   emailVerifyCode              String?
-  emailVerifyExpiry            DateTime?               @db.Timestamp(6)
+  emailVerifyExpiry            DateTime?               @db.Timestamptz(6)
   resetPasswordCode            String?
-  resetPasswordExpiry          DateTime?               @db.Timestamp(6)
+  resetPasswordExpiry          DateTime?               @db.Timestamptz(6)
   plan                         user_plan               @default(FREE)
-  lastExportAt                 DateTime?               @db.Timestamp(6)
+  lastExportAt                 DateTime?               @db.Timestamptz(6)
   storageUsageBytes            BigInt                  @default(0)
   storageQuotaBytes            BigInt                  @default(104857600)
   lastNotifiedStorageThreshold Int                     @default(0)
@@ -107,12 +107,12 @@ model newsletter {
 
 model newsletter_subscription {
   id                     String                         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  createdAt              DateTime                       @default(now()) @db.Timestamp(6)
+  createdAt              DateTime                       @default(now()) @db.Timestamptz(6)
   status                 newsletter_subscription_status @default(ACTIVE)
   name                   String
-  lastReceivedAt         DateTime?                      @db.Timestamp(6)
+  lastReceivedAt         DateTime?                      @db.Timestamptz(6)
   unsubscribeUrl         String?
-  unsubscribeAttemptedAt DateTime?                      @db.Timestamp(6)
+  unsubscribeAttemptedAt DateTime?                      @db.Timestamptz(6)
   inboundEmailAddressId  String                         @db.Uuid
   newsletter             newsletter[]
   inbound_email_address  inbound_email_address          @relation(fields: [inboundEmailAddressId], references: [id], onDelete: Cascade, onUpdate: NoAction)
@@ -121,8 +121,8 @@ model newsletter_subscription {
 model inbound_email_address {
   id                      String                    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId                  String?                   @db.Uuid
-  createdAt               DateTime                  @default(now()) @db.Timestamp(6)
-  deletedAt               DateTime?                 @db.Timestamp(6)
+  createdAt               DateTime                  @default(now()) @db.Timestamptz(6)
+  deletedAt               DateTime?                 @db.Timestamptz(6)
   localPart               String                    @db.VarChar(64)
   fullAddress             String                    @unique
   user                    user?                     @relation(fields: [userId], references: [id], onUpdate: NoAction)
@@ -134,7 +134,7 @@ model inbound_email_address {
 
 model highlight {
   id                String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  createdAt         DateTime            @default(now()) @db.Timestamp(6)
+  createdAt         DateTime            @default(now()) @db.Timestamptz(6)
   savedItemId       String?             @db.Uuid
   userId            String              @db.Uuid
   saved_item        saved_item?         @relation(fields: [savedItemId], references: [id], onUpdate: NoAction)
@@ -159,12 +159,12 @@ model highlight_segment {
 
 model api_token {
   id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  createdAt  DateTime  @default(now()) @db.Timestamp(6)
-  lastUsedAt DateTime? @db.Timestamp(6)
+  createdAt  DateTime  @default(now()) @db.Timestamptz(6)
+  lastUsedAt DateTime? @db.Timestamptz(6)
   name       String
   token      String?
   userId     String    @db.Uuid
-  expiresAt  DateTime? @db.Timestamp(6)
+  expiresAt  DateTime? @db.Timestamptz(6)
   user       user      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@index([token], map: "api_token_token_index")

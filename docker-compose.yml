@@ -8,6 +8,8 @@ services:
       POSTGRES_USER: ${DATABASE_USER}
       POSTGRES_PASSWORD: ${DATABASE_USER}
       POSTGRES_DB: ${DATABASE_NAME}
+      TZ: "UTC"
+      PGTZ: "UTC"
       
       PGUSER: "postgres"
     volumes:
@@ -44,6 +46,7 @@ services:
       - ./apps/api/migrations:/usr/src/app/apps/api/migrations:cached
     environment:
       DATABASE_URL: ${DATABASE_URL}
+      TZ: "UTC"
     depends_on:
       database:
         condition: service_healthy

@@ -36,7 +36,7 @@ blockquote{margin:0;padding-left:12px;border-left:3px solid #ddd;white-space:pre
 <article>
 ${highlights
 	.map((h) => {
-		const date = dayjs(h.createdAt).format('YYYY-MM-DD HH:mm');
+		const date = dayjs(h.createdAt).format('YYYY-MM-DD HH:mm [UTC]');
 		const title = h.savedItemUrl
 			? `<h3><a href="${h.savedItemUrl}">${escapeHtml(h.savedItemTitle)}</a></h3>`
 			: `<h3>${escapeHtml(h.savedItemTitle)}</h3>`;

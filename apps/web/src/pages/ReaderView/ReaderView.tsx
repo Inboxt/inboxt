@@ -189,7 +189,9 @@ export const ReaderView = () => {
 									<Stack gap="xxs">
 										<Breadcrumbs separator="•" separatorMargin={6}>
 											<Text>
-												{dayjs(savedItem.createdAt).format('MMMM D, YYYY')}
+												{dayjs(savedItem.createdAt).format(
+													'MMMM D, YYYY HH:mm',
+												)}
 											</Text>
 											<Text>{`${Math.ceil((savedItem.wordCount || 0) / 240)} min read`}</Text>
 										</Breadcrumbs>

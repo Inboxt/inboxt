@@ -3,13 +3,7 @@ import cookieParser from 'cookie-parser';
 import { ConfigService } from '@nestjs/config';
 import * as dotenv from 'dotenv';
 import { join } from 'path';
-import utc from 'dayjs/plugin/utc';
-import timezone from 'dayjs/plugin/timezone';
-import dayjs from 'dayjs';
 import { json } from 'express';
-
-dayjs.extend(utc);
-dayjs.extend(timezone);
 
 dotenv.config({
 	path: join(__dirname, '../../../.env'),

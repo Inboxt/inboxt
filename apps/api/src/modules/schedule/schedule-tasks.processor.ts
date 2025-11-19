@@ -70,7 +70,7 @@ export class ScheduleTasksProcessor extends BaseQueueProcessor {
 					subject: EMAIL_ACCOUNT_DELETED.subject,
 					template: accountDeletedTemplate,
 					templateData: {
-						timestamp: dayjs().format('dddd, MMMM D, YYYY, HH:mm'),
+						timestamp: dayjs().format('dddd, MMMM D, YYYY, HH:mm [UTC]'),
 					},
 					to: user.emailAddress,
 				});

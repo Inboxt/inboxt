@@ -1,6 +1,7 @@
 # Base image
 FROM node:22
 
+ENV TZ=UTC
 WORKDIR /usr/src/app
 
 # Copy package.json and other necessary files

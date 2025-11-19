@@ -23,11 +23,9 @@ import { ContextModalProps } from '@mantine/modals';
 import { IconBell, IconDatabase, IconHighlight, IconTag } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-import utc from 'dayjs/plugin/utc';
 import { useEffect } from 'react';
 
 dayjs.extend(duration);
-dayjs.extend(utc);
 
 import {
 	formatBytes,

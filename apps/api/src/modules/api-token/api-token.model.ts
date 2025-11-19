@@ -9,7 +9,7 @@ export class ApiToken extends BaseModel {
 	@Field()
 	name: string;
 
-	@Field({ nullable: true })
+	@Field(() => Date, { nullable: true })
 	expiresAt?: Date;
 }
 

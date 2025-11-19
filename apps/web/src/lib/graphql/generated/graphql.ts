@@ -27,6 +27,15 @@ export type ApiToken = {
   name: Scalars['String']['output'];
 };
 
+/** Token expiration presets */
+export enum ApiTokenExpiry {
+  Never = 'NEVER',
+  NinetyDays = 'NINETY_DAYS',
+  OneDay = 'ONE_DAY',
+  SevenDays = 'SEVEN_DAYS',
+  ThirtyDays = 'THIRTY_DAYS'
+}
+
 export type Article = {
   __typename?: 'Article';
   contentHtml: Scalars['String']['output'];
@@ -40,7 +49,7 @@ export type CreateAccountInput = {
 };
 
 export type CreateApiTokenInput = {
-  expiresAt?: InputMaybe<Scalars['DateTime']['input']>;
+  expiry: ApiTokenExpiry;
   name: Scalars['String']['input'];
 };
 

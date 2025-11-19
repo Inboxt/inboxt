@@ -83,8 +83,6 @@ export const ApiTokensModal = ({ id, context }: ContextModalProps) => {
 		await refetch();
 	};
 
-	const now = dayjs();
-
 	return (
 		<Stack gap="xl" justify="space-between" flex={1}>
 			<Alert color="gray">
@@ -114,7 +112,7 @@ export const ApiTokensModal = ({ id, context }: ContextModalProps) => {
 									: null;
 								const expiresAt = token.expiresAt ? dayjs(token.expiresAt) : null;
 
-								const isExpired = expiresAt ? expiresAt.isBefore(now) : false;
+								const isExpired = expiresAt ? expiresAt.isBefore(dayjs()) : false;
 
 								return (
 									<Card key={token.id}>

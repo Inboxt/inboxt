@@ -22,17 +22,18 @@ import { createApiTokenSchema } from '@inboxt/common';
 import { ButtonContainer } from '~components/ButtonContainer';
 import { Form } from '~components/Form';
 import { CREATE_API_TOKEN } from '~lib/graphql';
+import { ApiTokenExpiry } from '~lib/graphql/generated/graphql';
 
 type CreateApiTokenModalInnerProps = {
 	onCreated?: () => void;
 };
 
 const EXPIRY_PRESETS = [
-	{ value: '1d', label: '1 day', days: 1 },
-	{ value: '7d', label: '7 days', days: 7 },
-	{ value: '30d', label: '30 days', days: 30 },
-	{ value: '90d', label: '90 days', days: 90 },
-	{ value: 'never', label: 'No expiration', days: null },
+	{ value: ApiTokenExpiry.OneDay, label: '1 day', days: 1 },
+	{ value: ApiTokenExpiry.SevenDays, label: '7 days', days: 7 },
+	{ value: ApiTokenExpiry.ThirtyDays, label: '30 days', days: 30 },
+	{ value: ApiTokenExpiry.NinetyDays, label: '90 days', days: 90 },
+	{ value: ApiTokenExpiry.Never, label: 'No expiration', days: null },
 ] as const;
 
 type ExpiryPreset = (typeof EXPIRY_PRESETS)[number]['value'];
@@ -58,19 +59,17 @@ export const CreateApiTokenModal = ({
 	const form = useForm({
 		initialValues: {
 			name: '',
-			expiryPreset: '30d' as ExpiryPreset,
+			expiry: ApiTokenExpiry['ThirtyDays'] as ExpiryPreset,
 		},
 		validate: zodResolver(createApiTokenSchema),
 	});
 
 	const handleSubmit = async (values: typeof form.values) => {
-		const expiresAt = getExpiryDate(values.expiryPreset)?.toDate();
-
 		const res = await createApiToken({
 			variables: {
 				data: {
 					name: values.name,
-					expiresAt,
+					expiry: values.expiry,
 				},
 			},
 		});
@@ -94,7 +93,7 @@ export const CreateApiTokenModal = ({
 		const displayFormat = 'MMM D, YYYY';
 
 		return EXPIRY_PRESETS.map((preset) => {
-			if (preset.value === 'never') {
+			if (preset.value === ApiTokenExpiry.Never) {
 				return { value: preset.value, label: preset.label };
 			}
 
@@ -131,15 +130,14 @@ export const CreateApiTokenModal = ({
 										data-autofocus
 										{...form.getInputProps('name')}
 									/>
-
 									<Stack gap={4}>
 										<Select
 											label="Expiration"
 											allowDeselect={false}
 											data={expiryOptions}
-											{...form.getInputProps('expiryPreset')}
+											{...form.getInputProps('expiry')}
 											description={
-												form.values.expiryPreset === 'never' ? (
+												form.values.expiry === ApiTokenExpiry.Never ? (
 													<Text c="red" size="xs" lh={1.2}>
 														Tokens without an expiration date are less
 														secure. We strongly recommend setting an

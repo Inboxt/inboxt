@@ -18,23 +18,23 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 			default: pgm.func('gen_random_uuid()'),
 		},
 		createdAt: {
-			type: 'timestamp',
+			type: 'timestamptz',
 			notNull: true,
-			default: pgm.func('current_timestamp'),
+			default: pgm.func('now()'),
 		},
 		logins: { type: 'integer', notNull: true, default: 0 },
-		lastLogin: 'timestamp',
+		lastLogin: 'timestamptz',
 		emailAddress: { type: 'text', notNull: true, unique: true },
 		pendingEmailAddress: 'text',
 		password: 'text',
 		username: 'text',
 		isEmailVerified: { type: 'boolean', notNull: true, default: false },
 		emailVerifyCode: 'text',
-		emailVerifyExpiry: 'timestamp',
+		emailVerifyExpiry: 'timestamptz',
 		resetPasswordCode: 'text',
-		resetPasswordExpiry: 'timestamp',
+		resetPasswordExpiry: 'timestamptz',
 		plan: { type: 'user_plan', notNull: true, default: 'FREE' },
-		lastExportAt: 'timestamp',
+		lastExportAt: 'timestamptz',
 		storageUsageBytes: { type: 'bigint', notNull: true, default: 0 },
 		storageQuotaBytes: { type: 'bigint', notNull: true, default: 104_857_600 },
 		lastNotifiedStorageThreshold: { type: 'integer', notNull: true, default: 0 },
@@ -48,9 +48,9 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 			default: pgm.func('gen_random_uuid()'),
 		},
 		createdAt: {
-			type: 'timestamp',
+			type: 'timestamptz',
 			notNull: true,
-			default: pgm.func('current_timestamp'),
+			default: pgm.func('now()'),
 		},
 		userId: {
 			type: 'uuid',
@@ -74,7 +74,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 			notNull: true,
 			default: 'ACTIVE',
 		},
-		deletedSince: 'timestamp',
+		deletedSince: 'timestamptz',
 		sizeBytes: { type: 'bigint', notNull: true, default: 0 },
 	});
 
@@ -100,9 +100,9 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 			default: pgm.func('gen_random_uuid()'),
 		},
 		createdAt: {
-			type: 'timestamp',
+			type: 'timestamptz',
 			notNull: true,
-			default: pgm.func('current_timestamp'),
+			default: pgm.func('now()'),
 		},
 		userId: {
 			type: 'uuid',
@@ -151,11 +151,11 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 			onDelete: 'SET NULL',
 		},
 		createdAt: {
-			type: 'timestamp',
+			type: 'timestamptz',
 			notNull: true,
-			default: pgm.func('current_timestamp'),
+			default: pgm.func('now()'),
 		},
-		deletedAt: 'timestamp',
+		deletedAt: 'timestamptz',
 		localPart: { type: 'varchar(64)', notNull: true },
 		fullAddress: { type: 'text', notNull: true, unique: true },
 	});
@@ -172,9 +172,9 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 			default: pgm.func('gen_random_uuid()'),
 		},
 		createdAt: {
-			type: 'timestamp',
+			type: 'timestamptz',
 			notNull: true,
-			default: pgm.func('current_timestamp'),
+			default: pgm.func('now()'),
 		},
 		status: {
 			type: 'newsletter_subscription_status',
@@ -182,9 +182,9 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 			default: 'ACTIVE',
 		},
 		name: { type: 'text', notNull: true },
-		lastReceivedAt: 'timestamp',
+		lastReceivedAt: 'timestamptz',
 		unsubscribeUrl: 'text',
-		unsubscribeAttemptedAt: { type: 'timestamp' },
+		unsubscribeAttemptedAt: { type: 'timestamptz' },
 		inboundEmailAddressId: {
 			type: 'uuid',
 			notNull: true,
@@ -226,9 +226,9 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 			default: pgm.func('gen_random_uuid()'),
 		},
 		createdAt: {
-			type: 'timestamp',
+			type: 'timestamptz',
 			notNull: true,
-			default: pgm.func('current_timestamp'),
+			default: pgm.func('now()'),
 		},
 		savedItemId: {
 			type: 'uuid',
@@ -276,11 +276,11 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 			default: pgm.func('gen_random_uuid()'),
 		},
 		createdAt: {
-			type: 'timestamp',
+			type: 'timestamptz',
 			notNull: true,
-			default: pgm.func('current_timestamp'),
+			default: pgm.func('now()'),
 		},
-		lastUsedAt: 'timestamp',
+		lastUsedAt: 'timestamptz',
 		name: { type: 'text', notNull: true },
 		token: 'text',
 		userId: {
@@ -289,7 +289,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 			references: 'user',
 			onDelete: 'CASCADE',
 		},
-		expiresAt: 'timestamp',
+		expiresAt: 'timestamptz',
 	});
 
 	pgm.createIndex('api_token', 'userId');

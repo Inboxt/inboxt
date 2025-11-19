@@ -264,7 +264,7 @@ export class AuthService {
 			to: data.emailAddress,
 			subject: EMAIL_CHANGED_PASSWORD.subject,
 			templateData: {
-				timestamp: dayjs().format('dddd, MMMM D, YYYY, HH:mm'),
+				timestamp: dayjs().format('dddd, MMMM D, YYYY, HH:mm [UTC]'),
 			},
 		});
 	}

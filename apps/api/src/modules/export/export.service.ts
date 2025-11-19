@@ -166,7 +166,7 @@ export class ExportService {
 		if (format === ExportHighlightsFormat.TEXT) {
 			const body = highlights
 				.map((highlight) => {
-					const date = dayjs(highlight.createdAt).format('YYYY-MM-DD HH:mm');
+					const date = dayjs(highlight.createdAt).format('YYYY-MM-DD HH:mm [UTC]');
 					const header = `${highlight.savedItemTitle}${highlight.savedItemUrl ? ` · ${highlight.savedItemUrl}` : ''} · ${date}`;
 					return `${header}\n${highlight.text}\n`;
 				})
@@ -182,7 +182,7 @@ export class ExportService {
 		if (format === ExportHighlightsFormat.MARKDOWN) {
 			const body = highlights
 				.map((highlight) => {
-					const date = dayjs(highlight.createdAt).format('YYYY-MM-DD HH:mm');
+					const date = dayjs(highlight.createdAt).format('YYYY-MM-DD HH:mm [UTC]');
 					const titleLine = highlight.savedItemUrl
 						? `### [${highlight.savedItemTitle}](${highlight.savedItemUrl})`
 						: `### ${highlight.savedItemTitle}`;

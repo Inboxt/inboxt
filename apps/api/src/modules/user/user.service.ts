@@ -97,7 +97,7 @@ export class UserService {
 				subject: EMAIL_CHANGED_EMAIL.subject,
 				to: user.emailAddress,
 				templateData: {
-					timestamp: dayjs().format('dddd, MMMM D, YYYY, HH:mm'),
+					timestamp: dayjs().format('dddd, MMMM D, YYYY, HH:mm [UTC]'),
 					oldEmail: user.emailAddress,
 					newEmail: pendingEmailAddress,
 				},
@@ -123,7 +123,7 @@ export class UserService {
 			where: { id },
 			data: {
 				logins: prevLogins + 1,
-				lastLogin: dayjs().toISOString(),
+				lastLogin: dayjs().toDate(),
 			},
 		});
 	}
@@ -268,7 +268,7 @@ export class UserService {
 			subject: EMAIL_ACCOUNT_DELETED.subject,
 			template: accountDeletedTemplate,
 			templateData: {
-				timestamp: dayjs().format('dddd, MMMM D, YYYY, HH:mm'),
+				timestamp: dayjs().format('dddd, MMMM D, YYYY, HH:mm [UTC]'),
 			},
 		});
 	}

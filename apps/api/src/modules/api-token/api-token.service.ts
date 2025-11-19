@@ -7,6 +7,7 @@ import { PrismaService } from '../../services/prisma.service';
 import { CreateApiTokenInput } from './dto/create-api-token.input';
 import { AppException } from '../../utils/app-exception';
 import { createApiTokenSchema } from '@inboxt/common';
+import { ApiTokenExpiry } from '../../common/enums/api-token-expiry.enum';
 
 @Injectable()
 export class ApiTokenService {
@@ -37,11 +38,20 @@ export class ApiTokenService {
 
 	async createToken(userId: string, input: CreateApiTokenInput) {
 		await createApiTokenSchema.parseAsync(input);
+
+		let expiresAt: Date | null = null;
+		if (input.expiry !== ApiTokenExpiry.NEVER) {
+			const days = parseInt(input.expiry);
+			if (!isNaN(days)) {
+				expiresAt = dayjs().add(days, 'day').endOf('day').toDate();
+			}
+		}
+
 		const created = await this.prisma.api_token.create({
 			data: {
 				userId,
 				name: input.name,
-				expiresAt: input.expiresAt ? dayjs(input.expiresAt).toDate() : null,
+				expiresAt,
 			},
 		});
 
