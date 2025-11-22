@@ -6,20 +6,20 @@
 		"libs/*"
 	],
 	"dependencies": {
-		"dayjs": "1.11.13",
+		"dayjs": "1.11.19",
 		"graphql": "16.10.0",
-		"zod": "3.24.3"
+		"zod": "4.1.12",
+		"dotenv": "17.2.3"
 	},
 	"devDependencies": {
-		"@eslint/eslintrc": "3.2.0",
-		"@eslint/js": "9.18.0",
-		"eslint": "9.18.0",
+		"@eslint/js": "9.39.1",
+		"eslint": "9.39.1",
 		"eslint-plugin-import": "2.32.0",
-		"eslint-config-prettier": "10.0.1",
-		"eslint-plugin-prettier": "5.2.2",
-		"globals": "15.14.0",
-		"prettier": "3.4.2",
-		"typescript": "5.7.3",
-		"typescript-eslint": "8.20.0"
+		"eslint-config-prettier": "10.1.8",
+		"eslint-plugin-prettier": "5.5.4",
+		"globals": "16.5.0",
+		"prettier": "3.6.2",
+		"typescript": "5.9.3",
+		"typescript-eslint": "8.47.0"
 	}
 }

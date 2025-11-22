@@ -1,6 +1,7 @@
 import { Button, Card, Stack, TextInput } from '@mantine/core';
-import { useForm, zodResolver } from '@mantine/form';
+import { useForm } from '@mantine/form';
 import { ContextModalProps } from '@mantine/modals';
+import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useState } from 'react';
 
 import { addItemFromUrlSchema } from '@inboxt/common';
@@ -21,7 +22,7 @@ export const AddContentModal = ({ id, context }: ContextModalProps) => {
 			url: '',
 			labels: [],
 		},
-		validate: zodResolver(addItemFromUrlSchema),
+		validate: zod4Resolver(addItemFromUrlSchema),
 	});
 
 	const handleAddContent = async (values: typeof form.values) => {

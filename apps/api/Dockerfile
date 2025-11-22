@@ -1,5 +1,5 @@
 # Base image
-FROM node:22
+FROM node:24
 
 ENV TZ=UTC
 WORKDIR /usr/src/app

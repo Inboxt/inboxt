@@ -1,5 +1,5 @@
 import { z } from './zod';
 
 export const verifyEmailSchema = z.object({
-	code: z.string().verificationCode(),
+	code: z.verificationCode(),
 });

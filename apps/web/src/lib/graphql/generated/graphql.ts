@@ -1,7 +1,7 @@
 /* eslint-disable */
 import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
 export type Maybe<T> = T | null;
-export type InputMaybe<T> = Maybe<T>;
+export type InputMaybe<T> = T | null | undefined;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
@@ -505,7 +505,10 @@ type EntryFragment_Highlight_Fragment = { __typename: 'Highlight', id: string, c
 
 type EntryFragment_SavedItem_Fragment = { __typename: 'SavedItem', id: string, createdAt: string, title: string, originalUrl?: string | null, sourceDomain?: string | null, description?: string | null, leadImage?: string | null, wordCount: number, author?: string | null, type: SavedItemType, status: SavedItemStatus, labels?: Array<{ __typename?: 'Label', createdAt: string, id: string, name: string, color: string }> | null };
 
-export type EntryFragmentFragment = EntryFragment_Highlight_Fragment | EntryFragment_SavedItem_Fragment;
+export type EntryFragmentFragment =
+  | EntryFragment_Highlight_Fragment
+  | EntryFragment_SavedItem_Fragment
+;
 
 export type ApiTokenFragmentFragment = { __typename?: 'ApiToken', id: string, createdAt: string, lastUsedAt?: string | null, name: string, expiresAt?: string | null };
 
@@ -536,7 +539,10 @@ export type EntriesQueryVariables = Exact<{
 }>;
 
 
-export type EntriesQuery = { __typename?: 'Query', entries: { __typename?: 'EntryConnection', edges: Array<{ __typename?: 'EntryEdge', cursor: string, node: { __typename: 'Highlight', id: string, createdAt: string, savedItem?: { __typename?: 'SavedItem', id: string, title: string } | null, segments?: Array<{ __typename?: 'HighlightSegment', id: string, xpath: string, beforeText: string, startOffset: number, endOffset: number, afterText: string, text?: string | null }> | null } | { __typename: 'SavedItem', id: string, createdAt: string, title: string, originalUrl?: string | null, sourceDomain?: string | null, description?: string | null, leadImage?: string | null, wordCount: number, author?: string | null, type: SavedItemType, status: SavedItemStatus, labels?: Array<{ __typename?: 'Label', createdAt: string, id: string, name: string, color: string }> | null } }>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } };
+export type EntriesQuery = { __typename?: 'Query', entries: { __typename?: 'EntryConnection', edges: Array<{ __typename?: 'EntryEdge', cursor: string, node:
+        | { __typename: 'Highlight', id: string, createdAt: string, savedItem?: { __typename?: 'SavedItem', id: string, title: string } | null, segments?: Array<{ __typename?: 'HighlightSegment', id: string, xpath: string, beforeText: string, startOffset: number, endOffset: number, afterText: string, text?: string | null }> | null }
+        | { __typename: 'SavedItem', id: string, createdAt: string, title: string, originalUrl?: string | null, sourceDomain?: string | null, description?: string | null, leadImage?: string | null, wordCount: number, author?: string | null, type: SavedItemType, status: SavedItemStatus, labels?: Array<{ __typename?: 'Label', createdAt: string, id: string, name: string, color: string }> | null }
+       }>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } };
 
 export type ApiTokensQueryVariables = Exact<{ [key: string]: never; }>;
 

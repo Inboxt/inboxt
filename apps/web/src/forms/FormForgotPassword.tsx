@@ -9,9 +9,10 @@ import {
 	TextInput,
 	Title,
 } from '@mantine/core';
-import { useForm, zodResolver } from '@mantine/form';
+import { useForm } from '@mantine/form';
 import { IconAt, IconLock } from '@tabler/icons-react';
 import { useLocation, useNavigate } from '@tanstack/react-router';
+import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
 
 import { resetPasswordSchema, requestPasswordRecoverySchema } from '@inboxt/common';
@@ -40,7 +41,7 @@ export const FormForgotPassword = ({ handleChangeAuthMode }: AuthViewProps) => {
 		initialValues: {
 			emailAddress: state?.emailAddress || '',
 		},
-		validate: zodResolver(requestPasswordRecoverySchema),
+		validate: zod4Resolver(requestPasswordRecoverySchema),
 	});
 
 	const resetPasswordForm = useForm({
@@ -50,7 +51,7 @@ export const FormForgotPassword = ({ handleChangeAuthMode }: AuthViewProps) => {
 			code: '',
 			password: '',
 		},
-		validate: zodResolver(resetPasswordSchema),
+		validate: zod4Resolver(resetPasswordSchema),
 	});
 
 	const handleBack = async () => {

@@ -1,8 +1,9 @@
 import { useMutation } from '@apollo/client';
 import { Anchor, Button, Divider, PasswordInput, Stack, Text, TextInput } from '@mantine/core';
-import { useForm, zodResolver } from '@mantine/form';
+import { useForm } from '@mantine/form';
 import { IconAt, IconLock, IconMail } from '@tabler/icons-react';
 import { useLocation, useNavigate } from '@tanstack/react-router';
+import { zod4Resolver } from 'mantine-form-zod-resolver';
 
 import { createAccountSchema } from '@inboxt/common';
 
@@ -24,7 +25,7 @@ export const FormCreateAccount = ({ handleChangeAuthMode }: AuthViewProps) => {
 			username: '',
 			password: '',
 		},
-		validate: zodResolver(createAccountSchema),
+		validate: zod4Resolver(createAccountSchema),
 	});
 
 	const handleSubmit = async (values: typeof form.values) => {

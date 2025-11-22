@@ -1,9 +1,9 @@
 import { Box, Skeleton } from '@mantine/core';
+import { useLongPress } from '@mantine/hooks';
 import { IconHighlight } from '@tabler/icons-react';
 import { useMemo, useRef, useEffect, useState } from 'react';
 
 import { HighlightPopover } from '~components/HighlightPopover';
-import { useLongPress } from '~hooks/useLongPress';
 import { useScreenQuery } from '~hooks/useScreenQuery';
 import { useTextHighlighting } from '~hooks/useTextSelection';
 import { SavedItem } from '~lib/graphql/generated/graphql.ts';
@@ -76,17 +76,6 @@ export const HighlightableArticle = ({ content, data }: ArticleWithHighlightsPro
 		{ threshold: 700 },
 	);
 
-	const touchHandlers = {
-		onTouchStart: (e) => {
-			const target = e?.target as HTMLElement | null;
-			if (target?.closest('.highlight')) {
-				longPressHandlers.onTouchStart?.(e);
-			}
-		},
-		onTouchEnd: longPressHandlers.onTouchEnd,
-		onTouchCancel: longPressHandlers.onTouchCancel,
-	};
-
 	return (
 		<>
 			<Skeleton visible={applyingHighlights} mih={560}>
@@ -96,7 +85,7 @@ export const HighlightableArticle = ({ content, data }: ArticleWithHighlightsPro
 					dangerouslySetInnerHTML={sanitizedContent}
 					style={{ visibility: applyingHighlights ? 'hidden' : 'visible' }}
 					pb="xxl"
-					{...touchHandlers}
+					{...longPressHandlers}
 				/>
 			</Skeleton>
 

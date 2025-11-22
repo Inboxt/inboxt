@@ -18,11 +18,12 @@ import {
 	useComputedColorScheme,
 	useMantineColorScheme,
 } from '@mantine/core';
-import { useForm, zodResolver } from '@mantine/form';
+import { useForm } from '@mantine/form';
 import { ContextModalProps } from '@mantine/modals';
 import { IconBell, IconDatabase, IconHighlight, IconTag } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
+import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect } from 'react';
 
 dayjs.extend(duration);
@@ -62,7 +63,7 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 			username: '',
 			emailAddress: '',
 		},
-		validate: zodResolver(updateAccountSchema),
+		validate: zod4Resolver(updateAccountSchema),
 	});
 
 	useEffect(() => {

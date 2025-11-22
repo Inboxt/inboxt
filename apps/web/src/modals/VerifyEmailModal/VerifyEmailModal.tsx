@@ -1,8 +1,9 @@
 import { useMutation } from '@apollo/client';
 import { Button, Card, Stack, Text, TextInput } from '@mantine/core';
-import { useForm, zodResolver } from '@mantine/form';
+import { useForm } from '@mantine/form';
 import { useInterval } from '@mantine/hooks';
 import { ContextModalProps } from '@mantine/modals';
+import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useState } from 'react';
 
 import { verifyEmailSchema } from '@inboxt/common';
@@ -26,7 +27,7 @@ export const VerifyEmailModal = ({ id, context }: ContextModalProps) => {
 		initialValues: {
 			code: '',
 		},
-		validate: zodResolver(verifyEmailSchema),
+		validate: zod4Resolver(verifyEmailSchema),
 	});
 
 	const interval = useInterval(() => {

@@ -1,10 +1,9 @@
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
-import { ApolloDriver } from '@nestjs/apollo';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
-import { MailerModule } from '@nestjs-modules/mailer';
 import { BullModule as NestBullModule } from '@nestjs/bullmq';
 
 import { AppController } from './app.controller';
@@ -39,9 +38,9 @@ import { ApiTokenGuard } from '../../guards/api-token.guard';
 			load: [config],
 			envFilePath: ['../../.env'],
 		}),
-		GraphQLModule.forRootAsync({
+		GraphQLModule.forRootAsync<ApolloDriverConfig>({
 			driver: ApolloDriver,
-			useFactory: async (configService: ConfigService) => {
+			useFactory: (configService: ConfigService) => {
 				const graphqlConfig = configService.get<GraphqlConfig>('graphql');
 
 				return {
@@ -56,12 +55,6 @@ import { ApiTokenGuard } from '../../guards/api-token.guard';
 				};
 			},
 			inject: [ConfigService],
-		}),
-		MailerModule.forRoot({
-			transport: {
-				host: process.env.MAIL_HOST,
-				port: parseInt(process.env.MAIL_PORT as string, 10),
-			},
 		}),
 		NestBullModule.forRootAsync({
 			useFactory: (configService: ConfigService) => {

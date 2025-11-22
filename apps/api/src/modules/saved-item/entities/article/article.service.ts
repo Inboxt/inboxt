@@ -1,6 +1,5 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import * as cheerio from 'cheerio';
-import { fetch } from 'undici';
 
 import { MAX_ARTICLE_WORD_COUNT } from '@inboxt/common';
 

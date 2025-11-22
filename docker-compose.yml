@@ -1,7 +1,7 @@
 services:
   database:
     container_name: "database"
-    image: postgres
+    image: postgres:18
     ports:
       - ${DATABASE_PORT}:${DATABASE_PORT}
     environment:
@@ -13,7 +13,7 @@ services:
       
       PGUSER: "postgres"
     volumes:
-      - db-data:/var/lib/postgresql/data
+      - db-data:/var/lib/postgresql
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready" ]
       interval: 5s

@@ -1,5 +1,5 @@
 import { Box, Breadcrumbs, Group, Stack, Text } from '@mantine/core';
-import { useHover } from '@mantine/hooks';
+import { useHover, useLongPress } from '@mantine/hooks';
 import { IconQuoteFilled } from '@tabler/icons-react';
 import { useNavigate } from '@tanstack/react-router';
 import dayjs from 'dayjs';
@@ -7,7 +7,6 @@ import dayjs from 'dayjs';
 import { ItemsOptions } from '~components/ItemsOptions';
 import { ReaderCheckbox } from '~components/ReaderCheckbox';
 import { useContentSelection } from '~context/content-selection';
-import { useLongPress } from '~hooks/useLongPress.tsx';
 import { useScreenQuery } from '~hooks/useScreenQuery.tsx';
 import { Highlight } from '~lib/graphql/generated/graphql';
 

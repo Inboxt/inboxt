@@ -10,13 +10,13 @@ import { SecurityConfig } from '../../config/config.interface';
 	imports: [
 		PassportModule.register({ defaultStrategy: 'jwt' }),
 		NestJwtModule.registerAsync({
-			useFactory: async (configService: ConfigService) => {
+			useFactory: (configService: ConfigService) => {
 				const securityConfig = configService.get<SecurityConfig>('security');
 
 				return {
 					secret: securityConfig!.jwtSecret,
 					signOptions: {
-						expiresIn: securityConfig!.expiresIn,
+						expiresIn: securityConfig!.expiresIn as any,
 					},
 				};
 			},

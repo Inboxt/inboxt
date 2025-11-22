@@ -1,6 +1,6 @@
 import { modals as mantineModals } from '@mantine/modals';
 
-import { ExportDataModalProps } from '~modals/ExportDataModal/ExportDataModal.tsx';
+import type { ExportDataModalProps } from '~modals/ExportDataModal/ExportDataModal.tsx';
 
 export const modals = {
 	openInstallModal: () => {

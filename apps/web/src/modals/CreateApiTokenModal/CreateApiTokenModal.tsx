@@ -11,10 +11,11 @@ import {
 	ActionIcon,
 	Card,
 } from '@mantine/core';
-import { useForm, zodResolver } from '@mantine/form';
+import { useForm } from '@mantine/form';
 import { ContextModalProps } from '@mantine/modals';
 import { IconCopy, IconCheck } from '@tabler/icons-react';
 import dayjs, { Dayjs } from 'dayjs';
+import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useState, useMemo } from 'react';
 
 import { createApiTokenSchema } from '@inboxt/common';
@@ -61,7 +62,7 @@ export const CreateApiTokenModal = ({
 			name: '',
 			expiry: ApiTokenExpiry['ThirtyDays'] as ExpiryPreset,
 		},
-		validate: zodResolver(createApiTokenSchema),
+		validate: zod4Resolver(createApiTokenSchema),
 	});
 
 	const handleSubmit = async (values: typeof form.values) => {

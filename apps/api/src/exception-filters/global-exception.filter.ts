@@ -7,7 +7,7 @@ import { ZodError } from 'zod';
 export class GlobalExceptionFilter implements ExceptionFilter, GqlExceptionFilter {
 	private handleException(exception: unknown) {
 		if (exception instanceof ZodError) {
-			const errors = exception.errors.map((error) => ({
+			const errors = exception.issues.map((error) => ({
 				path: error.path.join('.'),
 				message: error.message,
 			}));

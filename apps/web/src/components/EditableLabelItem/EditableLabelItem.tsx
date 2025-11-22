@@ -1,6 +1,6 @@
 import { useMutation } from '@apollo/client';
 import { Group, Text, TextInput, ActionIcon, Flex, Stack } from '@mantine/core';
-import { useForm, zodResolver } from '@mantine/form';
+import { useForm } from '@mantine/form';
 import {
 	IconLabelImportantFilled,
 	IconEdit,
@@ -8,6 +8,7 @@ import {
 	IconCheck,
 	IconX,
 } from '@tabler/icons-react';
+import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect } from 'react';
 
 import { updateLabelSchema } from '@inboxt/common';
@@ -47,7 +48,7 @@ export const EditableLabelItem = ({ label, isEditing, setIsEditing }: EditableLa
 			name: '',
 			color: '#fff',
 		},
-		validate: zodResolver(updateLabelSchema),
+		validate: zod4Resolver(updateLabelSchema),
 	});
 
 	useEffect(() => {

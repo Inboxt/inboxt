@@ -1,11 +1,10 @@
 import { Badge, Box, Breadcrumbs, Group, Stack, Text, Center } from '@mantine/core';
-import { useHover, useLocalStorage } from '@mantine/hooks';
+import { useHover, useLocalStorage, useLongPress } from '@mantine/hooks';
 import { IconPhotoOff } from '@tabler/icons-react';
 import { useNavigate } from '@tanstack/react-router';
 import dayjs from 'dayjs';
 
 import { useContentSelection } from '~context/content-selection';
-import { useLongPress } from '~hooks/useLongPress';
 import { useScreenQuery } from '~hooks/useScreenQuery';
 import { SavedItem } from '~lib/graphql/generated/graphql';
 import { Route } from '~routes/_auth.index';
