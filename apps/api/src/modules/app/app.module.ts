@@ -15,8 +15,7 @@ import { AuthModule } from '../auth/auth.module';
 import { ActiveUserModule } from '../active-user/active-user.module';
 import { MailModule } from '../mail/mail.module';
 import { GlobalExceptionFilter } from '../../exception-filters/global-exception.filter';
-import { config } from '../../config/config';
-import { GraphqlConfig, ValkeyConfig } from '../../config/config.interface';
+import { config, type Config } from '../../config';
 import { SavedItemModule } from '../saved-item/saved-item.module';
 import { InboundEmailAddressModule } from '../inbound-email-address/inbound-email-address.module';
 import { SavedItemManagerModule } from '../../managers/saved-item-manager/saved-item-manager.module';
@@ -40,13 +39,12 @@ import { ApiTokenGuard } from '../../guards/api-token.guard';
 		}),
 		GraphQLModule.forRootAsync<ApolloDriverConfig>({
 			driver: ApolloDriver,
-			useFactory: (configService: ConfigService) => {
-				const graphqlConfig = configService.get<GraphqlConfig>('graphql');
-
+			useFactory: (configService: ConfigService<Config>) => {
+				const graphqlConfig = configService.getOrThrow('graphql', { infer: true });
 				return {
-					autoSchemaFile: graphqlConfig!.autoSchemaFile,
-					sortSchema: graphqlConfig!.sortSchema,
-					graphiql: graphqlConfig!.graphiql,
+					autoSchemaFile: graphqlConfig.autoSchemaFile,
+					sortSchema: graphqlConfig.sortSchema,
+					graphiql: graphqlConfig.graphiql,
 					context: ({ req, res }) => ({ req, res }),
 					cors: {
 						credentials: true,
@@ -58,9 +56,9 @@ import { ApiTokenGuard } from '../../guards/api-token.guard';
 		}),
 		NestBullModule.forRootAsync({
 			useFactory: (configService: ConfigService) => {
-				const valkeyConfig = configService.get<ValkeyConfig>('valkey');
+				const valkeyConfig = configService.getOrThrow('valkey', { infer: true });
 				return {
-					connection: valkeyConfig!.connection,
+					connection: valkeyConfig.connection,
 				};
 			},
 			inject: [ConfigService],

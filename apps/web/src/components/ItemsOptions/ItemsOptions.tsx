@@ -417,13 +417,8 @@ export const ItemsOptions = ({ items, mode, size = 'md', onActionComplete }: Ite
 		}
 	};
 
-	const filteredOptions = useMemo(
-		() =>
-			OPTIONS.filter(
-				(option) =>
-					option.modes.includes(mode) && (option.visible ? option.visible() : true),
-			),
-		[mode, items, savedItems, highlightItems, loading],
+	const filteredOptions = OPTIONS.filter(
+		(option) => option.modes.includes(mode) && (option.visible ? option.visible() : true),
 	);
 
 	if (mode === 'reader') {

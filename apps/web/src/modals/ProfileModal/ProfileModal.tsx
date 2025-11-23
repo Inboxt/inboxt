@@ -73,6 +73,7 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 				emailAddress: data.me.emailAddress,
 			});
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [data?.me]);
 
 	const handleUpdateProfile = async (values: typeof form.values) => {

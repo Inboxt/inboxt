@@ -59,6 +59,8 @@ export const EditableLabelItem = ({ label, isEditing, setIsEditing }: EditableLa
 			});
 			form.clearErrors();
 		}
+
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [isEditing, label.name, label.color]);
 
 	const handleSave = async (values: typeof form.values) => {

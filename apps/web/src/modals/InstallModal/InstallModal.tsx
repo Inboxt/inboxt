@@ -113,10 +113,7 @@ export const InstallModal = ({ id, context }: ContextModalProps) => {
 					title="Access Anywhere with PWA"
 					description="Install our Progressive Web App on any device to save links and access your full library effortlessly."
 				>
-					<Button
-						leftSection={<IconDeviceDesktopPlus size={16} />}
-						onClick={() => void installPWA()}
-					>
+					<Button leftSection={<IconDeviceDesktopPlus size={16} />} onClick={installPWA}>
 						Install PWA
 					</Button>
 				</InstallOption>

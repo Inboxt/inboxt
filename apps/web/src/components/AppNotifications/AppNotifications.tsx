@@ -32,13 +32,15 @@ export const AppNotifications = () => {
 				const res = await fetch(`${process.env.API_URL}/notifications`, {
 					cache: 'no-store',
 				});
+
 				if (!res.ok) {
-					throw new Error(`Failed to load notifications (status ${res.status})`);
+					if (isMounted) {
+						setError('Unable to load updates right now.');
+						setNotificationList([]);
+					}
 				}
 
-				const data: RemoteNotification[] = await res.json();
-
-				// Preserve the order from JSON, add synthetic IDs for React keys
+				const data: RemoteNotification[] = (await res.json()) as RemoteNotification[];
 				const withIds: NotificationWithId[] = (data || []).map((item, index) => ({
 					...item,
 					id: index + 1,
@@ -47,7 +49,7 @@ export const AppNotifications = () => {
 				if (isMounted) {
 					setNotificationList(withIds);
 				}
-			} catch (err) {
+			} catch (_err) {
 				if (isMounted) {
 					setError('Unable to load updates right now.');
 					setNotificationList([]);
@@ -130,7 +132,7 @@ export const AppNotifications = () => {
 				)}
 			</Group>
 
-			{notificationList.length > 0 ? (
+			{notificationList.length > 0 && latestNotification ? (
 				<Stack
 					gap={expanded ? 'xs' : 4}
 					className={classes.notificationsList}

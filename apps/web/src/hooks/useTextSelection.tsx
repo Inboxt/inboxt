@@ -38,10 +38,15 @@ export function useTextHighlighting(
 				window.clearTimeout(hoverClearTimeout.current);
 				hoverClearTimeout.current = null;
 			}
-			setHoveredHighlight(null);
-			setHoveredRect(null);
+			if (hoveredHighlight) {
+				// eslint-disable-next-line react-hooks/set-state-in-effect
+				setHoveredHighlight(null);
+			}
+			if (hoveredRect) {
+				setHoveredRect(null);
+			}
 		}
-	}, [selectedText]);
+	}, [selectedText, hoveredHighlight, hoveredRect]);
 
 	useEffect(() => {
 		const container = containerRef?.current;
@@ -196,11 +201,12 @@ export function useTextHighlighting(
 			return;
 		}
 
-		// Use shared function to collect highlights to remove
 		const toUnwrap = collectContiguousHighlightsToUnwrap(el, container);
 		const idsToDelete = [
-			...new Set(toUnwrap.map((h) => h.dataset.highlightId).filter(Boolean)),
-		]; // Array without duplicates, as segments may have the same id
+			...new Set(
+				toUnwrap.map((h) => h.dataset.highlightId).filter((id): id is string => !!id),
+			),
+		];
 
 		removeHighlights(toUnwrap);
 
@@ -247,7 +253,7 @@ export function useTextHighlighting(
 			if (serverId) {
 				updateHighlightIds(tempId, serverId);
 			}
-		} catch (err) {
+		} catch (_err) {
 			const els = document.querySelectorAll(`[data-highlight-id="${tempId}"]`);
 			els.forEach((el) => {
 				const parent = el.parentNode;

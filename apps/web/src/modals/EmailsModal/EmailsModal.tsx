@@ -77,7 +77,7 @@ export const EmailsModal = ({ id, context }: ContextModalProps) => {
 				</Button>
 
 				<Button
-					onClick={() => void handleCreate()}
+					onClick={handleCreate}
 					disabled={emails.length >= USER_INBOUND_EMAIL_ADDRESS_LIMIT}
 					loading={creating}
 				>

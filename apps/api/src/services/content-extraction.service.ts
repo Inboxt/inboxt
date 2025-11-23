@@ -60,9 +60,13 @@ export class ContentExtractionService {
 						// ignore malformed data-attrs
 					}
 				}
-				// Squarespace / lazy-loaded patterns
-				if (!chosenSrc && dataSrc) chosenSrc = dataSrc;
-				if (!chosenSrc && dataImage) chosenSrc = dataImage;
+				if (!chosenSrc && dataSrc) {
+					chosenSrc = dataSrc;
+				}
+
+				if (!chosenSrc && dataImage) {
+					chosenSrc = dataImage;
+				}
 			}
 
 			const currentSrc = img.getAttribute('src') || '';
@@ -119,17 +123,25 @@ export class ContentExtractionService {
 			.replace(/\s+/g, ' ')
 			.replace(/\u00A0/g, ' ')
 			.trim();
-		if (!cleaned) return null;
+
+		if (!cleaned) {
+			return null;
+		}
 
 		// Prefer up to the end of the first sentence that fits
 		const sentenceEnd = cleaned.search(/([.!?])\s/);
 		if (sentenceEnd !== -1 && sentenceEnd + 1 <= maxLen) {
 			const firstSentence = cleaned.slice(0, sentenceEnd + 1).trim();
-			if (firstSentence.length >= 40) return firstSentence; // avoid too-short snippets
+			if (firstSentence.length >= 40) {
+				return firstSentence;
+			} // avoid too-short snippets
 		}
 
 		// Otherwise trim to maxLen without cutting a word
-		if (cleaned.length <= maxLen) return cleaned;
+		if (cleaned.length <= maxLen) {
+			return cleaned;
+		}
+
 		const slice = cleaned.slice(0, maxLen + 1);
 		const lastSpace = slice.lastIndexOf(' ');
 		const clipped = (

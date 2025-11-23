@@ -50,7 +50,9 @@ export class SavedItemService {
 		}
 
 		// ---------- Type ----------
-		if (query?.type) prismaWhere.type = query.type;
+		if (query?.type) {
+			prismaWhere.type = query.type;
+		}
 
 		// ---------- Labels ----------
 		if (query.labels) {
@@ -91,21 +93,34 @@ export class SavedItemService {
 		}
 
 		// ---------- Highlights ----------
-		if (query.hasHighlights === true) prismaWhere.highlight = { some: { userId } };
-		if (query.hasHighlights === false) prismaWhere.highlight = { none: { userId } };
+		if (query.hasHighlights === true) {
+			prismaWhere.highlight = { some: { userId } };
+		}
+
+		if (query.hasHighlights === false) {
+			prismaWhere.highlight = { none: { userId } };
+		}
 
 		// ---------- Saved date range ----------
 		if (query.saved) {
 			const createdAt: Prisma.DateTimeFilter = {};
 			if (query.saved.from) {
 				const from = dayjs(query.saved.from);
-				if (from.isValid()) createdAt.gte = from.toDate();
+				if (from.isValid()) {
+					createdAt.gte = from.toDate();
+				}
 			}
+
 			if (query.saved.to) {
 				const to = dayjs(query.saved.to);
-				if (to.isValid()) createdAt.lte = to.toDate();
+				if (to.isValid()) {
+					createdAt.lte = to.toDate();
+				}
 			}
-			if (Object.keys(createdAt).length) prismaWhere.createdAt = createdAt;
+
+			if (Object.keys(createdAt).length) {
+				prismaWhere.createdAt = createdAt;
+			}
 		}
 
 		// ---------- Source ----------

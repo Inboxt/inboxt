@@ -20,7 +20,10 @@ const articleDomainFilters: Record<string, ArticleDomainFilter> = {
 			const hasMenuLi = Array.from(ul.querySelectorAll('li')).some((li) =>
 				Array.from(li.classList).some((className) => className.startsWith('menu')),
 			);
-			if (hasMenuLi) ul.remove();
+
+			if (hasMenuLi) {
+				ul.remove();
+			}
 		});
 	},
 
@@ -28,7 +31,7 @@ const articleDomainFilters: Record<string, ArticleDomainFilter> = {
 	'medium.com': (doc) => {
 		const titleH1 = doc.querySelector('h1[data-testid="storyTitle"]');
 		if (titleH1) {
-			let nextElem = titleH1.nextElementSibling;
+			const nextElem = titleH1.nextElementSibling;
 			if (nextElem && nextElem.tagName === 'DIV') {
 				nextElem.remove();
 			}
@@ -39,7 +42,10 @@ const articleDomainFilters: Record<string, ArticleDomainFilter> = {
 	'nytimes.com': (doc) => {
 		const articleBody = doc.querySelector('section[name="articleBody"]');
 		if (articleBody) {
-			while (doc.body.firstChild) doc.body.removeChild(doc.body.firstChild);
+			while (doc.body.firstChild) {
+				doc.body.removeChild(doc.body.firstChild);
+			}
+
 			doc.body.appendChild(articleBody.cloneNode(true));
 		}
 	},
@@ -49,7 +55,9 @@ const articleDomainFilters: Record<string, ArticleDomainFilter> = {
 		doc.querySelectorAll('img[aria-label="image unavailable"]').forEach((img) => img.remove());
 		doc.querySelectorAll('div[data-testid="byline-new-contributors"]').forEach((bylineDiv) => {
 			const parent = bylineDiv.parentElement;
-			if (parent) parent.remove();
+			if (parent) {
+				parent.remove();
+			}
 		});
 	},
 

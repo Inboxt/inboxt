@@ -467,7 +467,7 @@ export class SavedItemManagerService {
 			return;
 		}
 
-		const response = await fetch(payload.validation_url);
+		const response = await fetch(payload.validation_url as string);
 		const validationResponse: any = await response.json();
 		if (!validationResponse.success) {
 			this.logger.warn(`Validation failed: ${validationResponse?.message} || No message`);
@@ -506,7 +506,7 @@ export class SavedItemManagerService {
 			await this.processAndCreateNewsletter(
 				inboundEmailAddress.userId,
 				inboundEmailAddress.id,
-				messageId,
+				messageId as string,
 				{ html: strippedHtml, text: strippedText },
 				{
 					title: payload.headers?.Subject?.[0],
@@ -521,8 +521,10 @@ export class SavedItemManagerService {
 
 		if (payload?.deletion_url) {
 			try {
-				await fetch(payload.deletion_url);
-			} catch {}
+				await fetch(payload.deletion_url as string);
+			} catch {
+				// Ignore fetch errors
+			}
 		}
 	}
 }

@@ -5,6 +5,7 @@ import { Transporter } from 'nodemailer';
 
 import { BaseQueueProcessor } from '../../common/processors/base-queue.processor';
 import { LogExecutionTime } from '../../decorators/log-execution-time.decorator';
+import Mail from 'nodemailer/lib/mailer';
 
 @Processor('mail', { concurrency: 5 })
 export class MailProcessor extends BaseQueueProcessor {
@@ -13,7 +14,7 @@ export class MailProcessor extends BaseQueueProcessor {
 		super();
 	}
 
-	async process(job: Job): Promise<any> {
+	async process(job: Job<Mail.Options, void, 'send'>): Promise<void> {
 		switch (job.name) {
 			case 'send':
 				return this.sendEmail(job.data);
@@ -23,7 +24,7 @@ export class MailProcessor extends BaseQueueProcessor {
 	}
 
 	@LogExecutionTime
-	private async sendEmail(mailOptions: any) {
+	private async sendEmail(mailOptions: Mail.Options) {
 		await this.transporter.sendMail({
 			from: '"Inboxt" <no-reply@inboxt.app>',
 			...mailOptions,

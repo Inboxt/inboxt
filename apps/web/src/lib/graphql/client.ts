@@ -1,4 +1,4 @@
-import { ApolloClient, InMemoryCache, type FieldFunctionOptions } from '@apollo/client';
+import { ApolloClient, InMemoryCache } from '@apollo/client';
 
 export const client = new ApolloClient({
 	uri: `${process.env.API_URL as string}/graphql`,

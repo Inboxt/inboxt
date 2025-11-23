@@ -52,7 +52,10 @@ export class ArticleService {
 			$('meta[name="twitter:image"]').attr('content') ??
 			$('link[rel="image_src"]').attr('href');
 
-		if (!raw) return null;
+		if (!raw) {
+			return null;
+		}
+
 		try {
 			return new URL(raw, base).toString();
 		} catch {
@@ -119,20 +122,22 @@ export class ArticleService {
 	}
 
 	async parse(input: ProcessArticleInput) {
-		let htmlFromUrl;
+		let htmlFromUrl: string | undefined;
 		let ogImage: string | null = null;
 		if (input.url) {
 			htmlFromUrl = await this.fetchHtml(input.url);
 			ogImage = this.extractOgImage(htmlFromUrl, input.url);
 		}
 
-		const result = this.contentExtractionService.extractReadableContent(
-			input.html || htmlFromUrl,
-			{
-				url: input.url,
-				maxWords: MAX_ARTICLE_WORD_COUNT,
-			},
-		);
+		const sourceHtml = input.html || htmlFromUrl;
+		if (!sourceHtml) {
+			throw new AppException('No HTML content provided', HttpStatus.BAD_REQUEST);
+		}
+
+		const result = this.contentExtractionService.extractReadableContent(sourceHtml, {
+			url: input.url,
+			maxWords: MAX_ARTICLE_WORD_COUNT,
+		});
 
 		return {
 			leadImage: ogImage,

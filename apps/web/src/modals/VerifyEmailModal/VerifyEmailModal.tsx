@@ -85,7 +85,7 @@ export const VerifyEmailModal = ({ id, context }: ContextModalProps) => {
 						<Button
 							variant="light"
 							color="text"
-							onClick={() => void handleResendEmail()}
+							onClick={handleResendEmail}
 							loading={resendVerificationEmailLoading || verifyEmailLoading}
 							disabled={isCooldownActive}
 						>

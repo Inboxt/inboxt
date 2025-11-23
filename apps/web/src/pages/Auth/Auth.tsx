@@ -51,13 +51,13 @@ export const Auth = () => {
 					</Stack>
 
 					<Stack>
-						<Button size="md" onClick={() => void handleChangeAuthMode('signup')}>
+						<Button size="md" onClick={() => handleChangeAuthMode('signup')}>
 							Create account
 						</Button>
 						<Button
 							size="md"
 							variant="light"
-							onClick={() => void handleChangeAuthMode('login')}
+							onClick={() => handleChangeAuthMode('login')}
 						>
 							Sign In
 						</Button>
@@ -67,7 +67,7 @@ export const Auth = () => {
 							size="compact-md"
 							c="dimmed"
 							mt="xs"
-							onClick={() => void handleChangeAuthMode('demo')}
+							onClick={() => handleChangeAuthMode('demo')}
 							component="button"
 						>
 							Just curious? Try the demo first!

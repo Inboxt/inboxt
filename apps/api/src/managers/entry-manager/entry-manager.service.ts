@@ -29,7 +29,9 @@ export class EntryManagerService {
 	) {}
 
 	private parseQuery(q?: string): ParsedQuery {
-		if (!q) return {};
+		if (!q) {
+			return {};
+		}
 
 		const result: ParsedQuery = {};
 		const freeText: string[] = [];
@@ -45,13 +47,19 @@ export class EntryManagerService {
 				inQuotes = !inQuotes;
 				buf += ch;
 			} else if (ch === ' ' && !inQuotes) {
-				if (buf.trim()) parts.push(buf);
+				if (buf.trim()) {
+					parts.push(buf);
+				}
+
 				buf = '';
 			} else {
 				buf += ch;
 			}
 		}
-		if (buf.trim()) parts.push(buf);
+
+		if (buf.trim()) {
+			parts.push(buf);
+		}
 
 		parts.forEach((part) => {
 			const [rawKey, ...rest] = part.split(':');
@@ -67,7 +75,9 @@ export class EntryManagerService {
 				}
 
 				if (key === 'label') {
-					if (!result.labels) result.labels = { and: [], not: [] };
+					if (!result.labels) {
+						result.labels = { and: [], not: [] };
+					}
 
 					// split by commas, but respect quotes
 					const regex = /"([^"]+)"|([^,]+)/g;
@@ -87,9 +97,18 @@ export class EntryManagerService {
 				} else if (key === 'saved') {
 					const [from, to] = value.split(',');
 					const saved: { from?: string; to?: string } = {};
-					if (from && from !== '*') saved.from = from;
-					if (to && to !== '*') saved.to = to;
-					if (Object.keys(saved).length) result.saved = saved;
+
+					if (from && from !== '*') {
+						saved.from = from;
+					}
+
+					if (to && to !== '*') {
+						saved.to = to;
+					}
+
+					if (Object.keys(saved).length) {
+						result.saved = saved;
+					}
 				} else if (key === 'site') {
 					result.site = value.toLowerCase();
 				} else if (['in', 'type'].includes(key)) {
@@ -102,7 +121,9 @@ export class EntryManagerService {
 			}
 		});
 
-		if (freeText.length) result.text = freeText.join(' ');
+		if (freeText.length) {
+			result.text = freeText.join(' ');
+		}
 
 		return result;
 	}

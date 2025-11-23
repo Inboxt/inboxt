@@ -57,7 +57,7 @@ export const NewsletterSubscriptionButton = ({ subscription }: NewsletterSubscri
 				size="compact-md"
 				fz="xs"
 				variant={isBelowXsScreen ? 'light' : 'white'}
-				onClick={() => void handleButtonAction(NewsletterSubscriptionStatus.Active)}
+				onClick={() => handleButtonAction(NewsletterSubscriptionStatus.Active)}
 				loading={loading}
 				w={isBelowXsScreen ? undefined : 128}
 				fullWidth={isBelowXsScreen}

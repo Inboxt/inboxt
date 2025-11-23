@@ -1,19 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { ConfigService } from '@nestjs/config';
+
+import { Config } from '../../config';
 
 @Injectable()
 export class S3StorageService {
 	private readonly s3: S3Client;
-	private bucket = process.env.STORAGE_S3_BUCKET!;
+	private bucket: string;
 
-	constructor() {
+	constructor(private readonly configService: ConfigService<Config>) {
+		const storageConfig = this.configService.getOrThrow('storage', { infer: true });
+
 		this.s3 = new S3Client({
-			region: process.env.STORAGE_S3_REGION,
-			endpoint: process.env.STORAGE_S3_ENDPOINT,
+			region: storageConfig.region,
+			endpoint: storageConfig.endpoint,
 			credentials: {
-				accessKeyId: process.env.STORAGE_S3_ACCESS_KEY!,
-				secretAccessKey: process.env.STORAGE_S3_SECRET_KEY!,
+				accessKeyId: storageConfig.accessKeyId,
+				secretAccessKey: storageConfig.secretAccessKey,
 			},
 			forcePathStyle: true,
 		});

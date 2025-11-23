@@ -14,7 +14,7 @@ import {
 	Stack,
 	Text,
 	Title,
-	TypographyStylesProvider,
+	Typography,
 } from '@mantine/core';
 import { useDocumentTitle } from '@mantine/hooks';
 import { IconArrowLeft, IconHighlight } from '@tabler/icons-react';
@@ -156,11 +156,11 @@ export const ReaderView = () => {
 							size="lg"
 							onClick={(e) => {
 								e.preventDefault();
-								highlightSelection();
+								void highlightSelection();
 							}}
 							onTouchEnd={(e) => {
 								e.preventDefault();
-								highlightSelection();
+								void highlightSelection();
 							}}
 							hiddenFrom="md"
 						>
@@ -244,12 +244,12 @@ export const ReaderView = () => {
 							)}
 
 							{!error && savedItem && content && (
-								<TypographyStylesProvider className={classes.typography}>
+								<Typography className={classes.typography}>
 									<HighlightableArticle
 										content={content || null}
 										data={savedItem}
 									/>
-								</TypographyStylesProvider>
+								</Typography>
 							)}
 
 							{(error || !savedItem) && (

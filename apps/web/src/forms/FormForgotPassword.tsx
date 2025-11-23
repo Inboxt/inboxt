@@ -178,7 +178,7 @@ export const FormForgotPassword = ({ handleChangeAuthMode }: AuthViewProps) => {
 					{error}
 
 					<Group mt="xl" justify="space-between">
-						<Button variant="default" size="md" onClick={() => void handleBack()}>
+						<Button variant="default" size="md" onClick={handleBack}>
 							Back
 						</Button>
 						<Button

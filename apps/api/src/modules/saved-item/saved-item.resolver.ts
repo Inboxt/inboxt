@@ -76,7 +76,10 @@ export class SavedItemResolver {
 	}
 
 	@ResolveField('article', () => Article, { nullable: true })
-	async article(@Parent() savedItem, @ActiveUserMeta() activeUser: ActiveUserMetaType) {
+	async article(
+		@ActiveUserMeta() activeUser: ActiveUserMetaType,
+		@Parent() savedItem: SavedItem,
+	) {
 		if (!savedItem?.id) {
 			return null;
 		}
@@ -85,7 +88,10 @@ export class SavedItemResolver {
 	}
 
 	@ResolveField('newsletter', () => Newsletter, { nullable: true })
-	async newsletter(@Parent() savedItem, @ActiveUserMeta() activeUser: ActiveUserMetaType) {
+	async newsletter(
+		@ActiveUserMeta() activeUser: ActiveUserMetaType,
+		@Parent() savedItem: SavedItem,
+	) {
 		if (!savedItem?.id) {
 			return null;
 		}
@@ -96,7 +102,7 @@ export class SavedItemResolver {
 	}
 
 	@ResolveField('labels', () => [Label], { nullable: true })
-	async labels(@ActiveUserMeta() activeUser: ActiveUserMetaType, @Parent() savedItem) {
+	async labels(@ActiveUserMeta() activeUser: ActiveUserMetaType, @Parent() savedItem: SavedItem) {
 		if (!savedItem?.id) {
 			return null;
 		}

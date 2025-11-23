@@ -35,7 +35,7 @@ export class GlobalExceptionFilter implements ExceptionFilter, GqlExceptionFilte
 
 			return {
 				status: responseBody.statusCode ?? status,
-				message: responseBody.message ?? exception.message,
+				message: (responseBody.message as string) ?? exception.message,
 				code: responseBody.code ?? HttpStatus[status],
 			};
 		}

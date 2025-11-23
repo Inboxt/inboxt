@@ -1,5 +1,8 @@
-// A utility function to time the execution of methods
-export function LogExecutionTime(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+export function LogExecutionTime(
+	_target: any,
+	propertyKey: string,
+	descriptor: PropertyDescriptor,
+) {
 	const originalMethod = descriptor.value;
 
 	descriptor.value = async function (...args: any[]) {

@@ -94,7 +94,7 @@ export const DemoLogin = ({ handleChangeAuthMode }: AuthViewProps) => {
 						<Button
 							variant="default"
 							size="md"
-							onClick={() => void handleChangeAuthMode(undefined)}
+							onClick={() => handleChangeAuthMode(undefined)}
 						>
 							Back
 						</Button>

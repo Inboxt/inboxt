@@ -1,5 +1,7 @@
 import { Injectable, HttpStatus } from '@nestjs/common';
 
+import { Prisma } from '../../../prisma/client';
+
 import { PrismaService } from '../../services/prisma.service';
 import { AppException } from '../../utils/app-exception';
 
@@ -42,14 +44,17 @@ export class StorageQuotaService {
 	}
 
 	async incrementUsage(tx: any, userId: string, delta: bigint) {
-		if (delta <= 0n) return;
+		if (delta <= 0n) {
+			return;
+		}
+
 		await tx.user.update({
 			where: { id: userId },
 			data: { storageUsageBytes: { increment: delta } },
 		});
 	}
 
-	async decrementUsage(tx: any, userId: string, delta: bigint) {
+	async decrementUsage(tx: Prisma.TransactionClient, userId: string, delta: bigint) {
 		if (delta <= 0n) {
 			return;
 		}

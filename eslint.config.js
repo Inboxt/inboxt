@@ -8,22 +8,51 @@ import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended'
 import importPlugin from 'eslint-plugin-import';
 
 export default tseslint.config(
-	{ ignores: ['dist', '**/node_modules'] },
+	{
+		ignores: [
+			'**/dist/**',
+			'**/node_modules/**',
+			'apps/web/src/lib/graphql/generated/**',
+			'apps/web/src/lib/graphql/client.ts',
+			'apps/web/codegen.ts',
+			'apps/api/prisma/**',
+		],
+	},
 	eslintPluginPrettierRecommended,
 
 	// base config
 	{
 		files: ['**/*.{ts,tsx}'],
-		extends: [js.configs.recommended, ...tseslint.configs.strictTypeChecked],
+		extends: [js.configs.recommended, ...tseslint.configs.recommended],
 		languageOptions: {
 			ecmaVersion: 2020,
 			globals: globals.browser,
 		},
 		rules: {
-			'@typescript-eslint/no-non-null-assertion': 'off',
+			curly: ['error', 'all'],
 			'@typescript-eslint/no-confusing-void-expression': [
 				'error',
 				{ ignoreArrowShorthand: true },
+			],
+			'@typescript-eslint/no-unused-vars': [
+				'error',
+				{
+					args: 'all',
+					argsIgnorePattern: '^_',
+					caughtErrors: 'all',
+					caughtErrorsIgnorePattern: '^_',
+					destructuredArrayIgnorePattern: '^_',
+					varsIgnorePattern: '^_',
+					ignoreRestSiblings: true,
+				},
+			],
+			'@typescript-eslint/no-misused-promises': [
+				'error',
+				{
+					checksVoidReturn: {
+						attributes: false,
+					},
+				},
 			],
 		},
 	},
@@ -44,20 +73,8 @@ export default tseslint.config(
 		},
 		rules: {
 			...reactHooks.configs.recommended.rules,
-			'no-throw-literal': 'off',
 			'@typescript-eslint/only-throw-error': 'off',
-			'@typescript-eslint/restrict-template-expressions': [
-				'error',
-				{
-					allowAny: true,
-					allowBoolean: true,
-					allowNullish: true,
-					allowNumber: true,
-					allowRegExp: true,
-				},
-			],
 			'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
-			curly: ['error', 'all'],
 			'import/order': [
 				'error',
 				{
@@ -94,7 +111,7 @@ export default tseslint.config(
 
 	// api config
 	{
-		files: ['apps/api/**/*.{ts,tsx}'],
+		files: ['apps/api/**/*.ts'],
 		languageOptions: {
 			globals: {
 				...globals.node,
@@ -109,6 +126,12 @@ export default tseslint.config(
 			'@typescript-eslint/no-explicit-any': 'off',
 			'@typescript-eslint/no-floating-promises': 'warn',
 			'@typescript-eslint/no-unsafe-argument': 'warn',
+			'@typescript-eslint/no-extraneous-class': [
+				'error',
+				{
+					allowWithDecorator: true,
+				},
+			],
 		},
 	},
 );

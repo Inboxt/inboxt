@@ -22,7 +22,7 @@ export const ItemRenderer = ({ item }: { item: SavedItem | Highlight | null }) =
 			return <HighlightRenderer highlight={item} />;
 
 		default:
-			console.warn(`Unknown item type: ${item.__typename}`, item);
+			console.warn(`Unknown item type: ${item.__typename as string}`, item);
 			return <div>Unknown content type</div>;
 	}
 };

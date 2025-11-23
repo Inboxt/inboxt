@@ -28,7 +28,7 @@ export class AppController {
 		let response: Response;
 		try {
 			response = await fetch(url, { method: 'GET' });
-		} catch (err) {
+		} catch (_err) {
 			throw new AppException('Failed to fetch notifications', HttpStatus.BAD_GATEWAY);
 		}
 

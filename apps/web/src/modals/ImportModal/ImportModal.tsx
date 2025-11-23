@@ -159,9 +159,7 @@ export const ImportModal = ({ id, context }: ContextModalProps<ImportModalProps>
 			<ButtonContainer>
 				<Button
 					variant="default"
-					onClick={() =>
-						!!selectedType ? setSelectedType(null) : context.closeModal(id)
-					}
+					onClick={() => (selectedType ? setSelectedType(null) : context.closeModal(id))}
 					disabled={loading}
 				>
 					Cancel

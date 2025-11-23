@@ -71,7 +71,9 @@ export class ImportService {
 
 		for (const name of labels) {
 			const normalized = name.trim();
-			if (normalized) uniqueLabelNames.add(normalized);
+			if (normalized) {
+				uniqueLabelNames.add(normalized);
+			}
 		}
 
 		return uniqueLabelNames;
@@ -111,8 +113,13 @@ export class ImportService {
 
 		for (const l of labelsFromExport) {
 			const name = l.name.trim();
-			if (!name) continue;
-			if (map.has(name)) continue;
+			if (!name) {
+				continue;
+			}
+
+			if (map.has(name)) {
+				continue;
+			}
 
 			if (count >= USER_LABELS_LIMIT) {
 				this.logger.warn(`Label limit reached. Skipping label: ${name}`);
@@ -157,7 +164,9 @@ export class ImportService {
 
 		try {
 			html = await fs.readFile(htmlPath, 'utf8');
-		} catch {}
+		} catch {
+			//
+		}
 
 		if (type === 'ARTICLE') {
 			await this.savedItemManagerService.processAndCreateArticle(userId, { html }, labelIds, {
@@ -279,7 +288,9 @@ export class ImportService {
 			const labelIds: string[] = [];
 			for (const name of labels) {
 				const id = nameToId.get(name.trim());
-				if (id) labelIds.push(id);
+				if (id) {
+					labelIds.push(id);
+				}
 			}
 
 			await this.savedItemManagerService.addArticleFromUrl(data.userId, url, labelIds, {
@@ -394,7 +405,9 @@ export class ImportService {
 		// Cleanup temp dir (best-effort)
 		try {
 			await fs.rm(baseDir, { recursive: true, force: true });
-		} catch {}
+		} catch {
+			/* empty */
+		}
 
 		this.logger.log(
 			`Zip archive import completed for user ${data.userId} from ${data.originalName}`,

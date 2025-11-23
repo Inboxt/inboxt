@@ -94,12 +94,15 @@ export const ItemsList = () => {
 
 		const itemsNode = items.map((i) => i.node);
 		setVisibleItems(itemsNode);
+
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [items]);
 
 	useEffect(() => {
 		if (q || sort) {
 			virtualizer.scrollToIndex(0);
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [q, sort]);
 
 	const handlePermanentlyDeleteSavedItems = async () => {
@@ -173,7 +176,7 @@ export const ItemsList = () => {
 							<Button
 								variant="transparent"
 								size="compact-sm"
-								onClick={() => void handlePermanentlyDeleteSavedItems()}
+								onClick={handlePermanentlyDeleteSavedItems}
 							>
 								Empty Trash Now
 							</Button>
@@ -212,7 +215,7 @@ export const ItemsList = () => {
 											<Loader size="sm" />
 										</Center>
 									) : (
-										<ItemRenderer item={items[index]!.node} />
+										<ItemRenderer item={items[index].node} />
 									)}
 								</Box>
 							);

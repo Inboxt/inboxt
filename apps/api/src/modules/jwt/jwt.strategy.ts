@@ -3,12 +3,12 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
-import { SecurityConfig } from '../../config/config.interface';
+import { Config } from '../../config';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-	constructor(readonly configService: ConfigService) {
-		const securityConfig = configService.get<SecurityConfig>('security');
+	constructor(readonly configService: ConfigService<Config>) {
+		const securityConfig = configService.getOrThrow('security', { infer: true });
 		super({
 			jwtFromRequest: ExtractJwt.fromExtractors([
 				(req) => {
@@ -19,7 +19,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 					return token;
 				},
 			]),
-			secretOrKey: securityConfig!.jwtSecret,
+			secretOrKey: securityConfig.jwtSecret,
 		});
 	}
 

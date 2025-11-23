@@ -2,7 +2,8 @@ import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { RateLimiterValkey } from 'rate-limiter-flexible';
 import Valkey from 'iovalkey';
-import { ValkeyConfig } from '../config/config.interface';
+
+import { type Config } from '../config';
 import { AuthState, RateLimitBucket } from '../decorators/rate-limit.decorator';
 
 @Injectable()
@@ -17,12 +18,11 @@ export class RateLimitService implements OnModuleDestroy {
 
 	private readonly limiters: Record<AuthState, RateLimiterValkey>;
 
-	constructor(private readonly configService: ConfigService) {
-		const valkeyConfig = this.configService.get<ValkeyConfig>('valkey');
-
+	constructor(private readonly configService: ConfigService<Config>) {
+		const valkeyConfig = this.configService.getOrThrow('valkey', { infer: true });
 		this.valkeyClient = new Valkey({
-			host: valkeyConfig?.connection.host,
-			port: valkeyConfig?.connection.port,
+			host: valkeyConfig.connection.host,
+			port: valkeyConfig.connection.port,
 		});
 
 		this.limiters = {

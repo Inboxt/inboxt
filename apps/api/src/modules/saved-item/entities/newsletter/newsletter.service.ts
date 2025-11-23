@@ -34,7 +34,7 @@ export class NewsletterService {
 		}
 
 		// Fallback: scan HTML content for "unsubscribe" links
-		const html = payload?.body?.stripped_html || '';
+		const html: string = payload?.body?.stripped_html || '';
 		const dom = new JSDOM(html);
 		const doc = dom.window.document;
 		const links = Array.from(doc.querySelectorAll('a[href]'));

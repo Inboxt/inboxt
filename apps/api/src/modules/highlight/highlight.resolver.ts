@@ -37,7 +37,10 @@ export class HighlightResolver {
 	}
 
 	@ResolveField('segments', () => [HighlightSegment], { nullable: true })
-	async segments(@ActiveUserMeta() activeUser: ActiveUserMetaType, @Parent() highlight) {
+	async segments(
+		@ActiveUserMeta() activeUser: ActiveUserMetaType,
+		@Parent() highlight: Highlight,
+	) {
 		if (!highlight?.id) {
 			return null;
 		}
@@ -46,7 +49,10 @@ export class HighlightResolver {
 	}
 
 	@ResolveField('savedItem', () => SavedItem, { nullable: true })
-	async savedItem(@ActiveUserMeta() activeUser: ActiveUserMetaType, @Parent() highlight) {
+	async savedItem(
+		@ActiveUserMeta() activeUser: ActiveUserMetaType,
+		@Parent() highlight: Highlight & { savedItemId?: string },
+	) {
 		if (!highlight?.savedItemId) {
 			return null;
 		}

@@ -42,8 +42,8 @@ export class InboundEmailAddressResolver {
 
 	@ResolveField('subscriptions', () => [NewsletterSubscription], { nullable: true })
 	async subscriptions(
-		@Parent() inboundEmailAddress,
 		@ActiveUserMeta() activeUser: ActiveUserMetaType,
+		@Parent() inboundEmailAddress: InboundEmailAddress,
 	) {
 		if (!inboundEmailAddress) {
 			return null;

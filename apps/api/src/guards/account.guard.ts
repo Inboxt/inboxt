@@ -17,9 +17,14 @@ export class AccountGuard implements CanActivate {
 		const ctx = GqlExecutionContext.create(context);
 		const { user: partialUser } = ctx.getContext().req;
 
-		if (!partialUser) return true;
+		if (!partialUser) {
+			return true;
+		}
+
 		const user = await this.prismaService.user.findUnique({ where: { id: partialUser.id } });
-		if (!user) return true;
+		if (!user) {
+			return true;
+		}
 
 		const requireNonDemo = this.reflector.getAllAndOverride<boolean>(NON_DEMO_KEY, [
 			context.getHandler(),

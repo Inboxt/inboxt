@@ -22,8 +22,8 @@ import { VOID_RESPONSE } from '../../constants/void';
 import { RateLimit } from '../../decorators/rate-limit.decorator';
 
 const storage = diskStorage({
-	destination: (req, file, cb) => cb(null, '/tmp'),
-	filename: (req, file, cb) => {
+	destination: (_req, _file, cb) => cb(null, '/tmp'),
+	filename: (_req, file, cb) => {
 		cb(null, `${crypto.randomUUID()}${extname(file.originalname)}`);
 	},
 });

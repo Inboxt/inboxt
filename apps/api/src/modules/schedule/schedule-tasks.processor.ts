@@ -189,7 +189,9 @@ export class ScheduleTasksProcessor extends BaseQueueProcessor {
 				skip: scanned,
 			});
 
-			if (!users.length) break;
+			if (!users.length) {
+				break;
+			}
 
 			for (const u of users) {
 				const [savedItemAgg, articleAgg, newsletterAgg, highlightAgg] = await Promise.all([
@@ -233,7 +235,9 @@ export class ScheduleTasksProcessor extends BaseQueueProcessor {
 			}
 
 			scanned += users.length;
-			if (users.length < pageSize) break;
+			if (users.length < pageSize) {
+				break;
+			}
 		}
 
 		this.logger.log(`Reconcile storage usage done. scanned:${scanned}, corrected:${corrected}`);
@@ -251,11 +255,16 @@ export class ScheduleTasksProcessor extends BaseQueueProcessor {
 				take: pageSize,
 				skip: scanned,
 			});
-			if (!users.length) break;
+
+			if (!users.length) {
+				break;
+			}
 
 			for (const u of users) {
 				const quota = u.storageQuotaBytes;
-				if (quota <= 0n) continue;
+				if (quota <= 0n) {
+					continue;
+				}
 
 				const usage = u.storageUsageBytes;
 				const percent = Number((usage * 100n) / quota);
@@ -269,9 +278,13 @@ export class ScheduleTasksProcessor extends BaseQueueProcessor {
 				}
 
 				const crossed = thresholds.filter((t) => percent >= t).sort((a, b) => b - a)[0];
-				if (!crossed) continue;
+				if (!crossed) {
+					continue;
+				}
 
-				if (u.lastNotifiedStorageThreshold >= crossed) continue;
+				if (u.lastNotifiedStorageThreshold >= crossed) {
+					continue;
+				}
 
 				const isExceeded = crossed >= 100;
 
@@ -297,7 +310,9 @@ export class ScheduleTasksProcessor extends BaseQueueProcessor {
 			}
 
 			scanned += users.length;
-			if (users.length < pageSize) break;
+			if (users.length < pageSize) {
+				break;
+			}
 		}
 
 		this.logger.log(

@@ -6,17 +6,18 @@ import { join } from 'path';
 import { json } from 'express';
 import { NestExpressApplication } from '@nestjs/platform-express';
 
+import { type Config } from 'src/config';
+
 dotenv.config({
 	path: join(__dirname, '../../../.env'),
 });
 
 import { AppModule } from './modules/app/app.module';
-import { CorsConfig } from './config/config.interface';
 
 async function bootstrap() {
 	const app = await NestFactory.create<NestExpressApplication>(AppModule);
-	const configService = app.get(ConfigService);
-	const corsConfig = configService.get<CorsConfig>('cors');
+	const configService = app.get(ConfigService<Config>);
+	const corsConfig = configService.getOrThrow('cors', { infer: true });
 
 	if (corsConfig?.enabled) {
 		app.enableCors({
@@ -32,4 +33,5 @@ async function bootstrap() {
 
 	await app.listen(process.env.PORT ?? 7000);
 }
-bootstrap();
+
+void bootstrap();

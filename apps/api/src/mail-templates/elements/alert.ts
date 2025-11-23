@@ -30,10 +30,15 @@ export default ({ content, type }: AlertProps): string => {
 				const isLast = index === content.length - 1;
 				let padding = '';
 
-				if (isFirst && isLast) padding = 'padding="0"';
-				else if (isFirst) padding = 'padding-bottom="0"';
-				else if (isLast) padding = 'padding-top="6px"';
-				else padding = 'padding-top="6px" padding-bottom="0"';
+				if (isFirst && isLast) {
+					padding = 'padding="0"';
+				} else if (isFirst) {
+					padding = 'padding-bottom="0"';
+				} else if (isLast) {
+					padding = 'padding-top="6px"';
+				} else {
+					padding = 'padding-top="6px" padding-bottom="0"';
+				}
 
 				// Prefix is only for the first line
 				const displayLine = isFirst ? `${prefix}${line}` : line;

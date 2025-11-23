@@ -13,12 +13,18 @@ import { SavedItemType } from './enums/saved-item-type.enum';
 const prisma = new PrismaClient();
 
 const logStep = (message: string, newline = true) => {
-	if (newline) console.log('');
+	if (newline) {
+		console.log('');
+	}
+
 	console.log('\x1b[33m%s\x1b[0m', `🚧 ${message}`);
 };
 
 const logSuccess = (message: string, newline = false) => {
-	if (newline) console.log('');
+	if (newline) {
+		console.log('');
+	}
+
 	console.log('\x1b[32m%s\x1b[0m', `✅ ${message}`);
 };
 

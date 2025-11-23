@@ -101,7 +101,7 @@ export const HighlightableArticle = ({ content, data }: ArticleWithHighlightsPro
 				visible={!selectedText && !!hoveredHighlight && !!hoveredRect && isAboveMdScreen}
 				rect={hoveredRect}
 				buttonLabel="Unhighlight"
-				onButtonClick={() => void unhighlight(hoveredHighlight)}
+				onButtonClick={() => unhighlight(hoveredHighlight)}
 			/>
 		</>
 	);

@@ -93,7 +93,9 @@ export const HighlightItem = ({ highlight }: HighlightItemProps) => {
 						{highlight?.segments
 							?.slice()
 							.reverse()
-							.map((segment, index) => <span key={index}>{segment.text}</span>)}
+							.map((segment, index) => (
+								<span key={index}>{segment.text}</span>
+							))}
 					</Text>
 				</Stack>
 			</Group>

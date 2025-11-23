@@ -1,7 +1,7 @@
 import { useFragment, useMutation, useQuery } from '@apollo/client';
 import { Button, Card, Checkbox, Stack, Text } from '@mantine/core';
 import { ContextModalProps } from '@mantine/modals';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { ButtonContainer } from '~components/ButtonContainer';
 import { SelectableLabel } from '~components/SelectableLabel';
@@ -28,15 +28,16 @@ export const LabelsSelectionModal = ({
 	});
 
 	const [value, setValue] = useState<string[]>([]);
+	const [initialized, setInitialized] = useState(false);
+
+	if (complete && !initialized) {
+		setValue((itemLabels?.labels || []).map((label) => label.id));
+		setInitialized(true);
+	}
+
 	const [setSavedItemLabels, { loading }] = useMutation(SET_SAVED_ITEM_LABELS, {
 		refetchQueries: [pathname.startsWith('/r') ? SAVED_ITEM : ENTRIES],
 	});
-
-	useEffect(() => {
-		if (complete) {
-			setValue((itemLabels.labels || []).map((label) => label.id));
-		}
-	}, [itemLabels, complete]);
 
 	const handleSelection = async () => {
 		await setSavedItemLabels({
@@ -76,7 +77,7 @@ export const LabelsSelectionModal = ({
 					Create new
 				</Button>
 
-				<Button onClick={() => void handleSelection()} loading={loading}>
+				<Button onClick={handleSelection} loading={loading}>
 					Save & Close
 				</Button>
 			</ButtonContainer>

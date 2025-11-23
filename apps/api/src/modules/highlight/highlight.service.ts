@@ -82,11 +82,16 @@ export class HighlightService {
 
 			if (query.saved.from) {
 				const fromDate = dayjs(query.saved.from);
-				if (fromDate.isValid()) createdAtFilter.gte = fromDate.toDate();
+				if (fromDate.isValid()) {
+					createdAtFilter.gte = fromDate.toDate();
+				}
 			}
+
 			if (query.saved.to) {
 				const toDate = dayjs(query.saved.to);
-				if (toDate.isValid()) createdAtFilter.lte = toDate.toDate();
+				if (toDate.isValid()) {
+					createdAtFilter.lte = toDate.toDate();
+				}
 			}
 
 			if (Object.keys(createdAtFilter).length) {
