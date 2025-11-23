@@ -16,6 +16,7 @@ export default tseslint.config(
 			'apps/web/src/lib/graphql/client.ts',
 			'apps/web/codegen.ts',
 			'apps/api/prisma/**',
+			'apps/api/migrations/**',
 		],
 	},
 	eslintPluginPrettierRecommended,
