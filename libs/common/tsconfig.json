@@ -1,5 +1,17 @@
 {
 	"extends": "../../tsconfig.base.json",
-	"exclude": ["node_modules"],
-	"include": ["src/**/*"]
+	"compilerOptions": {
+		"composite": true,
+		"rootDir": "src",
+		"declaration": true,
+		"declarationMap": true,
+		"outDir": "dist",
+		"module": "NodeNext",
+		"target": "ESNext",
+		"moduleResolution": "NodeNext",
+		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true
+	},
+	"include": ["src/**/*"],
+	"exclude": ["node_modules", "dist", "**/*.spec.ts"]
 }

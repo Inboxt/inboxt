@@ -39,3 +39,29 @@ export interface ParsedQuery {
 	site?: string;
 	saved?: { from?: string; to?: string };
 }
+
+export type SavedItemExportJson = {
+	id: string;
+	createdAt: Date | string;
+	title: string | null;
+	originalUrl: string | null;
+	sourceDomain: string | null;
+	description: string | null;
+	leadImage: string | null;
+	wordCount: number | null;
+	author: string | null;
+	type: 'ARTICLE' | 'NEWSLETTER';
+	status: string;
+	deletedSince: Date | string | null;
+	labels: Array<{
+		id: string;
+		createdAt: Date | string;
+		name: string;
+		color: string | null;
+	}>;
+	contentHtml: string | null;
+	contentText: string | null;
+	messageId: string | null;
+	inboundEmailAddressId: string | null;
+	subscription: string | null;
+};

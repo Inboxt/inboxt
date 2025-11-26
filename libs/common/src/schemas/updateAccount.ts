@@ -1,5 +1,5 @@
-import { z } from './zod';
-import { rules as createAccountRules } from './createAccount';
+import { z } from './zod.js';
+import { rules as createAccountRules } from './createAccount.js';
 
 export const updateAccountSchema = z.object({
 	emailAddress: createAccountRules.emailAddress.optional(),

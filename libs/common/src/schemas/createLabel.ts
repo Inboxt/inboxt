@@ -1,4 +1,4 @@
-import { z } from './zod';
+import { z } from './zod.js';
 
 export const rules = {
 	name: z.string().nonempty().max(30),

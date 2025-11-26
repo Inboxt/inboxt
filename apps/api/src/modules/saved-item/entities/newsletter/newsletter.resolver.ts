@@ -12,7 +12,10 @@ export class NewsletterResolver {
 	constructor(private newsletterSubscriptionService: NewsletterSubscriptionService) {}
 
 	@ResolveField('subscription', () => NewsletterSubscription, { nullable: true })
-	async subscription(@Parent() newsletter, @ActiveUserMeta() activeUser: ActiveUserMetaType) {
+	async subscription(
+		@ActiveUserMeta() activeUser: ActiveUserMetaType,
+		@Parent() newsletter: Newsletter & { subscriptionId?: string },
+	) {
 		if (!newsletter?.subscriptionId) {
 			return null;
 		}

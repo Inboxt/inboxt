@@ -10,10 +10,12 @@ import crypto from 'crypto';
 
 import { APP_PRIMARY_COLOR, USER_LABELS_LIMIT } from '@inboxt/common';
 
+import { saved_item_status } from '../../../prisma/client';
 import { LabelService } from '../saved-item/entities/label/label.service';
 import { ImportType } from '../../common/enums/import-type.enum';
 import { UserService } from '../user/user.service';
 import { SavedItemManagerService } from '../../managers/saved-item-manager/saved-item-manager.service';
+import { SavedItemExportJson } from '../../common/types';
 
 type DiskSource = {
 	kind: 'disk';
@@ -39,7 +41,7 @@ export class ImportService {
 		return new Promise((resolve) => setTimeout(resolve, delay));
 	}
 
-	private extractCsvLabels(row) {
+	private extractCsvLabels(row: any) {
 		const uniqueLabelNames = new Set<string>();
 
 		const labelsRaw = row.labels || row.tags || row.Tags || '';
@@ -141,7 +143,7 @@ export class ImportService {
 	private async importSingleSavedItem(params: {
 		userId: string;
 		itemDir: string;
-		itemJson: any;
+		itemJson: SavedItemExportJson;
 		labelNameToId: Map<string, string>;
 	}) {
 		const { userId, itemDir, itemJson, labelNameToId } = params;
@@ -160,12 +162,13 @@ export class ImportService {
 
 		// Content
 		const htmlPath = `${itemDir}/content.html`;
-		let html;
+		let html: string | undefined;
 
 		try {
 			html = await fs.readFile(htmlPath, 'utf8');
 		} catch {
-			//
+			this.logger.warn(`Missing content.html for item ${itemJson.id}`);
+			return { created: false };
 		}
 
 		if (type === 'ARTICLE') {
@@ -177,7 +180,9 @@ export class ImportService {
 				leadImage: itemJson.leadImage ?? undefined,
 				wordCount: typeof itemJson.wordCount === 'number' ? itemJson.wordCount : undefined,
 				author: itemJson.author ?? undefined,
-				status: itemJson.status || 'ACTIVE',
+				status: Object.values(saved_item_status).includes(itemJson.status as any)
+					? (itemJson.status as saved_item_status)
+					: undefined,
 				createdAt: itemJson.createdAt ? new Date(itemJson.createdAt) : undefined,
 			});
 		} else {

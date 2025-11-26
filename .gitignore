@@ -25,3 +25,7 @@ apps/api/prisma/client
 *.njsproj
 *.sln
 *.sw?
+
+# TypeScript incremental build info
+*.tsbuildinfo
+**/*.tsbuildinfo

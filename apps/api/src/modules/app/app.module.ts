@@ -45,7 +45,7 @@ import { ApiTokenGuard } from '../../guards/api-token.guard';
 					autoSchemaFile: graphqlConfig.autoSchemaFile,
 					sortSchema: graphqlConfig.sortSchema,
 					graphiql: graphqlConfig.graphiql,
-					context: ({ req, res }) => ({ req, res }),
+					context: (ctx: { req: Request; res: Response }) => ctx,
 					cors: {
 						credentials: true,
 						origin: true,

@@ -17,6 +17,7 @@ import { NewsletterSubscriptionService } from '../saved-item/entities/newsletter
 import { ExportHighlightsFormat } from '../../common/enums/export-highlights-format.enum';
 import { renderHighlightsHtml } from '../../utils/renderHighlightsHtml';
 import { AppException } from '../../utils/app-exception';
+import { SavedItemExportJson } from '../../common/types';
 
 type HighlightWithRelations = Prisma.highlightGetPayload<{
 	include: { saved_item: true; highlight_segment: true };
@@ -76,7 +77,7 @@ export class ExportService {
 				}
 			: null;
 
-		const savedItemsJson = savedItems.map((savedItem) => ({
+		const savedItemsJson: SavedItemExportJson[] = savedItems.map((savedItem) => ({
 			id: savedItem.id,
 			createdAt: savedItem.createdAt,
 			title: savedItem.title,

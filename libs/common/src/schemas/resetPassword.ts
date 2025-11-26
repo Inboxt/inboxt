@@ -1,4 +1,4 @@
-import { z } from './zod';
+import { z } from './zod.js';
 
 export const resetPasswordSchema = z.object({
 	password: z.password(),

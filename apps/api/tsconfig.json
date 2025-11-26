@@ -1,21 +1,23 @@
 {
+	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"target": "ES2023",
+		"target": "ES2022",
 		"module": "CommonJS",
-		"declaration": true,
-		"emitDecoratorMetadata": true,
-		"experimentalDecorators": true,
-		"allowSyntheticDefaultImports": true,
-		"sourceMap": true,
 		"outDir": "./dist",
-		"baseUrl": "./",
+		"sourceMap": true,
+		"declaration": true,
 		"incremental": true,
-		"skipLibCheck": true,
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true,
 		"strictNullChecks": true,
-		"forceConsistentCasingInFileNames": true,
-		"strictBindCallApply": false,
-		"noFallthroughCasesInSwitch": false,
-		"esModuleInterop": true
+		"strictPropertyInitialization": false,
+		"skipLibCheck": true,
+		"esModuleInterop": true,
+		"baseUrl": "./",
+		"paths": {
+			"@inboxt/common": ["libs/common/src/index.ts"]
+		}
 	},
-	"include": ["src"]
+	"include": ["src"],
+	"exclude": ["node_modules", "dist", "**/*.spec.ts"]
 }

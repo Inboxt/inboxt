@@ -269,7 +269,7 @@ export class ScheduleTasksProcessor extends BaseQueueProcessor {
 				const usage = u.storageUsageBytes;
 				const percent = Number((usage * 100n) / quota);
 
-				if (u.lastNotifiedStorageThreshold && percent < thresholds[0]) {
+				if (u.lastNotifiedStorageThreshold && percent < thresholds[0]!) {
 					await this.prisma.user.update({
 						where: { id: u.id },
 						data: { lastNotifiedStorageThreshold: 0 },

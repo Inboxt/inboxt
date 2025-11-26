@@ -1,8 +1,4 @@
-export function LogExecutionTime(
-	_target: any,
-	propertyKey: string,
-	descriptor: PropertyDescriptor,
-) {
+export function LogExecutionTime(_target: any, propertyKey: string, descriptor: any) {
 	const originalMethod = descriptor.value;
 
 	descriptor.value = async function (...args: any[]) {

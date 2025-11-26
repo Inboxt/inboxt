@@ -6,20 +6,7 @@ import { EntryEdge } from './entry-connection';
 import { SavedItemType } from '../../enums/saved-item-type.enum';
 import { SavedItemStatus } from '../../enums/saved-item-status.enum';
 import { AppException } from '../../utils/app-exception';
-import { GetHighlightsQuery, GetSavedItemsQuery } from '../../common/types';
-
-interface ParsedQuery {
-	in?: string;
-	type?: string;
-	labels?: {
-		and?: string[][]; // array of OR-groups that must all exist (AND of ORs)
-		not?: string[]; // labels that must NOT exist
-	};
-	hasHighlights?: boolean;
-	text?: string;
-	site?: string;
-	saved?: { from?: string; to?: string };
-}
+import { GetHighlightsQuery, GetSavedItemsQuery, ParsedQuery } from '../../common/types';
 
 @Injectable()
 export class EntryManagerService {
@@ -62,7 +49,7 @@ export class EntryManagerService {
 		}
 
 		parts.forEach((part) => {
-			const [rawKey, ...rest] = part.split(':');
+			const [rawKey = '', ...rest] = part.split(':');
 			const isNegated = rawKey.startsWith('-');
 			const key = isNegated ? rawKey.slice(1) : rawKey;
 
@@ -84,7 +71,7 @@ export class EntryManagerService {
 					const matches: string[] = [];
 					let m;
 					while ((m = regex.exec(value)) !== null) {
-						matches.push((m[1] || m[2]).trim());
+						matches.push((m[1] || m[2] || '').trim());
 					}
 
 					if (isNegated) {
@@ -210,7 +197,7 @@ export class EntryManagerService {
 			edges,
 			pageInfo: {
 				hasNextPage: allContent.length > first,
-				endCursor: edges.length ? edges[edges.length - 1].cursor : null,
+				endCursor: edges.length ? edges[edges.length - 1]?.cursor : null,
 			},
 		};
 	}

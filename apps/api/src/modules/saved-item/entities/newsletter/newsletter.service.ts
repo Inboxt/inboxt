@@ -26,9 +26,9 @@ export class NewsletterService {
 		if (header) {
 			const matches = header.match(/<([^>]+)>/g);
 			if (matches && matches.length > 0) {
-				const urls = matches.map((str) => str.replace(/[<>]/g, ''));
+				const urls = matches.map((str: string) => str.replace(/[<>]/g, ''));
 				// Prefer HTTPS link over mailto
-				const httpLink = urls.find((u) => u.startsWith('http'));
+				const httpLink = urls.find((u: string) => u.startsWith('http'));
 				return httpLink || urls[0];
 			}
 		}

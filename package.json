@@ -5,6 +5,12 @@
 		"apps/*",
 		"libs/*"
 	],
+	"scripts": {
+		"type:check-api": "tsc --noEmit -p apps/api",
+		"type:check-web": "tsc --noEmit -p apps/web/tsconfig.app.json",
+		"type:check-common": "tsc --noEmit -p libs/common",
+		"lint": "eslint --ext .ts,.tsx,.js,.jsx apps"
+	},
 	"dependencies": {
 		"dayjs": "1.11.19",
 		"graphql": "16.10.0",

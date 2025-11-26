@@ -1,1 +1,1 @@
-export { formatBytes } from './formatBytes';
+export { formatBytes } from './formatBytes.js';

@@ -1,5 +1,5 @@
-import { z } from './zod';
-import { rules as createLabelRules } from './createLabel';
+import { z } from './zod.js';
+import { rules as createLabelRules } from './createLabel.js';
 
 export const updateLabelSchema = z.object({
 	...createLabelRules,

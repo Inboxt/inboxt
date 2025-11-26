@@ -1,4 +1,4 @@
-import { Highlight, HighlightSegment } from '~lib/graphql/generated/graphql.ts';
+import { CreateHighlightSegmentInput, Highlight } from '~lib/graphql/generated/graphql.ts';
 
 export interface SafeRange {
 	node: Text;
@@ -16,7 +16,12 @@ export const getFirstTextNode = (node: Node | null): Node | null => {
 	}
 
 	for (let i = 0; i < node.childNodes.length; i++) {
-		const textNode = getFirstTextNode(node.childNodes[i]);
+		const child = node.childNodes[i];
+		if (!child) {
+			continue;
+		}
+
+		const textNode = getFirstTextNode(child);
 
 		if (textNode) {
 			return textNode;
@@ -26,7 +31,7 @@ export const getFirstTextNode = (node: Node | null): Node | null => {
 	return null;
 };
 
-export const getNextNode = (node: Node | null): ChildNode | null => {
+export const getNextNode = (node: Node | null): Node | null => {
 	if (!node) {
 		return null;
 	}
@@ -190,6 +195,10 @@ export const lookupByXPath = (xpath: string, container: HTMLElement): Text | nul
 			const parentPath = parts[0];
 			const idx = Number(parts[1]);
 
+			if (!parentPath) {
+				return null;
+			}
+
 			const parent = document.evaluate(
 				parentPath,
 				container,
@@ -284,7 +293,7 @@ export const getSafeTextRanges = (range: Range): SafeRange[] => {
 		}
 	}
 
-	let currentNode = startContainer;
+	let currentNode: Node | null = startContainer;
 	while (currentNode) {
 		if (currentNode.nodeType === Node.TEXT_NODE) {
 			safeRanges.push({
@@ -447,7 +456,7 @@ export const applyHighlightsToDOM = (
 
 	try {
 		for (const highlight of highlights) {
-			if (highlight.segments.length === 0) {
+			if (highlight.segments?.length === 0 || !highlight.segments) {
 				continue;
 			}
 
@@ -509,7 +518,7 @@ export const applyHighlightsToDOM = (
 export const createHighlightsFromSelection = (
 	range: Range,
 	tempId: string,
-): { segments: HighlightSegment[] } => {
+): { segments: CreateHighlightSegmentInput[] } => {
 	const safeRanges = getSafeTextRanges(range);
 
 	if (safeRanges.length === 0) {
@@ -520,7 +529,12 @@ export const createHighlightsFromSelection = (
 
 	// IMPORTANT: iterate from last -> first so earlier DOM edits do not invalidate later nodes
 	for (let i = safeRanges.length - 1; i >= 0; i--) {
-		const safeRangeData = wrapSafeRangeWithSpan(safeRanges[i], tempId);
+		const safeRange = safeRanges[i];
+		if (!safeRange) {
+			continue;
+		}
+
+		const safeRangeData = wrapSafeRangeWithSpan(safeRange, tempId);
 		if (safeRangeData) {
 			segmentsData.push(safeRangeData);
 		}
@@ -616,6 +630,7 @@ export const collectContiguousHighlightsToUnwrap = (
 	): HTMLElement[] => {
 		const toUnwrap: HTMLElement[] = [];
 		let currentNodeIdx = highlightItemsInner[startIndexInner]?.idx;
+
 		const range =
 			direction === 'left'
 				? { iStart: startIndexInner - 1, iEnd: -1, step: -1 }
@@ -623,12 +638,21 @@ export const collectContiguousHighlightsToUnwrap = (
 
 		for (let i = range.iStart; i !== range.iEnd; i += range.step) {
 			const candidate = highlightItemsInner[i];
+			if (!candidate) {
+				break;
+			}
+
 			let blocked = false;
 			const kStart = direction === 'left' ? candidate.idx + 1 : (currentNodeIdx ?? 0) + 1;
 			const kEnd = direction === 'left' ? (currentNodeIdx ?? 0) : candidate.idx;
 
 			for (let k = kStart; k < kEnd; k++) {
-				if (isNodeBlockingUnwrap(nodesInner[k], startIdInner)) {
+				const node = nodesInner[k];
+				if (!node) {
+					break;
+				}
+
+				if (isNodeBlockingUnwrap(node, startIdInner)) {
 					blocked = true;
 					break;
 				}
@@ -646,6 +670,7 @@ export const collectContiguousHighlightsToUnwrap = (
 
 			currentNodeIdx = candidate.idx;
 		}
+
 		return toUnwrap;
 	};
 

@@ -1,6 +1,7 @@
 {
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
+		"module": "ESNext",
 		"jsx": "react-jsx",
 		"moduleResolution": "Bundler",
 		"allowImportingTsExtensions": true,
@@ -24,5 +25,12 @@
 		},
 		"tsBuildInfoFile": "../../node_modules/.tmp/web.tsbuildinfo"
 	},
-	"include": ["src"]
+	"include": ["src"],
+	"exclude": [
+		"node_modules",
+		"dist",
+		"**/*.spec.ts",
+		"src/lib/graphql/generated",
+		"src/lib/graphql/client.ts"
+	]
 }

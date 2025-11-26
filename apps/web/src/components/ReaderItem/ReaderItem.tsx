@@ -122,13 +122,31 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 					/>
 				)}
 
-				<Stack gap={6} flex={1}>
+				<Stack gap="xs" flex={1}>
+					<Breadcrumbs
+						separator="•"
+						separatorMargin={6}
+						mb={-8}
+						style={{ flexWrap: 'nowrap' }}
+					>
+						<Text fz="sm" className={classes.text}>
+							{dayjs(item.createdAt).isSame(new Date(), 'year')
+								? dayjs(item.createdAt).format('MMM D')
+								: dayjs(item.createdAt).format('MMMM D, YYYY')}
+						</Text>
+
+						<Text
+							fz="sm"
+							className={classes.text}
+						>{`${Math.ceil(item.wordCount / 240)} min read`}</Text>
+					</Breadcrumbs>
+
 					<Group wrap="nowrap" gap="md" justify="space-between" pos="relative">
 						<Text fw="700" lineClamp={1} fz="lg" maw={hovered ? '75%' : 'unset'}>
 							{item.title}
 						</Text>
 
-						{hovered && !isBelowLgScreen ? (
+						{hovered && !isBelowLgScreen && (
 							<Group
 								gap={4}
 								style={{ position: 'absolute', right: 0 }}
@@ -136,23 +154,6 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 							>
 								<ItemsOptions size="sm" items={[item]} mode="single" />
 							</Group>
-						) : (
-							<Breadcrumbs
-								separator="•"
-								separatorMargin={6}
-								style={{ flexWrap: 'nowrap' }}
-							>
-								<Text fz="sm" className={classes.text}>
-									{dayjs(item.createdAt).isSame(new Date(), 'year')
-										? dayjs(item.createdAt).format('MMM D')
-										: dayjs(item.createdAt).format('MMMM D, YYYY')}
-								</Text>
-
-								<Text
-									fz="sm"
-									className={classes.text}
-								>{`${Math.ceil(item.wordCount / 240)} min read`}</Text>
-							</Breadcrumbs>
 						)}
 					</Group>
 
@@ -162,7 +163,7 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 
 					<Group
 						align="center"
-						mt={6}
+						mt={item.labels?.length || item.sourceDomain ? 6 : 0}
 						justify={item.labels?.length ? 'space-between' : 'flex-start'}
 						wrap="nowrap"
 					>

@@ -63,7 +63,7 @@ export class SavedItemService {
 					if (orGroup.length === 1) {
 						orClauses.push({
 							saved_item_label: {
-								some: { label: { name: { equals: orGroup[0].toLowerCase() } } },
+								some: { label: { name: { equals: orGroup[0]!.toLowerCase() } } },
 							},
 						});
 					} else if (orGroup.length > 1) {

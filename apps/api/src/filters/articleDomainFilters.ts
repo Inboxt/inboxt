@@ -82,6 +82,6 @@ const articleDomainFilters: Record<string, ArticleDomainFilter> = {
 export function applyArticleDomainFilter(host: string, doc: Document) {
 	const match = Object.keys(articleDomainFilters).find((key) => host.endsWith(key));
 	if (match) {
-		articleDomainFilters[match](doc);
+		articleDomainFilters[match]?.(doc);
 	}
 }

@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@apollo/client';
-import { Alert, Box, Button, Center, Group, Loader, Stack, Text } from '@mantine/core';
+import { Alert, Box, Button, Center, Group, Loader, Text } from '@mantine/core';
 import { useSearch } from '@tanstack/react-router';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -158,45 +158,50 @@ export const ItemsList = () => {
 
 	return (
 		<AppLayout>
-			<Stack gap={0} className={classes.items} ref={parentRef}>
-				{hasDeletedItems && (
-					<Alert
-						variant="light"
-						color="yellow"
-						fz="xxs"
-						radius={0}
-						className={classes.trashAlert}
-						p="xxs"
-					>
-						<Group gap={0} justify="center">
-							<Text ta="center">
-								Items in Trash will be automatically deleted after 30 days.
-							</Text>
-
-							<Button
-								variant="transparent"
-								size="compact-sm"
-								onClick={handlePermanentlyDeleteSavedItems}
-							>
-								Empty Trash Now
-							</Button>
-						</Group>
-					</Alert>
-				)}
-
-				{!loading && !error && items.length === 0 && (
-					<Center py="lg">
-						<Text c="dimmed" size="sm">
-							No items found.
+			{hasDeletedItems && (
+				<Alert
+					variant="light"
+					color="yellow"
+					fz="xxs"
+					radius={0}
+					className={classes.trashAlert}
+					p="xxs"
+				>
+					<Group gap={0} justify="center">
+						<Text ta="center">
+							Items in Trash will be automatically deleted after 30 days.
 						</Text>
-					</Center>
-				)}
 
-				{items.length > 0 && (
+						<Button
+							variant="transparent"
+							size="compact-sm"
+							onClick={handlePermanentlyDeleteSavedItems}
+						>
+							Empty Trash Now
+						</Button>
+					</Group>
+				</Alert>
+			)}
+
+			{!loading && !error && items.length === 0 && (
+				<Center py="lg">
+					<Text c="dimmed" size="sm">
+						No items found.
+					</Text>
+				</Center>
+			)}
+
+			{items.length > 0 && (
+				<Box
+					className={classes.items}
+					ref={parentRef}
+					style={{ height: '100%', overflowY: 'auto' }}
+				>
 					<Box pos="relative" h={virtualizer.getTotalSize()}>
 						{virtualItems.map((virtualRow) => {
 							const index = virtualRow.index;
 							const isLoaderRow = index >= items.length;
+
 							return (
 								<Box
 									key={virtualRow.key}
@@ -221,8 +226,8 @@ export const ItemsList = () => {
 							);
 						})}
 					</Box>
-				)}
-			</Stack>
+				</Box>
+			)}
 		</AppLayout>
 	);
 };

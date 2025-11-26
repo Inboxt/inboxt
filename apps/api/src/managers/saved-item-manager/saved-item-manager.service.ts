@@ -450,7 +450,7 @@ export class SavedItemManagerService {
 			? payload.recipients
 			: (payload.headers?.To ?? []);
 
-		if (!toAddresses.length) {
+		if (!toAddresses.length || !toAddresses[0]) {
 			this.logger.warn('No recipient addresses found in payload.');
 			return;
 		}
