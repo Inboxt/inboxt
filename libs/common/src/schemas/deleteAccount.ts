@@ -1,5 +1,5 @@
 import { z } from './zod.js';
 
 export const deleteAccountSchema = z.object({
-	emailAddress: z.email(),
+	emailAddress: z.email('Please enter a valid email address'),
 });
