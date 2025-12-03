@@ -1,8 +1,8 @@
 import { BoxProps, Divider, Stack } from '@mantine/core';
 
+import { AppName } from '~components/AppName';
 import { AppNotifications } from '~components/AppNotifications';
 
-import { AppName } from '../AppName';
 import { FooterLinks } from '../FooterLinks';
 
 export const Footer = (props: BoxProps) => {

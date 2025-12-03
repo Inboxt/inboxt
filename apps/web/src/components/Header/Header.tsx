@@ -17,13 +17,13 @@ import { useSearch, useRouter } from '@tanstack/react-router';
 
 import { SORT_OPTIONS } from '@inboxt/common';
 
+import { AppName } from '~components/AppName';
 import { AppSearch } from '~components/AppSearch';
 import { useContentSelection } from '~context/content-selection';
 import { useScreenQuery } from '~hooks/useScreenQuery';
 import { modals } from '~modals/modals';
 import { RouteSearchParams, Route } from '~routes/_auth.index';
 
-import { AppName } from '../AppName';
 import { ItemsOptions } from '../ItemsOptions';
 import { ReaderCheckbox } from '../ReaderCheckbox';
 import { UserMenu } from '../UserMenu';

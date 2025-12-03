@@ -1,5 +1,7 @@
-import { Group, Title, TitleOrder } from '@mantine/core';
-import { IconInbox } from '@tabler/icons-react';
+import { Group, Image, Title, TitleOrder } from '@mantine/core';
+
+import AppLogoWhite from '../../assets/logo-white.png';
+import AppLogo from '../../assets/logo.png';
 
 type AppNameProps = {
 	size?: 'sm' | 'md' | 'lg';
@@ -7,29 +9,31 @@ type AppNameProps = {
 };
 
 export const AppName = ({ size = 'sm', variant = 'full' }: AppNameProps) => {
-	let iconSize;
 	let titleSize: TitleOrder;
+	let logoSize;
 
 	switch (size) {
 		case 'sm':
-			iconSize = 24;
 			titleSize = 3;
+			logoSize = 30;
 			break;
 
 		case 'md':
-			iconSize = 30;
 			titleSize = 3;
+			logoSize = 30;
 			break;
 
 		case 'lg':
-			iconSize = 36;
 			titleSize = 1;
+			logoSize = 44;
 			break;
 	}
 
 	return (
-		<Group gap="xs">
-			<IconInbox size={iconSize} />
+		<Group gap={4}>
+			<Image src={AppLogo} h={logoSize} w="auto" fit="contain" darkHidden />
+			<Image src={AppLogoWhite} h={logoSize} w="auto" fit="contain" lightHidden />
+
 			{variant === 'full' && (
 				<Title order={titleSize} c="primary">
 					Inboxt

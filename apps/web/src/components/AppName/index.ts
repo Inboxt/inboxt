@@ -1,1 +1,1 @@
-export { AppName } from './AppName';
+export { AppName } from './AppName.tsx';
