@@ -14,6 +14,10 @@ export default defineConfig(({ mode }) => {
 		server: {
 			host: '0.0.0.0',
 			port: Number(env.WEB_PORT),
+			proxy: {
+				'/graphql': env.API_URL as string,
+				'/inbox': env.API_URL as string,
+			},
 		},
 		define: {
 			'process.env': env,
@@ -22,7 +26,7 @@ export default defineConfig(({ mode }) => {
 			tanstackRouter({
 				target: 'react',
 				autoCodeSplitting: true,
-				tmpDir: 'src/.tsr-temp', // Changed to use a local tmp directory
+				tmpDir: 'src/.tsr-temp',
 			}),
 			react(),
 			tsconfigPaths(),
@@ -32,6 +36,8 @@ export default defineConfig(({ mode }) => {
 				manifest: {
 					name: 'Inboxt',
 					short_name: 'Inboxt',
+					start_url: '/',
+					scope: '/',
 					theme_color: '#55a57e',
 					background_color: '#55a57e',
 					display: 'standalone',
@@ -49,6 +55,16 @@ export default defineConfig(({ mode }) => {
 							purpose: 'maskable',
 						},
 					],
+					share_target: {
+						action: '/share-target',
+						method: 'GET',
+						enctype: 'application/x-www-form-urlencoded',
+						params: {
+							title: 'title',
+							text: 'text',
+							url: 'url',
+						},
+					},
 				},
 			}),
 		],

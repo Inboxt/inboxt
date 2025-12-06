@@ -28,7 +28,7 @@ export const AddContentModal = ({ id, context }: ContextModalProps) => {
 	const handleAddContent = async (values: typeof form.values) => {
 		setLoading(true);
 		try {
-			const response = await fetch(`${process.env.API_URL}/inbox/items/from-url`, {
+			const response = await fetch(`/inbox/items/from-url`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -77,9 +77,9 @@ export const AddContentModal = ({ id, context }: ContextModalProps) => {
 								key={form.key('labels')}
 								{...form.getInputProps('labels')}
 							/>
-						</Stack>
 
-						{error}
+							{error}
+						</Stack>
 					</Card>
 
 					<ButtonContainer>

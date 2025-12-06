@@ -1,7 +1,7 @@
 import { Group, Image, Title, TitleOrder } from '@mantine/core';
 
-import AppLogoWhite from '../../assets/logo-white.png';
-import AppLogo from '../../assets/logo.png';
+import AppLogoWhite from '../../assets/logo-white.svg';
+import AppLogo from '../../assets/logo.svg';
 
 type AppNameProps = {
 	size?: 'sm' | 'md' | 'lg';
@@ -31,8 +31,8 @@ export const AppName = ({ size = 'sm', variant = 'full' }: AppNameProps) => {
 
 	return (
 		<Group gap={4}>
-			<Image src={AppLogo} h={logoSize} w="auto" fit="contain" darkHidden />
-			<Image src={AppLogoWhite} h={logoSize} w="auto" fit="contain" lightHidden />
+			<Image src={AppLogo} h={logoSize} w={logoSize} fit="contain" darkHidden />
+			<Image src={AppLogoWhite} h={logoSize} w={logoSize} fit="contain" lightHidden />
 
 			{variant === 'full' && (
 				<Title order={titleSize} c="primary">

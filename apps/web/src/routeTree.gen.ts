@@ -13,6 +13,7 @@ import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as AuthRouteRouteImport } from './routes/auth.route'
 import { Route as AuthIndexRouteImport } from './routes/_auth.index'
 import { Route as RIdRouteImport } from './routes/r.$id'
+import { Route as AuthShareTargetRouteImport } from './routes/_auth.share-target'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/_auth',
@@ -33,14 +34,21 @@ const RIdRoute = RIdRouteImport.update({
   path: '/r/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthShareTargetRoute = AuthShareTargetRouteImport.update({
+  id: '/share-target',
+  path: '/share-target',
+  getParentRoute: () => AuthRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/auth': typeof AuthRouteRoute
+  '/share-target': typeof AuthShareTargetRoute
   '/r/$id': typeof RIdRoute
   '/': typeof AuthIndexRoute
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRouteRoute
+  '/share-target': typeof AuthShareTargetRoute
   '/r/$id': typeof RIdRoute
   '/': typeof AuthIndexRoute
 }
@@ -48,15 +56,22 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/auth': typeof AuthRouteRoute
   '/_auth': typeof AuthRouteWithChildren
+  '/_auth/share-target': typeof AuthShareTargetRoute
   '/r/$id': typeof RIdRoute
   '/_auth/': typeof AuthIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/auth' | '/r/$id' | '/'
+  fullPaths: '/auth' | '/share-target' | '/r/$id' | '/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/auth' | '/r/$id' | '/'
-  id: '__root__' | '/auth' | '/_auth' | '/r/$id' | '/_auth/'
+  to: '/auth' | '/share-target' | '/r/$id' | '/'
+  id:
+    | '__root__'
+    | '/auth'
+    | '/_auth'
+    | '/_auth/share-target'
+    | '/r/$id'
+    | '/_auth/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -95,14 +110,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_auth/share-target': {
+      id: '/_auth/share-target'
+      path: '/share-target'
+      fullPath: '/share-target'
+      preLoaderRoute: typeof AuthShareTargetRouteImport
+      parentRoute: typeof AuthRoute
+    }
   }
 }
 
 interface AuthRouteChildren {
+  AuthShareTargetRoute: typeof AuthShareTargetRoute
   AuthIndexRoute: typeof AuthIndexRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
+  AuthShareTargetRoute: AuthShareTargetRoute,
   AuthIndexRoute: AuthIndexRoute,
 }
 
