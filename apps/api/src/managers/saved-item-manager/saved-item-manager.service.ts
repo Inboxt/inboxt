@@ -2,8 +2,11 @@ import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 
-import { addItemFromUrlSchema } from '@inboxt/common';
-import { APP_PRIMARY_COLOR } from '@inboxt/common';
+import {
+	addArticleFromHtmlSnapshotSchema,
+	addItemFromUrlSchema,
+	APP_PRIMARY_COLOR,
+} from '@inboxt/common';
 
 import { AppException } from '../../utils/app-exception';
 import { Prisma } from '../../../prisma/client';
@@ -32,6 +35,7 @@ import {
 	ArticleService,
 	ProcessArticleInput,
 } from '../../modules/saved-item/entities/article/article.service';
+import { AddArticleFromHtmlSnapshotInput } from './dto/add-article-from-html-snapshot.input';
 
 @Injectable()
 export class SavedItemManagerService {
@@ -278,6 +282,8 @@ export class SavedItemManagerService {
 				backoff: { type: 'exponential', delay: 30000 },
 			},
 		);
+
+		return created.id;
 	}
 
 	async addArticleFromUrl(
@@ -526,5 +532,20 @@ export class SavedItemManagerService {
 				// Ignore fetch errors
 			}
 		}
+	}
+
+	async addArticleFromHtmlSnapshot(userId: string, input: AddArticleFromHtmlSnapshotInput) {
+		/*----------  Validation  ----------*/
+		await addArticleFromHtmlSnapshotSchema.parseAsync(input);
+		const existingUser = await this.userService.get({ where: { id: userId } });
+		if (!existingUser) {
+			throw new AppException('User not found', HttpStatus.NOT_FOUND);
+		}
+
+		/*----------  Processing  ----------*/
+		return await this.processAndCreateArticle(userId, {
+			url: input.url,
+			html: input.html,
+		});
 	}
 }

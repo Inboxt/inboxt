@@ -63,8 +63,8 @@
 		"@types/nodemailer": "7.0.4",
 		"@types/passport-jwt": "4.0.1",
 		"@types/passport-local": "1.0.38",
-        "@types/unzipper": "0.10.11",
-        "@types/mjml": "4.7.4",
+		"@types/unzipper": "0.10.11",
+		"@types/mjml": "4.7.4",
 		"node-pg-migrate": "7.9.1",
 		"pg": "8.14.1",
 		"ts-node": "10.9.2"

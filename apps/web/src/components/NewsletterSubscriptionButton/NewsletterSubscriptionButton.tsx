@@ -1,17 +1,15 @@
 import { useMutation } from '@apollo/client';
 import { Button } from '@mantine/core';
 
-import { ConfirmWithAlert } from '~components/ConfirmWithAlert';
-import { useScreenQuery } from '~hooks/useScreenQuery';
 import {
 	INBOUND_EMAIL_ADDRESSES,
 	SAVED_ITEM,
 	UPDATE_NEWSLETTER_SUBSCRIPTION_STATUS,
-} from '~lib/graphql';
-import {
-	NewsletterSubscription,
-	NewsletterSubscriptionStatus,
-} from '~lib/graphql/generated/graphql';
+} from '@inboxt/graphql';
+import { NewsletterSubscription, NewsletterSubscriptionStatus } from '@inboxt/graphql';
+
+import { ConfirmWithAlert } from '~components/ConfirmWithAlert';
+import { useScreenQuery } from '~hooks/useScreenQuery';
 import { modals } from '~modals/modals';
 
 type NewsletterSubscriptionButton = {

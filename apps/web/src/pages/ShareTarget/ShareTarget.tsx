@@ -1,16 +1,19 @@
+import { useMutation } from '@apollo/client';
 import { Center, Loader, Stack, Text } from '@mantine/core';
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import { useEffect, useRef } from 'react';
 
+import { ADD_ARTICLE_FROM_URL, ENTRIES } from '@inboxt/graphql';
+
 import { toastError, toastInfo } from '~components/Toast';
-import { ENTRIES } from '~lib/graphql';
-import { client } from '~lib/graphql/client';
 import { Route } from '~routes/_auth.share-target.tsx';
 
 export const ShareTarget = () => {
 	const navigate = useNavigate();
 	const { url, text } = useSearch({ from: Route.id });
 	const hasProcessed = useRef(false);
+
+	const [addItemFromUrlMutation] = useMutation(ADD_ARTICLE_FROM_URL);
 
 	useEffect(() => {
 		const processShare = async () => {
@@ -31,48 +34,35 @@ export const ShareTarget = () => {
 			hasProcessed.current = true;
 
 			try {
-				const response = await fetch(`/inbox/items/from-url`, {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
+				await addItemFromUrlMutation({
+					variables: {
+						data: {
+							url: targetUrl,
+							labelIds: [],
+						},
 					},
-					body: JSON.stringify({
-						url: targetUrl,
-						labelIds: [],
-					}),
-					credentials: 'include',
+					refetchQueries: [ENTRIES],
 				});
-
-				if (!response.ok) {
-					const error = (await response.json()) as { message?: string };
-					toastError({
-						title: 'Failed to save link',
-						description: error.message || 'Internal server error',
-					});
-
-					await navigate({ to: '/' });
-					return;
-				}
 
 				toastInfo({
 					title: 'Link added for processing',
 					description: 'We’re fetching and analyzing it in the background.',
 				});
 
-				await client.refetchQueries({ include: [ENTRIES] });
 				await navigate({ to: '/', replace: true });
-			} catch (err) {
+			} catch (err: any) {
 				console.error('Network error:', err);
 				toastError({
 					title: 'Failed to save link',
-					description: 'Internal server error',
+					description:
+						err?.graphQLErrors?.[0]?.message ?? err?.message ?? 'Internal server error',
 				});
 				await navigate({ to: '/' });
 			}
 		};
 
-		processShare();
-	}, [url, text, navigate]);
+		void processShare();
+	}, [url, text, navigate, addItemFromUrlMutation]);
 
 	return (
 		<Center h="100vh">

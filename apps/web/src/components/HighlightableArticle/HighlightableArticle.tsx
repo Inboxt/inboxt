@@ -3,10 +3,11 @@ import { useLongPress } from '@mantine/hooks';
 import { IconHighlight } from '@tabler/icons-react';
 import { useMemo, useRef, useEffect, useState } from 'react';
 
+import { SavedItem } from '@inboxt/graphql';
+
 import { HighlightPopover } from '~components/HighlightPopover';
 import { useScreenQuery } from '~hooks/useScreenQuery';
 import { useTextHighlighting } from '~hooks/useTextSelection';
-import { SavedItem } from '~lib/graphql/generated/graphql.ts';
 import { applyHighlightsToDOM } from '~utils/highlightsDOM.ts';
 
 type ArticleWithHighlightsProps = {

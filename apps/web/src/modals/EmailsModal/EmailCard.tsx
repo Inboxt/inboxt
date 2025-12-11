@@ -1,7 +1,7 @@
 import { Box, Card, Group, Stack, Text, TextInput, Title } from '@mantine/core';
 import dayjs from 'dayjs';
 
-import { InboundEmailAddress, NewsletterSubscriptionStatus } from '~lib/graphql/generated/graphql';
+import { InboundEmailAddress, NewsletterSubscriptionStatus } from '@inboxt/graphql';
 
 import { EmailActions } from './EmailActions';
 import { SubscriptionList } from './SubscriptionList';

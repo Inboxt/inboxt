@@ -3,8 +3,9 @@ import { Anchor, Button, Divider, List, Stack, Switch, Text } from '@mantine/cor
 import { useForm } from '@mantine/form';
 import { useNavigate } from '@tanstack/react-router';
 
+import { CREATE_DEMO_ACCOUNT } from '@inboxt/graphql';
+
 import { ButtonContainer } from '~components/ButtonContainer';
-import { CREATE_DEMO_ACCOUNT } from '~lib/graphql';
 import { AuthViewProps } from '~pages/Auth/Auth';
 import { Route } from '~routes/auth.route';
 

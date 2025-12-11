@@ -19,11 +19,11 @@ import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useState, useMemo } from 'react';
 
 import { createApiTokenSchema } from '@inboxt/common';
+import { CREATE_API_TOKEN } from '@inboxt/graphql';
+import { ApiTokenExpiry } from '@inboxt/graphql';
 
 import { ButtonContainer } from '~components/ButtonContainer';
 import { Form } from '~components/Form';
-import { CREATE_API_TOKEN } from '~lib/graphql';
-import { ApiTokenExpiry } from '~lib/graphql/generated/graphql';
 
 type CreateApiTokenModalInnerProps = {
 	onCreated?: () => void;

@@ -1,4 +1,4 @@
-import { CreateHighlightSegmentInput, Highlight } from '~lib/graphql/generated/graphql.ts';
+import { CreateHighlightSegmentInput, Highlight } from '@inboxt/graphql';
 
 export interface SafeRange {
 	node: Text;

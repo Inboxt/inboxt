@@ -17,10 +17,9 @@ COPY libs/common ./libs/common
 COPY apps/api/prisma ./apps/api/dist/prisma
 
 # Install dependencies
-RUN npm install --workspace=apps/api --workspace=libs/common --include-workspace-root=true
-#RUN npm install
+RUN npm install --workspace=apps/api --include-workspace-root=true
 
-# Build the schemas
+# Build libs packages
 RUN npm run build --workspace=libs/common
 
 # Start the API

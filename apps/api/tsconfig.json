@@ -15,7 +15,7 @@
 		"esModuleInterop": true,
 		"baseUrl": "./",
 		"paths": {
-			"@inboxt/common": ["libs/common/src/index.ts"]
+			"@inboxt/common": ["libs/common/src/index.ts"],
 		}
 	},
 	"include": ["src"],

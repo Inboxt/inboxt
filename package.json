@@ -9,7 +9,10 @@
 		"type:check-api": "tsc --noEmit -p apps/api",
 		"type:check-web": "tsc --noEmit -p apps/web/tsconfig.app.json",
 		"type:check-common": "tsc --noEmit -p libs/common",
-		"lint": "eslint --ext .ts,.tsx,.js,.jsx apps"
+		"lint": "eslint --ext .ts,.tsx,.js,.jsx apps",
+		"dev:extension": "npm run dev --workspace=apps/web-extension",
+		"build:common": "npm run build --workspace=libs/common",
+		"codegen": "npm run codegen --workspace=libs/graphql"
 	},
 	"dependencies": {
 		"dayjs": "1.11.19",

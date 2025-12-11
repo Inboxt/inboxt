@@ -3,15 +3,16 @@ import { Button, Card, Checkbox, Stack, Text } from '@mantine/core';
 import { ContextModalProps } from '@mantine/modals';
 import { useState } from 'react';
 
-import { ButtonContainer } from '~components/ButtonContainer';
-import { SelectableLabel } from '~components/SelectableLabel';
 import {
 	ENTRIES,
 	LABELS,
 	SAVED_ITEM,
 	SAVED_ITEM_LABELS_FRAGMENT,
 	SET_SAVED_ITEM_LABELS,
-} from '~lib/graphql';
+} from '@inboxt/graphql';
+
+import { ButtonContainer } from '~components/ButtonContainer';
+import { SelectableLabel } from '~components/SelectableLabel';
 import { modals } from '~modals/modals';
 
 export const LabelsSelectionModal = ({

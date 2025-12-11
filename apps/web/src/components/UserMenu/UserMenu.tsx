@@ -11,9 +11,10 @@ import {
 } from '@tabler/icons-react';
 import { useNavigate } from '@tanstack/react-router';
 
-import { ACTIVE_USER, SIGN_OUT } from '~lib/graphql';
-import { client } from '~lib/graphql/client';
+import { ACTIVE_USER, SIGN_OUT } from '@inboxt/graphql';
+
 import { modals } from '~modals/modals';
+import { client } from '~utils/client.ts';
 
 import { MenuDrawer } from '../MenuDrawer';
 

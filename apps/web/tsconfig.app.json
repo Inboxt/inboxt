@@ -21,16 +21,12 @@
 			"~pages/*": ["./src/pages/*"],
 			"~utils/*": ["./src/utils/*"],
 			"~routes/*": ["./src/routes/*"],
-			"@inboxt/common": ["../../libs/common/src"]
+			"@inboxt/common": ["../../libs/common/src"],
+			"@inboxt/ui": ["../../libs/ui/src"],
+			"@inboxt/graphql": ["../../libs/graphql/src"]
 		},
 		"tsBuildInfoFile": "../../node_modules/.tmp/web.tsbuildinfo"
 	},
 	"include": ["src"],
-	"exclude": [
-		"node_modules",
-		"dist",
-		"**/*.spec.ts",
-		"src/lib/graphql/generated",
-		"src/lib/graphql/client.ts"
-	]
+	"exclude": ["node_modules", "dist", "**/*.spec.ts"]
 }

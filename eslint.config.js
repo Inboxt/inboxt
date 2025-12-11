@@ -31,10 +31,6 @@ export default tseslint.config(
 		},
 		rules: {
 			curly: ['error', 'all'],
-			'@typescript-eslint/no-confusing-void-expression': [
-				'error',
-				{ ignoreArrowShorthand: true },
-			],
 			'@typescript-eslint/no-unused-vars': [
 				'error',
 				{
@@ -45,14 +41,6 @@ export default tseslint.config(
 					destructuredArrayIgnorePattern: '^_',
 					varsIgnorePattern: '^_',
 					ignoreRestSiblings: true,
-				},
-			],
-			'@typescript-eslint/no-misused-promises': [
-				'error',
-				{
-					checksVoidReturn: {
-						attributes: false,
-					},
 				},
 			],
 		},

@@ -1,7 +1,7 @@
 import { useDebouncedCallback } from '@mantine/hooks';
 import { ReactNode, useState } from 'react';
 
-import { SavedItem, Highlight } from '~lib/graphql/generated/graphql.ts';
+import { SavedItem, Highlight } from '@inboxt/graphql';
 
 import { ContentSelectionContext, SelectableItem } from './ContentSelectionContext';
 

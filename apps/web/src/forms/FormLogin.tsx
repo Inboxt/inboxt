@@ -7,10 +7,10 @@ import { useLocation, useNavigate } from '@tanstack/react-router';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 
 import { signInSchema } from '@inboxt/common';
+import { SIGN_IN } from '@inboxt/graphql';
 
 import { ButtonContainer } from '~components/ButtonContainer';
 import { Form } from '~components/Form';
-import { SIGN_IN } from '~lib/graphql';
 import { AuthViewProps } from '~pages/Auth/Auth';
 import { Route } from '~routes/auth.route';
 

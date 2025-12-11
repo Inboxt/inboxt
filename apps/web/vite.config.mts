@@ -74,7 +74,7 @@ export default defineConfig(({ mode }) => {
 			},
 		},
 		optimizeDeps: {
-			include: ['@inboxt/common'],
+			include: ['@inboxt/common', '@inboxt/ui', '@inboxt/graphql'],
 		},
 	};
 });

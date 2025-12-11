@@ -52,6 +52,8 @@ type Documents = {
     "\n\tmutation requestExport($data: RequestExportInput!) {\n\t\trequestExport(data: $data)\n\t}\n": typeof types.RequestExportDocument,
     "\n    mutation createApiToken($data: CreateApiTokenInput!) {\n    \tcreateApiToken(data: $data) {\n    \t\ttoken {\n    \t\t\t...ApiTokenFragment\n    \t\t}\n    \t\tsecret\n    \t}\n    }\n": typeof types.CreateApiTokenDocument,
     "\n\tmutation deleteApiToken($data: DeleteApiTokenInput!) {\n\t\tdeleteApiToken(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": typeof types.DeleteApiTokenDocument,
+    "\n\tmutation addArticleFromUrl($data: AddArticleFromUrlInput!) {\n\t\taddArticleFromUrl(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": typeof types.AddArticleFromUrlDocument,
+    "\n\tmutation addArticleFromHtmlSnapshot($data: AddArticleFromHtmlSnapshotInput!) {\n\t\taddArticleFromHtmlSnapshot(data: $data)\n\t}\n": typeof types.AddArticleFromHtmlSnapshotDocument,
 };
 const documents: Documents = {
     "\n\tfragment UserFragment on User {\n\t\tid\n\t\tcreatedAt\n\t\temailAddress\n\t\tisEmailVerified\n\t\tusername\n\t\tpendingEmailAddress\n\t\tplan\n\t\tlabelsCount\n\t\tinboundEmailAddressesCount\n\t\tlastExportAt\n\t\tstorageUsageBytes\n\t\tstorageQuotaBytes\n\t}\n": types.UserFragmentFragmentDoc,
@@ -92,6 +94,8 @@ const documents: Documents = {
     "\n\tmutation requestExport($data: RequestExportInput!) {\n\t\trequestExport(data: $data)\n\t}\n": types.RequestExportDocument,
     "\n    mutation createApiToken($data: CreateApiTokenInput!) {\n    \tcreateApiToken(data: $data) {\n    \t\ttoken {\n    \t\t\t...ApiTokenFragment\n    \t\t}\n    \t\tsecret\n    \t}\n    }\n": types.CreateApiTokenDocument,
     "\n\tmutation deleteApiToken($data: DeleteApiTokenInput!) {\n\t\tdeleteApiToken(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": types.DeleteApiTokenDocument,
+    "\n\tmutation addArticleFromUrl($data: AddArticleFromUrlInput!) {\n\t\taddArticleFromUrl(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": types.AddArticleFromUrlDocument,
+    "\n\tmutation addArticleFromHtmlSnapshot($data: AddArticleFromHtmlSnapshotInput!) {\n\t\taddArticleFromHtmlSnapshot(data: $data)\n\t}\n": types.AddArticleFromHtmlSnapshotDocument,
 };
 
 /**
@@ -260,6 +264,14 @@ export function gql(source: "\n    mutation createApiToken($data: CreateApiToken
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n\tmutation deleteApiToken($data: DeleteApiTokenInput!) {\n\t\tdeleteApiToken(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n"): (typeof documents)["\n\tmutation deleteApiToken($data: DeleteApiTokenInput!) {\n\t\tdeleteApiToken(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n\tmutation addArticleFromUrl($data: AddArticleFromUrlInput!) {\n\t\taddArticleFromUrl(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n"): (typeof documents)["\n\tmutation addArticleFromUrl($data: AddArticleFromUrlInput!) {\n\t\taddArticleFromUrl(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n\tmutation addArticleFromHtmlSnapshot($data: AddArticleFromHtmlSnapshotInput!) {\n\t\taddArticleFromHtmlSnapshot(data: $data)\n\t}\n"): (typeof documents)["\n\tmutation addArticleFromHtmlSnapshot($data: AddArticleFromHtmlSnapshotInput!) {\n\t\taddArticleFromHtmlSnapshot(data: $data)\n\t}\n"];
 
 export function gql(source: string) {
   return (documents as any)[source] ?? {};

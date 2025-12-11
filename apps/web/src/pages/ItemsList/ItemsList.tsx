@@ -4,12 +4,17 @@ import { useSearch } from '@tanstack/react-router';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import {
+	PERMANENTLY_DELETE_SAVED_ITEMS,
+	ENTRIES,
+	EntrySortField,
+	SortDirection,
+} from '@inboxt/graphql';
+
 import { ConfirmWithAlert } from '~components/ConfirmWithAlert';
 import { toastSuccess } from '~components/Toast';
 import { useContentSelection } from '~context/content-selection';
 import { AppLayout } from '~layouts/AppLayout';
-import { PERMANENTLY_DELETE_SAVED_ITEMS, ENTRIES } from '~lib/graphql';
-import { EntrySortField, SortDirection } from '~lib/graphql/generated/graphql.ts';
 import { modals } from '~modals/modals';
 import { Route } from '~routes/_auth.index';
 

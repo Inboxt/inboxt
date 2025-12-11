@@ -11,9 +11,10 @@ import {
 } from '@tabler/icons-react';
 import { clsx } from 'clsx';
 
+import { LABELS } from '@inboxt/graphql';
+
 import { AppNotifications } from '~components/AppNotifications';
 import { useScreenQuery } from '~hooks/useScreenQuery';
-import { LABELS } from '~lib/graphql';
 import { formatLabelForQuery } from '~utils/formatLabelForQuery.ts';
 
 import { FooterLinks } from '../FooterLinks';

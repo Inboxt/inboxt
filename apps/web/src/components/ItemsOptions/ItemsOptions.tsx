@@ -16,17 +16,18 @@ import {
 import { useNavigate } from '@tanstack/react-router';
 import React, { useMemo } from 'react';
 
-import { ConfirmWithAlert } from '~components/ConfirmWithAlert';
-import { toastSuccess } from '~components/Toast';
-import { SelectableItem, useContentSelection } from '~context/content-selection';
 import {
 	PERMANENTLY_DELETE_SAVED_ITEMS,
 	UPDATE_SAVED_ITEM_STATUS,
 	DELETE_HIGHLIGHTS,
 	ENTRIES,
 	ACTIVE_USER,
-} from '~lib/graphql';
-import { SavedItem, SavedItemStatus, Highlight } from '~lib/graphql/generated/graphql';
+} from '@inboxt/graphql';
+import { SavedItem, SavedItemStatus, Highlight } from '@inboxt/graphql';
+
+import { ConfirmWithAlert } from '~components/ConfirmWithAlert';
+import { toastSuccess } from '~components/Toast';
+import { SelectableItem, useContentSelection } from '~context/content-selection';
 import { modals } from '~modals/modals';
 
 import { MenuDrawer } from '../MenuDrawer';

@@ -4,9 +4,10 @@ import { IconPhotoOff } from '@tabler/icons-react';
 import { useNavigate } from '@tanstack/react-router';
 import dayjs from 'dayjs';
 
+import { SavedItem } from '@inboxt/graphql';
+
 import { useContentSelection } from '~context/content-selection';
 import { useScreenQuery } from '~hooks/useScreenQuery';
-import { SavedItem } from '~lib/graphql/generated/graphql';
 import { Route } from '~routes/_auth.index';
 
 import { ItemsOptions } from '../ItemsOptions';

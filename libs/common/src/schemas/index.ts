@@ -9,3 +9,4 @@ export { addItemFromUrlSchema } from './addItemFromUrl.js';
 export { createLabelSchema } from './createLabel.js';
 export { updateLabelSchema } from './updateLabel.js';
 export { createApiTokenSchema } from './createApiToken.js';
+export { addArticleFromHtmlSnapshotSchema } from './addArticleFromHtmlSnapshot.js';

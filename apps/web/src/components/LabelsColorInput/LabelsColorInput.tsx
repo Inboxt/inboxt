@@ -1,9 +1,9 @@
 import { ColorInput } from '@mantine/core';
 import { useUncontrolled } from '@mantine/hooks';
 
-import { useScreenQuery } from '~hooks/useScreenQuery.tsx';
+import { labelColors } from '@inboxt/ui';
 
-import { labelColors } from '../../theme/labelColors.ts';
+import { useScreenQuery } from '~hooks/useScreenQuery.tsx';
 
 type LabelsColorInputProps = {
 	value?: string;

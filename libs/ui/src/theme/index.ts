@@ -2,6 +2,7 @@ import { Card, Checkbox, createTheme, Modal, SegmentedControl } from '@mantine/c
 
 import { fontSizes } from './fontSizes';
 import { spacing } from './spacing';
+
 import classes from './theme.module.css';
 
 export const theme = createTheme({

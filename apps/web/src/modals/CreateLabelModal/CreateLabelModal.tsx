@@ -5,14 +5,13 @@ import { ContextModalProps } from '@mantine/modals';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 
 import { createLabelSchema } from '@inboxt/common';
+import { CREATE_LABEL, LABELS } from '@inboxt/graphql';
+import { labelColors } from '@inboxt/ui';
 
 import { ButtonContainer } from '~components/ButtonContainer';
 import { Form } from '~components/Form';
 import { LabelsColorInput } from '~components/LabelsColorInput';
-import { CREATE_LABEL, LABELS } from '~lib/graphql';
 import { getRandomArrayItem } from '~utils/getRandomArrayItem';
-
-import { labelColors } from '../../theme/labelColors.ts';
 
 export const CreateLabelModal = ({ id, context }: ContextModalProps) => {
 	const [createLabel, { loading, error }] = useMutation(CREATE_LABEL);

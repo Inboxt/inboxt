@@ -23,6 +23,8 @@ import dayjs from 'dayjs';
 import { useEffect } from 'react';
 
 import { READER_THEMES } from '@inboxt/common';
+import { SAVED_ITEM, SavedItemType } from '@inboxt/graphql';
+import { theme } from '@inboxt/ui';
 
 import { AppName } from '~components/AppName';
 import { HighlightableArticle } from '~components/HighlightableArticle';
@@ -31,11 +33,7 @@ import { ReaderSettingsOptions } from '~components/ReaderSettingsOptions';
 import { useReaderSettings, makeReaderResolver } from '~hooks/useReaderSettings.tsx';
 import { useScreenQuery } from '~hooks/useScreenQuery';
 import { useTextHighlighting } from '~hooks/useTextSelection';
-import { SAVED_ITEM } from '~lib/graphql';
-import { SavedItemType } from '~lib/graphql/generated/graphql.ts';
 import { Route } from '~routes/r.$id';
-
-import { theme } from '../../theme';
 
 import classes from './ReaderView.module.css';
 

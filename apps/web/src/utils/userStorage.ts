@@ -1,4 +1,4 @@
-import { User } from '~lib/graphql/generated/graphql';
+import { User } from '@inboxt/graphql';
 
 export const getUserStorage = (data: User | null | undefined) => {
 	const usedStorageRaw = data?.storageUsageBytes ?? '0';

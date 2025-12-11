@@ -18,6 +18,16 @@ export type Scalars = {
   DateTime: { input: string; output: string; }
 };
 
+export type AddArticleFromHtmlSnapshotInput = {
+  html: Scalars['String']['input'];
+  url: Scalars['String']['input'];
+};
+
+export type AddArticleFromUrlInput = {
+  labelIds?: InputMaybe<Array<Scalars['String']['input']>>;
+  url: Scalars['String']['input'];
+};
+
 export type ApiToken = {
   __typename?: 'ApiToken';
   createdAt: Scalars['DateTime']['output'];
@@ -192,6 +202,8 @@ export type Label = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  addArticleFromHtmlSnapshot: Scalars['String']['output'];
+  addArticleFromUrl: Void;
   createAccount: Void;
   createApiToken: CreatedApiToken;
   createDemoAccount: Void;
@@ -216,6 +228,16 @@ export type Mutation = {
   updateNewsletterSubscriptionStatus: Void;
   updateSavedItemStatus: Void;
   verifyEmail: Void;
+};
+
+
+export type MutationAddArticleFromHtmlSnapshotArgs = {
+  data: AddArticleFromHtmlSnapshotInput;
+};
+
+
+export type MutationAddArticleFromUrlArgs = {
+  data: AddArticleFromUrlInput;
 };
 
 
@@ -709,6 +731,20 @@ export type DeleteApiTokenMutationVariables = Exact<{
 
 export type DeleteApiTokenMutation = { __typename?: 'Mutation', deleteApiToken: { __typename?: 'Void', success: boolean } };
 
+export type AddArticleFromUrlMutationVariables = Exact<{
+  data: AddArticleFromUrlInput;
+}>;
+
+
+export type AddArticleFromUrlMutation = { __typename?: 'Mutation', addArticleFromUrl: { __typename?: 'Void', success: boolean } };
+
+export type AddArticleFromHtmlSnapshotMutationVariables = Exact<{
+  data: AddArticleFromHtmlSnapshotInput;
+}>;
+
+
+export type AddArticleFromHtmlSnapshotMutation = { __typename?: 'Mutation', addArticleFromHtmlSnapshot: string };
+
 export const UserFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"UserFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"emailAddress"}},{"kind":"Field","name":{"kind":"Name","value":"isEmailVerified"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"pendingEmailAddress"}},{"kind":"Field","name":{"kind":"Name","value":"plan"}},{"kind":"Field","name":{"kind":"Name","value":"labelsCount"}},{"kind":"Field","name":{"kind":"Name","value":"inboundEmailAddressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"lastExportAt"}},{"kind":"Field","name":{"kind":"Name","value":"storageUsageBytes"}},{"kind":"Field","name":{"kind":"Name","value":"storageQuotaBytes"}}]}}]} as unknown as DocumentNode<UserFragmentFragment, unknown>;
 export const SavedItemLabelFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"SavedItemLabelFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Label"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"color"}}]}}]} as unknown as DocumentNode<SavedItemLabelFragmentFragment, unknown>;
 export const SavedItemLabelsFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"SavedItemLabelsFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"SavedItem"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"labels"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"SavedItemLabelFragment"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"SavedItemLabelFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Label"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"color"}}]}}]} as unknown as DocumentNode<SavedItemLabelsFragmentFragment, unknown>;
@@ -747,3 +783,5 @@ export const CreateDemoAccountDocument = {"kind":"Document","definitions":[{"kin
 export const RequestExportDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"requestExport"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"RequestExportInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"requestExport"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}]}]}}]} as unknown as DocumentNode<RequestExportMutation, RequestExportMutationVariables>;
 export const CreateApiTokenDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"createApiToken"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateApiTokenInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createApiToken"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"token"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"ApiTokenFragment"}}]}},{"kind":"Field","name":{"kind":"Name","value":"secret"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ApiTokenFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"ApiToken"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastUsedAt"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"expiresAt"}}]}}]} as unknown as DocumentNode<CreateApiTokenMutation, CreateApiTokenMutationVariables>;
 export const DeleteApiTokenDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"deleteApiToken"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DeleteApiTokenInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteApiToken"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}}]}}]}}]} as unknown as DocumentNode<DeleteApiTokenMutation, DeleteApiTokenMutationVariables>;
+export const AddArticleFromUrlDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"addArticleFromUrl"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"AddArticleFromUrlInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"addArticleFromUrl"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}}]}}]}}]} as unknown as DocumentNode<AddArticleFromUrlMutation, AddArticleFromUrlMutationVariables>;
+export const AddArticleFromHtmlSnapshotDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"addArticleFromHtmlSnapshot"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"AddArticleFromHtmlSnapshotInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"addArticleFromHtmlSnapshot"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}]}]}}]} as unknown as DocumentNode<AddArticleFromHtmlSnapshotMutation, AddArticleFromHtmlSnapshotMutationVariables>;

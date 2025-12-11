@@ -1,5 +1,9 @@
 import { gql } from './generated';
 
+export * from './client';
+export * from './generated';
+export * from './generated/graphql';
+
 /*----------  Fragments  ----------*/
 export const USER_FRAGMENT = gql(`
 	fragment UserFragment on User {
@@ -392,5 +396,19 @@ export const DELETE_API_TOKEN = gql(`
 		deleteApiToken(data: $data) {
 			success
 		}
+	}
+`);
+
+export const ADD_ARTICLE_FROM_URL = gql(`
+	mutation addArticleFromUrl($data: AddArticleFromUrlInput!) {
+		addArticleFromUrl(data: $data) {
+			success
+		}
+	}
+`);
+
+export const ADD_ARTICLE_FROM_HTML_SNAPSHOT = gql(`
+	mutation addArticleFromHtmlSnapshot($data: AddArticleFromHtmlSnapshotInput!) {
+		addArticleFromHtmlSnapshot(data: $data)
 	}
 `);

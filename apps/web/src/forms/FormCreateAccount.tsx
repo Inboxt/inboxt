@@ -6,10 +6,10 @@ import { useLocation, useNavigate } from '@tanstack/react-router';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 
 import { createAccountSchema } from '@inboxt/common';
+import { CREATE_ACCOUNT } from '@inboxt/graphql';
 
 import { ButtonContainer } from '~components/ButtonContainer';
 import { Form } from '~components/Form';
-import { CREATE_ACCOUNT } from '~lib/graphql';
 import { AuthViewProps } from '~pages/Auth/Auth';
 
 export const FormCreateAccount = ({ handleChangeAuthMode }: AuthViewProps) => {

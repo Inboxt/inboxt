@@ -34,13 +34,12 @@ import {
 	USER_INBOUND_EMAIL_ADDRESS_LIMIT,
 	USER_LABELS_LIMIT,
 } from '@inboxt/common';
+import { ACTIVE_USER, ExportType, UPDATE_ACCOUNT } from '@inboxt/graphql';
 
 import { ButtonContainer } from '~components/ButtonContainer';
 import { Form } from '~components/Form';
 import { toastSuccess } from '~components/Toast';
 import { useScreenQuery } from '~hooks/useScreenQuery.tsx';
-import { ACTIVE_USER, UPDATE_ACCOUNT } from '~lib/graphql';
-import { ExportType } from '~lib/graphql/generated/graphql.ts';
 import { modals } from '~modals/modals';
 import { getUserStorage } from '~utils/userStorage.ts';
 

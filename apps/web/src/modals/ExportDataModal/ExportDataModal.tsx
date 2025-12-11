@@ -3,10 +3,11 @@ import { Button, Card, SegmentedControl, Skeleton, Stack, Text, TextInput } from
 import { ContextModalProps } from '@mantine/modals';
 import { useState } from 'react';
 
+import { ACTIVE_USER, REQUEST_EXPORT } from '@inboxt/graphql';
+import { ExportHighlightsFormat, ExportType } from '@inboxt/graphql';
+
 import { ButtonContainer } from '~components/ButtonContainer';
 import { toastInfo } from '~components/Toast';
-import { ACTIVE_USER, REQUEST_EXPORT } from '~lib/graphql';
-import { ExportHighlightsFormat, ExportType } from '~lib/graphql/generated/graphql';
 
 export type ExportDataModalProps = {
 	type: ExportType;

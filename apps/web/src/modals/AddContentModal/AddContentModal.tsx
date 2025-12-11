@@ -1,21 +1,19 @@
-import { Button, Card, Stack, TextInput } from '@mantine/core';
+import { useMutation } from '@apollo/client';
+import { Button, Card, Stack, TextInput, Text } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { ContextModalProps } from '@mantine/modals';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
-import { useState } from 'react';
 
 import { addItemFromUrlSchema } from '@inboxt/common';
+import { ADD_ARTICLE_FROM_URL, ENTRIES } from '@inboxt/graphql';
+import { LabelsMultiSelect } from '@inboxt/ui';
 
 import { ButtonContainer } from '~components/ButtonContainer';
 import { Form } from '~components/Form';
-import { LabelsMultiSelect } from '~components/LabelsMultiSelect';
 import { toastInfo } from '~components/Toast';
-import { ENTRIES } from '~lib/graphql';
-import { client } from '~lib/graphql/client';
 
 export const AddContentModal = ({ id, context }: ContextModalProps) => {
-	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState<string | undefined>();
+	const [addItemFromUrlMutation, { loading, error }] = useMutation(ADD_ARTICLE_FROM_URL);
 
 	const form = useForm({
 		initialValues: {
@@ -26,39 +24,22 @@ export const AddContentModal = ({ id, context }: ContextModalProps) => {
 	});
 
 	const handleAddContent = async (values: typeof form.values) => {
-		setLoading(true);
-		try {
-			const response = await fetch(`/inbox/items/from-url`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({
+		await addItemFromUrlMutation({
+			variables: {
+				data: {
 					url: values.url,
 					labelIds: values.labels,
-				}),
-				credentials: 'include',
-			});
+				},
+			},
+			refetchQueries: [ENTRIES],
+		});
 
-			if (!response.ok) {
-				const error = (await response.json()) as { message?: string };
-				setError(error.message || 'Internal server error');
-				return;
-			}
+		toastInfo({
+			title: 'Link added for processing',
+			description: 'We’re fetching and analyzing it in the background.',
+		});
 
-			toastInfo({
-				title: 'Link added for processing',
-				description: 'We’re fetching and analyzing it in the background.',
-			});
-
-			await client.refetchQueries({ include: [ENTRIES] });
-			context.closeModal(id);
-		} catch (err) {
-			console.error('Network error:', err);
-			setError('Internal server error');
-		} finally {
-			setLoading(false);
-		}
+		context.closeModal(id);
 	};
 
 	return (
@@ -73,10 +54,16 @@ export const AddContentModal = ({ id, context }: ContextModalProps) => {
 								label="Page URL"
 							/>
 
-							<LabelsMultiSelect
-								key={form.key('labels')}
-								{...form.getInputProps('labels')}
-							/>
+							<Stack gap={2}>
+								<Text fz="sm" fw={500}>
+									Labels:
+								</Text>
+
+								<LabelsMultiSelect
+									key={form.key('labels')}
+									{...form.getInputProps('labels')}
+								/>
+							</Stack>
 
 							{error}
 						</Stack>

@@ -6,11 +6,11 @@ import { IconAlertTriangleFilled } from '@tabler/icons-react';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 
 import { deleteAccountSchema } from '@inboxt/common';
+import { DELETE_ACCOUNT } from '@inboxt/graphql';
 
 import { ButtonContainer } from '~components/ButtonContainer';
 import { Form } from '~components/Form';
-import { DELETE_ACCOUNT } from '~lib/graphql';
-import { client } from '~lib/graphql/client';
+import { client } from '~utils/client.ts';
 
 import { router } from '../../main';
 

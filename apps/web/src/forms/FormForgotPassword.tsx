@@ -16,9 +16,9 @@ import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect, useState } from 'react';
 
 import { resetPasswordSchema, requestPasswordRecoverySchema } from '@inboxt/common';
+import { REQUEST_PASSWORD_RECOVERY, RESET_PASSWORD } from '@inboxt/graphql';
 
 import { Form } from '~components/Form';
-import { REQUEST_PASSWORD_RECOVERY, RESET_PASSWORD } from '~lib/graphql';
 import { AuthViewProps } from '~pages/Auth/Auth';
 
 export const FormForgotPassword = ({ handleChangeAuthMode }: AuthViewProps) => {

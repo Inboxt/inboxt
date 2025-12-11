@@ -16,10 +16,11 @@ import { IconTrash } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import { useEffect } from 'react';
 
+import { API_TOKENS, DELETE_API_TOKEN } from '@inboxt/graphql';
+
 import { ButtonContainer } from '~components/ButtonContainer';
 import { ConfirmWithAlert } from '~components/ConfirmWithAlert';
 import { toastSuccess } from '~components/Toast';
-import { API_TOKENS, DELETE_API_TOKEN } from '~lib/graphql';
 import { modals } from '~modals/modals';
 
 export const ApiTokensModal = ({ id, context }: ContextModalProps) => {

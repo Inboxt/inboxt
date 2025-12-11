@@ -12,6 +12,7 @@ import { MailModule } from '../../modules/mail/mail.module';
 import { InboundEmailAddressModule } from '../../modules/inbound-email-address/inbound-email-address.module';
 import { PrismaService } from '../../services/prisma.service';
 import { SavedItemManagerProcessor } from './saved-item-manager.processor';
+import { SavedItemManagerResolver } from './saved-item-manager.resolver';
 
 @Module({
 	imports: [
@@ -27,7 +28,12 @@ import { SavedItemManagerProcessor } from './saved-item-manager.processor';
 			name: 'saved-item-processing',
 		}),
 	],
-	providers: [SavedItemManagerService, PrismaService, SavedItemManagerProcessor],
+	providers: [
+		SavedItemManagerService,
+		PrismaService,
+		SavedItemManagerProcessor,
+		SavedItemManagerResolver,
+	],
 	controllers: [SavedItemManagerController],
 	exports: [SavedItemManagerService],
 })

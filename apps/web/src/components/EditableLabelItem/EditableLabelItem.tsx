@@ -12,10 +12,10 @@ import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect } from 'react';
 
 import { updateLabelSchema } from '@inboxt/common';
+import { DELETE_LABEL, ENTRIES, LABELS, UPDATE_LABEL } from '@inboxt/graphql';
+import { Label } from '@inboxt/graphql';
 
 import { useScreenQuery } from '~hooks/useScreenQuery';
-import { DELETE_LABEL, ENTRIES, LABELS, UPDATE_LABEL } from '~lib/graphql';
-import { Label } from '~lib/graphql/generated/graphql';
 
 import { Form } from '../Form';
 import { LabelsColorInput } from '../LabelsColorInput';

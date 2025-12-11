@@ -2,9 +2,10 @@ import { Button, Group, Stack, Text, Title, Flex } from '@mantine/core';
 import dayjs from 'dayjs';
 import { useState } from 'react';
 
+import { NewsletterSubscription } from '@inboxt/graphql';
+
 import { NewsletterSubscriptionButton } from '~components/NewsletterSubscriptionButton';
 import { useScreenQuery } from '~hooks/useScreenQuery';
-import { NewsletterSubscription } from '~lib/graphql/generated/graphql';
 
 type SubscriptionsListProps = {
 	emailId: string;

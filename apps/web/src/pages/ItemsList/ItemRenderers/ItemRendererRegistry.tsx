@@ -1,4 +1,4 @@
-import { SavedItem, Highlight, SavedItemType } from '~lib/graphql/generated/graphql';
+import { SavedItem, Highlight, SavedItemType } from '@inboxt/graphql';
 
 import { ArticleRenderer } from './ArticleRenderer';
 import { HighlightRenderer } from './HighlightRenderer';

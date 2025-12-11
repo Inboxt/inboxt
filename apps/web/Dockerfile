@@ -10,11 +10,13 @@ COPY .env .
 # Copy the apps and libs folders
 COPY apps/web ./apps/web
 COPY libs/common ./libs/common
+COPY libs/ui ./libs/ui
+COPY libs/graphql ./libs/graphql
 
-# Install deps (this installs both root and web deps)
-RUN npm install --workspace=apps/web --workspace=libs/common --include-workspace-root=true
+# Install dependencies
+RUN npm install --workspace=apps/web --workspace=libs/ui --workspace=libs/graphql --include-workspace-root=true
 
-# Build the schemas
+# Build libs packages
 RUN npm run build --workspace=libs/common
 
 # Start the dev server

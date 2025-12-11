@@ -7,10 +7,10 @@ import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useState } from 'react';
 
 import { verifyEmailSchema } from '@inboxt/common';
+import { ACTIVE_USER, RESEND_VERIFICATION_EMAIL, VERIFY_EMAIL } from '@inboxt/graphql';
 
 import { ButtonContainer } from '~components/ButtonContainer';
 import { Form } from '~components/Form';
-import { ACTIVE_USER, RESEND_VERIFICATION_EMAIL, VERIFY_EMAIL } from '~lib/graphql';
 
 import { router } from '../../main';
 

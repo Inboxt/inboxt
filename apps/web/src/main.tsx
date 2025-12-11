@@ -2,15 +2,15 @@ import '@mantine/core/styles.css';
 import './main.css';
 
 import { ApolloProvider } from '@apollo/client';
-import { MantineProvider } from '@mantine/core';
 import { ModalsProvider } from '@mantine/modals';
 import { RouterProvider, createRouter } from '@tanstack/react-router';
 import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
 import { Toaster } from 'sonner';
 
+import { AppThemeProvider } from '@inboxt/ui';
+
 import { ContentSelectionProvider } from '~context/content-selection';
-import { client } from '~lib/graphql/client';
 import { AddContentModal } from '~modals/AddContentModal';
 import { ApiTokensModal } from '~modals/ApiTokensModal';
 import { CreateApiTokenModal } from '~modals/CreateApiTokenModal';
@@ -25,9 +25,9 @@ import { LabelsSelectionModal } from '~modals/LabelsSelectionModal';
 import { ProfileModal } from '~modals/ProfileModal';
 import { StorageHelpModal } from '~modals/StorageHelpModal';
 import { VerifyEmailModal } from '~modals/VerifyEmailModal';
+import { client } from '~utils/client.ts';
 
 import { routeTree } from './routeTree.gen';
-import { theme } from './theme';
 
 export const router = createRouter({
 	routeTree,
@@ -48,38 +48,34 @@ declare module '@tanstack/history' {
 	}
 }
 
-const rootElement = document.getElementById('root');
-if (!rootElement.innerHTML) {
-	const root = ReactDOM.createRoot(rootElement);
-	root.render(
-		<StrictMode>
-			<ApolloProvider client={client}>
-				<MantineProvider theme={theme} defaultColorScheme="light">
-					<ContentSelectionProvider>
-						<ModalsProvider
-							modals={{
-								install: InstallModal,
-								labels: LabelsModal,
-								labelsSelection: LabelsSelectionModal,
-								profile: ProfileModal,
-								createLabel: CreateLabelModal,
-								verifyEmail: VerifyEmailModal,
-								emails: EmailsModal,
-								deleteAccount: DeleteAccountModal,
-								addContent: AddContentModal,
-								exportData: ExportDataModal,
-								import: ImportModal,
-								storageHelp: StorageHelpModal,
-								apiTokens: ApiTokensModal,
-								createApiToken: CreateApiTokenModal,
-							}}
-						>
-							<RouterProvider router={router} />
-							<Toaster position="bottom-left" />
-						</ModalsProvider>
-					</ContentSelectionProvider>
-				</MantineProvider>
-			</ApolloProvider>
-		</StrictMode>,
-	);
-}
+ReactDOM.createRoot(document.getElementById('root')!).render(
+	<StrictMode>
+		<ApolloProvider client={client}>
+			<AppThemeProvider>
+				<ContentSelectionProvider>
+					<ModalsProvider
+						modals={{
+							install: InstallModal,
+							labels: LabelsModal,
+							labelsSelection: LabelsSelectionModal,
+							profile: ProfileModal,
+							createLabel: CreateLabelModal,
+							verifyEmail: VerifyEmailModal,
+							emails: EmailsModal,
+							deleteAccount: DeleteAccountModal,
+							addContent: AddContentModal,
+							exportData: ExportDataModal,
+							import: ImportModal,
+							storageHelp: StorageHelpModal,
+							apiTokens: ApiTokensModal,
+							createApiToken: CreateApiTokenModal,
+						}}
+					>
+						<RouterProvider router={router} />
+						<Toaster position="bottom-left" />
+					</ModalsProvider>
+				</ContentSelectionProvider>
+			</AppThemeProvider>
+		</ApolloProvider>
+	</StrictMode>,
+);

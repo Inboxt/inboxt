@@ -1,20 +1,10 @@
 import { useQuery } from '@apollo/client';
-import {
-	Combobox,
-	useCombobox,
-	Pill,
-	PillsInput,
-	Group,
-	Stack,
-	Text,
-	Checkbox,
-} from '@mantine/core';
+import { Combobox, useCombobox, Pill, PillsInput, Group, Stack, Checkbox } from '@mantine/core';
 import { IconLabelImportantFilled } from '@tabler/icons-react';
 import { useState } from 'react';
 
 import { MAX_VISIBLE_SELECTED_LABELS } from '@inboxt/common';
-
-import { LABELS } from '~lib/graphql';
+import { LABELS } from '@inboxt/graphql';
 
 type LabelValue = {
 	value: string;
@@ -106,8 +96,6 @@ export const LabelsMultiSelect = ({ value = [], onChange = () => {} }: LabelsMul
 
 	return (
 		<Stack gap={2}>
-			<Text>Labels:</Text>
-
 			<Combobox store={combobox} onOptionSubmit={handleValueSelect}>
 				<Combobox.DropdownTarget>
 					<PillsInput onClick={() => combobox.openDropdown()}>
@@ -145,6 +133,7 @@ export const LabelsMultiSelect = ({ value = [], onChange = () => {} }: LabelsMul
 											}
 										}
 									}}
+									placeholder={value.length === 0 ? 'Search labels...' : ''}
 								/>
 							</Combobox.EventsTarget>
 						</Pill.Group>

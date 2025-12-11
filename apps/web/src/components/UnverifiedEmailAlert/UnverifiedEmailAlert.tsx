@@ -1,8 +1,9 @@
 import { Alert, Button, Flex, Text } from '@mantine/core';
 import dayjs from 'dayjs';
 
+import { User } from '@inboxt/graphql';
+
 import { useScreenQuery } from '~hooks/useScreenQuery';
-import { User } from '~lib/graphql/generated/graphql';
 import { modals } from '~modals/modals';
 
 type UnverifiedEmailAlertProps = {

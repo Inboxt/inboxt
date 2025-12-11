@@ -4,11 +4,12 @@ import { IconQuoteFilled } from '@tabler/icons-react';
 import { useNavigate } from '@tanstack/react-router';
 import dayjs from 'dayjs';
 
+import { Highlight } from '@inboxt/graphql';
+
 import { ItemsOptions } from '~components/ItemsOptions';
 import { ReaderCheckbox } from '~components/ReaderCheckbox';
 import { useContentSelection } from '~context/content-selection';
 import { useScreenQuery } from '~hooks/useScreenQuery.tsx';
-import { Highlight } from '~lib/graphql/generated/graphql';
 
 import classes from './HighlightItem.module.css';
 
