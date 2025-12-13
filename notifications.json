@@ -1,15 +1,9 @@
 [
-    {
-        "type": "UPDATE",
-        "badge": "v1.2.0",
-        "date": "2025-08-20",
-        "text": "Dark mode available",
-        "link": "/changelog"
-    },
-    {
-      "type": "ALERT",
-      "date": "2025-11-02",
-      "text": "API service degradation affecting article syncing",
-      "link": "/breaking-change-2"
-    }
+	{
+		"type": "UPDATE",
+		"badge": "v1.0.0",
+		"date": "2026-01-02",
+		"text": "Introducing v1.0 — a faster, simpler way to sync and read your articles.",
+		"link": "/changelog"
+	}
 ]
