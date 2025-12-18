@@ -13,6 +13,7 @@ export class S3StorageService {
 	constructor(private readonly configService: ConfigService<Config>) {
 		const storageConfig = this.configService.getOrThrow('storage', { infer: true });
 
+		this.bucket = storageConfig.bucket;
 		this.s3 = new S3Client({
 			region: storageConfig.region,
 			endpoint: storageConfig.endpoint,

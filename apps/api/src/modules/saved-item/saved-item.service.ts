@@ -63,14 +63,26 @@ export class SavedItemService {
 					if (orGroup.length === 1) {
 						orClauses.push({
 							saved_item_label: {
-								some: { label: { name: { equals: orGroup[0]!.toLowerCase() } } },
+								some: {
+									label: {
+										name: {
+											equals: orGroup[0],
+											mode: 'insensitive',
+										},
+									},
+								},
 							},
 						});
 					} else if (orGroup.length > 1) {
 						orClauses.push({
 							saved_item_label: {
 								some: {
-									label: { name: { in: orGroup.map((l) => l.toLowerCase()) } },
+									label: {
+										name: {
+											in: orGroup.map((l) => l),
+											mode: 'insensitive',
+										},
+									},
 								},
 							},
 						});
@@ -83,7 +95,9 @@ export class SavedItemService {
 				notClauses.push({
 					saved_item_label: {
 						none: {
-							label: { name: { in: query.labels.not.map((l) => l.toLowerCase()) } },
+							label: {
+								name: { in: query.labels.not.map((l) => l), mode: 'insensitive' },
+							},
 						},
 					},
 				});

@@ -67,7 +67,8 @@ export class SavedItemManagerService {
 			},
 			[defaultLabel.id],
 			{
-				author: 'Inboxt Team',
+				author: 'Inboxt Guides',
+				leadImage: `${process.env.STORAGE_S3_URL}/lead-image.png`,
 				originalUrl: null,
 				sourceDomain: null,
 				description:
@@ -84,7 +85,8 @@ export class SavedItemManagerService {
 			[defaultLabel.id],
 
 			{
-				author: 'Inboxt Team',
+				author: 'Inboxt Guides',
+				leadImage: `${process.env.STORAGE_S3_URL}/lead-image.png`,
 				originalUrl: null,
 				sourceDomain: null,
 				description:
@@ -118,6 +120,8 @@ export class SavedItemManagerService {
 					prismaData?.description ||
 					ITEM_PROCESSING_CONTENT(prismaData?.sourceDomain ?? domain ?? ''),
 				wordCount: prismaData?.wordCount ?? 0,
+				originalUrl: prismaData?.originalUrl ?? input.url ?? null,
+				sourceDomain: prismaData?.sourceDomain ?? domain ?? null,
 				...prismaData,
 			},
 			{ skipQuota: true },

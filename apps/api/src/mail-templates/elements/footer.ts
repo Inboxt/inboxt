@@ -20,7 +20,7 @@ export default () => `
 			width="20px"
 			src="${process.env.STORAGE_S3_URL}/github-mark.svg"
 			alt="GitHub mark"
-			href="https://github.com/repo"
+			href="https://github.com/Inboxt/inboxt"
 			rel="noopener noreferrer"
 			align="right"
 		/>

@@ -45,7 +45,7 @@ export const forwardedEmailTemplate = ({
 				})}
 				
 				<mj-text>
-					Think this was a mistake? You can <a href="https://github.com/" target="_blank">report the issue on GitHub</a>.
+					Think this was a mistake? You can <a href="https://github.com/Inboxt/inboxt/issues" target="_blank">report the issue on GitHub</a>.
 				</mj-text>
 			</mj-column>
 		</mj-section>

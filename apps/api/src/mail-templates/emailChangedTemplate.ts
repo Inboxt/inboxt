@@ -49,7 +49,7 @@ export const emailChangedTemplate = ({
 				
 				${button({
 					text: 'Contact Support',
-					url: 'mailto:',
+					url: 'mailto:support@inboxt.app',
 				})}
 			</mj-column>
 		</mj-section>
