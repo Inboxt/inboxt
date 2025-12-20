@@ -158,32 +158,33 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 						)}
 					</Group>
 
-					<Text lineClamp={2} fz="md" className={classes.text}>
+					<Text lineClamp={2} mt={-4} fz="md" className={classes.text}>
 						{item.description ? item.description : item.author}
 					</Text>
 
-					<Group
-						align="center"
-						mt={item.labels?.length || item.sourceDomain ? 6 : 0}
-						justify={item.labels?.length ? 'space-between' : 'flex-start'}
-						wrap="nowrap"
-					>
-						{item.labels?.length && (
-							<Group wrap="nowrap" gap="xxxs">
-								{item.labels.map(({ id, name, color }) => (
-									<Badge size="xs" radius="sm" key={id} color={color}>
-										{name}
-									</Badge>
-								))}
-							</Group>
-						)}
+					{(item.labels?.length || item.sourceDomain) && (
+						<Group
+							align="center"
+							justify={item.labels?.length ? 'space-between' : 'flex-start'}
+							wrap="nowrap"
+						>
+							{item.labels?.length && (
+								<Group wrap="nowrap" gap="xxxs">
+									{item.labels.map(({ id, name, color }) => (
+										<Badge size="xs" radius="sm" key={id} color={color}>
+											{name}
+										</Badge>
+									))}
+								</Group>
+							)}
 
-						{item.sourceDomain && (
-							<Text fz="xs" c="dimmed">
-								{item.sourceDomain}
-							</Text>
-						)}
-					</Group>
+							{item.sourceDomain && (
+								<Text fz="xs" c="dimmed">
+									{item.sourceDomain}
+								</Text>
+							)}
+						</Group>
+					)}
 				</Stack>
 			</Group>
 		</Box>

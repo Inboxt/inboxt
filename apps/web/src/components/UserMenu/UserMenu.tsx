@@ -54,11 +54,6 @@ export const UserMenu = () => {
 			action: modals.openImportModal,
 		},
 		{
-			label: 'Install',
-			icon: <IconDownload />,
-			action: modals.openInstallModal,
-		},
-		{
 			label: 'API Tokens',
 			icon: <IconKey />,
 			action: modals.openApiTokensModal,

@@ -20,7 +20,14 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { ContextModalProps } from '@mantine/modals';
-import { IconBell, IconDatabase, IconHighlight, IconTag } from '@tabler/icons-react';
+import {
+	IconBell,
+	IconDatabase,
+	IconHighlight,
+	IconTag,
+	IconPuzzle,
+	IconDeviceMobile,
+} from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
@@ -145,6 +152,60 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 								{ label: 'Dark', value: 'dark' },
 							]}
 						/>
+					</Card>
+
+					<Card>
+						<Stack gap="md">
+							<Title order={5}>Install & access</Title>
+
+							{/* Browser extension */}
+							<Flex
+								justify="space-between"
+								align={{ base: 'stretch', xs: 'center' }}
+								gap="md"
+								direction={{ base: 'column', xs: 'row' }}
+							>
+								<Stack gap={2}>
+									<Text size="sm">Browser extension</Text>
+									<Text size="xs" c="dimmed">
+										Save pages with one click from your browser toolbar.
+									</Text>
+								</Stack>
+
+								<Button
+									component="a"
+									href="https://inboxt.app/install"
+									size="xs"
+									variant="light"
+									leftSection={<IconPuzzle size={14} />}
+								>
+									Install
+								</Button>
+							</Flex>
+
+							<Flex
+								justify="space-between"
+								align={{ base: 'stretch', xs: 'center' }}
+								gap="md"
+								direction={{ base: 'column', xs: 'row' }}
+							>
+								<Stack gap={2}>
+									<Text size="sm">Add to home screen</Text>
+									<Text size="xs" c="dimmed">
+										Get quick access to Inboxt on mobile or desktop.
+									</Text>
+								</Stack>
+
+								<Button
+									component="a"
+									href="https://docs.inboxt.app/installation#mobile-and-progressive-web-app"
+									size="xs"
+									variant="default"
+								>
+									View instructions
+								</Button>
+							</Flex>
+						</Stack>
 					</Card>
 
 					<Card>

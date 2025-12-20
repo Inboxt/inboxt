@@ -24,25 +24,43 @@ export class ArticleService {
 
 	/* ------------ Private Helpers ------------ */
 	private async fetchHtml(url: string) {
-		const res = await fetch(url, {
-			headers: {
-				'User-Agent':
-					'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-				Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-				'Accept-Language': 'en-US,en;q=0.5',
-				Referer: 'https://www.google.com/',
-			},
-		});
+		const controller = new AbortController();
+		const timeoutId = setTimeout(() => controller.abort(), 30000); // time out after 30s
 
-		if (!res.ok) {
-			throw new AppException(
-				`Fetch failed: ${res.status}`,
-				HttpStatus.BAD_REQUEST,
-				'FETCH_FAILED',
-			);
+		try {
+			const res = await fetch(url, {
+				signal: controller.signal,
+				headers: {
+					'User-Agent':
+						'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+					Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+					'Accept-Language': 'en-US,en;q=0.5',
+					Referer: 'https://www.google.com/',
+				},
+			});
+
+			clearTimeout(timeoutId);
+
+			if (!res.ok) {
+				throw new AppException(
+					`Fetch failed: ${res.status}`,
+					HttpStatus.BAD_REQUEST,
+					'FETCH_FAILED',
+				);
+			}
+
+			return res.text();
+		} catch (error: any) {
+			clearTimeout(timeoutId);
+			if (error.name === 'AbortError') {
+				throw new AppException(
+					'The request timed out while trying to reach the website.',
+					HttpStatus.REQUEST_TIMEOUT,
+					'TIMEOUT',
+				);
+			}
+			throw error;
 		}
-
-		return res.text();
 	}
 
 	private extractOgImage(html: string, base: string): string | null {
@@ -134,7 +152,13 @@ export class ArticleService {
 			throw new AppException('No HTML content provided', HttpStatus.BAD_REQUEST);
 		}
 
-		const result = this.contentExtractionService.extractReadableContent(sourceHtml, {
+		const $ = cheerio.load(sourceHtml);
+		$(
+			'script, style, iframe, nav, footer, aside, .sidebar, .ad-container, noscript, svg, canvas',
+		).remove();
+		const cleanedHtml = $.html();
+
+		const result = this.contentExtractionService.extractReadableContent(cleanedHtml, {
 			url: input.url,
 			maxWords: MAX_ARTICLE_WORD_COUNT,
 		});

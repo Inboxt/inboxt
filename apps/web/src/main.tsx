@@ -19,7 +19,6 @@ import { DeleteAccountModal } from '~modals/DeleteAccountModal';
 import { EmailsModal } from '~modals/EmailsModal/EmailsModal';
 import { ExportDataModal } from '~modals/ExportDataModal';
 import { ImportModal } from '~modals/ImportModal';
-import { InstallModal } from '~modals/InstallModal';
 import { LabelsModal } from '~modals/LabelsModal';
 import { LabelsSelectionModal } from '~modals/LabelsSelectionModal';
 import { ProfileModal } from '~modals/ProfileModal';
@@ -55,7 +54,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 				<ContentSelectionProvider>
 					<ModalsProvider
 						modals={{
-							install: InstallModal,
 							labels: LabelsModal,
 							labelsSelection: LabelsSelectionModal,
 							profile: ProfileModal,

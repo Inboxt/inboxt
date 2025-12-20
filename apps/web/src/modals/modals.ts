@@ -3,17 +3,6 @@ import { modals as mantineModals } from '@mantine/modals';
 import type { ExportDataModalProps } from '~modals/ExportDataModal/ExportDataModal.tsx';
 
 export const modals = {
-	openInstallModal: () => {
-		return mantineModals.openContextModal({
-			modal: 'install',
-			size: 540,
-			centered: true,
-			title: 'Install on Other Devices',
-			innerProps: {},
-			className: 'fullscreen-modal',
-		});
-	},
-
 	openLabelsModal: () => {
 		return mantineModals.openContextModal({
 			modal: 'labels',

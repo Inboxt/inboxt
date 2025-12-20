@@ -280,10 +280,8 @@ export class SavedItemManagerService {
 				prismaData,
 			},
 			{
-				removeOnComplete: 100,
-				removeOnFail: 50,
-				attempts: 3,
-				backoff: { type: 'exponential', delay: 30000 },
+				removeOnComplete: true,
+				removeOnFail: true,
 			},
 		);
 
@@ -441,8 +439,8 @@ export class SavedItemManagerService {
 				unsubscribeUrl,
 			},
 			{
-				removeOnComplete: 100,
-				removeOnFail: 50,
+				removeOnComplete: true,
+				removeOnFail: true,
 				attempts: 2,
 				backoff: { type: 'fixed', delay: 30000 },
 			},

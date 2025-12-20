@@ -4,11 +4,11 @@ export const USER_INBOUND_EMAIL_ADDRESS_LIMIT = 2;
 /** Maximum number of labels a user can create */
 export const USER_LABELS_LIMIT = 50;
 /** Maximum word count for articles before they're considered too large */
-export const MAX_ARTICLE_WORD_COUNT = 32000;
+export const MAX_ARTICLE_WORD_COUNT = 15000;
 /** Minimum word count for newsletters to be considered valid content */
 export const MIN_NEWSLETTER_WORD_COUNT = 100;
 /** Maximum word count for newsletters before they're considered too large */
-export const MAX_NEWSLETTER_WORD_COUNT = 32000;
+export const MAX_NEWSLETTER_WORD_COUNT = 15000;
 /** Maximum number of labels displayed in the label selector */
 export const MAX_VISIBLE_SELECTED_LABELS = 3;
 /** Sort options for saved items. Backend uses a separate DTO structure with field and direction. */

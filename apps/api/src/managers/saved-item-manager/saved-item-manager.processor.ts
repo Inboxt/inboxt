@@ -32,7 +32,7 @@ interface NewsletterProcessingJobData {
 	unsubscribeUrl?: string;
 }
 
-@Processor('saved-item-processing', { concurrency: 5 })
+@Processor('saved-item-processing', { concurrency: 5, lockDuration: 120000 })
 export class SavedItemManagerProcessor extends BaseQueueProcessor {
 	protected readonly logger = new Logger(SavedItemManagerProcessor.name);
 	constructor(private savedItemManagerService: SavedItemManagerService) {
