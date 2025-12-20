@@ -154,7 +154,6 @@ export const getContainerTextNodePath = (node: Node | null): string => {
 		return '';
 	}
 
-	// climb until we find a non-highlight ancestor to use as the "parent" reference
 	while (parent && parent.classList.contains('highlight')) {
 		parent = parent.parentElement;
 	}
@@ -168,18 +167,7 @@ export const getContainerTextNodePath = (node: Node | null): string => {
 		return '';
 	}
 
-	// collect text nodes under `parent` while skipping any text nodes that are descendants of `.highlight`
-	const textNodes = collectNonHighlightTextNodes(parent);
-
-	// find the index of our node among collected text nodes
-	const idx = textNodes.findIndex((tn) => tn === node);
-	if (idx === -1) {
-		// fallback to a parent path only
-		return parentXPath;
-	}
-
-	// return parentXPath::index (index is zero-based ordinal among non-highlight text nodes)
-	return `${parentXPath}::${idx}`;
+	return `${parentXPath}::0`;
 };
 
 export const lookupByXPath = (xpath: string, container: HTMLElement): Text | null => {
@@ -340,10 +328,14 @@ export const wrapSafeRangeWithSpan = ({ node, start, end }: SafeRange, highlight
 		return null;
 	}
 
-	let xpath = getContainerTextNodePath(node);
-	if (!xpath) {
-		xpath = getAbsoluteXPath(node);
+	const xpath = getContainerTextNodePath(node);
+	let globalStart = start;
+	let prev = node.previousSibling;
+	while (prev) {
+		globalStart += prev.textContent?.length || 0;
+		prev = prev.previousSibling;
 	}
+	const globalEnd = globalStart + (end - start);
 
 	const fragment = document.createDocumentFragment();
 	if (beforeText) {
@@ -358,8 +350,8 @@ export const wrapSafeRangeWithSpan = ({ node, start, end }: SafeRange, highlight
 
 	const data = {
 		highlightId,
-		start,
-		end,
+		start: globalStart,
+		end: globalEnd,
 		beforeText,
 		highlightedText,
 		afterText,
@@ -454,64 +446,63 @@ export const applyHighlightsToDOM = (
 		return;
 	}
 
-	try {
-		for (const highlight of highlights) {
-			if (highlight.segments?.length === 0 || !highlight.segments) {
-				continue;
-			}
+	const allSegments = highlights
+		.flatMap((h) => (h.segments || []).map((s) => ({ ...s, highlightId: h.id })))
+		.sort((a, b) => b.startOffset - a.startOffset);
 
-			const map = new Map<
-				Text,
-				{ startOffset: number; endOffset: number; xpath?: string }[]
-			>();
-
-			for (const seg of highlight.segments) {
-				let node: Text | null = null;
-
-				if (seg.xpath) {
-					node = lookupByXPath(seg.xpath, container);
-				}
-
-				if (!node && seg.text) {
-					node = findByTextFallback(seg.text, container);
-				}
-
-				if (!node) {
-					continue;
-				}
-
-				const arr = map.get(node) || [];
-				arr.push({
-					startOffset: seg.startOffset,
-					endOffset: seg.endOffset,
-					xpath: seg.xpath,
-				});
-				map.set(node, arr);
-			}
-
-			// apply wraps per text node, from highest startOffset -> lowest
-			for (const [node, segs] of map.entries()) {
-				segs.sort((a, b) => b.startOffset - a.startOffset);
-				for (const s of segs) {
-					try {
-						wrapSafeRangeWithSpan(
-							{ node, start: s.startOffset, end: s.endOffset },
-							highlight.id,
-						);
-					} catch (_) {
-						//
-					}
-				}
-			}
+	for (const seg of allSegments) {
+		const parentPath = seg.xpath?.split('::')[0];
+		if (!parentPath) {
+			continue;
 		}
-	} finally {
-		// normalize once after finishing DOM work to coalesce text nodes
-		try {
-			container.normalize();
-		} catch (_) {
-			//
+
+		const parent = document.evaluate(
+			parentPath,
+			container,
+			null,
+			XPathResult.FIRST_ORDERED_NODE_TYPE,
+			null,
+		).singleNodeValue as HTMLElement | null;
+
+		if (!parent) {
+			continue;
+		}
+
+		const walker = document.createTreeWalker(parent, NodeFilter.SHOW_TEXT, null);
+		let currentGlobalOffset = 0;
+		let targetNode: Text | null = null;
+		let localStart = 0;
+
+		let n = walker.nextNode() as Text | null;
+		while (n) {
+			const nodeLength = n.textContent?.length || 0;
+
+			if (
+				currentGlobalOffset <= seg.startOffset &&
+				currentGlobalOffset + nodeLength >= seg.startOffset
+			) {
+				targetNode = n;
+				localStart = seg.startOffset - currentGlobalOffset;
+
+				if (localStart >= 0 && localStart < nodeLength) {
+					break;
+				}
+			}
+
+			currentGlobalOffset += nodeLength;
+			n = walker.nextNode() as Text | null;
+		}
+
+		if (targetNode) {
+			const localEnd = localStart + (seg.endOffset - seg.startOffset);
+			wrapSafeRangeWithSpan(
+				{ node: targetNode, start: localStart, end: localEnd },
+				seg.highlightId,
+			);
 		}
 	}
+
+	container.normalize();
 };
 
 // Creates highlights from a selection range and returns the segment data

@@ -35,8 +35,12 @@ export const HighlightableArticle = ({ content, data }: ArticleWithHighlightsPro
 			return;
 		}
 
-		const container = containerRef.current as HTMLElement;
+		const container = containerRef.current;
 		const highlights = data.highlights;
+
+		container.innerHTML = content || '';
+		container.normalize();
+
 		if (!highlights || highlights.length === 0) {
 			setApplyingHighlights(false);
 			return;
