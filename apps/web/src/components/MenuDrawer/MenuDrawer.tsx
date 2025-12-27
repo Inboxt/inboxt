@@ -20,7 +20,6 @@ type MenuDrawerProps = {
 	height?: number;
 };
 
-// todo: handle links?
 export const MenuDrawer = ({ items, children, label, height = 300 }: MenuDrawerProps) => {
 	const isAboveXsScreen = useScreenQuery('xs', 'above');
 	const iconSize = isAboveXsScreen ? 16 : 21;

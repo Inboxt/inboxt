@@ -1,8 +1,7 @@
 import { gql } from './generated';
 
-export * from './client';
 export * from './generated';
-export * from './generated/graphql';
+export * from './generated/graphql.ts';
 
 /*----------  Fragments  ----------*/
 export const USER_FRAGMENT = gql(`
@@ -297,6 +296,15 @@ export const PERMANENTLY_DELETE_SAVED_ITEMS = gql(`
 	mutation permanentlyDeleteSavedItems($data: PermanentlyDeleteSavedItemsInput!) {
 		permanentlyDeleteSavedItems(data: $data) {
 			success
+		}
+	}
+`);
+
+export const EMPTY_TRASH = gql(`
+	mutation emptyTrash {
+		emptyTrash {
+			success
+			count
 		}
 	}
 `);

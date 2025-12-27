@@ -11,10 +11,9 @@ import {
 } from '@tabler/icons-react';
 import { clsx } from 'clsx';
 
-import { LABELS } from '@inboxt/graphql';
-
 import { AppNotifications } from '~components/AppNotifications';
 import { useScreenQuery } from '~hooks/useScreenQuery';
+import { LABELS } from '~lib/graphql';
 import { formatLabelForQuery } from '~utils/formatLabelForQuery.ts';
 
 import { FooterLinks } from '../FooterLinks';
@@ -65,7 +64,7 @@ export const Navbar = ({ opened, toggle }: NavbarProps) => {
 	const isAboveLgScreen = useScreenQuery('lg', 'above');
 
 	const navLinks = (
-		<Stack mt={isAboveLgScreen ? 18 : 0} gap={0} h="100%" pb={isAboveLgScreen ? 32 : 0}>
+		<Stack mt={isAboveLgScreen ? 'md' : 0} gap={0} h="100%" pb={isAboveLgScreen ? 'xxl' : 0}>
 			{NAV_LINKS.map((link) => (
 				<NavbarLink
 					key={link.id}
@@ -140,7 +139,7 @@ export const Navbar = ({ opened, toggle }: NavbarProps) => {
 		>
 			<Box className={classes.mobileNavMain}>{navLinks}</Box>
 
-			<Box style={{ backgroundColor: 'var(--mantine-color-body)' }}>
+			<Box bg="body">
 				<AppNotifications />
 				<FooterLinks justify="center" />
 			</Box>

@@ -159,6 +159,9 @@ export class SavedItemManagerService {
 		} else if (code === 'STORAGE_QUOTA_EXCEEDED') {
 			message =
 				'You’ve reached your storage limit, so we couldn’t save this item. Delete items you no longer need to free up space.';
+		} else if (code === 'APP_DOMAIN_BLOCKED') {
+			message =
+				'This page is part of the Inboxt app and can’t be saved for later. Try saving articles from external sites instead.';
 		}
 
 		const isArticleProcessing = existing.title.startsWith(ITEM_PROCESSING_BASE_TITLE);

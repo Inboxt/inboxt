@@ -19,11 +19,11 @@ import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useState, useMemo } from 'react';
 
 import { createApiTokenSchema } from '@inboxt/common';
-import { CREATE_API_TOKEN } from '@inboxt/graphql';
-import { ApiTokenExpiry } from '@inboxt/graphql';
 
 import { ButtonContainer } from '~components/ButtonContainer';
 import { Form } from '~components/Form';
+import { CREATE_API_TOKEN } from '~lib/graphql';
+import { ApiTokenExpiry } from '~lib/graphql';
 
 type CreateApiTokenModalInnerProps = {
 	onCreated?: () => void;
@@ -58,6 +58,7 @@ export const CreateApiTokenModal = ({
 	const [createApiToken, { loading, error }] = useMutation(CREATE_API_TOKEN);
 
 	const form = useForm({
+		mode: 'uncontrolled',
 		initialValues: {
 			name: '',
 			expiry: ApiTokenExpiry['ThirtyDays'] as ExpiryPreset,
@@ -113,7 +114,6 @@ export const CreateApiTokenModal = ({
 					onSubmit={form.onSubmit(handleSubmit)}
 					error={error}
 					setErrors={form.setErrors}
-					style={{ flex: 1 }}
 				>
 					{({ error: formError }) => (
 						<Stack flex={1} gap="xl">
@@ -129,13 +129,16 @@ export const CreateApiTokenModal = ({
 										label="Name"
 										placeholder="My extension"
 										data-autofocus
+										key={form.key('name')}
 										{...form.getInputProps('name')}
 									/>
+
 									<Stack gap={4}>
 										<Select
 											label="Expiration"
 											allowDeselect={false}
 											data={expiryOptions}
+											key={form.key('expiry')}
 											{...form.getInputProps('expiry')}
 											description={
 												form.values.expiry === ApiTokenExpiry.Never ? (

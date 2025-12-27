@@ -3,11 +3,10 @@ import { Button, Card, SegmentedControl, Skeleton, Stack, Text, TextInput } from
 import { ContextModalProps } from '@mantine/modals';
 import { useState } from 'react';
 
-import { ACTIVE_USER, REQUEST_EXPORT } from '@inboxt/graphql';
-import { ExportHighlightsFormat, ExportType } from '@inboxt/graphql';
-
 import { ButtonContainer } from '~components/ButtonContainer';
 import { toastInfo } from '~components/Toast';
+import { ACTIVE_USER, REQUEST_EXPORT } from '~lib/graphql';
+import { ExportHighlightsFormat, ExportType } from '~lib/graphql';
 
 export type ExportDataModalProps = {
 	type: ExportType;
@@ -66,14 +65,14 @@ export const ExportDataModal = ({
 					{type === ExportType.All && !loading && (
 						<TextInput
 							variant="filled"
-							label="E	mail Address"
+							label="E-mail Address"
 							value={data?.me?.emailAddress}
 							readOnly
 							description="If this address is incorrect, please update it in your profile."
 						/>
 					)}
 
-					<Stack gap={4}>
+					<Stack gap="xxxs">
 						<Text size="sm" fw={500}>
 							{type === ExportType.All ? 'Highlights Format' : 'Format'}
 						</Text>

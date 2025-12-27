@@ -1,6 +1,8 @@
 export const formatBytes = (bytes: number | bigint): string => {
 	const n = typeof bytes === 'bigint' ? Number(bytes) : bytes;
-	if (!Number.isFinite(n) || n <= 0) return '0 Bytes';
+	if (!Number.isFinite(n) || n <= 0) {
+		return '0 Bytes';
+	}
 
 	const k = 1024;
 	const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB'];

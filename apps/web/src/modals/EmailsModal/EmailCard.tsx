@@ -1,7 +1,7 @@
 import { Box, Card, Group, Stack, Text, TextInput, Title } from '@mantine/core';
 import dayjs from 'dayjs';
 
-import { InboundEmailAddress, NewsletterSubscriptionStatus } from '@inboxt/graphql';
+import { InboundEmailAddress, NewsletterSubscriptionStatus } from '~lib/graphql';
 
 import { EmailActions } from './EmailActions';
 import { SubscriptionList } from './SubscriptionList';
@@ -37,7 +37,7 @@ export const EmailCard = ({ email }: EmailCardProps) => {
 								}}
 							/>
 
-							<Text size="xs" c="dimmed" mt={-6}>
+							<Text size="xs" c="dimmed" mt="-xxs">
 								Created: {dayjs(email.createdAt).format('MMM D, YYYY')}
 							</Text>
 						</Stack>

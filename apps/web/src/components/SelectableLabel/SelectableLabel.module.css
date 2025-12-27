@@ -4,7 +4,7 @@
 	align-items: center;
 	justify-content: space-between;
 	width: 100%;
-	padding: 4px 0;
+	padding: var(--mantine-spacing-xxxs) 0;
 	user-select: none;
 	column-gap: var(--mantine-spacing-md);
 	

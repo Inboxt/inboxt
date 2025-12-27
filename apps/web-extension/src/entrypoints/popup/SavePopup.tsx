@@ -4,11 +4,52 @@ import { IconAlertCircle, IconCheck } from '@tabler/icons-react';
 
 import { LabelsMultiSelect } from '@inboxt/ui';
 import { SaveJob } from '@/types';
+import { graphqlFetch } from '@/utils/graphql.ts';
+
+const LABELS_QUERY = `
+  query Labels {
+    labels {
+      id
+      name
+      color
+    }
+  }
+`;
 
 export const SavePopup = () => {
 	const [jobId, setJobId] = useState<string | null>(null);
 	const [job, setJob] = useState<SaveJob | null>(null);
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
+	const [labelsData, setLabelsData] = useState<{ labels: any[] } | null>(null);
+	const [labelsLoading, setLabelsLoading] = useState(false);
+
+	useEffect(() => {
+		let cancelled = false;
+
+		const fetchLabels = async () => {
+			setLabelsLoading(true);
+			try {
+				const data = await graphqlFetch<{ labels: any[] }>(LABELS_QUERY);
+				if (!cancelled) {
+					setLabelsData(data);
+				}
+			} catch (err: any) {
+				if (!cancelled) {
+					setErrorMessage(err?.message ?? 'Failed to load labels');
+				}
+			} finally {
+				if (!cancelled) {
+					setLabelsLoading(false);
+				}
+			}
+		};
+
+		void fetchLabels();
+
+		return () => {
+			cancelled = true;
+		};
+	}, []);
 
 	// Start job when popup opens
 	useEffect(() => {
@@ -225,6 +266,8 @@ export const SavePopup = () => {
 						</Stack>
 
 						<LabelsMultiSelect
+							labels={labelsData?.labels}
+							loading={labelsLoading}
 							value={job?.labelIds || []}
 							onChange={isSaved && job?.itemId ? handleLabelsChange : undefined}
 						/>

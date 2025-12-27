@@ -152,6 +152,18 @@ export class ArticleService {
 			throw new AppException('No HTML content provided', HttpStatus.BAD_REQUEST);
 		}
 
+		if (input.url) {
+			const { hostname } = new URL(input.url);
+			const appHostname = process.env.WEB_URL ? new URL(process.env.WEB_URL).hostname : null;
+			if (appHostname && hostname === appHostname) {
+				throw new AppException(
+					'Articles from the Inbox app itself can’t be saved.',
+					HttpStatus.BAD_REQUEST,
+					'APP_DOMAIN_BLOCKED',
+				);
+			}
+		}
+
 		const $ = cheerio.load(sourceHtml);
 		$(
 			'script, style, iframe, nav, footer, aside, .sidebar, .ad-container, noscript, svg, canvas',

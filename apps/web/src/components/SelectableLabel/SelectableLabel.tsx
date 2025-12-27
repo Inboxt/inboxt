@@ -1,7 +1,7 @@
 import { Checkbox, Group, Text } from '@mantine/core';
 import { IconLabelImportantFilled } from '@tabler/icons-react';
 
-import { Label } from '@inboxt/graphql';
+import { Label } from '~lib/graphql';
 
 import classes from './SelectableLabel.module.css';
 

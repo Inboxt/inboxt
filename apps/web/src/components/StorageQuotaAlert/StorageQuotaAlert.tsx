@@ -1,8 +1,7 @@
 import { Alert, Button, Flex, Text } from '@mantine/core';
 
-import { User } from '@inboxt/graphql';
-
 import { useScreenQuery } from '~hooks/useScreenQuery';
+import { User } from '~lib/graphql';
 import { modals } from '~modals/modals.ts';
 import { getUserStorage } from '~utils/userStorage';
 

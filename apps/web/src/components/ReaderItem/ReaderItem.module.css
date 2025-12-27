@@ -23,3 +23,27 @@
 		color: var(--mantine-color-dark-2);
 	}
 }
+
+.leadImageWrapper {
+	height: 90px;
+	width: 90px;
+	overflow: hidden;
+}
+
+.leadImage {
+	height: 100%;
+	width: 100%;
+	object-fit: cover;
+	background-color: light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-5));
+	border-radius: var(--mantine-radius-sm);
+}
+
+.checkboxWrapper {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	display: flex;
+	align-items: center;
+}

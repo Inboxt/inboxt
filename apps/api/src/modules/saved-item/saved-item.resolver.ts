@@ -15,6 +15,7 @@ import { PermanentlyDeleteSavedItemsInput } from './dto/permanently-delete-saved
 import { Newsletter } from './entities/newsletter/newsletter.model';
 import { NewsletterService } from './entities/newsletter/newsletter.service';
 import { ApiTokenAllowed } from '../../decorators/api-token.decorator';
+import { EmptyTrash } from './dto/empty-trash.model';
 
 @Resolver(() => SavedItem)
 export class SavedItemResolver {
@@ -73,6 +74,12 @@ export class SavedItemResolver {
 		}
 
 		return VOID_RESPONSE;
+	}
+
+	@Mutation(() => EmptyTrash)
+	async emptyTrash(@ActiveUserMeta() activeUser: ActiveUserMetaType) {
+		const count = await this.savedItemService.emptyTrash(activeUser.id);
+		return { success: true, count };
 	}
 
 	@ResolveField('article', () => Article, { nullable: true })

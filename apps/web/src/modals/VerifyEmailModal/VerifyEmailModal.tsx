@@ -7,12 +7,11 @@ import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useState } from 'react';
 
 import { verifyEmailSchema } from '@inboxt/common';
-import { ACTIVE_USER, RESEND_VERIFICATION_EMAIL, VERIFY_EMAIL } from '@inboxt/graphql';
 
 import { ButtonContainer } from '~components/ButtonContainer';
 import { Form } from '~components/Form';
-
-import { router } from '../../main';
+import { ACTIVE_USER, RESEND_VERIFICATION_EMAIL, VERIFY_EMAIL } from '~lib/graphql';
+import { router } from '~router/index.tsx';
 
 export const VerifyEmailModal = ({ id, context }: ContextModalProps) => {
 	const [resendCooldown, setResendCooldown] = useState(0);
@@ -74,6 +73,7 @@ export const VerifyEmailModal = ({ id, context }: ContextModalProps) => {
 							<TextInput
 								label="Confirmation Code"
 								placeholder="XXXXX-XXXXX"
+								key={form.key('code')}
 								{...form.getInputProps('code')}
 							/>
 						</Stack>

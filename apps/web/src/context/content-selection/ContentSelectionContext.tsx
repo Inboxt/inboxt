@@ -1,6 +1,6 @@
 import { createContext, useContext } from 'react';
 
-import { SavedItem, Highlight } from '@inboxt/graphql';
+import { SavedItem, Highlight } from '~lib/graphql';
 
 export type SelectableItem = SavedItem | Highlight;
 

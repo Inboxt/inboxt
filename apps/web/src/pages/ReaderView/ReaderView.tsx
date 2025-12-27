@@ -23,7 +23,6 @@ import dayjs from 'dayjs';
 import { useEffect } from 'react';
 
 import { READER_THEMES } from '@inboxt/common';
-import { SAVED_ITEM, SavedItemType } from '@inboxt/graphql';
 import { theme } from '@inboxt/ui';
 
 import { AppName } from '~components/AppName';
@@ -33,6 +32,7 @@ import { ReaderSettingsOptions } from '~components/ReaderSettingsOptions';
 import { useReaderSettings, makeReaderResolver } from '~hooks/useReaderSettings.tsx';
 import { useScreenQuery } from '~hooks/useScreenQuery';
 import { useTextHighlighting } from '~hooks/useTextSelection';
+import { SAVED_ITEM, SavedItemType } from '~lib/graphql';
 import { Route } from '~routes/r.$id';
 
 import classes from './ReaderView.module.css';
@@ -95,26 +95,6 @@ export const ReaderView = () => {
 		);
 	}
 
-	// todo: possibly more edge-cases, for example: don't save new position when the article was already fully read?
-	// todo: looks like possible perfomance issue... test it more, as it re-render i think on each scroll
-	// const [scroll, scrollTo] = useWindowScroll();
-	// const [savedScrollPosition, setSavedScrollPosition] = useLocalStorage({
-	// 	key: `last-reading-position-${ARTICLE_FROM_BACKEND.id}`,
-	// 	defaultValue: 0,
-	// });
-
-	// useEffect(() => {
-	// 	scrollTo({ y: savedScrollPosition });
-	// }, [savedScrollPosition]);
-	//
-	// useEffect(() => {
-	// 	const savePosition = () => setSavedScrollPosition(scroll.y);
-	// 	window.addEventListener('beforeunload', savePosition);
-	// 	return () => {
-	// 		window.removeEventListener('beforeunload', savePosition);
-	// 	};
-	// }, [scroll.y, setSavedScrollPosition]);
-
 	const content =
 		savedItem?.type === SavedItemType.Article
 			? savedItem.article?.contentHtml
@@ -125,7 +105,7 @@ export const ReaderView = () => {
 	return (
 		<Box
 			pt="md"
-			px={isAboveXsScreen ? 24 : 'md'}
+			px={isAboveXsScreen ? 'xl' : 'md'}
 			className={classes.readerView}
 			data-reader-theme={effectiveTheme}
 			id="reader-root"
@@ -185,7 +165,7 @@ export const ReaderView = () => {
 							{savedItem && (
 								<>
 									<Stack gap="xxs">
-										<Breadcrumbs separator="•" separatorMargin={6}>
+										<Breadcrumbs separator="•">
 											<Text>
 												{dayjs(savedItem.createdAt).format(
 													'MMMM D, YYYY HH:mm',

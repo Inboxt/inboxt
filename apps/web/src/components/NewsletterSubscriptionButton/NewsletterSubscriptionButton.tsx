@@ -1,15 +1,14 @@
 import { useMutation } from '@apollo/client';
 import { Button } from '@mantine/core';
 
+import { ConfirmWithAlert } from '~components/ConfirmWithAlert';
+import { useScreenQuery } from '~hooks/useScreenQuery';
 import {
 	INBOUND_EMAIL_ADDRESSES,
 	SAVED_ITEM,
 	UPDATE_NEWSLETTER_SUBSCRIPTION_STATUS,
-} from '@inboxt/graphql';
-import { NewsletterSubscription, NewsletterSubscriptionStatus } from '@inboxt/graphql';
-
-import { ConfirmWithAlert } from '~components/ConfirmWithAlert';
-import { useScreenQuery } from '~hooks/useScreenQuery';
+} from '~lib/graphql';
+import { NewsletterSubscription, NewsletterSubscriptionStatus } from '~lib/graphql';
 import { modals } from '~modals/modals';
 
 type NewsletterSubscriptionButton = {
@@ -22,7 +21,7 @@ export const NewsletterSubscriptionButton = ({ subscription }: NewsletterSubscri
 	const [updateNewsletterSubscriptionStatus, { loading }] = useMutation(
 		UPDATE_NEWSLETTER_SUBSCRIPTION_STATUS,
 		{
-			refetchQueries: [INBOUND_EMAIL_ADDRESSES, SAVED_ITEM], // todo: skip one or the other
+			refetchQueries: [INBOUND_EMAIL_ADDRESSES, SAVED_ITEM],
 		},
 	);
 

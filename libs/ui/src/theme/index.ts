@@ -1,12 +1,28 @@
-import { Card, Checkbox, createTheme, Modal, SegmentedControl } from '@mantine/core';
+import {
+	Breadcrumbs,
+	Card,
+	Checkbox,
+	createTheme,
+	DefaultMantineColor,
+	MantineColorsTuple,
+	Modal,
+	SegmentedControl,
+} from '@mantine/core';
 
 import { fontSizes } from './fontSizes';
 import { spacing } from './spacing';
 
 import classes from './theme.module.css';
 
+type ExtendedCustomColors = 'primary' | DefaultMantineColor;
+
+declare module '@mantine/core' {
+	export interface MantineThemeColorsOverride {
+		colors: Record<ExtendedCustomColors, MantineColorsTuple>;
+	}
+}
+
 export const theme = createTheme({
-	//fontFamily: '"Poppins", sans-serif',
 	colors: {
 		dark: [
 			'#C1C2C5',
@@ -36,7 +52,6 @@ export const theme = createTheme({
 	fontSizes,
 	spacing,
 	primaryColor: 'primary',
-	// headings,
 	components: {
 		Modal: Modal.extend({
 			classNames: {
@@ -55,6 +70,11 @@ export const theme = createTheme({
 			defaultProps: {
 				withBorder: true,
 				radius: 'md',
+			},
+		}),
+		Breadcrumbs: Breadcrumbs.extend({
+			defaultProps: {
+				separatorMargin: 6,
 			},
 		}),
 	},

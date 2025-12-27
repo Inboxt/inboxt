@@ -7,10 +7,10 @@ import { useLocation, useNavigate } from '@tanstack/react-router';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 
 import { signInSchema } from '@inboxt/common';
-import { SIGN_IN } from '@inboxt/graphql';
 
 import { ButtonContainer } from '~components/ButtonContainer';
 import { Form } from '~components/Form';
+import { SIGN_IN } from '~lib/graphql';
 import { AuthViewProps } from '~pages/Auth/Auth';
 import { Route } from '~routes/auth.route';
 
@@ -50,6 +50,7 @@ export const FormLogin = ({ handleChangeAuthMode }: AuthViewProps) => {
 						leftSectionPointerEvents="none"
 						leftSection={<IconAt size={16} />}
 						size="md"
+						key={form.key('emailAddress')}
 						{...form.getInputProps('emailAddress')}
 					/>
 					<PasswordInput
@@ -91,6 +92,7 @@ export const FormLogin = ({ handleChangeAuthMode }: AuthViewProps) => {
 								</ActionIcon>
 							</Group>
 						}
+						key={form.key('password')}
 						{...form.getInputProps('password')}
 						size="md"
 					/>

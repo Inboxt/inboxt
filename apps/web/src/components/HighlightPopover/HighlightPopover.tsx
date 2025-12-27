@@ -45,7 +45,7 @@ export const HighlightPopover = ({
 				dropdown: classes.popoverDropdown,
 			}}
 			arrowSize={12}
-			radius={6}
+			radius="md"
 		>
 			<Popover.Target>
 				<Box style={boxStyle} className={classes.popoverContent} />

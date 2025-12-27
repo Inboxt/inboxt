@@ -30,7 +30,7 @@ export const AppName = ({ size = 'sm', variant = 'full' }: AppNameProps) => {
 	}
 
 	return (
-		<Group gap={4}>
+		<Group gap="xxxs">
 			<Image src={AppLogo} h={logoSize} w={logoSize} fit="contain" darkHidden />
 			<Image src={AppLogoWhite} h={logoSize} w={logoSize} fit="contain" lightHidden />
 

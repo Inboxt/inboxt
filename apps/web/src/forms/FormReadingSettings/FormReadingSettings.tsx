@@ -60,7 +60,7 @@ export const FormReadingSettings = () => {
 
 			<Group justify="space-between">
 				<Text>Text size ({contentSettings.textSize}px)</Text>
-				<Group gap={4}>
+				<Group gap="xxxs">
 					<ActionIcon
 						variant="light"
 						color="var(--mantine-color-text)"

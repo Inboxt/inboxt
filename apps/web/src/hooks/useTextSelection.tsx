@@ -2,9 +2,8 @@ import { useMutation } from '@apollo/client';
 import { useTextSelection } from '@mantine/hooks';
 import { RefObject, useMemo, useState, useEffect, useRef } from 'react';
 
-import { CREATE_HIGHLIGHT, DELETE_HIGHLIGHTS } from '@inboxt/graphql';
-
 import { toastError } from '~components/Toast';
+import { CREATE_HIGHLIGHT, DELETE_HIGHLIGHTS } from '~lib/graphql';
 import { parseError } from '~utils/parse-error.ts';
 
 import {

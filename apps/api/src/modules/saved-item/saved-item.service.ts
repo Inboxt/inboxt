@@ -323,6 +323,37 @@ export class SavedItemService {
 		});
 	}
 
+	private async permanentlyDeleteSavedItemTx(
+		tx: Prisma.TransactionClient,
+		userId: string,
+		savedItem: { id: string; sizeBytes: bigint },
+	) {
+		const article = await tx.article.findUnique({
+			where: { savedItemId: savedItem.id, saved_item: { userId } },
+			select: { sizeBytes: true },
+		});
+
+		const newsletter = await tx.newsletter.findUnique({
+			where: { savedItemId: savedItem.id, saved_item: { userId } },
+			select: { sizeBytes: true },
+		});
+
+		const highlightSegmentsAgg = await tx.highlight_segment.aggregate({
+			where: { highlight: { savedItemId: savedItem.id, saved_item: { userId } } },
+			_sum: { sizeBytes: true },
+		});
+
+		const total =
+			savedItem.sizeBytes +
+			(article?.sizeBytes ?? 0n) +
+			(newsletter?.sizeBytes ?? 0n) +
+			(highlightSegmentsAgg._sum.sizeBytes ?? 0n);
+
+		await tx.saved_item.delete({ where: { id: savedItem.id } });
+
+		return total;
+	}
+
 	async delete(userId: string, id: string) {
 		/*----------  Validation  ----------*/
 		const savedItem = await this.get(userId, {
@@ -338,33 +369,37 @@ export class SavedItemService {
 
 		/*----------  Processing  ----------*/
 		return this.prisma.$transaction(async (tx) => {
-			const article = await tx.article.findUnique({
-				where: { savedItemId: id },
-				select: { sizeBytes: true },
-			});
+			const total = await this.permanentlyDeleteSavedItemTx(tx, userId, savedItem);
 
-			const newsletter = await tx.newsletter.findUnique({
-				where: { savedItemId: id },
-				select: { sizeBytes: true },
-			});
-
-			const highlightSegmentsAgg = await tx.highlight_segment.aggregate({
-				where: { highlight: { savedItemId: id } },
-				_sum: { sizeBytes: true },
-			});
-
-			const savedItemSize = savedItem.sizeBytes;
-			const articleSize = article?.sizeBytes ?? 0n;
-			const newsletterSize = newsletter?.sizeBytes ?? 0n;
-			const highlightsSize = highlightSegmentsAgg._sum.sizeBytes ?? 0n;
-			const total = savedItemSize + articleSize + newsletterSize + highlightsSize;
-
-			await tx.saved_item.delete({ where: { id } });
 			if (total > 0n) {
 				await this.storageQuota.decrementUsage(tx, userId, total);
 			}
 
 			return { id };
+		});
+	}
+
+	async emptyTrash(userId: string) {
+		const trashedItems = await this.getMany(userId, {
+			where: { status: 'DELETED', deletedSince: { not: null } },
+		});
+
+		if (trashedItems.length === 0) {
+			return 0;
+		}
+
+		return this.prisma.$transaction(async (tx) => {
+			let totalFreed = 0n;
+
+			for (const item of trashedItems) {
+				totalFreed += await this.permanentlyDeleteSavedItemTx(tx, userId, item);
+			}
+
+			if (totalFreed > 0n) {
+				await this.storageQuota.decrementUsage(tx, userId, totalFreed);
+			}
+
+			return trashedItems.length;
 		});
 	}
 }

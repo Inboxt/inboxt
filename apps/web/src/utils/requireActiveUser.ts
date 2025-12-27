@@ -1,8 +1,7 @@
 import { redirect } from '@tanstack/react-router';
 
-import { ACTIVE_USER } from '@inboxt/graphql';
-
-import { client } from '~utils/client.ts';
+import { ACTIVE_USER } from '~lib/graphql';
+import { client } from '~lib/graphql/client.ts';
 
 export const requireActiveUser = async () => {
 	const { data } = await client.query({

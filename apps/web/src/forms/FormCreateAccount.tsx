@@ -6,10 +6,10 @@ import { useLocation, useNavigate } from '@tanstack/react-router';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 
 import { createAccountSchema } from '@inboxt/common';
-import { CREATE_ACCOUNT } from '@inboxt/graphql';
 
 import { ButtonContainer } from '~components/ButtonContainer';
 import { Form } from '~components/Form';
+import { CREATE_ACCOUNT } from '~lib/graphql';
 import { AuthViewProps } from '~pages/Auth/Auth';
 
 export const FormCreateAccount = ({ handleChangeAuthMode }: AuthViewProps) => {
@@ -43,6 +43,7 @@ export const FormCreateAccount = ({ handleChangeAuthMode }: AuthViewProps) => {
 						leftSectionPointerEvents="none"
 						leftSection={<IconAt size={16} />}
 						size="md"
+						key={form.key('emailAddress')}
 						{...form.getInputProps('emailAddress')}
 					/>
 
@@ -52,6 +53,7 @@ export const FormCreateAccount = ({ handleChangeAuthMode }: AuthViewProps) => {
 						leftSectionPointerEvents="none"
 						leftSection={<IconMail size={16} />}
 						size="md"
+						key={form.key('username')}
 						{...form.getInputProps('username')}
 					/>
 
@@ -62,6 +64,7 @@ export const FormCreateAccount = ({ handleChangeAuthMode }: AuthViewProps) => {
 						leftSectionPointerEvents="none"
 						leftSection={<IconLock size={16} />}
 						size="md"
+						key={form.key('password')}
 						{...form.getInputProps('password')}
 					/>
 

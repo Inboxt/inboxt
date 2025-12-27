@@ -3,10 +3,9 @@ import { Button, Card, Stack, Text } from '@mantine/core';
 import { ContextModalProps } from '@mantine/modals';
 import { useEffect, useState } from 'react';
 
-import { LABELS } from '@inboxt/graphql';
-
 import { ButtonContainer } from '~components/ButtonContainer';
 import { EditableLabelItem } from '~components/EditableLabelItem';
+import { LABELS } from '~lib/graphql';
 import { modals } from '~modals/modals';
 
 export const LabelsModal = ({ id, context }: ContextModalProps) => {

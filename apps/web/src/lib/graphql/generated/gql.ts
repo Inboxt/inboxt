@@ -40,6 +40,7 @@ type Documents = {
     "\n\tmutation setSavedItemLabels($data: SetSavedItemLabelsInput!) {\n\t\tsetSavedItemLabels(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": typeof types.SetSavedItemLabelsDocument,
     "\n\tmutation updateSavedItemStatus($data: UpdateSavedItemStatusInput!) {\n\t\tupdateSavedItemStatus(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": typeof types.UpdateSavedItemStatusDocument,
     "\n\tmutation permanentlyDeleteSavedItems($data: PermanentlyDeleteSavedItemsInput!) {\n\t\tpermanentlyDeleteSavedItems(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": typeof types.PermanentlyDeleteSavedItemsDocument,
+    "\n\tmutation emptyTrash {\n\t\temptyTrash {\n\t\t\tsuccess\n\t\t\tcount\n\t\t}\n\t}\n": typeof types.EmptyTrashDocument,
     "\n\tmutation createLabel($data: CreateLabelInput!) {\n\t\tcreateLabel(data: $data) {\n\t\t\t...SavedItemLabelFragment\n\t\t}\n\t}\n": typeof types.CreateLabelDocument,
     "\n\tmutation updateLabel($data: UpdateLabelInput!) {\n\t\tupdateLabel(data: $data) {\n\t\t\t...SavedItemLabelFragment\n\t\t}\n\t}\n": typeof types.UpdateLabelDocument,
     "\n\tmutation deleteLabel($data: DeleteLabelInput!) {\n\t\tdeleteLabel(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": typeof types.DeleteLabelDocument,
@@ -82,6 +83,7 @@ const documents: Documents = {
     "\n\tmutation setSavedItemLabels($data: SetSavedItemLabelsInput!) {\n\t\tsetSavedItemLabels(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": types.SetSavedItemLabelsDocument,
     "\n\tmutation updateSavedItemStatus($data: UpdateSavedItemStatusInput!) {\n\t\tupdateSavedItemStatus(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": types.UpdateSavedItemStatusDocument,
     "\n\tmutation permanentlyDeleteSavedItems($data: PermanentlyDeleteSavedItemsInput!) {\n\t\tpermanentlyDeleteSavedItems(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": types.PermanentlyDeleteSavedItemsDocument,
+    "\n\tmutation emptyTrash {\n\t\temptyTrash {\n\t\t\tsuccess\n\t\t\tcount\n\t\t}\n\t}\n": types.EmptyTrashDocument,
     "\n\tmutation createLabel($data: CreateLabelInput!) {\n\t\tcreateLabel(data: $data) {\n\t\t\t...SavedItemLabelFragment\n\t\t}\n\t}\n": types.CreateLabelDocument,
     "\n\tmutation updateLabel($data: UpdateLabelInput!) {\n\t\tupdateLabel(data: $data) {\n\t\t\t...SavedItemLabelFragment\n\t\t}\n\t}\n": types.UpdateLabelDocument,
     "\n\tmutation deleteLabel($data: DeleteLabelInput!) {\n\t\tdeleteLabel(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": types.DeleteLabelDocument,
@@ -216,6 +218,10 @@ export function gql(source: "\n\tmutation updateSavedItemStatus($data: UpdateSav
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n\tmutation permanentlyDeleteSavedItems($data: PermanentlyDeleteSavedItemsInput!) {\n\t\tpermanentlyDeleteSavedItems(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n"): (typeof documents)["\n\tmutation permanentlyDeleteSavedItems($data: PermanentlyDeleteSavedItemsInput!) {\n\t\tpermanentlyDeleteSavedItems(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n\tmutation emptyTrash {\n\t\temptyTrash {\n\t\t\tsuccess\n\t\t\tcount\n\t\t}\n\t}\n"): (typeof documents)["\n\tmutation emptyTrash {\n\t\temptyTrash {\n\t\t\tsuccess\n\t\t\tcount\n\t\t}\n\t}\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

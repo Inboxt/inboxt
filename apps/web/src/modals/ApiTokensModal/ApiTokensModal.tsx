@@ -16,11 +16,10 @@ import { IconTrash } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import { useEffect } from 'react';
 
-import { API_TOKENS, DELETE_API_TOKEN } from '@inboxt/graphql';
-
 import { ButtonContainer } from '~components/ButtonContainer';
 import { ConfirmWithAlert } from '~components/ConfirmWithAlert';
 import { toastSuccess } from '~components/Toast';
+import { API_TOKENS, DELETE_API_TOKEN } from '~lib/graphql';
 import { modals } from '~modals/modals';
 
 export const ApiTokensModal = ({ id, context }: ContextModalProps) => {
@@ -111,17 +110,17 @@ export const ApiTokensModal = ({ id, context }: ContextModalProps) => {
 								const lastUsedAt = token.lastUsedAt
 									? dayjs(token.lastUsedAt)
 									: null;
-								const expiresAt = token.expiresAt ? dayjs(token.expiresAt) : null;
 
+								const expiresAt = token.expiresAt ? dayjs(token.expiresAt) : null;
 								const isExpired = expiresAt ? expiresAt.isBefore(dayjs()) : false;
 
 								return (
 									<Card key={token.id}>
 										<Group justify="space-between" align="flex-start">
-											<Stack gap={6} flex={1}>
+											<Stack gap="xxs" flex={1}>
 												<Text fw={500}>{token.name}</Text>
 
-												<Breadcrumbs separator="•" separatorMargin={6}>
+												<Breadcrumbs separator="•">
 													<Text c="dimmed" size="xs">
 														Created{' '}
 														{createdAt.format('YYYY-MM-DD HH:mm')}

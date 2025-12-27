@@ -1,12 +1,19 @@
-import { ADD_ARTICLE_FROM_HTML_SNAPSHOT } from '@inboxt/graphql';
-import type {
-	AddArticleFromHtmlSnapshotMutation,
-	AddArticleFromHtmlSnapshotMutationVariables,
-	SetSavedItemLabelsMutation,
-	SetSavedItemLabelsMutationVariables,
-} from '@inboxt/graphql';
-import { SET_SAVED_ITEM_LABELS } from '@inboxt/graphql';
 import { SaveJob } from '@/types';
+import { graphqlFetch } from '@/utils/graphql.ts';
+
+const ADD_ARTICLE_FROM_HTML_SNAPSHOT = `
+  mutation AddArticleFromHtmlSnapshot($data: AddArticleFromHtmlSnapshotInput!) {
+    addArticleFromHtmlSnapshot(data: $data)
+  }
+`;
+
+const SET_SAVED_ITEM_LABELS = `
+  mutation SetSavedItemLabels($data: SetSavedItemLabelsInput!) {
+    setSavedItemLabels(data: $data) {
+      success
+    }
+  }
+`;
 
 type SaveJobResponse =
 	| { ok: true; jobId: string }
@@ -103,20 +110,13 @@ export default defineBackground(() => {
 							job.pageUrl = url;
 							job.title = url;
 
-							const { data } = await client.mutate<
-								AddArticleFromHtmlSnapshotMutation,
-								AddArticleFromHtmlSnapshotMutationVariables
-							>({
-								mutation: ADD_ARTICLE_FROM_HTML_SNAPSHOT,
-								variables: {
-									data: {
-										url,
-										html,
-									},
-								},
+							const data = await graphqlFetch<{
+								addArticleFromHtmlSnapshot: string;
+							}>(ADD_ARTICLE_FROM_HTML_SNAPSHOT, {
+								data: { url, html },
 							});
 
-							const savedItemId = data?.addArticleFromHtmlSnapshot;
+							const savedItemId = data.addArticleFromHtmlSnapshot;
 							if (!savedItemId) {
 								throw new Error('No id returned from addArticleFromHtmlSnapshot');
 							}
@@ -177,20 +177,16 @@ export default defineBackground(() => {
 
 				return (async () => {
 					try {
-						const { data } = await client.mutate<
-							SetSavedItemLabelsMutation,
-							SetSavedItemLabelsMutationVariables
-						>({
-							mutation: SET_SAVED_ITEM_LABELS,
-							variables: {
-								data: {
-									id: job.itemId!,
-									labelIds: job.labelIds,
-								},
+						const data = await graphqlFetch<{
+							setSavedItemLabels: { success: boolean };
+						}>(SET_SAVED_ITEM_LABELS, {
+							data: {
+								id: job.itemId!,
+								labelIds: job.labelIds,
 							},
 						});
 
-						if (!data?.setSavedItemLabels?.success) {
+						if (!data.setSavedItemLabels.success) {
 							throw new Error('Failed to set labels');
 						}
 

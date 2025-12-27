@@ -4,7 +4,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 
 dayjs.extend(relativeTime);
 
-export type NotificationType = 'UPDATE' | 'ALERT' | 'NEWS' | 'SURVEY';
+export type NotificationType = 'UPDATE' | 'ALERT';
 
 type AppNotificationItem = {
 	id: number;
@@ -33,11 +33,6 @@ export const AppNotificationItem = ({ item }: { item: AppNotificationItem }) => 
 			buttonText = 'View details';
 			itemColor = 'red';
 			break;
-		case 'NEWS':
-			break;
-		case 'SURVEY':
-			buttonText = 'Send feedback';
-			break;
 	}
 
 	const anchorProps = item.link
@@ -56,7 +51,7 @@ export const AppNotificationItem = ({ item }: { item: AppNotificationItem }) => 
 			<Tooltip
 				label={
 					<>
-						<Text size="xs" mb={4}>
+						<Text size="xs" mb="xxxs">
 							{item.text}
 						</Text>
 						{timeAgo && (
@@ -89,7 +84,7 @@ export const AppNotificationItem = ({ item }: { item: AppNotificationItem }) => 
 			</Tooltip>
 
 			{item.link && (
-				<Anchor {...anchorProps} fz="xs" ml={4}>
+				<Anchor {...anchorProps} fz="xs" ml="xxxs">
 					{buttonText}
 				</Anchor>
 			)}

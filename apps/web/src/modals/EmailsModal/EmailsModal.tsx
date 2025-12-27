@@ -5,9 +5,9 @@ import { IconAlertTriangleFilled } from '@tabler/icons-react';
 import { useEffect } from 'react';
 
 import { USER_INBOUND_EMAIL_ADDRESS_LIMIT } from '@inboxt/common';
-import { CREATE_INBOUND_EMAIL_ADDRESS, INBOUND_EMAIL_ADDRESSES } from '@inboxt/graphql';
 
 import { ButtonContainer } from '~components/ButtonContainer';
+import { CREATE_INBOUND_EMAIL_ADDRESS, INBOUND_EMAIL_ADDRESSES } from '~lib/graphql';
 import { modals } from '~modals/modals';
 import { parseError } from '~utils/parse-error';
 

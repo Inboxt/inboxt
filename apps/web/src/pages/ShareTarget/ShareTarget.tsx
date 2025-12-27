@@ -3,9 +3,8 @@ import { Center, Loader, Stack, Text } from '@mantine/core';
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import { useEffect, useRef } from 'react';
 
-import { ADD_ARTICLE_FROM_URL, ENTRIES } from '@inboxt/graphql';
-
 import { toastError, toastInfo } from '~components/Toast';
+import { ADD_ARTICLE_FROM_URL, ENTRIES } from '~lib/graphql';
 import { Route } from '~routes/_auth.share-target.tsx';
 
 export const ShareTarget = () => {

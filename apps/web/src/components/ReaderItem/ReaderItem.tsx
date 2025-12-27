@@ -4,10 +4,9 @@ import { IconPhotoOff } from '@tabler/icons-react';
 import { useNavigate } from '@tanstack/react-router';
 import dayjs from 'dayjs';
 
-import { SavedItem } from '@inboxt/graphql';
-
 import { useContentSelection } from '~context/content-selection';
 import { useScreenQuery } from '~hooks/useScreenQuery';
+import { SavedItem } from '~lib/graphql';
 import { Route } from '~routes/_auth.index';
 
 import { ItemsOptions } from '../ItemsOptions';
@@ -55,53 +54,18 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 		>
 			<Group wrap="nowrap" maw="100%">
 				{display === 'gallery' ? (
-					<Box style={{ position: 'relative' }}>
-						<Box
-							style={{
-								height: 90,
-								width: 90,
-								overflow: 'hidden',
-							}}
-						>
+					<Box pos="relative">
+						<Box className={classes.leadImageWrapper}>
 							{item.leadImage ? (
-								<img
-									src={item.leadImage}
-									alt=""
-									style={{
-										height: '100%',
-										width: '100%',
-										objectFit: 'cover',
-										backgroundColor:
-											'light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-5))',
-										borderRadius: 4,
-									}}
-								/>
+								<img src={item.leadImage} alt="" className={classes.leadImage} />
 							) : (
-								<Center
-									style={{
-										height: '100%',
-										width: '100%',
-										backgroundColor:
-											'light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-5))',
-										borderRadius: 4,
-									}}
-								>
+								<Center className={classes.leadImage}>
 									<IconPhotoOff size={36} color="var(--mantine-color-dimmed)" />
 								</Center>
 							)}
 						</Box>
 
-						<Box
-							style={{
-								position: 'absolute',
-								top: 0,
-								bottom: 0,
-								left: 0,
-								right: 0,
-								display: 'flex',
-								alignItems: 'center',
-							}}
-						>
+						<Box className={classes.checkboxWrapper}>
 							<ReaderCheckbox
 								checked={selected}
 								onChange={() => toggleItemSelection(item)}
@@ -124,12 +88,7 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 				)}
 
 				<Stack gap="xs" flex={1}>
-					<Breadcrumbs
-						separator="•"
-						separatorMargin={6}
-						mb={-8}
-						style={{ flexWrap: 'nowrap' }}
-					>
+					<Breadcrumbs separator="•" mb="-xxs" style={{ flexWrap: 'nowrap' }}>
 						<Text fz="sm" className={classes.text}>
 							{dayjs(item.createdAt).isSame(new Date(), 'year')
 								? dayjs(item.createdAt).format('MMM D')
@@ -148,17 +107,13 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 						</Text>
 
 						{hovered && !isBelowLgScreen && (
-							<Group
-								gap={4}
-								style={{ position: 'absolute', right: 0 }}
-								visibleFrom="lg"
-							>
+							<Group gap="xxxs" visibleFrom="lg" right={0} pos="absolute">
 								<ItemsOptions size="sm" items={[item]} mode="single" />
 							</Group>
 						)}
 					</Group>
 
-					<Text lineClamp={2} mt={-4} fz="md" className={classes.text}>
+					<Text lineClamp={2} mt="-xxxs" fz="md" className={classes.text}>
 						{item.description ? item.description : item.author}
 					</Text>
 

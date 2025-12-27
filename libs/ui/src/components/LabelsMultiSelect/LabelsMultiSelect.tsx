@@ -1,10 +1,6 @@
-import { useQuery } from '@apollo/client';
 import { Combobox, useCombobox, Pill, PillsInput, Group, Stack, Checkbox } from '@mantine/core';
 import { IconLabelImportantFilled } from '@tabler/icons-react';
 import { useState } from 'react';
-
-import { MAX_VISIBLE_SELECTED_LABELS } from '@inboxt/common';
-import { LABELS } from '@inboxt/graphql';
 
 type LabelValue = {
 	value: string;
@@ -12,26 +8,39 @@ type LabelValue = {
 	color: string;
 };
 
+type LabelData = {
+	id: string;
+	name: string;
+	color: string;
+};
+
 type LabelsMultiSelectProps = {
+	labels: LabelData[];
+	loading: boolean;
 	value?: string[];
 	onChange?: (value: string[]) => void;
 };
 
-export const LabelsMultiSelect = ({ value = [], onChange = () => {} }: LabelsMultiSelectProps) => {
+export const LabelsMultiSelect = ({
+	labels,
+	loading,
+	value = [],
+	onChange = () => {},
+}: LabelsMultiSelectProps) => {
 	const [search, setSearch] = useState('');
-	const { data, loading: labelsLoading } = useQuery(LABELS);
+	const maxVisibleSelected = 3;
 
 	const combobox = useCombobox({
 		onDropdownClose: () => combobox.resetSelectedOption(),
 		onDropdownOpen: () => combobox.updateSelectedOptionIndex('active'),
 	});
 
-	if (labelsLoading) {
+	if (loading) {
 		return null;
 	}
 
 	const labelsData: LabelValue[] =
-		data?.labels?.map((label) => ({
+		labels?.map((label) => ({
 			value: label.id,
 			label: label.name,
 			color: label.color,
@@ -43,12 +52,7 @@ export const LabelsMultiSelect = ({ value = [], onChange = () => {} }: LabelsMul
 	const handleValueRemove = (val: string) => onChange(value.filter((v) => v !== val));
 
 	const values = value
-		.slice(
-			0,
-			MAX_VISIBLE_SELECTED_LABELS === value.length
-				? MAX_VISIBLE_SELECTED_LABELS
-				: MAX_VISIBLE_SELECTED_LABELS - 1,
-		)
+		.slice(0, maxVisibleSelected === value.length ? maxVisibleSelected : maxVisibleSelected - 1)
 
 		.map((id) => {
 			const item = labelsData.find((l) => l.value === id);
@@ -103,10 +107,8 @@ export const LabelsMultiSelect = ({ value = [], onChange = () => {} }: LabelsMul
 							{value.length > 0 && (
 								<>
 									{values}
-									{value.length > MAX_VISIBLE_SELECTED_LABELS && (
-										<Pill>
-											+{value.length - (MAX_VISIBLE_SELECTED_LABELS - 1)} more
-										</Pill>
+									{value.length > maxVisibleSelected && (
+										<Pill>+{value.length - (maxVisibleSelected - 1)} more</Pill>
 									)}
 								</>
 							)}

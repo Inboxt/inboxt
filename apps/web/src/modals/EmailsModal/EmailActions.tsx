@@ -2,10 +2,9 @@ import { useMutation } from '@apollo/client';
 import { ActionIcon, Button, CopyButton, Group, Stack, Tooltip } from '@mantine/core';
 import { IconCheck, IconCopy, IconTrash } from '@tabler/icons-react';
 
-import { DELETE_INBOUND_EMAIL_ADDRESS, INBOUND_EMAIL_ADDRESSES } from '@inboxt/graphql';
-import { InboundEmailAddress } from '@inboxt/graphql';
-
 import { ConfirmWithAlert } from '~components/ConfirmWithAlert';
+import { DELETE_INBOUND_EMAIL_ADDRESS, INBOUND_EMAIL_ADDRESSES } from '~lib/graphql';
+import { InboundEmailAddress } from '~lib/graphql';
 import { modals } from '~modals/modals';
 
 type EmailActionsProps = {

@@ -4,17 +4,11 @@ import { useSearch } from '@tanstack/react-router';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import {
-	PERMANENTLY_DELETE_SAVED_ITEMS,
-	ENTRIES,
-	EntrySortField,
-	SortDirection,
-} from '@inboxt/graphql';
-
 import { ConfirmWithAlert } from '~components/ConfirmWithAlert';
 import { toastSuccess } from '~components/Toast';
 import { useContentSelection } from '~context/content-selection';
 import { AppLayout } from '~layouts/AppLayout';
+import { ENTRIES, EntrySortField, SortDirection, EMPTY_TRASH } from '~lib/graphql';
 import { modals } from '~modals/modals';
 import { Route } from '~routes/_auth.index';
 
@@ -44,7 +38,7 @@ export const ItemsList = () => {
 		fetchPolicy: 'cache-and-network',
 	});
 
-	const [permanentlyDeleteSavedItems] = useMutation(PERMANENTLY_DELETE_SAVED_ITEMS, {
+	const [emptyTrash] = useMutation(EMPTY_TRASH, {
 		refetchQueries: [ENTRIES],
 	});
 
@@ -110,24 +104,15 @@ export const ItemsList = () => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [q, sort]);
 
-	const handlePermanentlyDeleteSavedItems = async () => {
-		const savedItemIds = items
-			.filter(({ node }) => node.__typename === 'SavedItem')
-			.map(({ node }) => node.id);
-
-		if (savedItemIds.length === 0) {
-			return;
-		}
-
-		const count = savedItemIds.length;
+	const handleEmptyTrash = async () => {
 		const confirmed = await new Promise<boolean>((resolve) => {
 			modals.openConfirmModal({
-				title: 'Delete Permanently',
+				title: 'Empty Trash',
 				centered: true,
 				children: (
 					<ConfirmWithAlert
 						lines={[
-							`Are you sure you want to permanently delete ${count > 1 ? `${count} items` : 'this item'}?`,
+							'Are you sure you want to permanently delete all items in the trash?',
 							'This action cannot be undone.',
 						]}
 					/>
@@ -143,16 +128,13 @@ export const ItemsList = () => {
 			return;
 		}
 
-		// todo: delete all in trash not only ones that are currently visible on frontend
-		await permanentlyDeleteSavedItems({
-			variables: { data: { ids: savedItemIds } },
-		});
-
+		const result = await emptyTrash();
+		const count = result.data?.emptyTrash?.count ?? 0;
 		toastSuccess({
 			title:
-				count > 1
-					? `${count} items were deleted permanently`
-					: 'Item was deleted permanently',
+				count > 0
+					? `${count} item${count === 1 ? '' : 's'} permanently deleted`
+					: 'Trash is already empty',
 		});
 	};
 
@@ -177,11 +159,7 @@ export const ItemsList = () => {
 							Items in Trash will be automatically deleted after 30 days.
 						</Text>
 
-						<Button
-							variant="transparent"
-							size="compact-sm"
-							onClick={handlePermanentlyDeleteSavedItems}
-						>
+						<Button variant="transparent" size="compact-sm" onClick={handleEmptyTrash}>
 							Empty Trash Now
 						</Button>
 					</Group>

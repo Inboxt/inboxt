@@ -1,4 +1,4 @@
-import { CreateHighlightSegmentInput, Highlight } from '@inboxt/graphql';
+import { CreateHighlightSegmentInput, Highlight } from '~lib/graphql';
 
 export interface SafeRange {
 	node: Text;
@@ -215,26 +215,6 @@ export const lookupByXPath = (xpath: string, container: HTMLElement): Text | nul
 		}
 	} catch (_err) {
 		// ignore
-	}
-
-	return null;
-};
-
-export const findByTextFallback = (text: string, container: HTMLElement): Text | null => {
-	const needle = text?.trim();
-	if (!needle) {
-		return null;
-	}
-
-	const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, null);
-	let n = walker.nextNode();
-
-	while (n) {
-		if ((n.textContent ?? '').includes(needle)) {
-			return n as Text;
-		}
-
-		n = walker.nextNode();
 	}
 
 	return null;

@@ -9,8 +9,6 @@ export const MAX_ARTICLE_WORD_COUNT = 15000;
 export const MIN_NEWSLETTER_WORD_COUNT = 100;
 /** Maximum word count for newsletters before they're considered too large */
 export const MAX_NEWSLETTER_WORD_COUNT = 15000;
-/** Maximum number of labels displayed in the label selector */
-export const MAX_VISIBLE_SELECTED_LABELS = 3;
 /** Sort options for saved items. Backend uses a separate DTO structure with field and direction. */
 export const SORT_OPTIONS = [
 	{ value: 'date_desc', label: 'Date (newest first)' },

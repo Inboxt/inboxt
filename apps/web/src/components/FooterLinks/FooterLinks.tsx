@@ -10,7 +10,6 @@ export const FooterLinks = ({ justify = 'flex-start' }: FooterLinksProps) => {
 	return (
 		<Breadcrumbs
 			separator="•"
-			separatorMargin={6}
 			classNames={{
 				separator: classes.separator,
 			}}

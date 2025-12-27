@@ -2,11 +2,11 @@ import { Text, Group, Stack, ActionIcon, Button, Collapse, Skeleton } from '@man
 import { IconChevronDown, IconChevronUp } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 
-import { AppNotificationItem } from './AppNotificationItem';
+import { AppNotificationItem, NotificationType } from './AppNotificationItem';
 import classes from './AppNotifications.module.css';
 
 type RemoteNotification = {
-	type: 'UPDATE' | 'ALERT' | 'NEWS' | 'SURVEY';
+	type: NotificationType;
 	badge?: string;
 	date?: string;
 	text: string;
@@ -29,7 +29,7 @@ export const AppNotifications = () => {
 				setIsLoading(true);
 				setError(null);
 
-				const res = await fetch(`${process.env.API_URL}/notifications`, {
+				const res = await fetch(`${import.meta.env.VITE_API_URL}/notifications`, {
 					cache: 'no-store',
 				});
 

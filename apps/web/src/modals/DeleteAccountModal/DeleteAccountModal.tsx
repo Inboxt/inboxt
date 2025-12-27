@@ -6,17 +6,17 @@ import { IconAlertTriangleFilled } from '@tabler/icons-react';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 
 import { deleteAccountSchema } from '@inboxt/common';
-import { DELETE_ACCOUNT } from '@inboxt/graphql';
 
 import { ButtonContainer } from '~components/ButtonContainer';
 import { Form } from '~components/Form';
-import { client } from '~utils/client.ts';
-
-import { router } from '../../main';
+import { DELETE_ACCOUNT } from '~lib/graphql';
+import { client } from '~lib/graphql/client.ts';
+import { router } from '~router/index.tsx';
 
 export const DeleteAccountModal = ({ id, context }: ContextModalProps) => {
 	const [deleteAccount, { loading, error }] = useMutation(DELETE_ACCOUNT);
 	const form = useForm({
+		mode: 'uncontrolled',
 		initialValues: {
 			emailAddress: '',
 		},
@@ -31,7 +31,7 @@ export const DeleteAccountModal = ({ id, context }: ContextModalProps) => {
 	};
 
 	return (
-		<Form onSubmit={form.onSubmit(handleDeleteAccount)} error={error} style={{ flex: 1 }}>
+		<Form onSubmit={form.onSubmit(handleDeleteAccount)} error={error}>
 			{({ error }) => (
 				<Stack gap="xl" flex={1}>
 					<Alert color="red" icon={<IconAlertTriangleFilled />} variant="light">
@@ -46,6 +46,7 @@ export const DeleteAccountModal = ({ id, context }: ContextModalProps) => {
 
 							<TextInput
 								placeholder="Enter your email address"
+								key={form.key('emailAddress')}
 								{...form.getInputProps('emailAddress')}
 							/>
 						</Stack>

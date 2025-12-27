@@ -2,7 +2,6 @@ import { useMutation, useQuery } from '@apollo/client';
 import { Avatar } from '@mantine/core';
 import {
 	IconCloudUpload,
-	IconDownload,
 	IconKey,
 	IconLogout,
 	IconMail,
@@ -11,10 +10,9 @@ import {
 } from '@tabler/icons-react';
 import { useNavigate } from '@tanstack/react-router';
 
-import { ACTIVE_USER, SIGN_OUT } from '@inboxt/graphql';
-
+import { ACTIVE_USER, SIGN_OUT } from '~lib/graphql';
+import { client } from '~lib/graphql/client.ts';
 import { modals } from '~modals/modals';
-import { client } from '~utils/client.ts';
 
 import { MenuDrawer } from '../MenuDrawer';
 
@@ -71,7 +69,7 @@ export const UserMenu = () => {
 				name={data?.me?.username || 'User'}
 				color="initials"
 				allowedInitialsColors={['primary']}
-				radius={4}
+				radius="sm"
 				style={{ cursor: 'pointer' }}
 			/>
 		</MenuDrawer>

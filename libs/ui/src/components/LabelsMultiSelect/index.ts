@@ -1,1 +1,1 @@
-export { LabelsMultiSelect } from './LabelsMultiSelect.tsx';
+export { LabelsMultiSelect } from './LabelsMultiSelect';

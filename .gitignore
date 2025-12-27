@@ -29,3 +29,9 @@ apps/api/prisma/client
 # TypeScript incremental build info
 *.tsbuildinfo
 **/*.tsbuildinfo
+
+# Development PWA dist folder
+apps/web/dev-dist
+
+# Tanstack temp
+apps/web/.tanstack/tmp/

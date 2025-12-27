@@ -10,7 +10,6 @@ services:
       POSTGRES_DB: ${DATABASE_NAME}
       TZ: "UTC"
       PGTZ: "UTC"
-      
       PGUSER: "postgres"
     volumes:
       - db-data:/var/lib/postgresql
@@ -52,23 +51,6 @@ services:
         condition: service_healthy
       valkey:
         condition: service_healthy
-
-  web:
-    container_name: "web"
-    restart: always
-    build:
-      context: .
-      dockerfile: ./apps/web/Dockerfile
-    ports:
-      - ${WEB_PORT}:${WEB_PORT}
-    volumes:
-      - ./apps/web/src:/usr/src/app/apps/web/src:cached
-      - ./apps/web/vite.config.mts:/usr/src/app/apps/web/vite.config.mts:cached
-      - ./apps/web/index.html:/usr/src/app/apps/web/index.html:cached
-      - ./apps/web/public:/usr/src/app/apps/web/public:cached
-      - ./.env:/usr/src/app/.env:cached
-    depends_on:
-      - database
         
   mailpit:
     image: axllent/mailpit

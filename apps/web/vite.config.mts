@@ -5,28 +5,23 @@ import { tanstackRouter } from '@tanstack/router-plugin/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig(({ mode }) => {
-	const env = {
-		...process.env,
-		...loadEnv(mode, '../../', ''),
-	};
+	const rootEnv = loadEnv(mode, '../../', '');
+	Object.assign(process.env, rootEnv);
 
 	return {
+		envDir: '../../',
 		server: {
 			host: '0.0.0.0',
-			port: Number(env.WEB_PORT),
+			port: Number(process.env.WEB_PORT) || 3000,
 			proxy: {
-				'/graphql': env.API_URL as string,
-				'/inbox': env.API_URL as string,
+				'/graphql': process.env.API_URL!,
+				'/inbox': process.env.API_URL!,
 			},
-		},
-		define: {
-			'process.env': env,
 		},
 		plugins: [
 			tanstackRouter({
 				target: 'react',
 				autoCodeSplitting: true,
-				tmpDir: 'src/.tsr-temp',
 			}),
 			react(),
 			tsconfigPaths(),
@@ -77,7 +72,7 @@ export default defineConfig(({ mode }) => {
 			},
 		},
 		optimizeDeps: {
-			include: ['@inboxt/common', '@inboxt/ui', '@inboxt/graphql'],
+			include: ['@inboxt/common', '@inboxt/ui'],
 		},
 	};
 });

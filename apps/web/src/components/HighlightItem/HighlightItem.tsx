@@ -4,12 +4,11 @@ import { IconQuoteFilled } from '@tabler/icons-react';
 import { useNavigate } from '@tanstack/react-router';
 import dayjs from 'dayjs';
 
-import { Highlight } from '@inboxt/graphql';
-
 import { ItemsOptions } from '~components/ItemsOptions';
 import { ReaderCheckbox } from '~components/ReaderCheckbox';
 import { useContentSelection } from '~context/content-selection';
 import { useScreenQuery } from '~hooks/useScreenQuery.tsx';
+import { Highlight } from '~lib/graphql';
 
 import classes from './HighlightItem.module.css';
 
@@ -59,13 +58,9 @@ export const HighlightItem = ({ highlight }: HighlightItemProps) => {
 					px={3}
 				/>
 
-				<Stack gap={6} flex={1}>
+				<Stack gap="xxs" flex={1}>
 					<Group wrap="nowrap" gap="md" pos="relative">
-						<Breadcrumbs
-							separator="•"
-							separatorMargin={6}
-							style={{ flexWrap: 'nowrap' }}
-						>
+						<Breadcrumbs separator="•" className={classes.breadcrumb}>
 							<Text fz="sm" className={classes.text}>
 								{sourceTitle}
 							</Text>
@@ -78,7 +73,7 @@ export const HighlightItem = ({ highlight }: HighlightItemProps) => {
 						</Breadcrumbs>
 
 						{hovered && !isBelowLgScreen && (
-							<Group gap={4} pos="absolute" right={0} visibleFrom="lg">
+							<Group gap="xxxs" pos="absolute" right={0} visibleFrom="lg">
 								<ItemsOptions size="sm" items={[highlight]} mode="highlights" />
 							</Group>
 						)}

@@ -10,9 +10,14 @@
 		"type:check-web": "tsc --noEmit -p apps/web/tsconfig.app.json",
 		"type:check-common": "tsc --noEmit -p libs/common",
 		"lint": "eslint --ext .ts,.tsx,.js,.jsx apps",
+		"dev": "concurrently -k --names \"SYSTEM,WEB\" --prefix-colors \"cyan,green\" \"docker compose up\" \"npm run dev --workspace=apps/web\"",
 		"dev:extension": "npm run dev --workspace=apps/web-extension",
 		"build:common": "npm run build --workspace=libs/common",
-		"codegen": "npm run codegen --workspace=libs/graphql"
+		"codegen": "npm run codegen --workspace=apps/web",
+		"api:docker:migrate": "docker compose exec api sh -c \"cd apps/api && npm run migrate:up\"",
+		"api:docker:generate": "docker compose exec api sh -c \"cd apps/api && npm run prisma:generate\"",
+		"api:docker:introspect": "docker compose exec api sh -c \"cd apps/api && npm run prisma:introspect\"",
+		"api:docker:seed": "docker compose exec -T api sh -c \"cd apps/api && npm run db:seed\""
 	},
 	"dependencies": {
 		"dayjs": "1.11.19",
@@ -22,9 +27,10 @@
 	},
 	"devDependencies": {
 		"@eslint/js": "9.39.1",
+		"concurrently": "^9.2.1",
 		"eslint": "9.39.1",
-		"eslint-plugin-import": "2.32.0",
 		"eslint-config-prettier": "10.1.8",
+		"eslint-plugin-import": "2.32.0",
 		"eslint-plugin-prettier": "5.5.4",
 		"globals": "16.5.0",
 		"prettier": "3.6.2",

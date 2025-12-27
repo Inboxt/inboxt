@@ -47,7 +47,7 @@ export const CustomToast = (props: ToastProps) => {
 	return (
 		<Paper
 			p="sm"
-			radius={4}
+			radius="sm"
 			withBorder
 			className={classes.container}
 			miw={356}

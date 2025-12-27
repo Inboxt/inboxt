@@ -20,14 +20,7 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { ContextModalProps } from '@mantine/modals';
-import {
-	IconBell,
-	IconDatabase,
-	IconHighlight,
-	IconTag,
-	IconPuzzle,
-	IconDeviceMobile,
-} from '@tabler/icons-react';
+import { IconBell, IconDatabase, IconHighlight, IconTag, IconPuzzle } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
@@ -41,16 +34,15 @@ import {
 	USER_INBOUND_EMAIL_ADDRESS_LIMIT,
 	USER_LABELS_LIMIT,
 } from '@inboxt/common';
-import { ACTIVE_USER, ExportType, UPDATE_ACCOUNT } from '@inboxt/graphql';
 
 import { ButtonContainer } from '~components/ButtonContainer';
 import { Form } from '~components/Form';
 import { toastSuccess } from '~components/Toast';
 import { useScreenQuery } from '~hooks/useScreenQuery.tsx';
+import { ACTIVE_USER, ExportType, UPDATE_ACCOUNT } from '~lib/graphql';
 import { modals } from '~modals/modals';
+import { router } from '~router/index.tsx';
 import { getUserStorage } from '~utils/userStorage.ts';
-
-import { router } from '../../main';
 
 export const ProfileModal = ({ id, context }: ContextModalProps) => {
 	const { setColorScheme, colorScheme } = useMantineColorScheme();
@@ -123,8 +115,16 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 					<Card>
 						<Skeleton visible={loading}>
 							<SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
-								<TextInput label="Name" {...form.getInputProps('username')} />
-								<TextInput label="Email" {...form.getInputProps('emailAddress')} />
+								<TextInput
+									label="Name"
+									key={form.key('username')}
+									{...form.getInputProps('username')}
+								/>
+								<TextInput
+									label="Email"
+									key={form.key('emailAddress')}
+									{...form.getInputProps('emailAddress')}
+								/>
 							</SimpleGrid>
 
 							{data?.me?.pendingEmailAddress && (
@@ -157,8 +157,6 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 					<Card>
 						<Stack gap="md">
 							<Title order={5}>Install & access</Title>
-
-							{/* Browser extension */}
 							<Flex
 								justify="space-between"
 								align={{ base: 'stretch', xs: 'center' }}

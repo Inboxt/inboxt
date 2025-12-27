@@ -81,7 +81,7 @@ export const ReaderSettingsPopover = ({
 				}}
 				title={<Title order={4}>{label}</Title>}
 			>
-				<Box pt={8}>{children}</Box>
+				<Box pt="xxs">{children}</Box>
 			</Drawer>
 		</>
 	);

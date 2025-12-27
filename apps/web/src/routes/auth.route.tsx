@@ -1,9 +1,8 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
 
-import { ACTIVE_USER } from '@inboxt/graphql';
-
+import { ACTIVE_USER } from '~lib/graphql';
+import { client } from '~lib/graphql/client.ts';
 import { Auth } from '~pages/Auth';
-import { client } from '~utils/client.ts';
 
 export type AuthMode = 'login' | 'signup' | 'demo' | 'forgot-password' | undefined;
 

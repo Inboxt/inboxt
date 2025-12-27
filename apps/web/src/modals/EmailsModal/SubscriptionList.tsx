@@ -2,10 +2,9 @@ import { Button, Group, Stack, Text, Title, Flex } from '@mantine/core';
 import dayjs from 'dayjs';
 import { useState } from 'react';
 
-import { NewsletterSubscription } from '@inboxt/graphql';
-
 import { NewsletterSubscriptionButton } from '~components/NewsletterSubscriptionButton';
 import { useScreenQuery } from '~hooks/useScreenQuery';
+import { NewsletterSubscription } from '~lib/graphql';
 
 type SubscriptionsListProps = {
 	emailId: string;
@@ -41,7 +40,7 @@ export const SubscriptionList = ({
 	const subsToShow = isExpanded ? subscriptions : subscriptions.slice(0, maxVisible);
 
 	return (
-		<Stack gap={4}>
+		<Stack gap="xxxs">
 			<Title order={5}>{title}</Title>
 			{subsToShow.map((sub) => (
 				<Flex
@@ -68,6 +67,7 @@ export const SubscriptionList = ({
 						>
 							{sub.name}
 						</Text>
+
 						{sub.lastReceivedAt && (
 							<Text size="xs" c="dimmed">
 								Recently received:{' '}

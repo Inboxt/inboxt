@@ -2,11 +2,10 @@ import { Box, Divider, Flex } from '@mantine/core';
 import { IconLetterCase, IconPaint, IconX } from '@tabler/icons-react';
 import { useCanGoBack, useNavigate, useRouter } from '@tanstack/react-router';
 
-import { SavedItem } from '@inboxt/graphql';
-
 import { FormReadingSettings } from '~forms/FormReadingSettings';
 import { FormReadingThemeSettings } from '~forms/FormReadingThemeSettings';
 import { useScreenQuery } from '~hooks/useScreenQuery';
+import { SavedItem } from '~lib/graphql';
 import { Route } from '~routes/r.$id';
 
 import { ItemsOptions } from '../ItemsOptions';
