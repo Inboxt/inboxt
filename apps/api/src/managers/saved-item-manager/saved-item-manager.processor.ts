@@ -26,6 +26,7 @@ interface NewsletterProcessingJobData {
 		savedItemId: string;
 		inboundEmailAddressId: string | null;
 		messageId: string | null;
+		eventId: string | null;
 	};
 	input: ProcessNewsletterInput;
 	prismaData?: Partial<

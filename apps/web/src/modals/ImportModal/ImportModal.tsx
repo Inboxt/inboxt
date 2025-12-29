@@ -4,6 +4,7 @@ import { IconCsv, IconZip } from '@tabler/icons-react';
 import { ReactNode, useState } from 'react';
 
 import { ButtonContainer } from '~components/ButtonContainer';
+import { Form } from '~components/Form';
 import { toastInfo } from '~components/Toast';
 
 type ImportType = 'CSV' | 'ZIP_ARCHIVE';
@@ -41,23 +42,23 @@ export const ImportModal = ({ id, context }: ContextModalProps<ImportModalProps>
 	const [selectedType, setSelectedType] = useState<ImportType | null>(null);
 	const [file, setFile] = useState<File | null>(null);
 	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState<string>();
+	const [importError, setImportError] = useState<string>();
 
 	const selectedOption = importOptions.find((opt) => opt.type === selectedType);
 
 	const handleImport = async () => {
 		if (!selectedType) {
-			setError('Please choose an import source.');
+			setImportError('Please choose an import source.');
 			return;
 		}
 
 		if (!file) {
-			setError('Please select a file to import.');
+			setImportError('Please select a file to import.');
 			return;
 		}
 
 		setLoading(true);
-		setError(undefined);
+		setImportError(undefined);
 
 		try {
 			const formData = new FormData();
@@ -72,7 +73,7 @@ export const ImportModal = ({ id, context }: ContextModalProps<ImportModalProps>
 
 			if (!response.ok) {
 				const error = (await response.json()) as { message?: string };
-				setError(error.message || 'Failed to upload file.');
+				setImportError(error.message || 'Failed to upload file.');
 				return;
 			}
 
@@ -84,90 +85,107 @@ export const ImportModal = ({ id, context }: ContextModalProps<ImportModalProps>
 			context.closeModal(id);
 		} catch (err) {
 			console.error(err);
-			setError('Internal server error.');
+			setImportError('Internal server error.');
 		} finally {
 			setLoading(false);
 		}
 	};
 
 	return (
-		<Stack gap="xl">
-			{!selectedType && (
-				<Alert color="gray">
-					You can import your saved items using a CSV file or a ZIP archive. CSV imports
-					might take a bit longer to finish. Items will appear in your library as they are
-					processed in the background.
-				</Alert>
-			)}
+		<Form
+			onSubmit={(e) => {
+				e.preventDefault();
+				void handleImport();
+			}}
+			error={importError}
+		>
+			{({ error }) => (
+				<Stack gap="xl">
+					{!selectedType && (
+						<Alert color="gray">
+							You can import your saved items using a CSV file or a ZIP archive. CSV
+							imports might take a bit longer to finish. Items will appear in your
+							library as they are processed in the background.
+						</Alert>
+					)}
 
-			{!selectedType && (
-				<Stack>
-					{importOptions.map((opt) => (
-						<Card
-							key={opt.type}
-							onClick={() => setSelectedType(opt.type)}
-							style={{ cursor: 'pointer' }}
-						>
-							<Flex gap="sm" align="flex-start">
-								{opt.icon}
-								<Stack gap={2}>
-									<Text fw={500}>{opt.label}</Text>
-									<Text size="xs" c="dimmed">
-										{opt.description}
-									</Text>
-								</Stack>
-							</Flex>
+					{!selectedType && (
+						<Stack>
+							{importOptions.map((opt) => (
+								<Card
+									key={opt.type}
+									onClick={() => setSelectedType(opt.type)}
+									style={{ cursor: 'pointer' }}
+								>
+									<Flex gap="sm" align="flex-start">
+										{opt.icon}
+										<Stack gap={2}>
+											<Text fw={500}>{opt.label}</Text>
+											<Text size="xs" c="dimmed">
+												{opt.description}
+											</Text>
+										</Stack>
+									</Flex>
+								</Card>
+							))}
+						</Stack>
+					)}
+
+					{selectedType && (
+						<Card>
+							<Stack gap="sm">
+								<Flex justify="space-between" align="center">
+									<Title order={5}>{selectedOption?.label}</Title>
+									<Button
+										variant="subtle"
+										size="xs"
+										onClick={() => {
+											setSelectedType(null);
+											setImportError(undefined);
+										}}
+										disabled={loading}
+										type="button"
+									>
+										Change
+									</Button>
+								</Flex>
+
+								<Text size="sm">{selectedOption?.description}</Text>
+
+								<FileInput
+									label="Select File"
+									placeholder="Choose the export file"
+									value={file}
+									onChange={setFile}
+									accept={selectedOption?.accept}
+								/>
+
+								{error}
+							</Stack>
 						</Card>
-					))}
+					)}
+
+					<ButtonContainer>
+						<Button
+							variant="default"
+							onClick={() => {
+								if (selectedType) {
+									setSelectedType(null);
+									setImportError(undefined);
+								} else {
+									context.closeModal(id);
+								}
+							}}
+							disabled={loading}
+						>
+							Cancel
+						</Button>
+						<Button type="submit" loading={loading} disabled={!selectedType}>
+							Import
+						</Button>
+					</ButtonContainer>
 				</Stack>
 			)}
-
-			{selectedType && (
-				<Card>
-					<Stack gap="sm">
-						<Flex justify="space-between" align="center">
-							<Title order={5}>{selectedOption?.label}</Title>
-							<Button
-								variant="subtle"
-								size="xs"
-								onClick={() => setSelectedType(null)}
-								disabled={loading}
-							>
-								Change
-							</Button>
-						</Flex>
-
-						<Text size="sm">{selectedOption?.description}</Text>
-
-						<FileInput
-							label="Select File"
-							placeholder="Choose the export file"
-							value={file}
-							onChange={setFile}
-							accept={selectedOption?.accept}
-						/>
-
-						{error && (
-							<Text c="red" size="sm">
-								{error}
-							</Text>
-						)}
-					</Stack>
-				</Card>
-			)}
-
-			<ButtonContainer>
-				<Button
-					variant="default"
-					onClick={() => (selectedType ? setSelectedType(null) : context.closeModal(id))}
-					disabled={loading}
-				>
-					Cancel
-				</Button>
-				<Button onClick={handleImport} loading={loading} disabled={!selectedType}>
-					Import
-				</Button>
-			</ButtonContainer>
-		</Stack>
+		</Form>
 	);
 };

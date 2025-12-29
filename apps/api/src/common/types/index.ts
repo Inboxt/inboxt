@@ -63,6 +63,7 @@ export type SavedItemExportJson = {
 	contentHtml: string | null;
 	contentText: string | null;
 	messageId: string | null;
+	eventId: string | null;
 	inboundEmailAddressId: string | null;
 	subscription: string | null;
 };

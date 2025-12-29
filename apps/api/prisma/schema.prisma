@@ -100,6 +100,7 @@ model newsletter {
   contentHtml             String
   contentText             String
   messageId               String?
+  eventId                 String?
   subscriptionId          String?                  @db.Uuid
   sizeBytes               BigInt                   @default(0)
   inbound_email_address   inbound_email_address?   @relation(fields: [inboundEmailAddressId], references: [id], onUpdate: NoAction)
@@ -109,6 +110,7 @@ model newsletter {
   @@index([inboundEmailAddressId], map: "newsletter_inboundEmailAddressId_index")
   @@index([messageId], map: "newsletter_messageId_index")
   @@index([subscriptionId], map: "newsletter_subscriptionId_index")
+  @@index([eventId], map: "newsletter_eventId_index")
 }
 
 model newsletter_subscription {

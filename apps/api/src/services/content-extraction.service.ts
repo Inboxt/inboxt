@@ -183,7 +183,11 @@ export class ContentExtractionService {
 			);
 		}
 
-		if (!isProbablyReaderable(doc)) {
+		if (
+			!isProbablyReaderable(doc, {
+				minContentLength: 5,
+			})
+		) {
 			throw new AppException(
 				'We were unable to extract the readable portion of this content. \n The page or document may not contain structured text, or it may be unsupported. \n\n Please check the source and try again. If the issue persists, contact support for assistance.',
 				HttpStatus.BAD_REQUEST,

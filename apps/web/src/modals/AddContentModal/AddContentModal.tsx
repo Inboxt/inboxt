@@ -51,7 +51,7 @@ export const AddContentModal = ({ id, context }: ContextModalProps) => {
 					<Card>
 						<Stack gap="md">
 							<TextInput
-								placeholder="https://example.com/"
+								placeholder="https://inboxt.app/"
 								key={form.key('url')}
 								{...form.getInputProps('url')}
 								label="Page URL"

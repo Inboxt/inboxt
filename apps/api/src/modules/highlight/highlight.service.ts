@@ -1,6 +1,7 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import dayjs from 'dayjs';
 
+import { createHighlightSchema } from '@inboxt/common';
 import { Prisma } from '@inboxt/prisma';
 
 import { GetHighlightsQuery } from '~common/types';
@@ -136,6 +137,7 @@ export class HighlightService {
 	}
 
 	async create(userId: string, data: CreateHighlightInput) {
+		await createHighlightSchema.parseAsync(data);
 		return this.prisma.$transaction(async (prisma) => {
 			const highlight = await prisma.highlight.create({
 				data: {

@@ -4,6 +4,7 @@ import { ContextModalProps } from '@mantine/modals';
 import { useState } from 'react';
 
 import { ButtonContainer } from '~components/ButtonContainer';
+import { Form } from '~components/Form';
 import { toastInfo } from '~components/Toast';
 import { ACTIVE_USER, REQUEST_EXPORT } from '~lib/graphql';
 import { ExportHighlightsFormat, ExportType } from '~lib/graphql';
@@ -21,7 +22,8 @@ export const ExportDataModal = ({
 		ExportHighlightsFormat.Html,
 	);
 	const { data, loading } = useQuery(ACTIVE_USER, { fetchPolicy: 'network-only' });
-	const [requestExport, { loading: loadingRequestExport }] = useMutation(REQUEST_EXPORT);
+	const [requestExport, { loading: loadingRequestExport, error: requestExportError }] =
+		useMutation(REQUEST_EXPORT);
 
 	const { type } = innerProps;
 
@@ -52,58 +54,73 @@ export const ExportDataModal = ({
 	};
 
 	return (
-		<Stack gap="xl">
-			<Card>
-				<Stack gap="md">
-					<Text size="sm">
-						{type === ExportType.All
-							? 'Request a full account export once per day. It includes your saved items, highlights, labels, and metadata. The export will be prepared and sent to your email address. Large exports can take a while to complete.'
-							: 'Export your highlights instantly in your chosen format. The file will download directly in your browser.'}
-					</Text>
+		<Form
+			onSubmit={(e) => {
+				e.preventDefault();
+				void handleRequestExport();
+			}}
+			error={requestExportError}
+		>
+			{({ error }) => (
+				<Stack gap="xl">
+					<Card>
+						<Stack gap="md">
+							<Text size="sm">
+								{type === ExportType.All
+									? 'Request a full account export once per day. It includes your saved items, highlights, labels, and metadata. The export will be prepared and sent to your email address. Large exports can take a while to complete.'
+									: 'Export your highlights instantly in your chosen format. The file will download directly in your browser.'}
+							</Text>
 
-					{type === ExportType.All && loading && <Skeleton height={80} />}
-					{type === ExportType.All && !loading && (
-						<TextInput
-							variant="filled"
-							label="E-mail Address"
-							value={data?.me?.emailAddress}
-							readOnly
-							description="If this address is incorrect, please update it in your profile."
-						/>
-					)}
+							{type === ExportType.All && loading && <Skeleton height={80} />}
+							{type === ExportType.All && !loading && (
+								<TextInput
+									variant="filled"
+									label="E-mail Address"
+									value={data?.me?.emailAddress}
+									readOnly
+									description="If this address is incorrect, please update it in your profile."
+								/>
+							)}
 
-					<Stack gap="xxxs">
-						<Text size="sm" fw={500}>
-							{type === ExportType.All ? 'Highlights Format' : 'Format'}
-						</Text>
+							<Stack gap="xxxs">
+								<Text size="sm" fw={500}>
+									{type === ExportType.All ? 'Highlights Format' : 'Format'}
+								</Text>
 
-						<SegmentedControl
-							color="dark.5"
-							value={formatForHighlights}
-							onChange={setFormatForHighlights}
-							data={[
-								{ label: 'HTML', value: ExportHighlightsFormat.Html },
-								{ label: 'Markdown', value: ExportHighlightsFormat.Markdown },
-								{ label: 'Text', value: ExportHighlightsFormat.Text },
-							]}
-						/>
-					</Stack>
+								<SegmentedControl
+									color="dark.5"
+									value={formatForHighlights}
+									onChange={setFormatForHighlights}
+									data={[
+										{ label: 'HTML', value: ExportHighlightsFormat.Html },
+										{
+											label: 'Markdown',
+											value: ExportHighlightsFormat.Markdown,
+										},
+										{ label: 'Text', value: ExportHighlightsFormat.Text },
+									]}
+								/>
+							</Stack>
+
+							{error}
+						</Stack>
+					</Card>
+
+					<ButtonContainer>
+						<Button
+							variant="default"
+							onClick={() => context.closeModal(id)}
+							loading={loadingRequestExport}
+						>
+							Cancel
+						</Button>
+
+						<Button type="submit" loading={loadingRequestExport}>
+							Export {type === ExportType.All ? 'All Data' : 'Highlights'}
+						</Button>
+					</ButtonContainer>
 				</Stack>
-			</Card>
-
-			<ButtonContainer>
-				<Button
-					variant="default"
-					onClick={() => context.closeModal(id)}
-					loading={loadingRequestExport}
-				>
-					Cancel
-				</Button>
-
-				<Button onClick={handleRequestExport} loading={loadingRequestExport}>
-					Export {type === ExportType.All ? 'All Data' : 'Highlights'}
-				</Button>
-			</ButtonContainer>
-		</Stack>
+			)}
+		</Form>
 	);
 };

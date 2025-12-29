@@ -6,6 +6,7 @@ import {
 	addArticleFromHtmlSnapshotSchema,
 	addItemFromUrlSchema,
 	APP_PRIMARY_COLOR,
+	inboundEmailEventSchema,
 } from '@inboxt/common';
 import { Prisma } from '@inboxt/prisma';
 
@@ -21,6 +22,7 @@ import {
 import { getDefaultItems } from '~common/content';
 import { SavedItemType } from '~common/enums/saved-item-type.enum';
 import { AppException } from '~common/utils/app-exception';
+import { fetchJsonWithTimeout } from '~common/utils/fetchJsonWithTimeout';
 import { InboundEmailAddressService } from '~modules/inbound-email-address/inbound-email-address.service';
 import { MailService } from '~modules/mail/mail.service';
 import { PrismaService } from '~modules/prisma/prisma.service';
@@ -314,6 +316,7 @@ export class SavedItemManagerService {
 			savedItemId: string;
 			inboundEmailAddressId?: string | null;
 			messageId?: string | null;
+			eventId?: string | null;
 		},
 		input: ProcessNewsletterInput,
 		prismaData?: Partial<
@@ -330,6 +333,7 @@ export class SavedItemManagerService {
 					contentHtml: parsed?.contentHtml || DEFAULT_PROCESSED_ITEM_CONTENT,
 					contentText: parsed?.contentText || DEFAULT_PROCESSED_ITEM_CONTENT,
 					messageId: ids.messageId,
+					eventId: ids.eventId,
 				},
 				client,
 			);
@@ -393,6 +397,7 @@ export class SavedItemManagerService {
 		userId: string,
 		inboundEmailAddressId: string | null,
 		messageId: string | null,
+		eventId: string | null,
 		input: ProcessNewsletterInput,
 		prismaData?: Partial<
 			Omit<Prisma.saved_itemCreateInput, 'user' | 'saved_item_label' | 'newsletter' | 'id'>
@@ -414,6 +419,7 @@ export class SavedItemManagerService {
 					userId,
 					inboundEmailAddressId,
 					messageId,
+					eventId,
 					savedItemId: created.id,
 				},
 				input,
@@ -430,54 +436,57 @@ export class SavedItemManagerService {
 	}
 
 	async addNewsletterFromEmail(payload: any) {
-		const messageId = payload?._id;
+		const parsed = inboundEmailEventSchema.safeParse(payload);
+		if (!parsed.success) {
+			this.logger.warn('Invalid Maileroo payload shape. Skipping.');
+			return;
+		}
+
+		const event = parsed.data;
+		const eventId = event._id;
+		const messageId = event.message_id;
+
 		this.logger.log(
-			`Starting to parse incoming newsletter email with messageId: ${messageId || 'unknown'}`,
+			`Starting to parse incoming newsletter email with eventId: ${eventId || 'unknown'}`,
 		);
 
-		// Finding the recipient email address
-		const toAddresses: string[] = payload.recipients?.length
-			? payload.recipients
-			: (payload.headers?.To ?? []);
-
-		if (!toAddresses.length || !toAddresses[0]) {
+		const toAddresses: string[] = event.recipients?.length
+			? event.recipients
+			: (event.headers?.To ?? []);
+		const recipient = toAddresses?.[0] ?? null;
+		if (!recipient) {
 			this.logger.warn('No recipient addresses found in payload.');
 			return;
 		}
 
-		const inboundEmailAddress = await this.inboundEmailAddressService.verify(toAddresses[0]);
+		const inboundEmailAddress = await this.inboundEmailAddressService.verify(recipient);
 		if (!inboundEmailAddress || !inboundEmailAddress?.userId) {
-			this.logger.warn(`Recipient ${toAddresses[0]} is not a valid or active inbox address.`);
+			this.logger.warn(`Recipient ${recipient} is not a valid or active inbox address.`);
 			return;
 		}
 
-		// Using validation_url endpoint to make sure that this is a valid Maileroo parsed email
-		if (!payload.validation_url) {
-			this.logger.warn('Missing validation_url. Skipping email.');
+		const validation = await fetchJsonWithTimeout(event.validation_url, 5000, {
+			allowedHosts: new Set(['inbound-api.maileroo.net']),
+		});
+
+		if (!validation.ok) {
+			this.logger.warn(`Validation call failed with status ${validation.status}. Skipping.`);
 			return;
 		}
 
-		const response = await fetch(payload.validation_url as string);
-		const validationResponse: any = await response.json();
-		if (!validationResponse.success) {
-			this.logger.warn(`Validation failed: ${validationResponse?.message} || No message`);
-			return;
-		}
-
-		// Use message id from Maileroo to check for duplicates
 		const isDuplicate = await this.newsletterService.get(inboundEmailAddress.userId, {
 			where: {
-				messageId,
+				eventId,
 			},
 		});
 
 		if (isDuplicate) {
-			this.logger.log(`Duplicate message ID: ${messageId}. Skipping.`);
+			this.logger.log(`Duplicate event ID: ${eventId}. Skipping.`);
 			return;
 		}
 
-		const strippedHtml = payload?.body?.stripped_html as string;
-		const strippedText = payload?.body?.stripped_plaintext as string;
+		const strippedHtml = event.body?.stripped_html;
+		const strippedText = event.body?.stripped_plaintext;
 
 		if (!strippedHtml || !this.newsletterService.isPossiblyUnreadable(strippedHtml)) {
 			this.logger.warn(
@@ -496,10 +505,11 @@ export class SavedItemManagerService {
 			await this.processAndCreateNewsletter(
 				inboundEmailAddress.userId,
 				inboundEmailAddress.id,
-				messageId as string,
+				messageId,
+				eventId,
 				{ html: strippedHtml, text: strippedText },
 				{
-					title: payload.headers?.Subject?.[0],
+					title: event.headers?.Subject?.[0],
 					author: this.newsletterService.extractAuthor(payload),
 				},
 				this.newsletterService.extractUnsubscribeUrl(payload),
@@ -509,9 +519,12 @@ export class SavedItemManagerService {
 			return;
 		}
 
-		if (payload?.deletion_url) {
+		if (event.deletion_url) {
 			try {
-				await fetch(payload.deletion_url as string);
+				await fetchJsonWithTimeout(event.deletion_url, 5000, {
+					allowedHosts: new Set(['inbound-api.maileroo.net']),
+					method: 'DELETE',
+				});
 			} catch {
 				// Ignore fetch errors
 			}

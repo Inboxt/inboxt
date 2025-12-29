@@ -102,6 +102,7 @@ export class ExportService {
 			contentText:
 				savedItem.article?.contentText || savedItem.newsletter?.contentText || null,
 			messageId: savedItem.newsletter?.messageId ?? null,
+			eventId: savedItem.newsletter?.eventId ?? null,
 			inboundEmailAddressId: savedItem.newsletter?.inboundEmailAddressId ?? null,
 			subscription: savedItem.newsletter?.newsletter_subscription?.name ?? null,
 		}));
@@ -331,6 +332,7 @@ export class ExportService {
 				contentText:
 					savedItem.article?.contentText || savedItem.newsletter?.contentText || null,
 				messageId: savedItem.newsletter?.messageId ?? null,
+				eventId: savedItem.newsletter?.eventId ?? null,
 				inboundEmailAddressId: savedItem.newsletter?.inboundEmailAddressId ?? null,
 				subscription: savedItem.newsletter?.newsletter_subscription?.name ?? null,
 			};
