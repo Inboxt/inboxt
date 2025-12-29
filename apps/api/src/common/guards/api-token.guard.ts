@@ -5,10 +5,11 @@ import {
 	Injectable,
 	UnauthorizedException,
 } from '@nestjs/common';
-import { GqlExecutionContext } from '@nestjs/graphql';
 import { Reflector } from '@nestjs/core';
+import { GqlExecutionContext } from '@nestjs/graphql';
 
-import { ApiTokenService } from '../modules/api-token/api-token.service';
+import { ApiTokenService } from '~modules/api-token/api-token.service';
+
 import { API_TOKEN_ALLOWED_KEY } from '../decorators/api-token.decorator';
 
 @Injectable()

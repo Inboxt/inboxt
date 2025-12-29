@@ -1,18 +1,19 @@
 import { Resolver, Args, Mutation, ResolveField, Parent } from '@nestjs/graphql';
 
-import { UpdateAccountInput } from './dto/update-account.input';
-import { UserService } from './user.service';
-import { User } from './user.model';
-import { ActiveUserMeta, ActiveUserMetaType } from '../../decorators/active-user-meta.decorator';
-import { Void } from '../../models/void.model';
-import { VOID_RESPONSE } from '../../constants/void';
+import { VOID_RESPONSE } from '~common/constants/void';
+import { NonDemo } from '~common/decorators/account.decorator';
+import { ActiveUserMeta, ActiveUserMetaType } from '~common/decorators/active-user-meta.decorator';
+import { RateLimit } from '~common/decorators/rate-limit.decorator';
+import { Void } from '~common/models/void.model';
+
 import { DeleteAccountInput } from './dto/delete-account.input';
-import { NonDemo } from '../../decorators/account.decorator';
-import { RateLimit } from '../../decorators/rate-limit.decorator';
+import { UpdateAccountInput } from './dto/update-account.input';
+import { User } from './user.model';
+import { UserService } from './user.service';
 
 @Resolver(() => User)
 export class UserResolver {
-	constructor(private userService: UserService) {}
+	constructor(private readonly userService: UserService) {}
 
 	@NonDemo()
 	@Mutation(() => User)

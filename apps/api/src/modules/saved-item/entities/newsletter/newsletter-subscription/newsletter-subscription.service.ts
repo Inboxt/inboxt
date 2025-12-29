@@ -1,18 +1,20 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import dayjs from 'dayjs';
 
-import { Prisma } from '../../../../../../prisma/client';
-import { PrismaService } from '../../../../../services/prisma.service';
-import { AppException } from '../../../../../utils/app-exception';
+import { Prisma } from '@inboxt/prisma';
+
+import { AppException } from '~common/utils/app-exception';
+import { InboundEmailAddressService } from '~modules/inbound-email-address/inbound-email-address.service';
+import { PrismaService } from '~modules/prisma/prisma.service';
+
 import { NewsletterService } from '../newsletter.service';
-import { InboundEmailAddressService } from '../../../../inbound-email-address/inbound-email-address.service';
 
 @Injectable()
 export class NewsletterSubscriptionService {
 	constructor(
-		private prisma: PrismaService,
-		private inboundEmailAddressService: InboundEmailAddressService,
-		private newsletterService: NewsletterService,
+		private readonly prisma: PrismaService,
+		private readonly inboundEmailAddressService: InboundEmailAddressService,
+		private readonly newsletterService: NewsletterService,
 	) {}
 
 	async get(userId: string, query: Prisma.newsletter_subscriptionFindFirstArgs) {
@@ -45,7 +47,6 @@ export class NewsletterSubscriptionService {
 			'inbound_email_address' | 'newsletter' | 'newsletterId' | 'inboundEmailAddressId'
 		>,
 	) {
-		/*----------  Validation  ----------*/
 		const inboundEmailAddress = await this.inboundEmailAddressService.get(userId, {
 			where: {
 				id: inboundEmailAddressId,
@@ -56,7 +57,6 @@ export class NewsletterSubscriptionService {
 			throw new AppException('Email address not found', HttpStatus.NOT_FOUND);
 		}
 
-		/*----------  Processing  ----------*/
 		return this.prisma.newsletter_subscription.create({
 			data: {
 				...data,
@@ -70,13 +70,11 @@ export class NewsletterSubscriptionService {
 		id: string,
 		data: Omit<Prisma.newsletter_subscriptionUpdateInput, 'id'>,
 	) {
-		/*----------  Validation  ----------*/
 		const subscription = await this.get(userId, { where: { id } });
 		if (!subscription) {
 			throw new AppException('Subscription not found', HttpStatus.NOT_FOUND);
 		}
 
-		/*----------  Processing  ----------*/
 		return this.prisma.newsletter_subscription.update({
 			where: { id },
 			data,
@@ -88,13 +86,11 @@ export class NewsletterSubscriptionService {
 		id: string,
 		status: Prisma.newsletter_subscriptionUpdateInput['status'],
 	) {
-		/*----------  Validation  ----------*/
 		const subscription = await this.get(userId, { where: { id } });
 		if (!subscription) {
 			throw new AppException('Subscription not found', HttpStatus.NOT_FOUND);
 		}
 
-		/*----------  Processing  ----------*/
 		return this.prisma.newsletter_subscription.update({
 			where: { id },
 			data: {
@@ -105,7 +101,6 @@ export class NewsletterSubscriptionService {
 	}
 
 	async link(userId: string, subscriptionId: string, newsletterId: string) {
-		/*----------  Validation  ----------*/
 		const newsletter = await this.newsletterService.get(userId, {
 			where: { savedItemId: newsletterId },
 		});
@@ -119,7 +114,6 @@ export class NewsletterSubscriptionService {
 			throw new AppException('Subscription not found', HttpStatus.NOT_FOUND);
 		}
 
-		/*----------  Processing  ----------*/
 		return this.prisma.newsletter.update({
 			where: { savedItemId: newsletterId },
 			data: { subscriptionId },

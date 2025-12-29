@@ -1,10 +1,10 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 
 import { createLabelSchema, updateLabelSchema, USER_LABELS_LIMIT } from '@inboxt/common';
+import { Prisma } from '@inboxt/prisma';
 
-import { Prisma } from '../../../../../prisma/client';
-import { PrismaService } from '../../../../services/prisma.service';
-import { AppException } from '../../../../utils/app-exception';
+import { AppException } from '~common/utils/app-exception';
+import { PrismaService } from '~modules/prisma/prisma.service';
 
 @Injectable()
 export class LabelService {
@@ -23,9 +23,7 @@ export class LabelService {
 	}
 
 	async create(userId: string, data: Omit<Prisma.labelCreateInput, 'user' | 'userId'>) {
-		/*----------  Validation  ----------*/
 		await createLabelSchema.parseAsync(data);
-
 		const labelCount = await this.prisma.label.count({
 			where: { userId },
 		});
@@ -37,7 +35,6 @@ export class LabelService {
 			);
 		}
 
-		/*----------  Processing  ----------*/
 		return this.prisma.label.create({
 			data: {
 				...data,
@@ -47,7 +44,6 @@ export class LabelService {
 	}
 
 	async update(userId: string, id: string, data: Omit<Prisma.labelUpdateInput, 'id'>) {
-		/*----------  Validation  ----------*/
 		await updateLabelSchema.parseAsync(data);
 		const label = await this.get(userId, { where: { id } });
 		if (!label) {
@@ -62,7 +58,6 @@ export class LabelService {
 			throw new AppException('Label already exists', HttpStatus.BAD_REQUEST);
 		}
 
-		/*----------  Processing  ----------*/
 		return this.prisma.label.update({
 			where: { id, userId },
 			data,
@@ -70,13 +65,11 @@ export class LabelService {
 	}
 
 	async delete(userId: string, id: string) {
-		/*----------  Validation  ----------*/
 		const label = await this.get(userId, { where: { id } });
 		if (!label) {
 			throw new AppException('Label not found', HttpStatus.NOT_FOUND);
 		}
 
-		/*----------  Processing  ----------*/
 		return this.prisma.label.delete({
 			where: { id, userId },
 		});

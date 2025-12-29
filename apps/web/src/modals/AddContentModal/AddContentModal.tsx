@@ -20,7 +20,7 @@ export const AddContentModal = ({ id, context }: ContextModalProps) => {
 		mode: 'uncontrolled',
 		initialValues: {
 			url: '',
-			labels: [],
+			labels: [] as string[],
 		},
 		validate: zod4Resolver(addItemFromUrlSchema),
 	});
@@ -65,7 +65,8 @@ export const AddContentModal = ({ id, context }: ContextModalProps) => {
 								<LabelsMultiSelect
 									labels={labelsData?.labels as Label[]}
 									loading={labelsLoading}
-									{...form.getInputProps('labels')}
+									value={form.getValues().labels}
+									onChange={(value) => form.setFieldValue('labels', value)}
 								/>
 							</Stack>
 

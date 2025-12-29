@@ -1,5 +1,6 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Void } from '../../../models/void.model';
+
+import { Void } from '~common/models/void.model';
 
 @ObjectType()
 export class EmptyTrash extends Void {

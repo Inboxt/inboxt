@@ -25,9 +25,11 @@ export default tseslint.config(
 	{
 		files: ['**/*.{ts,tsx}'],
 		extends: [js.configs.recommended, ...tseslint.configs.recommended],
+		plugins: {
+			import: importPlugin,
+		},
 		languageOptions: {
 			ecmaVersion: 2020,
-			globals: globals.browser,
 		},
 		rules: {
 			curly: ['error', 'all'],
@@ -43,27 +45,12 @@ export default tseslint.config(
 					ignoreRestSiblings: true,
 				},
 			],
-		},
-	},
-
-	// web config
-	{
-		files: ['apps/web/**/*.{ts,tsx}'],
-		plugins: {
-			'react-hooks': reactHooks,
-			'react-refresh': reactRefresh,
-			import: importPlugin,
-		},
-		languageOptions: {
-			parserOptions: {
-				project: ['./apps/web/tsconfig.app.json', './apps/web/tsconfig.node.json'],
-				tsconfigRootDir: fileURLToPath(new URL('.', import.meta.url)),
-			},
-		},
-		rules: {
-			...reactHooks.configs.recommended.rules,
-			'@typescript-eslint/only-throw-error': 'off',
-			'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+			'no-restricted-imports': [
+				'error',
+				{
+					patterns: ['src/*'],
+				},
+			],
 			'import/order': [
 				'error',
 				{
@@ -98,6 +85,27 @@ export default tseslint.config(
 		},
 	},
 
+	// web config
+	{
+		files: ['apps/web/**/*.{ts,tsx}'],
+		plugins: {
+			'react-hooks': reactHooks,
+			'react-refresh': reactRefresh,
+		},
+		languageOptions: {
+			globals: globals.browser,
+			parserOptions: {
+				project: ['./apps/web/tsconfig.app.json', './apps/web/tsconfig.node.json'],
+				tsconfigRootDir: fileURLToPath(new URL('.', import.meta.url)),
+			},
+		},
+		rules: {
+			...reactHooks.configs.recommended.rules,
+			'@typescript-eslint/only-throw-error': 'off',
+			'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+		},
+	},
+
 	// api config
 	{
 		files: ['apps/api/**/*.ts'],
@@ -121,6 +129,7 @@ export default tseslint.config(
 					allowWithDecorator: true,
 				},
 			],
+			'@typescript-eslint/prefer-readonly': 'warn',
 		},
 	},
 );

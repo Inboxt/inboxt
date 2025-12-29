@@ -1,19 +1,19 @@
 import { Resolver, Args, Mutation, Query, ResolveField, Parent } from '@nestjs/graphql';
 
-import { InboundEmailAddressService } from './inbound-email-address.service';
-import { ActiveUserMeta, ActiveUserMetaType } from '../../decorators/active-user-meta.decorator';
-import { Void } from '../../models/void.model';
-import { DeleteInboundEmailAddressInput } from './dto/delete-inbound-email-address.input';
-import { VOID_RESPONSE } from '../../constants/void';
-import { InboundEmailAddress } from './inbound-email-address.model';
+import { VOID_RESPONSE } from '~common/constants/void';
+import { VerifiedOnly } from '~common/decorators/account.decorator';
+import { ActiveUserMeta, ActiveUserMetaType } from '~common/decorators/active-user-meta.decorator';
+import { ApiTokenAllowed } from '~common/decorators/api-token.decorator';
+import { Void } from '~common/models/void.model';
+import { NewsletterSubscription } from '~modules/saved-item/entities/newsletter/newsletter-subscription/newsletter-subscription.model';
 
-import { NewsletterSubscription } from '../saved-item/entities/newsletter/newsletter-subscription/newsletter-subscription.model';
-import { VerifiedOnly } from '../../decorators/account.decorator';
-import { ApiTokenAllowed } from '../../decorators/api-token.decorator';
+import { DeleteInboundEmailAddressInput } from './dto/delete-inbound-email-address.input';
+import { InboundEmailAddress } from './inbound-email-address.model';
+import { InboundEmailAddressService } from './inbound-email-address.service';
 
 @Resolver(() => InboundEmailAddress)
 export class InboundEmailAddressResolver {
-	constructor(private inboundEmailAddressService: InboundEmailAddressService) {}
+	constructor(private readonly inboundEmailAddressService: InboundEmailAddressService) {}
 
 	@ApiTokenAllowed()
 	@Query(() => [InboundEmailAddress], { nullable: true })

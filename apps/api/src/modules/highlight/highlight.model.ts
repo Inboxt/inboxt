@@ -1,6 +1,7 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { SavedItem } from '../saved-item/saved-item.model';
-import { Entry } from '../../managers/entry-manager/entry.model';
+
+import { Entry } from '~managers/entry-manager/entry.model';
+import { SavedItem } from '~modules/saved-item/saved-item.model';
 
 @ObjectType({ implements: [Entry] })
 export class Highlight implements Entry {

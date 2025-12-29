@@ -1,6 +1,6 @@
 import { randomBytes } from 'crypto';
 
-export const generateCode = (): string => {
+export const generateAuthCode = (): string => {
 	const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 	const bytes = randomBytes(10);
 

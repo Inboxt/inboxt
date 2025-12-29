@@ -1,14 +1,14 @@
+import { BullModule } from '@nestjs/bullmq';
 import { Module } from '@nestjs/common';
 
-import { PrismaService } from '../../services/prisma.service';
-import { LabelModule } from '../saved-item/entities/label/label.module';
-import { ImportService } from './import.service';
-import { ImportProcessor } from './import.processor';
-import { BullModule } from '@nestjs/bullmq';
+import { SavedItemManagerModule } from '~managers/saved-item-manager/saved-item-manager.module';
+import { LabelModule } from '~modules/saved-item/entities/label/label.module';
+import { UserModule } from '~modules/user/user.module';
+import { ContentExtractionService } from '~services/content-extraction.service';
+
 import { ImportController } from './import.controller';
-import { UserModule } from '../user/user.module';
-import { SavedItemManagerModule } from '../../managers/saved-item-manager/saved-item-manager.module';
-import { ContentExtractionService } from '../../services/content-extraction.service';
+import { ImportProcessor } from './import.processor';
+import { ImportService } from './import.service';
 
 @Module({
 	imports: [
@@ -25,7 +25,7 @@ import { ContentExtractionService } from '../../services/content-extraction.serv
 		UserModule,
 		SavedItemManagerModule,
 	],
-	providers: [ImportService, PrismaService, ImportProcessor, ContentExtractionService],
+	providers: [ImportService, ImportProcessor, ContentExtractionService],
 	controllers: [ImportController],
 	exports: [ImportService],
 })

@@ -1,18 +1,20 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
+
+import { SavedItemStatus } from '~common/enums/saved-item-status.enum';
+import { SavedItemType } from '~common/enums/saved-item-type.enum';
+import { GetHighlightsQuery, GetSavedItemsQuery, ParsedQuery } from '~common/types';
+import { AppException } from '~common/utils/app-exception';
+import { HighlightService } from '~modules/highlight/highlight.service';
+import { SavedItemService } from '~modules/saved-item/saved-item.service';
+
 import { GetEntriesInput } from './dto/get-entries.input';
-import { SavedItemService } from '../../modules/saved-item/saved-item.service';
-import { HighlightService } from '../../modules/highlight/highlight.service';
 import { EntryEdge } from './entry-connection';
-import { SavedItemType } from '../../enums/saved-item-type.enum';
-import { SavedItemStatus } from '../../enums/saved-item-status.enum';
-import { AppException } from '../../utils/app-exception';
-import { GetHighlightsQuery, GetSavedItemsQuery, ParsedQuery } from '../../common/types';
 
 @Injectable()
 export class EntryManagerService {
 	constructor(
-		private savedItemService: SavedItemService,
-		private highlightService: HighlightService,
+		private readonly savedItemService: SavedItemService,
+		private readonly highlightService: HighlightService,
 	) {}
 
 	private parseQuery(q?: string): ParsedQuery {
@@ -66,7 +68,7 @@ export class EntryManagerService {
 						result.labels = { and: [], not: [] };
 					}
 
-					// split by commas, but respect quotes
+					// split by commas but respect quotes
 					const regex = /"([^"]+)"|([^,]+)/g;
 					const matches: string[] = [];
 					let m;

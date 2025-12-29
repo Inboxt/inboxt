@@ -1,10 +1,11 @@
+import { EMAIL_ACCOUNT_DELETED } from '~common/constants/email.constants';
+
+import alert from './elements/alert';
 import appHeader from './elements/appHeader';
+import baseStyles from './elements/baseStyles';
+import button from './elements/button';
 import footer from './elements/footer';
 import header from './elements/header';
-import baseStyles from './elements/baseStyles';
-import alert from './elements/alert';
-import button from './elements/button';
-import { EMAIL_ACCOUNT_DELETED } from '../common/constants/email.constants';
 
 export const accountDeletedTemplate = ({ timestamp }: { timestamp: string }) => `
 <mjml>

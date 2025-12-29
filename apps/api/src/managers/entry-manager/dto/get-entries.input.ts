@@ -1,5 +1,7 @@
 import { Field, InputType } from '@nestjs/graphql';
-import { PaginationInput } from '../../../common/dto/pagination.input';
+
+import { PaginationInput } from '~common/dto/pagination.input';
+
 import { EntrySort } from './entry-sort.input';
 
 @InputType()

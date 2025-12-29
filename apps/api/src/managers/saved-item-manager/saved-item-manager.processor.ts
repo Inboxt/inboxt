@@ -1,12 +1,14 @@
-import { Job } from 'bullmq';
-import { Logger } from '@nestjs/common';
 import { OnWorkerEvent, Processor } from '@nestjs/bullmq';
-import { BaseQueueProcessor } from '../../common/processors/base-queue.processor';
-import { LogExecutionTime } from '../../decorators/log-execution-time.decorator';
+import { Logger } from '@nestjs/common';
+import { Job } from 'bullmq';
 
-import { Prisma } from '../../../prisma/client';
-import { ProcessArticleInput } from '../../modules/saved-item/entities/article/article.service';
-import { ProcessNewsletterInput } from '../../modules/saved-item/entities/newsletter/newsletter.service';
+import { Prisma } from '@inboxt/prisma';
+
+import { LogExecutionTime } from '~common/decorators/log-execution-time.decorator';
+import { BaseQueueProcessor } from '~common/processors/base-queue.processor';
+import { ProcessArticleInput } from '~modules/saved-item/entities/article/article.service';
+import { ProcessNewsletterInput } from '~modules/saved-item/entities/newsletter/newsletter.service';
+
 import { SavedItemManagerService } from './saved-item-manager.service';
 
 interface ArticleProcessingJobData {
@@ -32,19 +34,23 @@ interface NewsletterProcessingJobData {
 	unsubscribeUrl?: string;
 }
 
+type SavedItemJob =
+	| { name: 'process-article'; data: ArticleProcessingJobData }
+	| { name: 'process-newsletter'; data: NewsletterProcessingJobData };
+
 @Processor('saved-item-processing', { concurrency: 5, lockDuration: 120000 })
 export class SavedItemManagerProcessor extends BaseQueueProcessor {
 	protected readonly logger = new Logger(SavedItemManagerProcessor.name);
-	constructor(private savedItemManagerService: SavedItemManagerService) {
+	constructor(private readonly savedItemManagerService: SavedItemManagerService) {
 		super();
 	}
 
-	async process(job: Job): Promise<any> {
+	async process(job: Job<SavedItemJob['data'], any, SavedItemJob['name']>): Promise<void> {
 		switch (job.name) {
 			case 'process-article':
-				return this.handleArticleProcessing(job.data);
+				return this.handleArticleProcessing(job.data as ArticleProcessingJobData);
 			case 'process-newsletter':
-				return this.handleNewsletterProcessing(job.data);
+				return this.handleNewsletterProcessing(job.data as NewsletterProcessingJobData);
 			default:
 				throw new Error(`Unknown job type: ${job.name}`);
 		}

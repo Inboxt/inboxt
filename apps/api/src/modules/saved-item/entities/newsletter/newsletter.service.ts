@@ -1,12 +1,13 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { JSDOM } from 'jsdom';
 
-import { Prisma } from '../../../../../prisma/client';
-import { PrismaService } from '../../../../services/prisma.service';
 import { MAX_NEWSLETTER_WORD_COUNT, MIN_NEWSLETTER_WORD_COUNT } from '@inboxt/common';
-import { ContentExtractionService } from '../../../../services/content-extraction.service';
-import { AppException } from '../../../../utils/app-exception';
-import { QuotaOptions, StorageQuotaService } from '../../../storage/storage-quota.service';
+import { Prisma } from '@inboxt/prisma';
+
+import { AppException } from '~common/utils/app-exception';
+import { PrismaService } from '~modules/prisma/prisma.service';
+import { QuotaOptions, StorageQuotaService } from '~modules/storage/storage-quota.service';
+import { ContentExtractionService } from '~services/content-extraction.service';
 
 export type ProcessNewsletterInput = {
 	html: string;
@@ -16,9 +17,9 @@ export type ProcessNewsletterInput = {
 @Injectable()
 export class NewsletterService {
 	constructor(
-		private prisma: PrismaService,
-		private contentExtractionService: ContentExtractionService,
-		private storageQuota: StorageQuotaService,
+		private readonly prisma: PrismaService,
+		private readonly contentExtractionService: ContentExtractionService,
+		private readonly storageQuota: StorageQuotaService,
 	) {}
 
 	extractUnsubscribeUrl(payload: any): string | null {

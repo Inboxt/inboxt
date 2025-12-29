@@ -1,10 +1,10 @@
+import { EMAIL_EXPORT_READY } from '~common/constants/email.constants';
+
 import appHeader from './elements/appHeader';
-import footer from './elements/footer';
-import header from './elements/header';
 import baseStyles from './elements/baseStyles';
 import button from './elements/button';
-
-import { EMAIL_EXPORT_READY } from '../common/constants/email.constants';
+import footer from './elements/footer';
+import header from './elements/header';
 
 export const exportReadyTemplate = ({ downloadUrl }: { downloadUrl: string }) => `
 <mjml>

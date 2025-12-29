@@ -1,4 +1,5 @@
 import { Field, InputType } from '@nestjs/graphql';
+
 import { CreateHighlightSegmentInput } from './create-highlight-segment.input';
 
 @InputType()

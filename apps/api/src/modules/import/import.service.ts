@@ -1,21 +1,21 @@
-import { Injectable, Logger } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bullmq';
+import { Injectable, Logger } from '@nestjs/common';
 import { Queue } from 'bullmq';
-import { createReadStream, promises as fs } from 'fs';
+import crypto from 'crypto';
 import { parse as csvParse } from 'csv-parse';
 import dayjs from 'dayjs';
-import unzipper from 'unzipper';
 import fg from 'fast-glob';
-import crypto from 'crypto';
+import { createReadStream, promises as fs } from 'fs';
+import unzipper from 'unzipper';
 
 import { APP_PRIMARY_COLOR, USER_LABELS_LIMIT } from '@inboxt/common';
+import { saved_item_status } from '@inboxt/prisma';
 
-import { saved_item_status } from '../../../prisma/client';
-import { LabelService } from '../saved-item/entities/label/label.service';
-import { ImportType } from '../../common/enums/import-type.enum';
-import { UserService } from '../user/user.service';
-import { SavedItemManagerService } from '../../managers/saved-item-manager/saved-item-manager.service';
-import { SavedItemExportJson } from '../../common/types';
+import { ImportType } from '~common/enums/import-type.enum';
+import { SavedItemExportJson } from '~common/types';
+import { SavedItemManagerService } from '~managers/saved-item-manager/saved-item-manager.service';
+import { LabelService } from '~modules/saved-item/entities/label/label.service';
+import { UserService } from '~modules/user/user.service';
 
 type DiskSource = {
 	kind: 'disk';
@@ -29,13 +29,12 @@ type DiskSource = {
 export class ImportService {
 	protected readonly logger = new Logger(ImportService.name);
 	constructor(
-		private userService: UserService,
-		private labelService: LabelService,
-		private savedItemManagerService: SavedItemManagerService,
+		private readonly userService: UserService,
+		private readonly labelService: LabelService,
+		private readonly savedItemManagerService: SavedItemManagerService,
 		@InjectQueue('import') private readonly importQueue: Queue,
 	) {}
 
-	/* ======================== HELPERS ========================= */
 	private randomDelay(min = 500, max = 2000) {
 		const delay = Math.floor(min + Math.random() * (max - min));
 		return new Promise((resolve) => setTimeout(resolve, delay));
@@ -204,7 +203,6 @@ export class ImportService {
 		}
 	}
 
-	// ======================== IMPORTS =========================
 	async enqueueImport(input: { userId: string; type: ImportType; source: DiskSource }) {
 		if (input.type === ImportType.CSV) {
 			await this.importQueue.add('import-csv', {
@@ -307,7 +305,6 @@ export class ImportService {
 
 		await this.randomDelay();
 		this.logger.log(`CSV import completed for user ${data.userId} from ${data.originalName}`);
-		return;
 	}
 
 	async importZipArchive(data: { userId: string; filePath: string; originalName: string }) {
@@ -315,109 +312,113 @@ export class ImportService {
 			`Zip archive import started for user ${data.userId} from ${data.originalName}`,
 		);
 
-		const user = await this.userService.get({ where: { id: data.userId } });
-		if (!user) {
-			return;
-		}
-
-		const baseDir = await this.unzipToTemp(data.filePath);
-		const labelsJson =
-			(await this.readJson<Array<{ id: string; name: string; color?: string | null }>>(
-				baseDir,
-				'json/labels.json',
-			)) || [];
-
-		const labelNameToId = await this.ensureLabels(
-			data.userId,
-			labelsJson.map((l) => ({ name: l.name, color: l.color || undefined })),
-		);
-
-		const itemsList =
-			(await this.readJson<
-				Array<{
-					id: string;
-					title: string;
-					createdAt: string;
-				}>
-			>(baseDir, 'saved_items/saved_items.json')) || [];
-
-		for (const listing of itemsList) {
-			const oldId = listing.id;
-			const itemDir = `${baseDir}/saved_items/${oldId}`;
-			const itemJson = await this.readJson<any>(itemDir, 'item.json');
-
-			if (!itemJson) {
-				this.logger.warn(`Missing item.json for saved_items/${oldId}, skipping`);
-				continue;
+		let baseDir: string | null = null;
+		try {
+			const user = await this.userService.get({ where: { id: data.userId } });
+			if (!user) {
+				return;
 			}
 
-			try {
-				await this.importSingleSavedItem({
-					userId: data.userId,
-					itemDir,
-					itemJson,
-					labelNameToId,
-				});
-			} catch (e: any) {
-				this.logger.error(`Failed to import item ${oldId}: ${e?.message || e}`);
-			}
-		}
+			baseDir = await this.unzipToTemp(data.filePath);
+			const labelsJson =
+				(await this.readJson<Array<{ id: string; name: string; color?: string | null }>>(
+					baseDir,
+					'json/labels.json',
+				)) || [];
 
-		// Standalone HTML files
-		const allHtmlFiles = await fg('**/*.html', {
-			cwd: baseDir,
-			absolute: true,
-			ignore: ['json/**', 'highlights/**', 'saved_items/**'],
-		});
+			const labelNameToId = await this.ensureLabels(
+				data.userId,
+				labelsJson.map((l) => ({ name: l.name, color: l.color || undefined })),
+			);
 
-		if (allHtmlFiles.length > 0) {
-			this.logger.log(`Found ${allHtmlFiles.length} standalone HTML files to process`);
+			const itemsList =
+				(await this.readJson<
+					Array<{
+						id: string;
+						title: string;
+						createdAt: string;
+					}>
+				>(baseDir, 'saved_items/saved_items.json')) || [];
 
-			for (const htmlPath of allHtmlFiles) {
+			for (const listing of itemsList) {
+				const oldId = listing.id;
+				const itemDir = `${baseDir}/saved_items/${oldId}`;
+				const itemJson = await this.readJson<any>(itemDir, 'item.json');
+
+				if (!itemJson) {
+					this.logger.warn(`Missing item.json for saved_items/${oldId}, skipping`);
+					continue;
+				}
+
 				try {
-					const html = await fs.readFile(htmlPath, 'utf-8');
-					const fileName = htmlPath.split('/').pop() || 'Imported.html';
-					const baseName = fileName.replace(/\.html?$/i, '');
-					const looksLikeNewsletter = /newsletter|email/i.test(baseName);
+					await this.importSingleSavedItem({
+						userId: data.userId,
+						itemDir,
+						itemJson,
+						labelNameToId,
+					});
+				} catch (e: any) {
+					this.logger.error(`Failed to import item ${oldId}: ${e?.message || e}`);
+				}
+			}
 
-					const title = baseName || fileName;
-					if (looksLikeNewsletter) {
-						await this.savedItemManagerService.processAndCreateNewsletter(
-							data.userId,
-							null,
-							null,
-							{ html },
-							{
-								title,
-							},
-						);
-					} else {
-						await this.savedItemManagerService.processAndCreateArticle(
-							data.userId,
-							{ html },
-							[],
-							{
-								title,
-							},
+			// Standalone HTML files
+			const allHtmlFiles = await fg('**/*.html', {
+				cwd: baseDir,
+				absolute: true,
+				ignore: ['json/**', 'highlights/**', 'saved_items/**'],
+			});
+
+			if (allHtmlFiles.length > 0) {
+				this.logger.log(`Found ${allHtmlFiles.length} standalone HTML files to process`);
+
+				for (const htmlPath of allHtmlFiles) {
+					try {
+						const html = await fs.readFile(htmlPath, 'utf-8');
+						const fileName = htmlPath.split('/').pop() || 'Imported.html';
+						const baseName = fileName.replace(/\.html?$/i, '');
+						const looksLikeNewsletter = /newsletter|email/i.test(baseName);
+
+						const title = baseName || fileName;
+						if (looksLikeNewsletter) {
+							await this.savedItemManagerService.processAndCreateNewsletter(
+								data.userId,
+								null,
+								null,
+								{ html },
+								{
+									title,
+								},
+							);
+						} else {
+							await this.savedItemManagerService.processAndCreateArticle(
+								data.userId,
+								{ html },
+								[],
+								{
+									title,
+								},
+							);
+						}
+					} catch (err: any) {
+						this.logger.error(
+							`Failed to process HTML file ${htmlPath}: ${err.message}`,
 						);
 					}
-				} catch (err: any) {
-					this.logger.error(`Failed to process HTML file ${htmlPath}: ${err.message}`);
+				}
+			}
+
+			this.logger.log(
+				`Zip archive import completed for user ${data.userId} from ${data.originalName}`,
+			);
+		} finally {
+			if (baseDir) {
+				try {
+					await fs.rm(baseDir, { recursive: true, force: true });
+				} catch (error) {
+					this.logger.warn(`Failed to cleanup directory ${baseDir}: ${error}`);
 				}
 			}
 		}
-
-		// Cleanup temp dir (best-effort)
-		try {
-			await fs.rm(baseDir, { recursive: true, force: true });
-		} catch {
-			/* empty */
-		}
-
-		this.logger.log(
-			`Zip archive import completed for user ${data.userId} from ${data.originalName}`,
-		);
-
-		return;
 	}
 }

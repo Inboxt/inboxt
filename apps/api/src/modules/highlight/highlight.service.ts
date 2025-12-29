@@ -1,20 +1,21 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import dayjs from 'dayjs';
 
-import { Prisma } from '../../../prisma/client';
+import { Prisma } from '@inboxt/prisma';
 
-import { PrismaService } from '../../services/prisma.service';
+import { GetHighlightsQuery } from '~common/types';
+import { AppException } from '~common/utils/app-exception';
+import { PrismaService } from '~modules/prisma/prisma.service';
+import { StorageQuotaService } from '~modules/storage/storage-quota.service';
+
 import { CreateHighlightInput } from './dto/create-highlight.input';
 import { DeleteHighlightsInput } from './dto/delete-highlights.input';
-import { AppException } from '../../utils/app-exception';
-import { GetHighlightsQuery } from '../../common/types';
-import { StorageQuotaService } from '../storage/storage-quota.service';
 
 @Injectable()
 export class HighlightService {
 	constructor(
-		private prisma: PrismaService,
-		private storageQuota: StorageQuotaService,
+		private readonly prisma: PrismaService,
+		private readonly storageQuota: StorageQuotaService,
 	) {}
 
 	async get(userId: string, query: Prisma.highlightFindFirstArgs) {

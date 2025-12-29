@@ -1,5 +1,6 @@
 import { InputType, Field } from '@nestjs/graphql';
-import { ImportType } from '../../../common/enums/import-type.enum';
+
+import { ImportType } from '~common/enums/import-type.enum';
 
 @InputType()
 export class ImportInput {

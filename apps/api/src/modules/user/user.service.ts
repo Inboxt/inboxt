@@ -1,46 +1,43 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import dayjs from 'dayjs';
 import { hash } from 'argon2';
+import dayjs from 'dayjs';
 
 import { updateAccountSchema, deleteAccountSchema } from '@inboxt/common';
+import { Prisma } from '@inboxt/prisma';
 
-import { PrismaService } from '../../services/prisma.service';
-import { Prisma } from '../../../prisma/client';
-import { CreateAccountInput } from './dto/create-account.input';
-import { UpdateAccountInput } from './dto/update-account.input';
-import { AppException } from '../../utils/app-exception';
-import { generateCode } from '../../utils/generate-code';
-import { MailService } from '../mail/mail.service';
-import { DeleteAccountInput } from './dto/delete-account.input';
-import { InboundEmailAddressService } from '../inbound-email-address/inbound-email-address.service';
-import { NewsletterSubscriptionManagerService } from '../../managers/newsletter-subscription-manager/newsletter-subscription-manager.service';
-import { verifyEmailTemplate } from '../../mail-templates/verifyEmailTemplate';
 import {
 	EMAIL_ACCOUNT_DELETED,
 	EMAIL_CHANGED_EMAIL,
 	EMAIL_VERIFY,
 	EMAIL_WELCOME,
-} from '../../common/constants/email.constants';
-import { accountDeletedTemplate } from '../../mail-templates/accountDeletedTemplate';
-import { welcomeTemplate } from '../../mail-templates/welcomeTemplate';
-import { emailChangedTemplate } from '../../mail-templates/emailChangedTemplate';
-import { UserPlan } from '../../enums/user-plan.enum';
+} from '~common/constants/email.constants';
+import { UserPlan } from '~common/enums/user-plan.enum';
+import { AppException } from '~common/utils/app-exception';
+import { generateAuthCode } from '~common/utils/generateAuthCode';
+import { accountDeletedTemplate } from '~mail-templates/accountDeletedTemplate';
+import { emailChangedTemplate } from '~mail-templates/emailChangedTemplate';
+import { verifyEmailTemplate } from '~mail-templates/verifyEmailTemplate';
+import { welcomeTemplate } from '~mail-templates/welcomeTemplate';
+import { NewsletterSubscriptionManagerService } from '~managers/newsletter-subscription-manager/newsletter-subscription-manager.service';
+import { InboundEmailAddressService } from '~modules/inbound-email-address/inbound-email-address.service';
+import { MailService } from '~modules/mail/mail.service';
+import { PrismaService } from '~modules/prisma/prisma.service';
+
+import { CreateAccountInput } from './dto/create-account.input';
+import { DeleteAccountInput } from './dto/delete-account.input';
+import { UpdateAccountInput } from './dto/update-account.input';
 
 @Injectable()
 export class UserService {
 	constructor(
-		private prisma: PrismaService,
-		private mailService: MailService,
-		private inboundEmailAddressService: InboundEmailAddressService,
-		private newsletterSubscriptionManagerService: NewsletterSubscriptionManagerService,
+		private readonly prisma: PrismaService,
+		private readonly mailService: MailService,
+		private readonly inboundEmailAddressService: InboundEmailAddressService,
+		private readonly newsletterSubscriptionManagerService: NewsletterSubscriptionManagerService,
 	) {}
 
 	async get(query: Prisma.userFindFirstArgs) {
 		return this.prisma.user.findFirst(query);
-	}
-
-	async getMany(query: Prisma.userFindManyArgs) {
-		return this.prisma.user.findMany(query);
 	}
 
 	async countLabels(userId: string) {
@@ -56,7 +53,7 @@ export class UserService {
 	}
 
 	async initiateEmailVerification(id: string) {
-		const code = generateCode();
+		const code = generateAuthCode();
 		const hashedCode = await hash(code);
 
 		await this.prisma.user.update({
@@ -163,7 +160,6 @@ export class UserService {
 		const { emailAddress, ...input } = data;
 		const parsedEmailAddress = emailAddress?.toLowerCase();
 
-		/*----------  Validation  ----------*/
 		const existingUser = await this.get({ where: { id } });
 		const existingEmailAddress = await this.get({
 			where: { emailAddress },
@@ -177,7 +173,6 @@ export class UserService {
 		const withEmailAddressChange =
 			existingUser.emailAddress !== parsedEmailAddress && !!emailAddress;
 
-		/*----------  Processing  ----------*/
 		if (withEmailAddressChange) {
 			await this.prisma.user.update({
 				where: { id },
@@ -201,7 +196,6 @@ export class UserService {
 	}
 
 	async sendVerificationEmail(userId: string, isEmailChange = false) {
-		/*----------  Validation  ----------*/
 		const existingUser = await this.get({
 			where: { id: userId },
 		});
@@ -213,9 +207,7 @@ export class UserService {
 			);
 		}
 
-		/*----------  Processing  ----------*/
 		const code = await this.initiateEmailVerification(userId);
-
 		return this.mailService.sendTemplate({
 			to: existingUser.pendingEmailAddress || existingUser.emailAddress,
 			subject: EMAIL_VERIFY.subject,
@@ -234,7 +226,6 @@ export class UserService {
 	}
 
 	async delete(id: string, data: DeleteAccountInput) {
-		/*----------  Validation  ----------*/
 		await deleteAccountSchema.parseAsync(data);
 		const user = await this.get({
 			where: { id, emailAddress: data.emailAddress },
@@ -247,7 +238,6 @@ export class UserService {
 			);
 		}
 
-		/*----------  Processing  ----------*/
 		const inboundEmailAddresses = await this.inboundEmailAddressService.getMany(id, {});
 		if (inboundEmailAddresses?.length) {
 			await Promise.all(

@@ -1,12 +1,14 @@
 import { Resolver, ResolveField, Parent } from '@nestjs/graphql';
-import { SavedItem } from '../saved-item/saved-item.model';
-import { ActiveUserMeta, ActiveUserMetaType } from '../../decorators/active-user-meta.decorator';
-import { HighlightService } from './highlight.service';
+
+import { ActiveUserMeta, ActiveUserMetaType } from '~common/decorators/active-user-meta.decorator';
+import { SavedItem } from '~modules/saved-item/saved-item.model';
+
 import { Highlight } from './highlight.model';
+import { HighlightService } from './highlight.service';
 
 @Resolver(() => SavedItem)
 export class SavedItemHighlightsResolver {
-	constructor(private highlightService: HighlightService) {}
+	constructor(private readonly highlightService: HighlightService) {}
 
 	@ResolveField('highlights', () => [Highlight], { nullable: true })
 	async highlights(

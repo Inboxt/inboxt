@@ -1,11 +1,11 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
-import { JSDOM, VirtualConsole } from 'jsdom';
 import { isProbablyReaderable, Readability } from '@mozilla/readability';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import DOMPurify, { WindowLike } from 'dompurify';
+import { JSDOM, VirtualConsole } from 'jsdom';
 
-import { AppException } from '../utils/app-exception';
-import { applyArticleDomainFilter } from '../filters/articleDomainFilters';
-import { DEFAULT_PROCESSED_ITEM_TITLE } from '../common/constants/content-extraction.constants';
+import { DEFAULT_PROCESSED_ITEM_TITLE } from '~common/constants/content-extraction.constants';
+import { AppException } from '~common/utils/app-exception';
+import { applyArticleDomainFilter } from '~common/utils/articleDomainFilters';
 
 @Injectable()
 export class ContentExtractionService {
@@ -92,7 +92,7 @@ export class ContentExtractionService {
 		});
 	}
 
-	private prepareDom = (html: string, url?: string) => {
+	private prepareDom(html: string, url?: string) {
 		const virtualConsole = new VirtualConsole();
 		const dom = new JSDOM(html, { url, virtualConsole });
 		this.preprocessDom(dom);
@@ -108,15 +108,15 @@ export class ContentExtractionService {
 			window,
 			doc,
 		};
-	};
+	}
 
-	private purifyAndSanitizeHtml = (html: string, window: WindowLike) => {
+	private purifyAndSanitizeHtml(html: string, window: WindowLike) {
 		const purify = DOMPurify(window);
 		return purify.sanitize(html, {
 			FORBID_TAGS: ['style', 'iframe', 'object', 'embed'],
 			FORBID_ATTR: ['onerror', 'onclick', 'onload', 'style'],
 		});
-	};
+	}
 
 	private buildFallbackDescription(text: string, maxLen = 160): string | null {
 		const cleaned = (text || '')

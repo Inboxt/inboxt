@@ -1,5 +1,5 @@
-import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bullmq';
+import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { Queue } from 'bullmq';
 
 import {
@@ -7,11 +7,8 @@ import {
 	addItemFromUrlSchema,
 	APP_PRIMARY_COLOR,
 } from '@inboxt/common';
+import { Prisma } from '@inboxt/prisma';
 
-import { AppException } from '../../utils/app-exception';
-import { Prisma } from '../../../prisma/client';
-import { UserService } from 'src/modules/user/user.service';
-import { SavedItemType } from '../../enums/saved-item-type.enum';
 import {
 	DEFAULT_PROCESSED_ITEM_CONTENT,
 	DEFAULT_PROCESSED_ITEM_TITLE,
@@ -20,38 +17,43 @@ import {
 	ITEM_PROCESSING_TITLE,
 	NEWSLETTER_PROCESSING_CONTENT,
 	NEWSLETTER_PROCESSING_TITLE,
-} from '../../common/constants/content-extraction.constants';
-import { PrismaService } from '../../services/prisma.service';
-import { LabelService } from '../../modules/saved-item/entities/label/label.service';
-import { SavedItemService } from '../../modules/saved-item/saved-item.service';
-import { NewsletterSubscriptionService } from '../../modules/saved-item/entities/newsletter/newsletter-subscription/newsletter-subscription.service';
-import { InboundEmailAddressService } from '../../modules/inbound-email-address/inbound-email-address.service';
-import {
-	NewsletterService,
-	ProcessNewsletterInput,
-} from '../../modules/saved-item/entities/newsletter/newsletter.service';
-import { MailService } from '../../modules/mail/mail.service';
+} from '~common/constants/content-extraction.constants';
+import { getDefaultItems } from '~common/content';
+import { SavedItemType } from '~common/enums/saved-item-type.enum';
+import { AppException } from '~common/utils/app-exception';
+import { InboundEmailAddressService } from '~modules/inbound-email-address/inbound-email-address.service';
+import { MailService } from '~modules/mail/mail.service';
+import { PrismaService } from '~modules/prisma/prisma.service';
 import {
 	ArticleService,
 	ProcessArticleInput,
-} from '../../modules/saved-item/entities/article/article.service';
+} from '~modules/saved-item/entities/article/article.service';
+import { LabelService } from '~modules/saved-item/entities/label/label.service';
+import { NewsletterSubscriptionService } from '~modules/saved-item/entities/newsletter/newsletter-subscription/newsletter-subscription.service';
+import {
+	NewsletterService,
+	ProcessNewsletterInput,
+} from '~modules/saved-item/entities/newsletter/newsletter.service';
+import { SavedItemService } from '~modules/saved-item/saved-item.service';
+import { UserService } from '~modules/user/user.service';
+
 import { AddArticleFromHtmlSnapshotInput } from './dto/add-article-from-html-snapshot.input';
 
 @Injectable()
 export class SavedItemManagerService {
 	private readonly logger = new Logger(SavedItemManagerService.name);
 	constructor(
-		private userService: UserService,
-		private labelService: LabelService,
-		private savedItemService: SavedItemService,
-		private articleService: ArticleService,
-		private newsletterService: NewsletterService,
-		private inboundEmailAddressService: InboundEmailAddressService,
+		private readonly userService: UserService,
+		private readonly labelService: LabelService,
+		private readonly savedItemService: SavedItemService,
+		private readonly articleService: ArticleService,
+		private readonly newsletterService: NewsletterService,
+		private readonly inboundEmailAddressService: InboundEmailAddressService,
 		@InjectQueue('saved-item-processing')
-		private savedItemProcessingQueue: Queue,
-		private newsletterSubscriptionService: NewsletterSubscriptionService,
-		private mailService: MailService,
-		private prisma: PrismaService,
+		private readonly savedItemProcessingQueue: Queue,
+		private readonly newsletterSubscriptionService: NewsletterSubscriptionService,
+		private readonly mailService: MailService,
+		private readonly prisma: PrismaService,
 	) {}
 
 	async createDefaultItems(userId: string) {
@@ -60,40 +62,25 @@ export class SavedItemManagerService {
 			color: APP_PRIMARY_COLOR,
 		});
 
-		await this.processAndCreateArticle(
-			userId,
-			{
-				url: `${process.env.WEB_URL}/getting-started.html`,
-			},
-			[defaultLabel.id],
-			{
-				author: 'Inboxt Guides',
-				leadImage: `${process.env.STORAGE_S3_URL}/lead-image.png`,
-				originalUrl: null,
-				sourceDomain: null,
-				description:
-					'Welcome to Inboxt! This guide introduces the core features, support channels, and ways to contribute or self-host.',
-			},
-			{ skipQueue: true },
-		);
-
-		await this.processAndCreateArticle(
-			userId,
-			{
-				url: `${process.env.WEB_URL}/tips-and-tricks.html`,
-			},
-			[defaultLabel.id],
-
-			{
-				author: 'Inboxt Guides',
-				leadImage: `${process.env.STORAGE_S3_URL}/lead-image.png`,
-				originalUrl: null,
-				sourceDomain: null,
-				description:
-					'Discover handy shortcuts, expert tips, and clever ways to organize and save content in Inboxt. Learn what’s possible (and what’s coming soon) to boost your productivity and reading experience.',
-			},
-			{ skipQueue: true },
-		);
+		for (const content of Object.values(getDefaultItems())) {
+			await this.processAndCreateArticle(
+				userId,
+				{
+					html: content.html,
+				},
+				[defaultLabel.id],
+				{
+					type: SavedItemType.ARTICLE,
+					title: content.metadata.title,
+					description: content.metadata.description,
+					author: content.metadata.author,
+					leadImage: content.metadata.leadImage,
+					originalUrl: null,
+					sourceDomain: null,
+				},
+				{ skipQueue: true },
+			);
+		}
 	}
 
 	private async createPendingArticle(
@@ -148,20 +135,14 @@ export class SavedItemManagerService {
 		}
 
 		const code = error?.response?.code;
-		let message = DEFAULT_PROCESSED_ITEM_CONTENT;
+		let message = error?.response?.message ?? DEFAULT_PROCESSED_ITEM_CONTENT;
 
 		if (code === 'FETCH_FAILED') {
 			message =
-				'We couldn’t fetch this page to prepare it for reading. The site may be blocking requests or temporarily unavailable. Please try again later, or try saving a different link. You can also import a ZIP that contains the page’s HTML.';
-		} else if (code === 'TOO_LARGE') {
-			message =
-				'This article is too large for us to process right now. Try saving a shorter section.';
+				'We couldn’t fetch this page to prepare it for reading. The site may be blocking requests or temporarily unavailable. Please try again later, or try saving a different link.';
 		} else if (code === 'STORAGE_QUOTA_EXCEEDED') {
 			message =
 				'You’ve reached your storage limit, so we couldn’t save this item. Delete items you no longer need to free up space.';
-		} else if (code === 'APP_DOMAIN_BLOCKED') {
-			message =
-				'This page is part of the Inboxt app and can’t be saved for later. Try saving articles from external sites instead.';
 		}
 
 		const isArticleProcessing = existing.title.startsWith(ITEM_PROCESSING_BASE_TITLE);
@@ -299,14 +280,12 @@ export class SavedItemManagerService {
 			Omit<Prisma.saved_itemCreateInput, 'user' | 'saved_item_label' | 'article' | 'id'>
 		>,
 	) {
-		/*----------  Validation  ----------*/
 		await addItemFromUrlSchema.parseAsync({ url });
 		const existingUser = await this.userService.get({ where: { id: userId } });
 		if (!existingUser) {
 			throw new AppException('User not found', HttpStatus.NOT_FOUND);
 		}
 
-		/*----------  Processing  ----------*/
 		await this.processAndCreateArticle(userId, { url }, labelIds, prismaData);
 	}
 
@@ -540,14 +519,12 @@ export class SavedItemManagerService {
 	}
 
 	async addArticleFromHtmlSnapshot(userId: string, input: AddArticleFromHtmlSnapshotInput) {
-		/*----------  Validation  ----------*/
 		await addArticleFromHtmlSnapshotSchema.parseAsync(input);
 		const existingUser = await this.userService.get({ where: { id: userId } });
 		if (!existingUser) {
 			throw new AppException('User not found', HttpStatus.NOT_FOUND);
 		}
 
-		/*----------  Processing  ----------*/
 		return await this.processAndCreateArticle(userId, {
 			url: input.url,
 			html: input.html,

@@ -1,15 +1,17 @@
-import { Processor } from '@nestjs/bullmq';
-import { Job } from 'bullmq';
+import { Processor, OnWorkerEvent } from '@nestjs/bullmq';
 import { Logger } from '@nestjs/common';
+import { Job } from 'bullmq';
+import { promises as fs } from 'fs';
 
-import { BaseQueueProcessor } from '../../common/processors/base-queue.processor';
+import { LogExecutionTime } from '~common/decorators/log-execution-time.decorator';
+import { BaseQueueProcessor } from '~common/processors/base-queue.processor';
+
 import { ImportService } from './import.service';
-import { LogExecutionTime } from '../../decorators/log-execution-time.decorator';
 
 @Processor('import', { concurrency: 2, limiter: { max: 5, duration: 1000 } })
 export class ImportProcessor extends BaseQueueProcessor {
 	protected readonly logger = new Logger(ImportProcessor.name);
-	constructor(private importService: ImportService) {
+	constructor(private readonly importService: ImportService) {
 		super();
 	}
 
@@ -33,6 +35,27 @@ export class ImportProcessor extends BaseQueueProcessor {
 				);
 			default:
 				throw new Error(`Unknown job type: ${job.name}`);
+		}
+	}
+
+	@OnWorkerEvent('completed')
+	async onCompleted(job: Job) {
+		await this.cleanupFile(job.data.filePath);
+	}
+
+	@OnWorkerEvent('failed')
+	async onFailed(job: Job) {
+		if (job.attemptsMade >= (job.opts.attempts || 1)) {
+			await this.cleanupFile(job.data.filePath);
+		}
+	}
+
+	private async cleanupFile(filePath: string) {
+		try {
+			await fs.unlink(filePath);
+			this.logger.log(`Cleaned up file: ${filePath}`);
+		} catch (error) {
+			this.logger.warn(`Failed to cleanup file ${filePath}: ${error}`);
 		}
 	}
 

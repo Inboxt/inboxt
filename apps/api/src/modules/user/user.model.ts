@@ -1,6 +1,7 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { BaseModel } from '../../models/base.model';
-import { UserPlan } from '../../enums/user-plan.enum';
+
+import { UserPlan } from '~common/enums/user-plan.enum';
+import { BaseModel } from '~common/models/base.model';
 
 @ObjectType({ isAbstract: true })
 export class User extends BaseModel {

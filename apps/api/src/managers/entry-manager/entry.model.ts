@@ -1,5 +1,6 @@
 import { Field, InterfaceType } from '@nestjs/graphql';
-import { BaseModel } from '../../models/base.model';
+
+import { BaseModel } from '~common/models/base.model';
 
 @InterfaceType({
 	resolveType(value) {

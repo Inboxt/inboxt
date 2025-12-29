@@ -1,11 +1,11 @@
 import { Processor } from '@nestjs/bullmq';
-import { Job } from 'bullmq';
 import { Inject, Logger } from '@nestjs/common';
+import { Job } from 'bullmq';
 import { Transporter } from 'nodemailer';
-
-import { BaseQueueProcessor } from '../../common/processors/base-queue.processor';
-import { LogExecutionTime } from '../../decorators/log-execution-time.decorator';
 import Mail from 'nodemailer/lib/mailer';
+
+import { LogExecutionTime } from '~common/decorators/log-execution-time.decorator';
+import { BaseQueueProcessor } from '~common/processors/base-queue.processor';
 
 @Processor('mail', { concurrency: 5 })
 export class MailProcessor extends BaseQueueProcessor {

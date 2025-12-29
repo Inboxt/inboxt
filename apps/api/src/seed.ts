@@ -6,9 +6,10 @@ dotenv.config({
 	path: join(__dirname, '../../../.env'),
 });
 
-import { PrismaClient } from '../prisma/client';
-import { UserPlan } from './enums/user-plan.enum';
-import { SavedItemType } from './enums/saved-item-type.enum';
+import { PrismaClient } from '@inboxt/prisma';
+
+import { SavedItemType } from '~common/enums/saved-item-type.enum';
+import { UserPlan } from '~common/enums/user-plan.enum';
 
 const prisma = new PrismaClient();
 

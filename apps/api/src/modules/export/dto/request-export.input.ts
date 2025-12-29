@@ -1,6 +1,7 @@
 import { InputType, Field } from '@nestjs/graphql';
-import { ExportType } from '../../../common/enums/export-type.enum';
-import { ExportHighlightsFormat } from '../../../common/enums/export-highlights-format.enum';
+
+import { ExportHighlightsFormat } from '~common/enums/export-highlights-format.enum';
+import { ExportType } from '~common/enums/export-type.enum';
 
 @InputType()
 export class RequestExportInput {

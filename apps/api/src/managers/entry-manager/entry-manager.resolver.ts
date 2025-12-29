@@ -1,13 +1,15 @@
 import { Resolver, Query, Args } from '@nestjs/graphql';
+
+import { ActiveUserMeta, ActiveUserMetaType } from '~common/decorators/active-user-meta.decorator';
+import { ApiTokenAllowed } from '~common/decorators/api-token.decorator';
+
 import { GetEntriesInput } from './dto/get-entries.input';
-import { EntryManagerService } from './entry-manager.service';
 import { EntryConnection } from './entry-connection';
-import { ActiveUserMeta, ActiveUserMetaType } from '../../decorators/active-user-meta.decorator';
-import { ApiTokenAllowed } from '../../decorators/api-token.decorator';
+import { EntryManagerService } from './entry-manager.service';
 
 @Resolver()
 export class EntryManagerResolver {
-	constructor(private entryManagerService: EntryManagerService) {}
+	constructor(private readonly entryManagerService: EntryManagerService) {}
 
 	@ApiTokenAllowed()
 	@Query(() => EntryConnection)

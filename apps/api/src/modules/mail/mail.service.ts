@@ -1,9 +1,11 @@
+import { InjectQueue } from '@nestjs/bullmq';
 import { Injectable } from '@nestjs/common';
 import { Queue } from 'bullmq';
-import { InjectQueue } from '@nestjs/bullmq';
+import dayjs from 'dayjs';
 import mjml2html from 'mjml';
-import { forwardedEmailTemplate } from '../../mail-templates/forwardedEmailTemplate';
-import { EMAIL_FORWARDED } from '../../common/constants/email.constants';
+
+import { EMAIL_FORWARDED } from '~common/constants/email.constants';
+import { forwardedEmailTemplate } from '~mail-templates/forwardedEmailTemplate';
 
 @Injectable()
 export class MailService {
@@ -12,7 +14,9 @@ export class MailService {
 	async forward(to: string, payload: any) {
 		const subject = payload.headers?.Subject?.[0] || 'Email without subject';
 		const from = payload.headers?.From?.[0] || 'Unknown sender';
-		const date = payload.headers?.Date?.[0] || new Date().toLocaleString(); // dayjs?
+		const date = payload.headers?.Date?.[0]
+			? dayjs(payload.headers.Date[0]).format('MMMM D, YYYY [at] h:mm A')
+			: dayjs().format('MMMM D, YYYY [at] h:mm A');
 		const plainText = payload.body?.stripped_plaintext || '';
 		const htmlContent = payload.body?.stripped_html || '';
 

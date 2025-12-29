@@ -1,16 +1,17 @@
 import { Resolver, ResolveField, Parent } from '@nestjs/graphql';
-import { Newsletter } from './newsletter.model';
-import { NewsletterSubscriptionService } from './newsletter-subscription/newsletter-subscription.service';
+
+import { ActiveUserMeta, ActiveUserMetaType } from '~common/decorators/active-user-meta.decorator';
+import { ApiTokenAllowed } from '~common/decorators/api-token.decorator';
+
 import { NewsletterSubscription } from './newsletter-subscription/newsletter-subscription.model';
-import {
-	ActiveUserMeta,
-	ActiveUserMetaType,
-} from '../../../../decorators/active-user-meta.decorator';
+import { NewsletterSubscriptionService } from './newsletter-subscription/newsletter-subscription.service';
+import { Newsletter } from './newsletter.model';
 
 @Resolver(() => Newsletter)
 export class NewsletterResolver {
-	constructor(private newsletterSubscriptionService: NewsletterSubscriptionService) {}
+	constructor(private readonly newsletterSubscriptionService: NewsletterSubscriptionService) {}
 
+	@ApiTokenAllowed()
 	@ResolveField('subscription', () => NewsletterSubscription, { nullable: true })
 	async subscription(
 		@ActiveUserMeta() activeUser: ActiveUserMetaType,

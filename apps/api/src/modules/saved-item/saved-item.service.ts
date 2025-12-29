@@ -1,19 +1,21 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import dayjs from 'dayjs';
 
-import { PrismaService } from '../../services/prisma.service';
-import { Prisma } from '../../../prisma/client';
-import { AppException } from '../../utils/app-exception';
+import { Prisma } from '@inboxt/prisma';
+
+import { GetSavedItemsQuery } from '~common/types';
+import { AppException } from '~common/utils/app-exception';
+import { PrismaService } from '~modules/prisma/prisma.service';
+import { QuotaOptions, StorageQuotaService } from '~modules/storage/storage-quota.service';
+
 import { LabelService } from './entities/label/label.service';
-import { GetSavedItemsQuery } from '../../common/types';
-import { QuotaOptions, StorageQuotaService } from '../storage/storage-quota.service';
 
 @Injectable()
 export class SavedItemService {
 	constructor(
-		private prisma: PrismaService,
-		private labelService: LabelService,
-		private storageQuota: StorageQuotaService,
+		private readonly prisma: PrismaService,
+		private readonly labelService: LabelService,
+		private readonly storageQuota: StorageQuotaService,
 	) {}
 
 	async get(
@@ -254,13 +256,11 @@ export class SavedItemService {
 	}
 
 	async updateStatus(userId: string, id: string, status: Prisma.saved_itemUpdateInput['status']) {
-		/*----------  Validation  ----------*/
 		const existingItem = await this.get(userId, { where: { id } });
 		if (!existingItem) {
 			throw new AppException('Item not found', HttpStatus.NOT_FOUND);
 		}
 
-		/*----------  Processing  ----------*/
 		return this.prisma.saved_item.update({
 			where: { id, userId },
 			data: {
@@ -285,7 +285,6 @@ export class SavedItemService {
 	}
 
 	async setLabels(userId: string, id: string, labels: string[]) {
-		/*----------  Validation  ----------*/
 		const item = await this.get(userId, { where: { id } });
 		if (!item) {
 			throw new AppException('Item not found', HttpStatus.NOT_FOUND);
@@ -312,7 +311,6 @@ export class SavedItemService {
 			return;
 		}
 
-		/*----------  Processing  ----------*/
 		await this.prisma.saved_item_label.deleteMany({
 			where: { savedItemId: id, labelId: { in: toRemove } },
 		});
@@ -350,12 +348,10 @@ export class SavedItemService {
 			(highlightSegmentsAgg._sum.sizeBytes ?? 0n);
 
 		await tx.saved_item.delete({ where: { id: savedItem.id } });
-
 		return total;
 	}
 
 	async delete(userId: string, id: string) {
-		/*----------  Validation  ----------*/
 		const savedItem = await this.get(userId, {
 			where: { id, userId, status: 'DELETED', deletedSince: { not: null } },
 		});
@@ -367,7 +363,6 @@ export class SavedItemService {
 			);
 		}
 
-		/*----------  Processing  ----------*/
 		return this.prisma.$transaction(async (tx) => {
 			const total = await this.permanentlyDeleteSavedItemTx(tx, userId, savedItem);
 

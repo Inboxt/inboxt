@@ -1,28 +1,29 @@
-import { Job } from 'bullmq';
-import { Logger } from '@nestjs/common';
 import { Processor } from '@nestjs/bullmq';
+import { Logger } from '@nestjs/common';
+import { Job } from 'bullmq';
 import dayjs from 'dayjs';
-import { PrismaService } from '../../services/prisma.service';
-import { BaseQueueProcessor } from '../../common/processors/base-queue.processor';
-import { LogExecutionTime } from '../../decorators/log-execution-time.decorator';
-import { MailService } from '../mail/mail.service';
+
 import {
 	EMAIL_ACCOUNT_DELETED,
 	EMAIL_STORAGE_APPROACHING_LIMIT,
 	EMAIL_STORAGE_LIMIT_REACHED,
 	EMAIL_VERIFY_REMINDER,
-} from '../../common/constants/email.constants';
-import { accountDeletedTemplate } from '../../mail-templates/accountDeletedTemplate';
-import { verifyEmailReminderTemplate } from '../../mail-templates/verifyEmailReminderTemplate';
-import { UserPlan } from '../../enums/user-plan.enum';
-import { storageThresholdTemplate } from '../../mail-templates/storageThresholdTemplate';
+} from '~common/constants/email.constants';
+import { LogExecutionTime } from '~common/decorators/log-execution-time.decorator';
+import { UserPlan } from '~common/enums/user-plan.enum';
+import { BaseQueueProcessor } from '~common/processors/base-queue.processor';
+import { accountDeletedTemplate } from '~mail-templates/accountDeletedTemplate';
+import { storageThresholdTemplate } from '~mail-templates/storageThresholdTemplate';
+import { verifyEmailReminderTemplate } from '~mail-templates/verifyEmailReminderTemplate';
+import { MailService } from '~modules/mail/mail.service';
+import { PrismaService } from '~modules/prisma/prisma.service';
 
 @Processor('schedule-tasks', { concurrency: 10 })
 export class ScheduleTasksProcessor extends BaseQueueProcessor {
 	protected readonly logger = new Logger(ScheduleTasksProcessor.name);
 	constructor(
-		private prisma: PrismaService,
-		private mailService: MailService,
+		private readonly prisma: PrismaService,
+		private readonly mailService: MailService,
 	) {
 		super();
 	}
@@ -244,7 +245,7 @@ export class ScheduleTasksProcessor extends BaseQueueProcessor {
 	}
 
 	private async notifyStorageThresholds() {
-		const thresholds = [80, 100]; // should be sorted from low to high
+		const thresholds = [80, 100]; // from low to high
 		const pageSize = 250;
 		let scanned = 0;
 		let sent = 0;

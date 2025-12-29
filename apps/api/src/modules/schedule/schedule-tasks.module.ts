@@ -1,10 +1,10 @@
-import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bullmq';
+import { Module } from '@nestjs/common';
 
-import { PrismaService } from '../../services/prisma.service';
+import { MailModule } from '~modules/mail/mail.module';
+
 import { ScheduleTasksProcessor } from './schedule-tasks.processor';
 import { ScheduleTasksService } from './schedule-tasks.service';
-import { MailModule } from '../mail/mail.module';
 
 @Module({
 	imports: [
@@ -19,6 +19,6 @@ import { MailModule } from '../mail/mail.module';
 			},
 		}),
 	],
-	providers: [PrismaService, ScheduleTasksService, ScheduleTasksProcessor],
+	providers: [ScheduleTasksService, ScheduleTasksProcessor],
 })
 export class ScheduleTasksModule {}

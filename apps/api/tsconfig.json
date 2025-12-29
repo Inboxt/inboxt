@@ -13,11 +13,18 @@
 		"strictPropertyInitialization": false,
 		"skipLibCheck": true,
 		"esModuleInterop": true,
-		"baseUrl": "./",
+		"baseUrl": ".",
 		"paths": {
 			"@inboxt/common": ["libs/common/src/index.ts"],
+			"@inboxt/prisma": ["./prisma/client"],
+			"~common/*": ["./src/common/*"],
+			"~config/*": ["./src/config/*"],
+			"~managers/*": ["./src/managers/*"],
+			"~modules/*": ["./src/modules/*"],
+			"~services/*": ["./src/services/*"],
+			"~mail-templates/*": ["./src/mail-templates/*"]
 		}
 	},
-	"include": ["src"],
+	"include": ["src", "prisma/client/**/*"],
 	"exclude": ["node_modules", "dist", "**/*.spec.ts"]
 }

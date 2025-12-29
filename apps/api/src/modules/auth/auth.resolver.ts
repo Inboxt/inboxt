@@ -1,23 +1,24 @@
 import { Resolver, Args, Mutation, Context } from '@nestjs/graphql';
 
+import { HOURLY_RATE_LIMIT } from '~common/constants/rate-limit.constants';
+import { VOID_RESPONSE } from '~common/constants/void';
+import { NonDemo } from '~common/decorators/account.decorator';
+import { ActiveUserMeta, ActiveUserMetaType } from '~common/decorators/active-user-meta.decorator';
+import { Public } from '~common/decorators/public.decorator';
+import { RateLimit } from '~common/decorators/rate-limit.decorator';
+import { Void } from '~common/models/void.model';
+import { GqlContext } from '~common/types/graphql-context';
+import { CreateAccountInput } from '~modules/user/dto/create-account.input';
+
 import { AuthService } from './auth.service';
-import { Void } from '../../models/void.model';
-import { VOID_RESPONSE } from '../../constants/void';
-import { Public } from 'src/decorators/public.decorator';
-import { SignInInput } from './dto/sign-in.input';
-import { GqlContext } from '../../types/graphql-context';
-import { VerifyEmailInput } from './dto/verify-email.input';
-import { CreateAccountInput } from '../user/dto/create-account.input';
-import { ActiveUserMeta, ActiveUserMetaType } from '../../decorators/active-user-meta.decorator';
 import { RequestPasswordRecoveryInput } from './dto/request-password-recovery.input';
 import { ResetPasswordInput } from './dto/reset-password.input';
-import { NonDemo } from '../../decorators/account.decorator';
-import { RateLimit } from '../../decorators/rate-limit.decorator';
-import { HOURLY_RATE_LIMIT } from '../../common/constants/rate-limit.constants';
+import { SignInInput } from './dto/sign-in.input';
+import { VerifyEmailInput } from './dto/verify-email.input';
 
 @Resolver()
 export class AuthResolver {
-	constructor(private authService: AuthService) {}
+	constructor(private readonly authService: AuthService) {}
 
 	@Public()
 	@Mutation(() => Void)

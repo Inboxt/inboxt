@@ -1,8 +1,9 @@
 import { Controller, Get, HttpStatus } from '@nestjs/common';
 
+import { Public } from '~common/decorators/public.decorator';
+import { AppException } from '~common/utils/app-exception';
+
 import { AppService } from './app.service';
-import { Public } from '../../decorators/public.decorator';
-import { AppException } from '../../utils/app-exception';
 
 @Controller()
 export class AppController {
@@ -39,7 +40,6 @@ export class AppController {
 			);
 		}
 
-		const data = await response.json();
-		return data;
+		return await response.json();
 	}
 }

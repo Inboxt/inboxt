@@ -1,14 +1,15 @@
 import { Module } from '@nestjs/common';
-import { HighlightService } from './highlight.service';
+
+import { SavedItemHighlightsResolver } from '~modules/highlight/saved-item-highlights.resolver';
+import { SavedItemModule } from '~modules/saved-item/saved-item.module';
+import { StorageModule } from '~modules/storage/storage.module';
+
 import { HighlightResolver } from './highlight.resolver';
-import { PrismaService } from '../../services/prisma.service';
-import { SavedItemHighlightsResolver } from './saved-item-highlights.resolver';
-import { SavedItemModule } from '../saved-item/saved-item.module';
-import { StorageModule } from '../storage/storage.module';
+import { HighlightService } from './highlight.service';
 
 @Module({
 	imports: [SavedItemModule, StorageModule],
-	providers: [HighlightService, HighlightResolver, PrismaService, SavedItemHighlightsResolver],
+	providers: [HighlightService, HighlightResolver, SavedItemHighlightsResolver],
 	exports: [HighlightService],
 })
 export class HighlightModule {}

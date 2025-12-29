@@ -1,12 +1,14 @@
 import { Resolver, Mutation, Args, Query } from '@nestjs/graphql';
-import { ApiTokenService } from './api-token.service';
-import { ActiveUserMeta, ActiveUserMetaType } from '../../decorators/active-user-meta.decorator';
+
+import { VOID_RESPONSE } from '~common/constants/void';
+import { VerifiedOnly } from '~common/decorators/account.decorator';
+import { ActiveUserMeta, ActiveUserMetaType } from '~common/decorators/active-user-meta.decorator';
+import { ApiTokenAllowed } from '~common/decorators/api-token.decorator';
+import { Void } from '~common/models/void.model';
+
 import { ApiToken, CreatedApiToken } from './api-token.model';
+import { ApiTokenService } from './api-token.service';
 import { CreateApiTokenInput } from './dto/create-api-token.input';
-import { ApiTokenAllowed } from '../../decorators/api-token.decorator';
-import { VerifiedOnly } from '../../decorators/account.decorator';
-import { Void } from '../../models/void.model';
-import { VOID_RESPONSE } from '../../constants/void';
 import { DeleteApiTokenInput } from './dto/delete-api-token.input';
 
 @Resolver()

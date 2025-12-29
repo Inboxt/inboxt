@@ -1,28 +1,29 @@
 import { Resolver, Query, ResolveField, Parent, Args, Mutation } from '@nestjs/graphql';
 
-import { ActiveUserMeta, ActiveUserMetaType } from '../../decorators/active-user-meta.decorator';
-import { SavedItemService } from './saved-item.service';
+import { VOID_RESPONSE } from '~common/constants/void';
+import { ActiveUserMeta, ActiveUserMetaType } from '~common/decorators/active-user-meta.decorator';
+import { ApiTokenAllowed } from '~common/decorators/api-token.decorator';
+import { Void } from '~common/models/void.model';
+
+import { EmptyTrash } from './dto/empty-trash.model';
+import { GetSavedItemInput } from './dto/get-saved-item.input';
+import { PermanentlyDeleteSavedItemsInput } from './dto/permanently-delete-saved-items.input';
+import { SetSavedItemLabelsInput } from './dto/set-saved-item-labels.input';
+import { UpdateSavedItemStatusInput } from './dto/update-saved-item-status.input';
 import { Article } from './entities/article/article.model';
 import { ArticleService } from './entities/article/article.service';
-import { SavedItem } from './saved-item.model';
-import { GetSavedItemInput } from './dto/get-saved-item.input';
-import { Void } from '../../models/void.model';
-import { VOID_RESPONSE } from '../../constants/void';
-import { UpdateSavedItemStatusInput } from './dto/update-saved-item-status.input';
-import { SetSavedItemLabelsInput } from './dto/set-saved-item-labels.input';
 import { Label } from './entities/label/label.model';
-import { PermanentlyDeleteSavedItemsInput } from './dto/permanently-delete-saved-items.input';
 import { Newsletter } from './entities/newsletter/newsletter.model';
 import { NewsletterService } from './entities/newsletter/newsletter.service';
-import { ApiTokenAllowed } from '../../decorators/api-token.decorator';
-import { EmptyTrash } from './dto/empty-trash.model';
+import { SavedItem } from './saved-item.model';
+import { SavedItemService } from './saved-item.service';
 
 @Resolver(() => SavedItem)
 export class SavedItemResolver {
 	constructor(
-		private savedItemService: SavedItemService,
-		private articleService: ArticleService,
-		private newsletterService: NewsletterService,
+		private readonly savedItemService: SavedItemService,
+		private readonly articleService: ArticleService,
+		private readonly newsletterService: NewsletterService,
 	) {}
 
 	@ApiTokenAllowed()

@@ -1,26 +1,27 @@
 import { OnWorkerEvent, Processor } from '@nestjs/bullmq';
-import { Job } from 'bullmq';
 import { Logger } from '@nestjs/common';
+import { Job } from 'bullmq';
 import dayjs from 'dayjs';
 
-import { BaseQueueProcessor } from '../../common/processors/base-queue.processor';
+import { EMAIL_EXPORT_READY } from '~common/constants/email.constants';
+import { LogExecutionTime } from '~common/decorators/log-execution-time.decorator';
+import { ExportHighlightsFormat } from '~common/enums/export-highlights-format.enum';
+import { BaseQueueProcessor } from '~common/processors/base-queue.processor';
+import { exportReadyTemplate } from '~mail-templates/exportReadyTemplate';
+import { MailService } from '~modules/mail/mail.service';
+import { S3StorageService } from '~modules/storage/s3-storage.service';
+import { UserService } from '~modules/user/user.service';
+
 import { ExportService } from './export.service';
-import { MailService } from '../mail/mail.service';
-import { S3StorageService } from '../storage/s3-storage.service';
-import { exportReadyTemplate } from '../../mail-templates/exportReadyTemplate';
-import { EMAIL_EXPORT_READY } from '../../common/constants/email.constants';
-import { LogExecutionTime } from '../../decorators/log-execution-time.decorator';
-import { ExportHighlightsFormat } from '../../common/enums/export-highlights-format.enum';
-import { UserService } from '../user/user.service';
 
 @Processor('export', { concurrency: 2 })
 export class ExportProcessor extends BaseQueueProcessor {
 	protected readonly logger = new Logger(ExportProcessor.name);
 	constructor(
-		private exportService: ExportService,
-		private s3StorageService: S3StorageService,
-		private mail: MailService,
-		private userService: UserService,
+		private readonly exportService: ExportService,
+		private readonly s3StorageService: S3StorageService,
+		private readonly mail: MailService,
+		private readonly userService: UserService,
 	) {
 		super();
 	}
@@ -46,8 +47,8 @@ export class ExportProcessor extends BaseQueueProcessor {
 		email: string;
 		formatForHighlights: ExportHighlightsFormat;
 	}) {
-		const ts = dayjs().format('YYYYMMDD_HHmmss');
-		const key = `exports/${data.userId}/inboxt_export_${ts}.zip`;
+		const timestamp = dayjs().format('YYYYMMDD_HHmmss');
+		const key = `exports/${data.userId}/inboxt_export_${timestamp}.zip`;
 		const zip = await this.exportService.buildZipForAll({
 			userId: data.userId,
 			formatForHighlights: data.formatForHighlights,

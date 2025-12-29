@@ -1,13 +1,15 @@
 import { Args, Mutation, Resolver } from '@nestjs/graphql';
-import { ActiveUserMeta, ActiveUserMetaType } from '../../decorators/active-user-meta.decorator';
-import { RateLimit } from '../../decorators/rate-limit.decorator';
-import { ApiTokenAllowed } from '../../decorators/api-token.decorator';
-import { Void } from '../../models/void.model';
-import { SavedItemManagerService } from './saved-item-manager.service';
-import { AddArticleFromUrlInput } from './dto/add-article-from-url.input';
-import { VOID_RESPONSE } from '../../constants/void';
+
+import { VOID_RESPONSE } from '~common/constants/void';
+import { VerifiedOnly } from '~common/decorators/account.decorator';
+import { ActiveUserMeta, ActiveUserMetaType } from '~common/decorators/active-user-meta.decorator';
+import { ApiTokenAllowed } from '~common/decorators/api-token.decorator';
+import { RateLimit } from '~common/decorators/rate-limit.decorator';
+import { Void } from '~common/models/void.model';
+
 import { AddArticleFromHtmlSnapshotInput } from './dto/add-article-from-html-snapshot.input';
-import { VerifiedOnly } from '../../decorators/account.decorator';
+import { AddArticleFromUrlInput } from './dto/add-article-from-url.input';
+import { SavedItemManagerService } from './saved-item-manager.service';
 
 @Resolver()
 export class SavedItemManagerResolver {

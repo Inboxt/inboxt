@@ -1,17 +1,19 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import dayjs from 'dayjs';
 import { hash, verify } from 'argon2';
 import crypto from 'crypto';
+import dayjs from 'dayjs';
 
-import { PrismaService } from '../../services/prisma.service';
-import { CreateApiTokenInput } from './dto/create-api-token.input';
-import { AppException } from '../../utils/app-exception';
 import { createApiTokenSchema } from '@inboxt/common';
-import { ApiTokenExpiry } from '../../common/enums/api-token-expiry.enum';
+
+import { ApiTokenExpiry } from '~common/enums/api-token-expiry.enum';
+import { AppException } from '~common/utils/app-exception';
+import { PrismaService } from '~modules/prisma/prisma.service';
+
+import { CreateApiTokenInput } from './dto/create-api-token.input';
 
 @Injectable()
 export class ApiTokenService {
-	constructor(private prisma: PrismaService) {}
+	constructor(private readonly prisma: PrismaService) {}
 
 	private generateSecretPart(): string {
 		return crypto.randomUUID();

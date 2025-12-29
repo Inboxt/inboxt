@@ -1,15 +1,15 @@
 import { Resolver, Query } from '@nestjs/graphql';
 
-import { ActiveUserMeta, ActiveUserMetaType } from '../../decorators/active-user-meta.decorator';
-import { UserService } from '../user/user.service';
-import { Public } from '../../decorators/public.decorator';
-import { User } from '../user/user.model';
-import { ApiTokenAllowed } from '../../decorators/api-token.decorator';
+import { ActiveUserMeta, ActiveUserMetaType } from '~common/decorators/active-user-meta.decorator';
+import { ApiTokenAllowed } from '~common/decorators/api-token.decorator';
+import { Public } from '~common/decorators/public.decorator';
+import { User } from '~modules/user/user.model';
+import { UserService } from '~modules/user/user.service';
 
 @Public()
 @Resolver(() => User)
 export class ActiveUserResolver {
-	constructor(private userService: UserService) {}
+	constructor(private readonly userService: UserService) {}
 
 	@ApiTokenAllowed()
 	@Query(() => User, { nullable: true })

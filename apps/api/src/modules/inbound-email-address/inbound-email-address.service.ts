@@ -1,20 +1,19 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import dayjs from 'dayjs';
 import { randomBytes } from 'crypto';
+import dayjs from 'dayjs';
 
 import { USER_INBOUND_EMAIL_ADDRESS_LIMIT } from '@inboxt/common';
+import { Prisma } from '@inboxt/prisma';
 
-import { Prisma } from '../../../prisma/client';
-
-import { PrismaService } from '../../services/prisma.service';
-import { AppException } from '../../utils/app-exception';
-import { NewsletterSubscriptionManagerService } from '../../managers/newsletter-subscription-manager/newsletter-subscription-manager.service';
+import { AppException } from '~common/utils/app-exception';
+import { NewsletterSubscriptionManagerService } from '~managers/newsletter-subscription-manager/newsletter-subscription-manager.service';
+import { PrismaService } from '~modules/prisma/prisma.service';
 
 @Injectable()
 export class InboundEmailAddressService {
 	constructor(
-		private readonly prismaService: PrismaService,
-		private newsletterSubscriptionManagerService: NewsletterSubscriptionManagerService,
+		private readonly prisma: PrismaService,
+		private readonly newsletterSubscriptionManagerService: NewsletterSubscriptionManagerService,
 	) {}
 
 	private generateSlug(): string {
@@ -30,7 +29,7 @@ export class InboundEmailAddressService {
 	}
 
 	async get(userId: string, query: Prisma.inbound_email_addressFindFirstArgs) {
-		return this.prismaService.inbound_email_address.findFirst({
+		return this.prisma.inbound_email_address.findFirst({
 			...query,
 			where: {
 				...query.where,
@@ -40,7 +39,7 @@ export class InboundEmailAddressService {
 	}
 
 	async getMany(userId: string, query: Prisma.inbound_email_addressFindManyArgs) {
-		return this.prismaService.inbound_email_address.findMany({
+		return this.prisma.inbound_email_address.findMany({
 			...query,
 			where: {
 				...query.where,
@@ -54,7 +53,6 @@ export class InboundEmailAddressService {
 		inboundEmailAddressId: string,
 		query: Prisma.newsletter_subscriptionFindManyArgs,
 	) {
-		/*----------  Validation  ----------*/
 		const inboundEmailAddress = await this.get(userId, {
 			where: { id: inboundEmailAddressId },
 		});
@@ -63,12 +61,11 @@ export class InboundEmailAddressService {
 			throw new AppException("Email doesn't exist", HttpStatus.NOT_FOUND);
 		}
 
-		/*----------  Processing  ----------*/
 		return this.newsletterSubscriptionManagerService.getMany(inboundEmailAddressId, query);
 	}
 
 	async verify(emailAddress: string) {
-		return this.prismaService.inbound_email_address.findFirst({
+		return this.prisma.inbound_email_address.findFirst({
 			where: {
 				fullAddress: emailAddress,
 				deletedAt: null,
@@ -77,7 +74,6 @@ export class InboundEmailAddressService {
 	}
 
 	async create(userId: string) {
-		/*----------  Validation  ----------*/
 		const existingInboundEmailAddresses = await this.getMany(userId, {
 			where: { deletedAt: null },
 		});
@@ -89,9 +85,8 @@ export class InboundEmailAddressService {
 			);
 		}
 
-		/*----------  Processing  ----------*/
 		const localPart = this.generateSlug();
-		return this.prismaService.inbound_email_address.create({
+		return this.prisma.inbound_email_address.create({
 			data: {
 				userId,
 				localPart,
@@ -101,15 +96,13 @@ export class InboundEmailAddressService {
 	}
 
 	async delete(userId: string, id: string) {
-		/*----------  Validation  ----------*/
 		const inboundEmailAddress = await this.get(userId, { where: { id } });
 		if (!inboundEmailAddress || inboundEmailAddress?.deletedAt) {
 			throw new AppException("Email doesn't exist", HttpStatus.NOT_FOUND);
 		}
 
-		/*----------  Processing  ----------*/
 		await this.newsletterSubscriptionManagerService.deleteForInboundEmailAddress(id);
-		return this.prismaService.inbound_email_address.update({
+		return this.prisma.inbound_email_address.update({
 			where: { id },
 			data: {
 				deletedAt: dayjs().toDate(),

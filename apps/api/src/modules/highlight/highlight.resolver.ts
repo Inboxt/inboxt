@@ -1,21 +1,23 @@
 import { Resolver, Mutation, Args, ResolveField, Parent } from '@nestjs/graphql';
+
+import { VOID_RESPONSE } from '~common/constants/void';
+import { ActiveUserMeta, ActiveUserMetaType } from '~common/decorators/active-user-meta.decorator';
+import { ApiTokenAllowed } from '~common/decorators/api-token.decorator';
+import { Void } from '~common/models/void.model';
+import { SavedItem } from '~modules/saved-item/saved-item.model';
+import { SavedItemService } from '~modules/saved-item/saved-item.service';
+
+import { CreateHighlightInput } from './dto/create-highlight.input';
+import { DeleteHighlightsInput } from './dto/delete-highlights.input';
+import { HighlightSegment } from './highlight-segment.model';
 import { Highlight } from './highlight.model';
 import { HighlightService } from './highlight.service';
-import { CreateHighlightInput } from './dto/create-highlight.input';
-import { ActiveUserMeta, ActiveUserMetaType } from '../../decorators/active-user-meta.decorator';
-import { Void } from '../../models/void.model';
-import { VOID_RESPONSE } from '../../constants/void';
-import { HighlightSegment } from './highlight-segment.model';
-import { DeleteHighlightsInput } from './dto/delete-highlights.input';
-import { SavedItemService } from '../saved-item/saved-item.service';
-import { SavedItem } from '../saved-item/saved-item.model';
-import { ApiTokenAllowed } from '../../decorators/api-token.decorator';
 
 @Resolver(() => Highlight)
 export class HighlightResolver {
 	constructor(
-		private highlightService: HighlightService,
-		private savedItemService: SavedItemService,
+		private readonly highlightService: HighlightService,
+		private readonly savedItemService: SavedItemService,
 	) {}
 
 	@ApiTokenAllowed()

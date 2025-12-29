@@ -50,7 +50,7 @@ export const config = (): Config => {
 		},
 		security: {
 			jwtSecret: process.env.API_JWT_SECRET,
-			expiresIn: process.env.API_JWT_EXPIRES_IN || '1d',
+			expiresIn: process.env.API_JWT_EXPIRES_IN || '30d',
 		},
 		valkey: {
 			connection: {

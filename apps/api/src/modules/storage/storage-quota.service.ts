@@ -1,15 +1,15 @@
 import { Injectable, HttpStatus } from '@nestjs/common';
 
-import { Prisma } from '../../../prisma/client';
+import { Prisma } from '@inboxt/prisma';
 
-import { PrismaService } from '../../services/prisma.service';
-import { AppException } from '../../utils/app-exception';
+import { AppException } from '~common/utils/app-exception';
+import { PrismaService } from '~modules/prisma/prisma.service';
 
 export type QuotaOptions = { skipQuota?: boolean };
 
 @Injectable()
 export class StorageQuotaService {
-	constructor(private prisma: PrismaService) {}
+	constructor(private readonly prisma: PrismaService) {}
 
 	computeSizeBytes(fields: Record<string, string | undefined>) {
 		let total = 0;

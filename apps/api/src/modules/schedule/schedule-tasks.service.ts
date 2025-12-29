@@ -1,12 +1,11 @@
+import { InjectQueue } from '@nestjs/bullmq';
 import { Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-
-import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 
 @Injectable()
 export class ScheduleTasksService {
-	constructor(@InjectQueue('schedule-tasks') private scheduleTasksQueue: Queue) {}
+	constructor(@InjectQueue('schedule-tasks') private readonly scheduleTasksQueue: Queue) {}
 
 	@Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
 	async deleteUnverifiedUsers() {

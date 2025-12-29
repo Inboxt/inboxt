@@ -1,23 +1,25 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
-import dayjs from 'dayjs';
-import archiver from 'archiver';
-import { PassThrough } from 'stream';
 import { InjectQueue } from '@nestjs/bullmq';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import archiver from 'archiver';
 import { Queue } from 'bullmq';
+import dayjs from 'dayjs';
+import { PassThrough } from 'stream';
+
+import { Prisma } from '@inboxt/prisma';
+
+import { ExportHighlightsFormat } from '~common/enums/export-highlights-format.enum';
+import { ExportType } from '~common/enums/export-type.enum';
+import { SavedItemExportJson } from '~common/types';
+import { AppException } from '~common/utils/app-exception';
+import { renderHighlightsHtml } from '~common/utils/renderHighlightsHtml';
+import { HighlightService } from '~modules/highlight/highlight.service';
+import { InboundEmailAddressService } from '~modules/inbound-email-address/inbound-email-address.service';
+import { LabelService } from '~modules/saved-item/entities/label/label.service';
+import { NewsletterSubscriptionService } from '~modules/saved-item/entities/newsletter/newsletter-subscription/newsletter-subscription.service';
+import { SavedItemService } from '~modules/saved-item/saved-item.service';
+import { UserService } from '~modules/user/user.service';
 
 import { RequestExportInput } from './dto/request-export.input';
-import { ExportType } from '../../common/enums/export-type.enum';
-import { SavedItemService } from '../saved-item/saved-item.service';
-import { HighlightService } from '../highlight/highlight.service';
-import { UserService } from '../user/user.service';
-import { Prisma } from '../../../prisma/client';
-import { LabelService } from '../saved-item/entities/label/label.service';
-import { InboundEmailAddressService } from '../inbound-email-address/inbound-email-address.service';
-import { NewsletterSubscriptionService } from '../saved-item/entities/newsletter/newsletter-subscription/newsletter-subscription.service';
-import { ExportHighlightsFormat } from '../../common/enums/export-highlights-format.enum';
-import { renderHighlightsHtml } from '../../utils/renderHighlightsHtml';
-import { AppException } from '../../utils/app-exception';
-import { SavedItemExportJson } from '../../common/types';
 
 type HighlightWithRelations = Prisma.highlightGetPayload<{
 	include: { saved_item: true; highlight_segment: true };
@@ -36,12 +38,12 @@ type SavedItemWithRelations = Prisma.saved_itemGetPayload<{
 @Injectable()
 export class ExportService {
 	constructor(
-		private userService: UserService,
-		private savedItemService: SavedItemService,
-		private highlightService: HighlightService,
-		private labelService: LabelService,
-		private inboundEmailAddressService: InboundEmailAddressService,
-		private newsletterSubscriptionService: NewsletterSubscriptionService,
+		private readonly userService: UserService,
+		private readonly savedItemService: SavedItemService,
+		private readonly highlightService: HighlightService,
+		private readonly labelService: LabelService,
+		private readonly inboundEmailAddressService: InboundEmailAddressService,
+		private readonly newsletterSubscriptionService: NewsletterSubscriptionService,
 		@InjectQueue('export') private readonly exportQueue: Queue,
 	) {}
 
@@ -62,7 +64,6 @@ export class ExportService {
 		]);
 
 		const highlights = await this.getHighlights(userId);
-
 		const userJson = user
 			? {
 					id: user.id,

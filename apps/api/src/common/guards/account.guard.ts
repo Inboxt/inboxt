@@ -2,15 +2,16 @@ import { ExecutionContext, Injectable, CanActivate, HttpStatus } from '@nestjs/c
 import { Reflector } from '@nestjs/core';
 import { GqlExecutionContext } from '@nestjs/graphql';
 
+import { PrismaService } from '~modules/prisma/prisma.service';
+
 import { NON_DEMO_KEY, VERIFIED_ONLY_KEY } from '../decorators/account.decorator';
-import { PrismaService } from '../services/prisma.service';
 import { AppException } from '../utils/app-exception';
 
 @Injectable()
 export class AccountGuard implements CanActivate {
 	constructor(
-		private reflector: Reflector,
-		private prismaService: PrismaService,
+		private readonly reflector: Reflector,
+		private readonly prisma: PrismaService,
 	) {}
 
 	async canActivate(context: ExecutionContext) {
@@ -21,7 +22,7 @@ export class AccountGuard implements CanActivate {
 			return true;
 		}
 
-		const user = await this.prismaService.user.findUnique({ where: { id: partialUser.id } });
+		const user = await this.prisma.user.findUnique({ where: { id: partialUser.id } });
 		if (!user) {
 			return true;
 		}

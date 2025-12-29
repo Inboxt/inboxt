@@ -1,6 +1,7 @@
-import { SavedItemStatus } from '../../enums/saved-item-status.enum';
-import { SavedItemType } from '../../enums/saved-item-type.enum';
-import { EntrySort } from '../../managers/entry-manager/dto/entry-sort.input';
+import { EntrySort } from '~managers/entry-manager/dto/entry-sort.input';
+
+import { SavedItemStatus } from '../enums/saved-item-status.enum';
+import { SavedItemType } from '../enums/saved-item-type.enum';
 
 export interface GetSavedItemsQuery {
 	status?: SavedItemStatus;

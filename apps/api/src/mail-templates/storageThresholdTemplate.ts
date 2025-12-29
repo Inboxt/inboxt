@@ -1,15 +1,16 @@
 import { formatBytes } from '@inboxt/common';
 
-import appHeader from './elements/appHeader';
-import footer from './elements/footer';
-import header from './elements/header';
-import baseStyles from './elements/baseStyles';
-import alert from './elements/alert';
-import button from './elements/button';
 import {
 	EMAIL_STORAGE_APPROACHING_LIMIT,
 	EMAIL_STORAGE_LIMIT_REACHED,
-} from '../common/constants/email.constants';
+} from '~common/constants/email.constants';
+
+import alert from './elements/alert';
+import appHeader from './elements/appHeader';
+import baseStyles from './elements/baseStyles';
+import button from './elements/button';
+import footer from './elements/footer';
+import header from './elements/header';
 
 export const storageThresholdTemplate = ({
 	usageBytes,

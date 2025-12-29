@@ -64,6 +64,8 @@ model saved_item_label {
   labelId     String     @db.Uuid
   label       label      @relation(fields: [labelId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   saved_item  saved_item @relation(fields: [savedItemId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([savedItemId, labelId], map: "saved_item_label_savedItemId_labelId_unique_index")
 }
 
 model user {
@@ -103,6 +105,10 @@ model newsletter {
   inbound_email_address   inbound_email_address?   @relation(fields: [inboundEmailAddressId], references: [id], onUpdate: NoAction)
   saved_item              saved_item               @relation(fields: [savedItemId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   newsletter_subscription newsletter_subscription? @relation(fields: [subscriptionId], references: [id], onUpdate: NoAction)
+
+  @@index([inboundEmailAddressId], map: "newsletter_inboundEmailAddressId_index")
+  @@index([messageId], map: "newsletter_messageId_index")
+  @@index([subscriptionId], map: "newsletter_subscriptionId_index")
 }
 
 model newsletter_subscription {
@@ -116,6 +122,8 @@ model newsletter_subscription {
   inboundEmailAddressId  String                         @db.Uuid
   newsletter             newsletter[]
   inbound_email_address  inbound_email_address          @relation(fields: [inboundEmailAddressId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([inboundEmailAddressId], map: "newsletter_subscription_inboundEmailAddressId_index")
 }
 
 model inbound_email_address {
@@ -140,6 +148,9 @@ model highlight {
   saved_item        saved_item?         @relation(fields: [savedItemId], references: [id], onUpdate: NoAction)
   user              user                @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   highlight_segment highlight_segment[]
+
+  @@index([savedItemId], map: "highlight_savedItemId_index")
+  @@index([userId], map: "highlight_userId_index")
 }
 
 model highlight_segment {
@@ -162,12 +173,11 @@ model api_token {
   createdAt  DateTime  @default(now()) @db.Timestamptz(6)
   lastUsedAt DateTime? @db.Timestamptz(6)
   name       String
-  token      String?
+  token      String?   @unique(map: "api_token_token_unique_index")
   userId     String    @db.Uuid
   expiresAt  DateTime? @db.Timestamptz(6)
   user       user      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
-  @@index([token], map: "api_token_token_index")
   @@index([userId], map: "api_token_userId_index")
 }
 

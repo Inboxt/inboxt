@@ -1,18 +1,18 @@
-import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bullmq';
+import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 
-import { MailService } from './mail.service';
 import { MailProcessor } from './mail.processor';
+import { MailService } from './mail.service';
 
 @Module({
 	imports: [
 		BullModule.registerQueue({
 			name: 'mail',
 			defaultJobOptions: {
-				removeOnComplete: 100,
-				removeOnFail: 50,
+				removeOnComplete: true,
+				removeOnFail: true,
 				attempts: 3,
 				backoff: { type: 'exponential', delay: 60000 },
 			},

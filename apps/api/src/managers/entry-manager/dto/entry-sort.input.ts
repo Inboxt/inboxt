@@ -1,6 +1,6 @@
 import { Field, InputType, registerEnumType } from '@nestjs/graphql';
 
-import { Sort } from '../../../common/dto/sort';
+import { Sort } from '~common/dto/sort';
 
 export enum EntrySortField {
 	title = 'title',

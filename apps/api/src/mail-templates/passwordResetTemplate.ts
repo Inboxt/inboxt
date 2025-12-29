@@ -1,9 +1,10 @@
-import codeBlock from './elements/codeBlock';
+import { EMAIL_RESET_PASSWORD } from '~common/constants/email.constants';
+
 import appHeader from './elements/appHeader';
+import baseStyles from './elements/baseStyles';
+import codeBlock from './elements/codeBlock';
 import footer from './elements/footer';
 import header from './elements/header';
-import baseStyles from './elements/baseStyles';
-import { EMAIL_RESET_PASSWORD } from '../common/constants/email.constants';
 
 export const passwordResetTemplate = ({ code }: { code: string }) => `
 <mjml>

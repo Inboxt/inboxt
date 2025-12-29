@@ -1,7 +1,8 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { SavedItemType } from '../../enums/saved-item-type.enum';
-import { SavedItemStatus } from '../../enums/saved-item-status.enum';
-import { Entry } from '../../managers/entry-manager/entry.model';
+
+import { SavedItemStatus } from '~common/enums/saved-item-status.enum';
+import { SavedItemType } from '~common/enums/saved-item-type.enum';
+import { Entry } from '~managers/entry-manager/entry.model';
 
 @ObjectType({ implements: [Entry] })
 export class SavedItem implements Entry {

@@ -1,12 +1,13 @@
 import { Body, Controller, HttpCode, Post } from '@nestjs/common';
 
-import { Public } from '../../decorators/public.decorator';
+import { Public } from '~common/decorators/public.decorator';
+import { RateLimit } from '~common/decorators/rate-limit.decorator';
+
 import { SavedItemManagerService } from './saved-item-manager.service';
-import { RateLimit } from '../../decorators/rate-limit.decorator';
 
 @Controller('inbox/items')
 export class SavedItemManagerController {
-	constructor(private savedItemManagerService: SavedItemManagerService) {}
+	constructor(private readonly savedItemManagerService: SavedItemManagerService) {}
 
 	@Public()
 	@Post('mail-webhook')

@@ -1,4 +1,5 @@
 import { Field, InputType } from '@nestjs/graphql';
+
 import { SortDirection } from '../enums/sort-direction.enum';
 
 @InputType({ isAbstract: true })

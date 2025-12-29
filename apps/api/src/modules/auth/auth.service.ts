@@ -1,8 +1,8 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
-import dayjs from 'dayjs';
 import { verify } from 'argon2';
 import crypto from 'crypto';
+import dayjs from 'dayjs';
 
 import {
 	signInSchema,
@@ -12,32 +12,30 @@ import {
 	verifyEmailSchema,
 } from '@inboxt/common';
 
-import { UserService } from '../user/user.service';
-import { GqlContext } from '../../types/graphql-context';
-import { AppException } from '../../utils/app-exception';
-import { PasswordService } from './services/password.service';
-import { VerifyEmailInput } from './dto/verify-email.input';
-import { CreateAccountInput } from '../user/dto/create-account.input';
-import { MailService } from '../mail/mail.service';
+import { EMAIL_CHANGED_PASSWORD, EMAIL_RESET_PASSWORD } from '~common/constants/email.constants';
+import { UserPlan } from '~common/enums/user-plan.enum';
+import { GqlContext } from '~common/types/graphql-context';
+import { AppException } from '~common/utils/app-exception';
+import { passwordChangedTemplate } from '~mail-templates/passwordChangedTemplate';
+import { passwordResetTemplate } from '~mail-templates/passwordResetTemplate';
+import { SavedItemManagerService } from '~managers/saved-item-manager/saved-item-manager.service';
+import { MailService } from '~modules/mail/mail.service';
+import { CreateAccountInput } from '~modules/user/dto/create-account.input';
+import { UserService } from '~modules/user/user.service';
+
 import { RequestPasswordRecoveryInput } from './dto/request-password-recovery.input';
 import { ResetPasswordInput } from './dto/reset-password.input';
-import { SavedItemManagerService } from '../../managers/saved-item-manager/saved-item-manager.service';
-import {
-	EMAIL_CHANGED_PASSWORD,
-	EMAIL_RESET_PASSWORD,
-} from '../../common/constants/email.constants';
-import { passwordResetTemplate } from '../../mail-templates/passwordResetTemplate';
-import { passwordChangedTemplate } from '../../mail-templates/passwordChangedTemplate';
-import { UserPlan } from '../../enums/user-plan.enum';
+import { VerifyEmailInput } from './dto/verify-email.input';
+import { PasswordService } from './services/password.service';
 
 @Injectable()
 export class AuthService {
 	constructor(
-		private jwtService: JwtService,
-		private userService: UserService,
-		private passwordService: PasswordService,
-		private mailService: MailService,
-		private savedItemManagerService: SavedItemManagerService,
+		private readonly jwtService: JwtService,
+		private readonly userService: UserService,
+		private readonly passwordService: PasswordService,
+		private readonly mailService: MailService,
+		private readonly savedItemManagerService: SavedItemManagerService,
 	) {}
 
 	createJwtToken(payload: Record<string, unknown>, options: JwtSignOptions): string {
@@ -46,20 +44,16 @@ export class AuthService {
 
 	attachJwtToken(name: string, contents: string, context: any, httpOnly = true) {
 		context.res.cookie(name, contents, {
-			// secure,
-			// domain,
+			secure: process.env.NODE_ENV === 'production',
+			domain: process.env.NODE_ENV === 'production' ? '.inboxt.app' : undefined,
 			httpOnly,
-			maxAge: 1000 * 60 * 60 * 24, // 1 day
-			// sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+			maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days
+			sameSite: 'lax',
+			path: '/',
 		});
 	}
 
-	async decodeJwt(token: string) {
-		return this.jwtService.decode(token);
-	}
-
 	async verifyEmailCode(userId: string, code: string) {
-		/*----------  Validation  ----------*/
 		const user = await this.userService.get({
 			where: { id: userId },
 		});
@@ -88,15 +82,11 @@ export class AuthService {
 			}
 		}
 
-		/*----------  Processing  ----------*/
 		await this.userService.markEmailAsVerified(userId);
 	}
 
 	async verifyEmail(userId: string, data: VerifyEmailInput) {
-		/*----------  Validation  ----------*/
 		await verifyEmailSchema.parseAsync(data);
-
-		/*----------  Processing  ----------*/
 		return this.verifyEmailCode(userId, data.code);
 	}
 
@@ -130,7 +120,6 @@ export class AuthService {
 	}
 
 	async signIn(emailAddress: string, password: string, context: any) {
-		/*----------  Validation  ----------*/
 		if (!emailAddress.length || !password.length) {
 			throw new AppException('No email and/or password provided', HttpStatus.BAD_REQUEST);
 		}
@@ -149,12 +138,10 @@ export class AuthService {
 			throw new AppException('Invalid email address or password', HttpStatus.BAD_REQUEST);
 		}
 
-		/*----------  Processing  ----------*/
 		await this.createTokens(emailAddress, context);
 	}
 
 	async createUser(data: CreateAccountInput, context: any) {
-		/*----------  Processing  ----------*/
 		await createAccountSchema.parseAsync(data);
 		const emailAddress = data.emailAddress.toLowerCase();
 		const existingUser = await this.userService.get({
@@ -165,9 +152,7 @@ export class AuthService {
 			return;
 		}
 
-		/*----------  Processing  ----------*/
 		const hashedPassword = await this.passwordService.hashPassword(data.password);
-
 		const user = await this.userService.create({
 			...data,
 			emailAddress,
@@ -200,6 +185,7 @@ export class AuthService {
 			isEmailVerified: true,
 			username,
 			plan: 'DEMO',
+			storageQuotaBytes: 10_485_760, // 10 MB
 		});
 
 		await this.savedItemManagerService.createDefaultItems(user.id);
@@ -209,7 +195,6 @@ export class AuthService {
 	}
 
 	async requestPasswordRecovery(data: RequestPasswordRecoveryInput) {
-		/*----------  Validation  ----------*/
 		await requestPasswordRecoverySchema.parseAsync(data);
 		const existingUser = await this.userService.get({
 			where: { emailAddress: data.emailAddress },
@@ -223,7 +208,6 @@ export class AuthService {
 			return;
 		}
 
-		/*----------  Processing  ----------*/
 		const passwordRecoveryCode = await this.passwordService.createPasswordRecovery(
 			existingUser.id,
 		);
@@ -237,7 +221,6 @@ export class AuthService {
 	}
 
 	async resetPassword(data: ResetPasswordInput) {
-		/*----------  Validation  ----------*/
 		await resetPasswordSchema.parseAsync(data);
 		const existingUser = await this.userService.get({
 			where: { emailAddress: data.emailAddress },
@@ -251,10 +234,7 @@ export class AuthService {
 		}
 
 		await this.passwordService.verifyPasswordRecoveryCode(existingUser.id, data.code);
-
-		/*----------  Processing  ----------*/
 		const updatedHashedPassword = await this.passwordService.hashPassword(data.password);
-
 		await this.userService.update(existingUser.id, {
 			password: updatedHashedPassword,
 		});

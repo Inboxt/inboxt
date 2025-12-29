@@ -1,6 +1,6 @@
 import { Field, InputType } from '@nestjs/graphql';
 
-import { ApiTokenExpiry } from '../../../common/enums/api-token-expiry.enum';
+import { ApiTokenExpiry } from '~common/enums/api-token-expiry.enum';
 
 @InputType()
 export class CreateApiTokenInput {

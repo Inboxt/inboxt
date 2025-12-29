@@ -2,12 +2,12 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import * as cheerio from 'cheerio';
 
 import { MAX_ARTICLE_WORD_COUNT } from '@inboxt/common';
+import { Prisma } from '@inboxt/prisma';
 
-import { Prisma } from '../../../../../prisma/client';
-import { PrismaService } from '../../../../services/prisma.service';
-import { AppException } from '../../../../utils/app-exception';
-import { ContentExtractionService } from '../../../../services/content-extraction.service';
-import { QuotaOptions, StorageQuotaService } from '../../../storage/storage-quota.service';
+import { AppException } from '~common/utils/app-exception';
+import { PrismaService } from '~modules/prisma/prisma.service';
+import { QuotaOptions, StorageQuotaService } from '~modules/storage/storage-quota.service';
+import { ContentExtractionService } from '~services/content-extraction.service';
 
 export type ProcessArticleInput =
 	| { url: string; html?: string }
@@ -17,9 +17,9 @@ export type ProcessArticleInput =
 @Injectable()
 export class ArticleService {
 	constructor(
-		private readonly prismaService: PrismaService,
-		private contentExtractionService: ContentExtractionService,
-		private storageQuota: StorageQuotaService,
+		private readonly prisma: PrismaService,
+		private readonly contentExtractionService: ContentExtractionService,
+		private readonly storageQuota: StorageQuotaService,
 	) {}
 
 	/* ------------ Private Helpers ------------ */
@@ -82,7 +82,7 @@ export class ArticleService {
 	}
 
 	async get(userId: string, query: Prisma.articleFindFirstArgs) {
-		return this.prismaService.article.findFirst({
+		return this.prisma.article.findFirst({
 			...query,
 			where: {
 				...query.where,
@@ -136,7 +136,7 @@ export class ArticleService {
 			return run(tx);
 		}
 
-		return this.prismaService.$transaction(async (client) => run(client));
+		return this.prisma.$transaction(async (client) => run(client));
 	}
 
 	async parse(input: ProcessArticleInput) {
@@ -157,7 +157,7 @@ export class ArticleService {
 			const appHostname = process.env.WEB_URL ? new URL(process.env.WEB_URL).hostname : null;
 			if (appHostname && hostname === appHostname) {
 				throw new AppException(
-					'Articles from the Inbox app itself can’t be saved.',
+					'This page is part of the Inboxt app and can’t be saved for later. Try saving articles from external sites instead.',
 					HttpStatus.BAD_REQUEST,
 					'APP_DOMAIN_BLOCKED',
 				);

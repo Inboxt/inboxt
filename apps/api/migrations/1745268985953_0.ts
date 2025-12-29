@@ -137,6 +137,8 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 		},
 	});
 
+	pgm.createIndex('saved_item_label', ['savedItemId', 'labelId'], { unique: true });
+
 	pgm.createTable('inbound_email_address', {
 		id: {
 			type: 'uuid',
@@ -193,6 +195,8 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 		},
 	});
 
+	pgm.createIndex('newsletter_subscription', 'inboundEmailAddressId');
+
 	pgm.createTable('newsletter', {
 		savedItemId: {
 			type: 'uuid',
@@ -217,6 +221,10 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 		},
 		sizeBytes: { type: 'bigint', notNull: true, default: 0 },
 	});
+
+	pgm.createIndex('newsletter', 'messageId');
+	pgm.createIndex('newsletter', 'subscriptionId');
+	pgm.createIndex('newsletter', 'inboundEmailAddressId');
 
 	pgm.createTable('highlight', {
 		id: {
@@ -243,6 +251,9 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 			onDelete: 'CASCADE',
 		},
 	});
+
+	pgm.createIndex('highlight', 'userId');
+	pgm.createIndex('highlight', 'savedItemId');
 
 	pgm.createTable('highlight_segment', {
 		id: {
@@ -293,16 +304,23 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 	});
 
 	pgm.createIndex('api_token', 'userId');
-	pgm.createIndex('api_token', 'token');
+	pgm.createIndex('api_token', 'token', { unique: true });
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
 	// Drop indexes
 	pgm.dropIndex('saved_item', 'userId');
+	pgm.dropIndex('saved_item_label', ['savedItemId', 'labelId'], { unique: true });
 	pgm.dropIndex('label', ['userId', 'name'], { unique: true });
+	pgm.dropIndex('newsletter_subscription', 'inboundEmailAddressId');
+	pgm.dropIndex('newsletter', 'messageId');
+	pgm.dropIndex('newsletter', 'subscriptionId');
+	pgm.dropIndex('newsletter', 'inboundEmailAddressId');
+	pgm.dropIndex('highlight', 'userId');
+	pgm.dropIndex('highlight', 'savedItemId');
 	pgm.dropIndex('highlight_segment', 'highlightId');
 	pgm.dropIndex('api_token', 'userId');
-	pgm.dropIndex('api_token', 'token');
+	pgm.dropIndex('api_token', 'token', { unique: true });
 
 	// Drop tables
 	pgm.dropTable('newsletter');

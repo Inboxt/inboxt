@@ -1,9 +1,10 @@
+import { EMAIL_FORWARDED } from '~common/constants/email.constants';
+
+import alert from './elements/alert';
 import appHeader from './elements/appHeader';
+import baseStyles from './elements/baseStyles';
 import footer from './elements/footer';
 import header from './elements/header';
-import baseStyles from './elements/baseStyles';
-import alert from './elements/alert';
-import { EMAIL_FORWARDED } from '../common/constants/email.constants';
 
 interface ForwardedEmailTemplateProps {
 	from: string;

@@ -5,10 +5,11 @@ import {
 	HttpStatus,
 	Injectable,
 } from '@nestjs/common';
-import { GqlExecutionContext } from '@nestjs/graphql';
 import { Reflector } from '@nestjs/core';
+import { GqlExecutionContext } from '@nestjs/graphql';
 
-import { RateLimitService } from '../services/rate-limit.service';
+import { RateLimitService } from '~services/rate-limit.service';
+
 import {
 	AuthState,
 	RATE_LIMIT_META_KEY,
@@ -54,7 +55,6 @@ export class GqlRateLimitGuard implements CanActivate {
 
 			return true;
 		} catch (error: any) {
-			// If this is a rate-limiter-flexible response, it should contain msBeforeNext, remainingPoints, etc.
 			const rateLimiterRes = error;
 
 			if (rateLimiterRes && res) {

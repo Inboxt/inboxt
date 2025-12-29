@@ -1,34 +1,35 @@
-import { Module } from '@nestjs/common';
-import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { APP_FILTER, APP_GUARD } from '@nestjs/core';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ScheduleModule } from '@nestjs/schedule';
 import { BullModule as NestBullModule } from '@nestjs/bullmq';
+import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ScheduleModule } from '@nestjs/schedule';
+
+import { GlobalExceptionFilter } from '~common/exception-filters/global-exception.filter';
+import { AccountGuard } from '~common/guards/account.guard';
+import { ApiTokenGuard } from '~common/guards/api-token.guard';
+import { GqlAuthGuard } from '~common/guards/auth.guard';
+import { GqlRateLimitGuard } from '~common/guards/rate-limit.guard';
+import { config, type Config } from '~config/index';
+import { EntryManagerModule } from '~managers/entry-manager/entry-manager.module';
+import { SavedItemManagerModule } from '~managers/saved-item-manager/saved-item-manager.module';
+import { ActiveUserModule } from '~modules/active-user/active-user.module';
+import { ApiTokenModule } from '~modules/api-token/api-token.module';
+import { AuthModule } from '~modules/auth/auth.module';
+import { ExportModule } from '~modules/export/export.module';
+import { HighlightModule } from '~modules/highlight/highlight.module';
+import { ImportModule } from '~modules/import/import.module';
+import { InboundEmailAddressModule } from '~modules/inbound-email-address/inbound-email-address.module';
+import { MailModule } from '~modules/mail/mail.module';
+import { PrismaModule } from '~modules/prisma/prisma.module';
+import { SavedItemModule } from '~modules/saved-item/saved-item.module';
+import { ScheduleTasksModule } from '~modules/schedule/schedule-tasks.module';
+import { UserModule } from '~modules/user/user.module';
+import { RateLimitService } from '~services/rate-limit.service';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { PrismaService } from '../../services/prisma.service';
-import { UserModule } from '../user/user.module';
-import { GqlAuthGuard } from '../../guards/auth.guard';
-import { AuthModule } from '../auth/auth.module';
-import { ActiveUserModule } from '../active-user/active-user.module';
-import { MailModule } from '../mail/mail.module';
-import { GlobalExceptionFilter } from '../../exception-filters/global-exception.filter';
-import { config, type Config } from '../../config';
-import { SavedItemModule } from '../saved-item/saved-item.module';
-import { InboundEmailAddressModule } from '../inbound-email-address/inbound-email-address.module';
-import { SavedItemManagerModule } from '../../managers/saved-item-manager/saved-item-manager.module';
-import { ScheduleTasksModule } from '../schedule/schedule-tasks.module';
-import { HighlightModule } from '../highlight/highlight.module';
-import { EntryManagerModule } from '../../managers/entry-manager/entry-manager.module';
-import { AccountGuard } from '../../guards/account.guard';
-import { ExportModule } from '../export/export.module';
-import { ImportModule } from '../import/import.module';
-import { GqlRateLimitGuard } from '../../guards/rate-limit.guard';
-import { RateLimitService } from '../../services/rate-limit.service';
-import { ApiTokenModule } from '../api-token/api-token.module';
-import { ApiTokenGuard } from '../../guards/api-token.guard';
 
 @Module({
 	imports: [
@@ -64,6 +65,7 @@ import { ApiTokenGuard } from '../../guards/api-token.guard';
 			inject: [ConfigService],
 		}),
 		ScheduleModule.forRoot(),
+		PrismaModule,
 		UserModule,
 		AuthModule,
 		ActiveUserModule,
@@ -79,7 +81,6 @@ import { ApiTokenGuard } from '../../guards/api-token.guard';
 		ApiTokenModule,
 	],
 	providers: [
-		PrismaService,
 		AppService,
 		RateLimitService,
 		{ provide: APP_GUARD, useClass: ApiTokenGuard },

@@ -1,12 +1,13 @@
 import { Module } from '@nestjs/common';
-import { PrismaService } from '../../services/prisma.service';
-import { InboundEmailAddressService } from './inbound-email-address.service';
+
+import { NewsletterSubscriptionManagerModule } from '~managers/newsletter-subscription-manager/newsletter-subscription-manager.module';
+
 import { InboundEmailAddressResolver } from './inbound-email-address.resolver';
-import { NewsletterSubscriptionManagerModule } from '../../managers/newsletter-subscription-manager/newsletter-subscription-manager.module';
+import { InboundEmailAddressService } from './inbound-email-address.service';
 
 @Module({
 	imports: [NewsletterSubscriptionManagerModule],
-	providers: [PrismaService, InboundEmailAddressService, InboundEmailAddressResolver],
+	providers: [InboundEmailAddressService, InboundEmailAddressResolver],
 	exports: [InboundEmailAddressService],
 })
 export class InboundEmailAddressModule {}

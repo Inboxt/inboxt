@@ -1,6 +1,6 @@
-import { Job } from 'bullmq';
-import { Logger, HttpException } from '@nestjs/common';
 import { OnWorkerEvent, WorkerHost } from '@nestjs/bullmq';
+import { Logger, HttpException } from '@nestjs/common';
+import { Job } from 'bullmq';
 
 export abstract class BaseQueueProcessor extends WorkerHost {
 	protected abstract readonly logger: Logger;

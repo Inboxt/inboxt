@@ -1,21 +1,19 @@
 import { Resolver, Args, Mutation, Query } from '@nestjs/graphql';
 
+import { VOID_RESPONSE } from '~common/constants/void';
+import { ActiveUserMeta, ActiveUserMetaType } from '~common/decorators/active-user-meta.decorator';
+import { ApiTokenAllowed } from '~common/decorators/api-token.decorator';
+import { Void } from '~common/models/void.model';
+
+import { CreateLabelInput } from './dto/create-label.input';
+import { DeleteLabelInput } from './dto/delete-label.input';
+import { UpdateLabelInput } from './dto/update-label.input';
 import { Label } from './label.model';
 import { LabelService } from './label.service';
-import {
-	ActiveUserMeta,
-	ActiveUserMetaType,
-} from '../../../../decorators/active-user-meta.decorator';
-import { CreateLabelInput } from './dto/create-label.input';
-import { UpdateLabelInput } from './dto/update-label.input';
-import { DeleteLabelInput } from './dto/delete-label.input';
-import { Void } from '../../../../models/void.model';
-import { VOID_RESPONSE } from '../../../../constants/void';
-import { ApiTokenAllowed } from '../../../../decorators/api-token.decorator';
 
 @Resolver(() => Label)
 export class LabelResolver {
-	constructor(private labelService: LabelService) {}
+	constructor(private readonly labelService: LabelService) {}
 
 	@ApiTokenAllowed()
 	@Mutation(() => Label)

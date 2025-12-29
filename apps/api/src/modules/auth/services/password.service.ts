@@ -1,14 +1,15 @@
-import { hash, verify } from 'argon2';
 import { HttpStatus, Injectable } from '@nestjs/common';
+import { hash, verify } from 'argon2';
 import dayjs from 'dayjs';
 
-import { generateCode } from '../../../utils/generate-code';
-import { AppException } from '../../../utils/app-exception';
+import { AppException } from '~common/utils/app-exception';
+import { generateAuthCode } from '~common/utils/generateAuthCode';
+
 import { UserService } from '../../user/user.service';
 
 @Injectable()
 export class PasswordService {
-	constructor(private userService: UserService) {}
+	constructor(private readonly userService: UserService) {}
 
 	async validatePassword(password: string, hashedPassword: string): Promise<boolean> {
 		return verify(hashedPassword, password);
@@ -19,7 +20,7 @@ export class PasswordService {
 	}
 
 	async createPasswordRecovery(userId: string) {
-		const code = generateCode();
+		const code = generateAuthCode();
 		const hashedCode = await hash(code);
 
 		await this.userService.initiatePasswordRecovery(userId, {
@@ -31,7 +32,6 @@ export class PasswordService {
 	}
 
 	async verifyPasswordRecoveryCode(userId: string, code: string) {
-		/*----------  Validation  ----------*/
 		const user = await this.userService.get({
 			where: { id: userId },
 		});
@@ -50,7 +50,6 @@ export class PasswordService {
 			);
 		}
 
-		/*----------  Processing  ----------*/
 		return this.userService.resetPasswordRecovery(userId);
 	}
 }
