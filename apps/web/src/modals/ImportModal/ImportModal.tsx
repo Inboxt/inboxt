@@ -65,7 +65,7 @@ export const ImportModal = ({ id, context }: ContextModalProps<ImportModalProps>
 			formData.append('file', file);
 			formData.append('type', selectedType);
 
-			const response = await fetch(`${import.meta.env.VITE_API_URL}/import`, {
+			const response = await fetch('/api/import', {
 				method: 'POST',
 				body: formData,
 				credentials: 'include',

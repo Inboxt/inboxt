@@ -12,10 +12,12 @@ async function bootstrap() {
 	const configService = app.get(ConfigService<Config>);
 	const corsConfig = configService.getOrThrow('cors', { infer: true });
 
+	app.set('trust proxy', 1);
+
 	if (corsConfig?.enabled) {
 		app.enableCors({
 			credentials: true,
-			origin: true,
+			origin: ['https://use.inboxt.app'],
 		});
 	}
 

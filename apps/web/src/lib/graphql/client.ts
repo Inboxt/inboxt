@@ -1,7 +1,7 @@
 import { ApolloClient, InMemoryCache } from '@apollo/client';
 
 export const client = new ApolloClient({
-	uri: '/graphql',
+	uri: '/api/graphql',
 	cache: new InMemoryCache({
 		possibleTypes: {
 			Entry: ['SavedItem', 'Highlight'],

@@ -14,8 +14,11 @@ export default defineConfig(({ mode }) => {
 			host: '0.0.0.0',
 			port: Number(process.env.WEB_PORT) || 3000,
 			proxy: {
-				'/graphql': process.env.API_URL!,
-				'/inbox': process.env.API_URL!,
+				'/api': {
+					target: process.env.API_URL!,
+					changeOrigin: true,
+					rewrite: (path) => path.replace(/^\/api/, ''),
+				},
 			},
 		},
 		plugins: [
