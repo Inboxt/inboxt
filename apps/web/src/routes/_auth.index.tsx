@@ -9,6 +9,7 @@ type SortOption = (typeof SORT_VALUES)[number];
 export type RouteSearchParams = {
 	sort?: SortOption;
 	q?: string;
+	modal?: 'api-tokens';
 };
 
 export const Route = createFileRoute('/_auth/')({
@@ -34,6 +35,7 @@ export const Route = createFileRoute('/_auth/')({
 		return {
 			q: (search.q as string) || 'in:inbox type:article',
 			sort,
+			modal: search.modal === 'api-tokens' ? 'api-tokens' : undefined,
 		};
 	},
 });

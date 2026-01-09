@@ -35,9 +35,11 @@ export class SavedItemManagerResolver {
 	}
 
 	@VerifiedOnly()
+	@ApiTokenAllowed()
 	@Mutation(() => String)
 	@RateLimit({
 		user: { points: 150, duration: 60 * 60 },
+		api_token: { points: 150, duration: 60 * 60 },
 	})
 	async addArticleFromHtmlSnapshot(
 		@ActiveUserMeta() activeUser: ActiveUserMetaType,

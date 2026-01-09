@@ -1,5 +1,5 @@
-import { defineConfig } from 'wxt';
 import path from 'node:path';
+import { defineConfig } from 'wxt';
 
 export default defineConfig({
 	srcDir: 'src',
@@ -17,8 +17,12 @@ export default defineConfig({
 	},
 
 	manifest: {
-		permissions: ['tabs'],
-		host_permissions: ['http://localhost:7000/', 'http://192.168.1.19:7000/'],
+		permissions: ['tabs', 'storage'],
+		host_permissions: [
+			'http://localhost:7000/*',
+			'http://192.168.1.19:7000/*',
+			'https://api.inboxt.app/*',
+		],
 	},
 
 	autoIcons: {

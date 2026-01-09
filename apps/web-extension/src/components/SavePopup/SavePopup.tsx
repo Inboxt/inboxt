@@ -1,8 +1,20 @@
+import {
+	ActionIcon,
+	Alert,
+	Box,
+	Card,
+	Group,
+	Loader,
+	Stack,
+	Text,
+	TextInput,
+	Title,
+} from '@mantine/core';
+import { IconAlertCircle, IconCheck, IconSettings } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
-import { Alert, Box, Card, Group, Loader, Stack, Text, TextInput, Title } from '@mantine/core';
-import { IconAlertCircle, IconCheck } from '@tabler/icons-react';
 
 import { LabelsMultiSelect } from '@inboxt/ui';
+
 import { SaveJob } from '@/types';
 import { graphqlFetch } from '@/utils/graphql.ts';
 
@@ -16,8 +28,14 @@ const LABELS_QUERY = `
   }
 `;
 
-export const SavePopup = () => {
-	const [jobId, setJobId] = useState<string | null>(null);
+interface SavePopupProps {
+	onOpenSettings: () => void;
+	existingJobId: string | null;
+	onJobStarted: (jobId: string) => void;
+}
+
+export const SavePopup = ({ onOpenSettings, existingJobId, onJobStarted }: SavePopupProps) => {
+	const [jobId, setJobId] = useState<string | null>(existingJobId);
 	const [job, setJob] = useState<SaveJob | null>(null);
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 	const [labelsData, setLabelsData] = useState<{ labels: any[] } | null>(null);
@@ -51,8 +69,13 @@ export const SavePopup = () => {
 		};
 	}, []);
 
-	// Start job when popup opens
+	// Start job when popup opens (only if no existing job)
 	useEffect(() => {
+		if (existingJobId) {
+			// Already have a job, don't start a new one
+			return;
+		}
+
 		let cancelled = false;
 
 		const start = async () => {
@@ -69,7 +92,9 @@ export const SavePopup = () => {
 				}
 
 				if (!cancelled) {
-					setJobId(response.jobId);
+					const newJobId = response.jobId;
+					setJobId(newJobId);
+					onJobStarted(newJobId);
 				}
 			} catch (err: any) {
 				if (!cancelled) {
@@ -83,7 +108,7 @@ export const SavePopup = () => {
 		return () => {
 			cancelled = true;
 		};
-	}, []);
+	}, [existingJobId, onJobStarted]);
 
 	// Poll job status while popup is open
 	useEffect(() => {
@@ -160,8 +185,6 @@ export const SavePopup = () => {
 	const isSaving = status === 'saving';
 	const isSaved = status === 'saved';
 	const hasError = status === 'error' || !!errorMessage;
-
-	const title = job?.title ?? 'Saving to Inboxt';
 	const pageUrl = job?.pageUrl ?? '';
 
 	const renderStatusChip = () => {
@@ -201,40 +224,26 @@ export const SavePopup = () => {
 			return 'This item will appear in your library in a moment.';
 		}
 
-		return 'We’re fetching and analyzing it in the background.';
+		return "We're fetching and analyzing it in the background.";
 	};
 
 	return (
 		<Box style={{ width: 420 }} p="md">
-			<Stack>
+			<Stack gap="md">
+				<Group justify="space-between">
+					<Title order={4}>Save to Inboxt</Title>
+					<ActionIcon
+						variant="subtle"
+						color="gray"
+						onClick={onOpenSettings}
+						aria-label="Settings"
+					>
+						<IconSettings size={18} />
+					</ActionIcon>
+				</Group>
+
 				<Card>
-					<Stack gap={hasError ? 2 : 'sm'}>
-						<Stack>
-							<Group gap="sm">
-								<Stack gap={2}>
-									<Title order={5}>{title}</Title>
-									{!hasError && (
-										<Text size="xs" c="dimmed">
-											{renderHelperText()}
-										</Text>
-									)}
-								</Stack>
-							</Group>
-
-							{renderStatusChip()}
-						</Stack>
-
-						{hasError && errorMessage && (
-							<Alert
-								color="red"
-								icon={<IconAlertCircle size={16} />}
-								variant="filled"
-								p="xs"
-							>
-								<Text size="xs">{errorMessage}</Text>
-							</Alert>
-						)}
-
+					<Stack gap="sm">
 						{pageUrl && (
 							<TextInput
 								label="Page URL"
@@ -246,6 +255,25 @@ export const SavePopup = () => {
 									label: { fontSize: 12 },
 								}}
 							/>
+						)}
+
+						{!hasError && (
+							<Text size="xs" c="dimmed">
+								{renderHelperText()}
+							</Text>
+						)}
+
+						{renderStatusChip()}
+
+						{hasError && errorMessage && (
+							<Alert
+								color="red"
+								icon={<IconAlertCircle size={16} />}
+								variant="filled"
+								p="xs"
+							>
+								<Text size="xs">{errorMessage}</Text>
+							</Alert>
 						)}
 					</Stack>
 				</Card>

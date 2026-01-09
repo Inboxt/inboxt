@@ -1,3 +1,5 @@
+import { getApiToken } from '@/utils/token.ts';
+
 const API_URL = import.meta.env.VITE_API_URL;
 
 type GraphQLResponse<T> = {
@@ -6,16 +8,18 @@ type GraphQLResponse<T> = {
 };
 
 export async function graphqlFetch<T>(query: string, variables?: Record<string, any>): Promise<T> {
+	const token = await getApiToken();
 	const res = await fetch(`${API_URL}/graphql`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
+			...(token ? { Authorization: `Bearer ${token}` } : {}),
 		},
 		body: JSON.stringify({
 			query,
 			variables,
 		}),
-		credentials: 'include',
+		credentials: 'omit',
 	});
 
 	if (!res.ok) {

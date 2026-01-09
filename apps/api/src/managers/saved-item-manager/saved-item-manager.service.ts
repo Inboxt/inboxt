@@ -1,6 +1,7 @@
 import { InjectQueue } from '@nestjs/bullmq';
 import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { Queue } from 'bullmq';
+import dayjs from 'dayjs';
 
 import {
 	addArticleFromHtmlSnapshotSchema,
@@ -250,6 +251,31 @@ export class SavedItemManagerService {
 	) {
 		if (!input.html && !input.url) {
 			throw new AppException('Invalid input', HttpStatus.BAD_REQUEST);
+		}
+
+		if (input.url) {
+			const duplicateWindowSeconds = 30;
+			const cutoffTime = dayjs().subtract(duplicateWindowSeconds, 'seconds').toDate();
+
+			const recentDuplicate = await this.prisma.saved_item.findFirst({
+				where: {
+					userId,
+					originalUrl: input.url,
+					createdAt: {
+						gte: cutoffTime,
+					},
+				},
+				orderBy: { createdAt: 'desc' },
+				select: { id: true },
+			});
+
+			if (recentDuplicate) {
+				this.logger.log(
+					`Duplicate save detected for user ${userId}, URL: ${input.url}. Returning existing item: ${recentDuplicate.id}`,
+				);
+
+				return recentDuplicate.id;
+			}
 		}
 
 		const created = await this.createPendingArticle(userId, input, labelIds, prismaData);

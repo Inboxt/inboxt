@@ -7,6 +7,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ConfirmWithAlert } from '~components/ConfirmWithAlert';
 import { toastSuccess } from '~components/Toast';
 import { useContentSelection } from '~context/content-selection';
+import { useModalFromUrl } from '~hooks/useModalFromUrl.tsx';
 import { AppLayout } from '~layouts/AppLayout';
 import { ENTRIES, EntrySortField, SortDirection, EMPTY_TRASH } from '~lib/graphql';
 import { modals } from '~modals/modals';
@@ -17,6 +18,7 @@ import classes from './ItemsList.module.css';
 
 export const ItemsList = () => {
 	const { q, sort } = useSearch({ from: Route.id });
+	useModalFromUrl();
 
 	const [field, dir] = (sort?.split('_') ?? 'date_desc') as [string, string];
 	const direction = dir === 'asc' ? SortDirection.Asc : SortDirection.Desc;
