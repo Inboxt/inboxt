@@ -3,11 +3,16 @@ FROM node:24-alpine AS builder
 WORKDIR /app
 
 COPY package.json package-lock.json ./
+COPY apps/api/package.json ./apps/api/
+COPY libs/common/package.json ./libs/common/
 COPY apps/api ./apps/api
 COPY libs ./libs
 COPY tsconfig*.json ./
 
-RUN npm ci
+RUN npm ci --workspace=apps/api --workspace=libs/common --include-workspace-root
+
+RUN cd apps/api && npm run prisma:generate
+
 RUN npm run build --workspace=libs/common
 RUN npm run build --workspace=apps/api
 
@@ -20,6 +25,6 @@ ENV TZ=UTC
 
 COPY --from=builder /app/apps/api/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
-COPY apps/api/prisma ./prisma
+COPY --from=builder /app/apps/api/prisma ./prisma
 
 CMD ["node", "dist/main.js"]
