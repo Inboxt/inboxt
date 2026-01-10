@@ -26,5 +26,7 @@ ENV TZ=UTC
 COPY --from=builder /app/apps/api/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/apps/api/prisma ./prisma
+COPY --from=builder /app/libs/common/dist ./libs/common/dist
+COPY --from=builder /app/libs/common/package.json ./libs/common/package.json
 
 CMD ["node", "dist/main.js"]
