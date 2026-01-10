@@ -12,8 +12,8 @@
 		"prisma:introspect": "prisma db pull",
 		"start": "nest start",
 		"start:dev": "npm run prisma:generate && nest start --watch --preserveWatchOutput",
-		"migrate:up": "node-pg-migrate up --tsconfig=tsconfig.json",
-		"migrate:down": "node-pg-migrate down --tsconfig=tsconfig.json",
+		"migrate:up": "node-pg-migrate up",
+		"migrate:down": "node-pg-migrate down",
 		"migrate:create": "node-pg-migrate create --templateFileName ../../node_modules/node-pg-migrate/templates/migration-template.ts --tsconfig=tsconfig.json"
 	},
 	"dependencies": {
