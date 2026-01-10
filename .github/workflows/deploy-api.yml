@@ -1,0 +1,48 @@
+name: Deploy API
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - apps/api/**
+      - libs/**
+      - package.json
+      - package-lock.json
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build API image
+        run: |
+          docker build \
+            -f apps/api/Dockerfile.prod \
+            -t inboxt-api:latest \
+            .
+
+      - name: Save image
+        run: docker save inboxt-api:latest | gzip > api.tar.gz
+
+      - name: Upload image
+        uses: burnett01/rsync-deployments@v8
+        with:
+          switches: -avz
+          path: api.tar.gz
+          remote_path: /srv/inboxt/images/api.tar.gz
+          remote_host: ${{ secrets.DEPLOY_HOST }}
+          remote_user: ${{ secrets.DEPLOY_USER }}
+          remote_key: ${{ secrets.DEPLOY_SSH_KEY }}
+
+      - name: Restart API
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            docker load < /srv/inboxt/images/api.tar.gz
+            cd /srv/inboxt
+            docker compose -f docker-compose.prod.yml up -d --no-deps api
