@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:17
+    restart: always
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    env_file: .env
+
+  valkey:
+    image: valkey/valkey:8-alpine
+    restart: always
+
+  api:
+    image: inboxt-api:latest
+    restart: always
+    env_file: .env
+    depends_on:
+      - postgres
+      - valkey
+
+volumes:
+  pg-data:
