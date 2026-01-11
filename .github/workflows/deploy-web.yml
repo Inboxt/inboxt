@@ -23,6 +23,9 @@ jobs:
 
       - run: npm ci
 
+      - name: Build common library
+        run: npm run build --workspace=libs/common
+
       - name: Build frontend
         run: npm run build --workspace=apps/web
         env:
