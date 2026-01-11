@@ -19,7 +19,8 @@
 		"api:docker:migrate": "docker compose exec api sh -c \"cd apps/api && npm run migrate:up\"",
 		"api:docker:generate": "docker compose exec api sh -c \"cd apps/api && npm run prisma:generate\"",
 		"api:docker:introspect": "docker compose exec api sh -c \"cd apps/api && npm run prisma:introspect\"",
-		"api:docker:seed": "docker compose exec -T api sh -c \"cd apps/api && npm run db:seed\""
+		"api:docker:seed": "docker compose exec -T api sh -c \"cd apps/api && npm run db:seed\"",
+		"api:migrate:up": "npm run migrate:up --workspace=apps/api"
 	},
 	"dependencies": {
 		"dayjs": "1.11.19",

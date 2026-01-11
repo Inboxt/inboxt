@@ -28,7 +28,7 @@ services:
       --save 60 1
       --loglevel warning
       --maxmemory 256mb
-      --maxmemory-policy allkeys-lru
+      --maxmemory-policy noeviction
     volumes:
       - valkey_data:/data
     networks:
