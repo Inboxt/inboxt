@@ -50,7 +50,7 @@ jobs:
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           script: |
             set -e
-            cd /srv/inboxt
+            cd /opt/inboxt
             
             # Pull new image
             docker pull ghcr.io/inboxt/inboxt-api:${{ env.IMAGE_TAG }}
