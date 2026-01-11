@@ -41,7 +41,7 @@ export function makeReaderResolver(
 			'--mantine-color-body': themeTokens.background,
 			'--mantine-color-text': themeTokens.text,
 			'--reader-border-color': themeTokens.border,
-			'--reader-link-color': themeTokens.link,
+			'--reader-link-color': themeTokens.link || 'var(--mantine-color-anchor)',
 			'--reader-highlight-color': themeTokens.highlight,
 			'--reader-font-size': `${settings.textSize}px`,
 			'--reader-line-height': String(settings.lineHeight),

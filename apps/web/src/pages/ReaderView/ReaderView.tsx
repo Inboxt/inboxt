@@ -149,14 +149,14 @@ export const ReaderView = () => {
 							<ReaderSettingsOptions
 								direction="row"
 								variant="menu"
-								item={savedItem || null}
+								item={(savedItem as any) || null}
 							/>
 						</Box>
 					)}
 				</Box>
 
 				<Box visibleFrom="md" className={classes.readerSettingsContainer}>
-					<ReaderSettingsOptions item={data?.savedItem || null} />
+					<ReaderSettingsOptions item={(data?.savedItem as any) || null} />
 				</Box>
 
 				<Center pt="xxl">
@@ -225,7 +225,7 @@ export const ReaderView = () => {
 								<Typography className={classes.typography}>
 									<HighlightableArticle
 										content={content || null}
-										data={savedItem}
+										data={savedItem as any}
 									/>
 								</Typography>
 							)}

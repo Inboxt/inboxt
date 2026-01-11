@@ -2,7 +2,11 @@ import { createContext, useContext } from 'react';
 
 import { SavedItem, Highlight } from '~lib/graphql';
 
-export type SelectableItem = SavedItem | Highlight;
+export type SelectableHighlight = Omit<Highlight, 'savedItem'> & {
+	savedItem?: Pick<SavedItem, 'id' | 'title' | 'createdAt'> | null;
+};
+
+export type SelectableItem = SavedItem | SelectableHighlight;
 
 interface ContentSelectionContextProps {
 	selectedItems: SelectableItem[];

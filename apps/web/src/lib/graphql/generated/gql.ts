@@ -19,7 +19,7 @@ type Documents = {
     "\n\tfragment SavedItemLabelFragment on Label {\n\t\tcreatedAt\n\t\tid\n\t\tname\n\t\tcolor\n\t}\n": typeof types.SavedItemLabelFragmentFragmentDoc,
     "\n\tfragment SavedItemLabelsFragment on SavedItem {\n\t\tid\n\t\tlabels {\n\t\t\tid\n\t\t\t...SavedItemLabelFragment\n\t\t}\n\t}\n": typeof types.SavedItemLabelsFragmentFragmentDoc,
     "\n\tfragment NewsletterFragment on Newsletter {\n\t\tcontentHtml\n\t\tcontentText\n\t\tsubscription {\n\t\t\tid\n\t\t\tcreatedAt\n\t\t\tname\n\t\t\tstatus\n\t\t\tlastReceivedAt\n\t\t\tunsubscribeUrl\n\t\t\tunsubscribeAttemptedAt\n\t\t}\n\t}\n": typeof types.NewsletterFragmentFragmentDoc,
-    "\n\tfragment HighlightFragment on Highlight {\n\t\tid\n\t\tcreatedAt\n\t\tsavedItem {\n        \tid\n            title\n        }\n\t\tsegments {\n\t\t\tid\n\t\t\txpath\n\t\t\tbeforeText\n\t\t\tstartOffset\n\t\t\tendOffset\n\t\t\tafterText\n\t\t\ttext\n\t\t}\n\t}\n": typeof types.HighlightFragmentFragmentDoc,
+    "\n\tfragment HighlightFragment on Highlight {\n\t\tid\n\t\tcreatedAt\n\t\tsavedItem {\n        \tid\n            title\n            createdAt\n        }\n\t\tsegments {\n\t\t\tid\n\t\t\txpath\n\t\t\tbeforeText\n\t\t\tstartOffset\n\t\t\tendOffset\n\t\t\tafterText\n\t\t\ttext\n\t\t}\n\t}\n": typeof types.HighlightFragmentFragmentDoc,
     "\n\tfragment EntryFragment on Entry {\n\t\t__typename\n\t\t... on SavedItem {\n\t\t\t...SavedItemFragment\n\t\t\tlabels {\n\t\t\t\t...SavedItemLabelFragment\n\t\t\t}\n\t\t}\n\t\t... on Highlight {\n\t\t\t...HighlightFragment\n\t\t}\n\t}\n": typeof types.EntryFragmentFragmentDoc,
     "\n    fragment ApiTokenFragment on ApiToken {\n    \tid\n    \tcreatedAt\n    \tlastUsedAt\n    \tname\n    \texpiresAt\n    }\n": typeof types.ApiTokenFragmentFragmentDoc,
     "\n\tquery me {\n\t\tme {\n\t\t\tid\n\t\t\t...UserFragment\n\t\t}\n\t}\n": typeof types.MeDocument,
@@ -62,7 +62,7 @@ const documents: Documents = {
     "\n\tfragment SavedItemLabelFragment on Label {\n\t\tcreatedAt\n\t\tid\n\t\tname\n\t\tcolor\n\t}\n": types.SavedItemLabelFragmentFragmentDoc,
     "\n\tfragment SavedItemLabelsFragment on SavedItem {\n\t\tid\n\t\tlabels {\n\t\t\tid\n\t\t\t...SavedItemLabelFragment\n\t\t}\n\t}\n": types.SavedItemLabelsFragmentFragmentDoc,
     "\n\tfragment NewsletterFragment on Newsletter {\n\t\tcontentHtml\n\t\tcontentText\n\t\tsubscription {\n\t\t\tid\n\t\t\tcreatedAt\n\t\t\tname\n\t\t\tstatus\n\t\t\tlastReceivedAt\n\t\t\tunsubscribeUrl\n\t\t\tunsubscribeAttemptedAt\n\t\t}\n\t}\n": types.NewsletterFragmentFragmentDoc,
-    "\n\tfragment HighlightFragment on Highlight {\n\t\tid\n\t\tcreatedAt\n\t\tsavedItem {\n        \tid\n            title\n        }\n\t\tsegments {\n\t\t\tid\n\t\t\txpath\n\t\t\tbeforeText\n\t\t\tstartOffset\n\t\t\tendOffset\n\t\t\tafterText\n\t\t\ttext\n\t\t}\n\t}\n": types.HighlightFragmentFragmentDoc,
+    "\n\tfragment HighlightFragment on Highlight {\n\t\tid\n\t\tcreatedAt\n\t\tsavedItem {\n        \tid\n            title\n            createdAt\n        }\n\t\tsegments {\n\t\t\tid\n\t\t\txpath\n\t\t\tbeforeText\n\t\t\tstartOffset\n\t\t\tendOffset\n\t\t\tafterText\n\t\t\ttext\n\t\t}\n\t}\n": types.HighlightFragmentFragmentDoc,
     "\n\tfragment EntryFragment on Entry {\n\t\t__typename\n\t\t... on SavedItem {\n\t\t\t...SavedItemFragment\n\t\t\tlabels {\n\t\t\t\t...SavedItemLabelFragment\n\t\t\t}\n\t\t}\n\t\t... on Highlight {\n\t\t\t...HighlightFragment\n\t\t}\n\t}\n": types.EntryFragmentFragmentDoc,
     "\n    fragment ApiTokenFragment on ApiToken {\n    \tid\n    \tcreatedAt\n    \tlastUsedAt\n    \tname\n    \texpiresAt\n    }\n": types.ApiTokenFragmentFragmentDoc,
     "\n\tquery me {\n\t\tme {\n\t\t\tid\n\t\t\t...UserFragment\n\t\t}\n\t}\n": types.MeDocument,
@@ -137,7 +137,7 @@ export function gql(source: "\n\tfragment NewsletterFragment on Newsletter {\n\t
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n\tfragment HighlightFragment on Highlight {\n\t\tid\n\t\tcreatedAt\n\t\tsavedItem {\n        \tid\n            title\n        }\n\t\tsegments {\n\t\t\tid\n\t\t\txpath\n\t\t\tbeforeText\n\t\t\tstartOffset\n\t\t\tendOffset\n\t\t\tafterText\n\t\t\ttext\n\t\t}\n\t}\n"): (typeof documents)["\n\tfragment HighlightFragment on Highlight {\n\t\tid\n\t\tcreatedAt\n\t\tsavedItem {\n        \tid\n            title\n        }\n\t\tsegments {\n\t\t\tid\n\t\t\txpath\n\t\t\tbeforeText\n\t\t\tstartOffset\n\t\t\tendOffset\n\t\t\tafterText\n\t\t\ttext\n\t\t}\n\t}\n"];
+export function gql(source: "\n\tfragment HighlightFragment on Highlight {\n\t\tid\n\t\tcreatedAt\n\t\tsavedItem {\n        \tid\n            title\n            createdAt\n        }\n\t\tsegments {\n\t\t\tid\n\t\t\txpath\n\t\t\tbeforeText\n\t\t\tstartOffset\n\t\t\tendOffset\n\t\t\tafterText\n\t\t\ttext\n\t\t}\n\t}\n"): (typeof documents)["\n\tfragment HighlightFragment on Highlight {\n\t\tid\n\t\tcreatedAt\n\t\tsavedItem {\n        \tid\n            title\n            createdAt\n        }\n\t\tsegments {\n\t\t\tid\n\t\t\txpath\n\t\t\tbeforeText\n\t\t\tstartOffset\n\t\t\tendOffset\n\t\t\tafterText\n\t\t\ttext\n\t\t}\n\t}\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

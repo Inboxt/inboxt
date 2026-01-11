@@ -79,6 +79,7 @@ export const HIGHLIGHT_FRAGMENT = gql(`
 		savedItem {
         	id
             title
+            createdAt
         }
 		segments {
 			id

@@ -1,19 +1,17 @@
 import { useDebouncedCallback } from '@mantine/hooks';
 import { ReactNode, useState } from 'react';
 
-import { SavedItem, Highlight } from '~lib/graphql';
-
 import { ContentSelectionContext, SelectableItem } from './ContentSelectionContext';
 
 export const ContentSelectionProvider = ({ children }: { children: ReactNode }) => {
 	const [selectedItems, setSelectedItemsRaw] = useState<SelectableItem[]>([]);
 	const [visibleItems, setVisibleItemsRaw] = useState<SelectableItem[]>([]);
 
-	const setSelectedItems = (items: (SavedItem | Highlight)[]) => {
+	const setSelectedItems = (items: SelectableItem[]) => {
 		setSelectedItemsRaw(items);
 	};
 
-	const setVisibleItems = (items: (SavedItem | Highlight)[]) => {
+	const setVisibleItems = (items: SelectableItem[]) => {
 		setVisibleItemsRaw(items);
 	};
 
@@ -36,7 +34,7 @@ export const ContentSelectionProvider = ({ children }: { children: ReactNode }) 
 		setSelectedItemsRaw([]);
 	};
 
-	const toggleItemSelection = useDebouncedCallback((item: SavedItem | Highlight) => {
+	const toggleItemSelection = useDebouncedCallback((item: SelectableItem) => {
 		setSelectedItemsRaw((prev) => {
 			const found = prev.find((it) => it.id === item.id);
 			if (found) {

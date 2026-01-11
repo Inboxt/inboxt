@@ -205,7 +205,7 @@ export const ItemsList = () => {
 											<Loader size="sm" />
 										</Center>
 									) : (
-										<ItemRenderer item={items[index].node} />
+										<ItemRenderer item={items[index]?.node as any} />
 									)}
 								</Box>
 							);

@@ -90,7 +90,9 @@ export const ExportDataModal = ({
 								<SegmentedControl
 									color="dark.5"
 									value={formatForHighlights}
-									onChange={setFormatForHighlights}
+									onChange={(value) =>
+										setFormatForHighlights(value as ExportHighlightsFormat)
+									}
 									data={[
 										{ label: 'HTML', value: ExportHighlightsFormat.Html },
 										{
