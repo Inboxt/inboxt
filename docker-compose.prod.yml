@@ -1,22 +1,68 @@
+
 services:
   postgres:
-    image: postgres:17
-    restart: always
+    image: postgres:17-alpine
+    container_name: inboxt-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
-      - pg-data:/var/lib/postgresql/data
-    env_file: .env
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - inboxt_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   valkey:
-    image: valkey/valkey:8-alpine
-    restart: always
+    image: valkey/valkey:9-alpine
+    container_name: inboxt-valkey
+    restart: unless-stopped
+    command: >
+      valkey-server
+      --save 60 1
+      --loglevel warning
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+    volumes:
+      - valkey_data:/data
+    networks:
+      - inboxt_network
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   api:
-    image: inboxt-api:latest
-    restart: always
-    env_file: .env
+    image: ghcr.io/inboxt/inboxt-api:${IMAGE_TAG:-latest}
+    container_name: inboxt-api
+    restart: unless-stopped
+    env_file:
+      - .env
     depends_on:
-      - postgres
-      - valkey
+      postgres:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+    networks:
+      - inboxt_network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:7000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
 volumes:
-  pg-data:
+  postgres_data:
+  valkey_data:
+
+networks:
+  inboxt_network:
+    external: true

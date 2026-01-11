@@ -4,7 +4,10 @@ on:
   push:
     branches: [master]
     paths:
-      - apps/web/**
+      - 'apps/web/**'
+      - 'libs/ui/**'
+      - 'libs/common/**'
+      - '.github/workflows/deploy-web.yml'
 
 jobs:
   deploy:
@@ -15,17 +18,17 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: npm
+          node-version: '22'
+          cache: 'npm'
 
       - run: npm ci
 
       - name: Build frontend
         run: npm run build --workspace=apps/web
         env:
-          VITE_API_URL: /api
+          NODE_ENV: production
 
-      - name: Deploy
+      - name: Deploy to VM
         uses: burnett01/rsync-deployments@v8
         with:
           switches: -avz --delete
@@ -34,3 +37,16 @@ jobs:
           remote_host: ${{ secrets.DEPLOY_HOST }}
           remote_user: ${{ secrets.DEPLOY_USER }}
           remote_key: ${{ secrets.DEPLOY_SSH_KEY }}
+
+      - name: Verify deployment
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            if [ ! -f /srv/app-web/dist/index.html ]; then
+              echo "❌ Deployment failed"
+              exit 1
+            fi
+            echo "✅ Web app deployed"
