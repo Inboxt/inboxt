@@ -59,7 +59,7 @@ jobs:
             sed -i "s/^IMAGE_TAG=.*/IMAGE_TAG=${{ env.IMAGE_TAG }}/" .env
             
             # Restart API service
-            docker compose -f docker-compose.prod.yml up -d --no-deps api
+            docker compose -f docker-compose.prod.yml up -d --no-deps --force-recreate api
             
             # Wait for health check
             echo "Waiting for API to become healthy..."
