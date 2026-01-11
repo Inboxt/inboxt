@@ -1,5 +1,4 @@
 {
 	"extends": "./tsconfig.json",
-	"include": ["src", "prisma/client/**/*", "migrations"],
-	"exclude": ["node_modules", "test", "dist", "**/*.spec.ts", "prisma"]
+	"exclude": ["node_modules", "test", "dist", "**/*spec.ts", "prisma"]
 }

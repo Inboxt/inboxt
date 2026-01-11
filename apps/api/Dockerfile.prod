@@ -38,6 +38,7 @@ COPY --from=builder /app/node_modules ./node_modules
 # Copy built artifacts
 COPY --from=builder /app/apps/api/dist ./dist
 COPY --from=builder /app/apps/api/prisma ./prisma
+COPY --from=builder /app/apps/api/migrations ./migrations
 
 # Copy shared libs (runtime)
 COPY --from=builder /app/libs/common/dist ./libs/common/dist
