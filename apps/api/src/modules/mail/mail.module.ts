@@ -24,9 +24,12 @@ import { MailService } from './mail.service';
 		{
 			provide: 'MAIL_TRANSPORTER',
 			useFactory: (configService: ConfigService) => {
+				const mailConfig = configService.get('mail');
 				return nodemailer.createTransport({
-					host: configService.get('MAIL_HOST'),
-					port: parseInt(configService.get('MAIL_PORT') as string, 10),
+					host: mailConfig.host,
+					port: mailConfig.port,
+					secure: mailConfig.secure,
+					auth: mailConfig.auth,
 				});
 			},
 			inject: [ConfigService],

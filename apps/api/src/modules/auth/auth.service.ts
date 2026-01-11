@@ -91,7 +91,13 @@ export class AuthService {
 	}
 
 	signOut(context: GqlContext) {
-		context.res.clearCookie('token');
+		context.res.clearCookie('token', {
+			secure: process.env.NODE_ENV === 'production',
+			domain: process.env.NODE_ENV === 'production' ? '.inboxt.app' : undefined,
+			httpOnly: true,
+			sameSite: 'lax',
+			path: '/',
+		});
 	}
 
 	async createTokens(emailAddress: string, context: any) {

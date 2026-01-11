@@ -45,4 +45,7 @@ export const client = new ApolloClient({
 		},
 	}),
 	credentials: 'include',
+	devtools: {
+		enabled: false,
+	},
 });

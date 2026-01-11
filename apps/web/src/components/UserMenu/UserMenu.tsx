@@ -25,9 +25,9 @@ export const UserMenu = () => {
 
 	const handleSignOut = async () => {
 		await signOut();
-		await client.cache.reset();
+		await client.clearStore();
 
-		return navigate({ to: '/' });
+		return navigate({ to: '/', replace: true });
 	};
 
 	const USER_MENU_ITEMS = [
