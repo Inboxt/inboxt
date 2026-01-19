@@ -1,4 +1,4 @@
-import { Badge, Box, Breadcrumbs, Group, Stack, Text, Center } from '@mantine/core';
+import { Badge, Box, Breadcrumbs, Group, Stack, Text, Center, darken } from '@mantine/core';
 import { useHover, useLocalStorage, useLongPress } from '@mantine/hooks';
 import { IconPhotoOff } from '@tabler/icons-react';
 import { useNavigate } from '@tanstack/react-router';
@@ -126,7 +126,13 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 							{item.labels?.length && (
 								<Group wrap="nowrap" gap="xxxs">
 									{item.labels.map(({ id, name, color }) => (
-										<Badge size="xs" radius="sm" key={id} color={color}>
+										<Badge
+											size="xs"
+											radius="sm"
+											key={id}
+											color={color}
+											c={darken(color, 0.7)}
+										>
 											{name}
 										</Badge>
 									))}

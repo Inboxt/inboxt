@@ -20,6 +20,7 @@ import { FormLogin } from '~forms/FormLogin';
 import { AuthMode, Route } from '~routes/auth.route';
 
 import classes from './Auth.module.css';
+import { FooterLinks } from '~components/FooterLinks';
 
 export type AuthViewProps = {
 	handleChangeAuthMode: (mode: AuthMode, emailAddress?: string) => Promise<void>;
@@ -85,11 +86,7 @@ export const Auth = () => {
 						<Divider />
 
 						<Group p="md" pt="xxs" justify="center">
-							<Anchor fz="sm">About</Anchor>
-							<Anchor fz="sm">Docs</Anchor>
-							<Anchor fz="sm">Privacy</Anchor>
-							<Anchor fz="sm">Terms</Anchor>
-							<Anchor fz="sm">Roadmap</Anchor>
+							<FooterLinks separator="" />
 						</Group>
 					</Box>
 				</Flex>

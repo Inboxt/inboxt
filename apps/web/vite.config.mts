@@ -34,6 +34,7 @@ export default defineConfig(({ mode }) => {
 				manifest: {
 					name: 'Inboxt',
 					short_name: 'Inboxt',
+					description: 'Your inbox for the internet',
 					start_url: '/',
 					scope: '/',
 					theme_color: '#55a57e',
@@ -44,7 +45,19 @@ export default defineConfig(({ mode }) => {
 							src: '/web-app-manifest-192x192.png',
 							sizes: '192x192',
 							type: 'image/png',
+							purpose: 'any',
+						},
+						{
+							src: '/web-app-manifest-192x192.png',
+							sizes: '192x192',
+							type: 'image/png',
 							purpose: 'maskable',
+						},
+						{
+							src: '/web-app-manifest-512x512.png',
+							sizes: '512x512',
+							type: 'image/png',
+							purpose: 'any',
 						},
 						{
 							src: '/web-app-manifest-512x512.png',

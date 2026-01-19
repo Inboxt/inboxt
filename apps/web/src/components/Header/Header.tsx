@@ -200,6 +200,7 @@ export const Header = ({ opened, toggle }: HeaderProps) => {
 								});
 							}}
 							data={SORT_OPTIONS}
+							className={classes.sortInput}
 						/>
 
 						<Flex

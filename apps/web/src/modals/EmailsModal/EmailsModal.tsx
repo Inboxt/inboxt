@@ -34,7 +34,7 @@ export const EmailsModal = ({ id, context }: ContextModalProps) => {
 	};
 
 	return (
-		<Stack gap="xl" className="overflow-container" flex={1}>
+		<Stack gap="xl" flex={1}>
 			<Alert color="gray">
 				You can use these email addresses to receive newsletters and other messages directly
 				within the app. When emails are sent to these addresses, we’ll do our best to

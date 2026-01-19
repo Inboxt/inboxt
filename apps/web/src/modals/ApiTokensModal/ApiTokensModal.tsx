@@ -8,7 +8,7 @@ import {
 	Group,
 	ActionIcon,
 	Card,
-	Box,
+	ScrollArea,
 	Breadcrumbs,
 } from '@mantine/core';
 import { ContextModalProps } from '@mantine/modals';
@@ -96,15 +96,15 @@ export const ApiTokensModal = ({ id, context }: ContextModalProps) => {
 			</Alert>
 
 			<Skeleton visible={loading}>
-				{tokens.length === 0 && (
-					<Text size="sm" c="dimmed">
-						You haven't created any API tokens yet.
-					</Text>
-				)}
+				<ScrollArea.Autosize mah="50vh" type="auto" scrollbars="y">
+					{tokens.length === 0 && (
+						<Text size="sm" c="dimmed">
+							You haven't created any API tokens yet.
+						</Text>
+					)}
 
-				{tokens.length > 0 && (
-					<Box className="overflow-container" mah={300}>
-						<Stack gap="sm">
+					{tokens.length > 0 && (
+						<Stack gap="sm" pr="sm">
 							{tokens.map((token) => {
 								const createdAt = dayjs(token.createdAt);
 								const lastUsedAt = token.lastUsedAt
@@ -118,7 +118,13 @@ export const ApiTokensModal = ({ id, context }: ContextModalProps) => {
 									<Card key={token.id}>
 										<Group justify="space-between" align="flex-start">
 											<Stack gap="xxs" flex={1}>
-												<Text fw={500}>{token.name}</Text>
+												<Text
+													fw={500}
+													lineClamp={1}
+													style={{ wordBreak: 'break-all' }}
+												>
+													{token.name}
+												</Text>
 
 												<Breadcrumbs separator="•">
 													<Text c="dimmed" size="xs">
@@ -160,8 +166,8 @@ export const ApiTokensModal = ({ id, context }: ContextModalProps) => {
 								);
 							})}
 						</Stack>
-					</Box>
-				)}
+					)}
+				</ScrollArea.Autosize>
 			</Skeleton>
 
 			<ButtonContainer mt="auto">

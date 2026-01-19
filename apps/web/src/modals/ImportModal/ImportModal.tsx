@@ -100,7 +100,7 @@ export const ImportModal = ({ id, context }: ContextModalProps<ImportModalProps>
 			error={importError}
 		>
 			{({ error }) => (
-				<Stack gap="xl">
+				<Stack gap="xl" flex={1}>
 					{!selectedType && (
 						<Alert color="gray">
 							You can import your saved items using a CSV file or a ZIP archive. CSV
@@ -165,7 +165,7 @@ export const ImportModal = ({ id, context }: ContextModalProps<ImportModalProps>
 						</Card>
 					)}
 
-					<ButtonContainer>
+					<ButtonContainer mt="auto">
 						<Button
 							variant="default"
 							onClick={() => {

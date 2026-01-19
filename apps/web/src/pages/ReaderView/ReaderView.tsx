@@ -6,6 +6,7 @@ import {
 	Box,
 	Breadcrumbs,
 	Center,
+	darken,
 	Divider,
 	Flex,
 	Group,
@@ -207,7 +208,12 @@ export const ReaderView = () => {
 
 										<Group gap={6}>
 											{(savedItem.labels || []).map((label) => (
-												<Badge size="sm" radius="sm" color={label.color}>
+												<Badge
+													size="sm"
+													radius="sm"
+													color={label.color}
+													c={darken(label.color, 0.7)}
+												>
 													{label.name}
 												</Badge>
 											))}

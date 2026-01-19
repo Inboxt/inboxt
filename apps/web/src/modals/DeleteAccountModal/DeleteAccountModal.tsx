@@ -1,5 +1,5 @@
 import { useMutation } from '@apollo/client';
-import { Button, Text, Stack, TextInput, Card, Alert } from '@mantine/core';
+import { Button, Text, Stack, TextInput, Card, Alert, Box } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { ContextModalProps } from '@mantine/modals';
 import { IconAlertTriangleFilled } from '@tabler/icons-react';
@@ -51,7 +51,7 @@ export const DeleteAccountModal = ({ id, context }: ContextModalProps) => {
 							/>
 						</Stack>
 
-						{error}
+						{error && <Box mt="sm">{error}</Box>}
 					</Card>
 
 					<ButtonContainer>

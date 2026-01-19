@@ -87,15 +87,24 @@ export const ItemsList = () => {
 		}
 	}, [virtualItems, items.length, loadMore]);
 
-	const { setVisibleItems } = useContentSelection();
+	const { setVisibleItems, deselectAll } = useContentSelection();
+	const prevItemIdsRef = useRef<string>('');
+
 	useEffect(() => {
-		if (!items.length) {
-			return;
-		}
-
 		const itemsNode = items.map((i) => i.node);
-		setVisibleItems(itemsNode);
+		const currentItemIds = itemsNode
+			.map((item) => item.id)
+			.sort()
+			.join(',');
 
+		if (currentItemIds !== prevItemIdsRef.current) {
+			if (prevItemIdsRef.current && !currentItemIds.startsWith(prevItemIdsRef.current)) {
+				deselectAll();
+			}
+
+			setVisibleItems(itemsNode);
+			prevItemIdsRef.current = currentItemIds;
+		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [items]);
 

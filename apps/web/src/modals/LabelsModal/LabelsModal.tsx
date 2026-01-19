@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client';
-import { Button, Card, Stack, Text } from '@mantine/core';
+import { Button, Card, ScrollArea, Stack, Text } from '@mantine/core';
 import { ContextModalProps } from '@mantine/modals';
 import { useEffect, useState } from 'react';
 
@@ -30,27 +30,29 @@ export const LabelsModal = ({ id, context }: ContextModalProps) => {
 	const hasLabels = labels.length > 0;
 
 	return (
-		<Stack gap="xl" justify="space-between" flex={1}>
-			{hasLabels ? (
-				<Card>
-					<Stack gap="sm" mah={300} className="overflow-container">
-						{labels.map((label) => (
-							<EditableLabelItem
-								key={label.id}
-								label={label}
-								isEditing={editingLabelId === label.id}
-								setIsEditing={(isEditing) =>
-									setEditingLabelId(isEditing ? label.id : null)
-								}
-							/>
-						))}
-					</Stack>
-				</Card>
-			) : (
-				<Text size="sm" c="dimmed">
-					No labels yet.
-				</Text>
-			)}
+		<Stack gap="xl">
+			<ScrollArea.Autosize mah="50vh" type="auto">
+				{hasLabels ? (
+					<Card mr="sm">
+						<Stack gap="sm">
+							{labels.map((label) => (
+								<EditableLabelItem
+									key={label.id}
+									label={label}
+									isEditing={editingLabelId === label.id}
+									setIsEditing={(isEditing) =>
+										setEditingLabelId(isEditing ? label.id : null)
+									}
+								/>
+							))}
+						</Stack>
+					</Card>
+				) : (
+					<Text size="sm" c="dimmed">
+						No labels yet.
+					</Text>
+				)}
+			</ScrollArea.Autosize>
 
 			<ButtonContainer>
 				<Button onClick={() => context.closeModal(id)} variant="default">

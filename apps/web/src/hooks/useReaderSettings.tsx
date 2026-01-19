@@ -8,6 +8,7 @@ import {
 	ReaderThemeName,
 	ReaderThemeTokens,
 } from '@inboxt/common';
+import { useMantineColorScheme } from '@mantine/core';
 
 function mapFontFamily(font: ReaderContentSettings['font']) {
 	if (font === 'Serif') {
@@ -59,6 +60,7 @@ export function makeReaderResolver(
 
 export function useReaderSettings() {
 	const systemScheme = useColorScheme('light', { getInitialValueInEffect: true });
+	const { colorScheme } = useMantineColorScheme();
 
 	const [theme, setTheme] = useLocalStorage<ReaderTheme>({
 		key: 'reader-theme',
@@ -71,10 +73,16 @@ export function useReaderSettings() {
 		defaultValue: READER_DEFAULT_SETTINGS,
 	});
 
-	const effectiveTheme: ReaderThemeName = useMemo(
-		() => (theme === 'auto' ? (systemScheme === 'dark' ? 'dark' : 'light') : theme),
-		[theme, systemScheme],
-	);
+	const effectiveTheme: ReaderThemeName = useMemo(() => {
+		if (theme === 'auto') {
+			if (colorScheme === 'auto') {
+				return systemScheme === 'dark' ? 'dark' : 'light';
+			}
+
+			return colorScheme === 'dark' ? 'dark' : 'light';
+		}
+		return theme;
+	}, [theme, colorScheme, systemScheme]);
 
 	const setReaderTheme = (value: ReaderTheme) => setTheme(value);
 	return { theme, setReaderTheme, effectiveTheme, contentSettings, setContentSettings };

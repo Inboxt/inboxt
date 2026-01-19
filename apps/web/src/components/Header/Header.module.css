@@ -26,3 +26,9 @@
 		width: 100%;
 	}
 }
+
+.sortInput {
+	@media (max-width: $mantine-breakpoint-xs) {
+		flex: 1;
+	}
+}

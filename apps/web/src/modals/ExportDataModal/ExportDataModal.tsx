@@ -62,7 +62,7 @@ export const ExportDataModal = ({
 			error={requestExportError}
 		>
 			{({ error }) => (
-				<Stack gap="xl">
+				<Stack gap="xl" flex={1}>
 					<Card>
 						<Stack gap="md">
 							<Text size="sm">
@@ -108,7 +108,7 @@ export const ExportDataModal = ({
 						</Stack>
 					</Card>
 
-					<ButtonContainer>
+					<ButtonContainer mt="auto">
 						<Button
 							variant="default"
 							onClick={() => context.closeModal(id)}

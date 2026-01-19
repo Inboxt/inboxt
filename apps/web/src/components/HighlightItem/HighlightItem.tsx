@@ -20,6 +20,7 @@ export const HighlightItem = ({ highlight }: HighlightItemProps) => {
 	const { hovered, ref } = useHover();
 	const navigate = useNavigate();
 	const isBelowLgScreen = useScreenQuery('lg', 'below');
+	const isAboveSmScreen = useScreenQuery('sm', 'above');
 
 	const { selectedItems, toggleItemSelection, isSelected } = useContentSelection();
 	const selected = isSelected(highlight.id);
@@ -80,7 +81,10 @@ export const HighlightItem = ({ highlight }: HighlightItemProps) => {
 
 						{(!hovered || isBelowLgScreen) && (
 							<Box top={0} pos="absolute" right={0}>
-								<IconQuoteFilled size={36} color="var(--mantine-color-dimmed)" />
+								<IconQuoteFilled
+									size={isAboveSmScreen ? 36 : 24}
+									color="var(--mantine-color-dimmed)"
+								/>
 							</Box>
 						)}
 					</Group>

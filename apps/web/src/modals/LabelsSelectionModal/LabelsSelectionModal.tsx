@@ -1,5 +1,5 @@
 import { useFragment, useMutation, useQuery } from '@apollo/client';
-import { Button, Card, Checkbox, Stack, Text } from '@mantine/core';
+import { Button, Card, Checkbox, ScrollArea, Stack, Text } from '@mantine/core';
 import { ContextModalProps } from '@mantine/modals';
 import { useState } from 'react';
 
@@ -50,27 +50,23 @@ export const LabelsSelectionModal = ({
 
 	return (
 		<Stack gap="xl">
-			{data?.labels?.length ? (
-				<Card>
-					<Checkbox.Group
-						value={value}
-						onChange={setValue}
-						mr={3}
-						mah={300}
-						className="overflow-container"
-					>
-						<Stack gap="xs">
-							{data.labels.map((label) => (
-								<SelectableLabel label={label} key={label.id} />
-							))}
-						</Stack>
-					</Checkbox.Group>
-				</Card>
-			) : (
-				<Text size="sm" c="dimmed">
-					No labels available yet.
-				</Text>
-			)}
+			<ScrollArea.Autosize mah="60vh" type="auto">
+				{data?.labels?.length ? (
+					<Card mr="sm">
+						<Checkbox.Group value={value} onChange={setValue}>
+							<Stack gap="xs">
+								{data.labels.map((label) => (
+									<SelectableLabel label={label} key={label.id} />
+								))}
+							</Stack>
+						</Checkbox.Group>
+					</Card>
+				) : (
+					<Text size="sm" c="dimmed">
+						No labels available yet.
+					</Text>
+				)}
+			</ScrollArea.Autosize>
 
 			<ButtonContainer>
 				<Button variant="light" onClick={modals.openCreateLabelModal}>

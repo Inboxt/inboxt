@@ -58,13 +58,13 @@ export const CustomToast = (props: ToastProps) => {
 				{icon}
 				<Stack flex={1} gap={2}>
 					{title && (
-						<Text size="sm" fw={500} truncate="end">
+						<Text size="sm" fw={500} style={{ wordBreak: 'break-word' }}>
 							{title}
 						</Text>
 					)}
 
 					{description && (
-						<Text c="dimmed" size="sm" truncate="end">
+						<Text c="dimmed" size="sm" style={{ wordBreak: 'break-word' }}>
 							{description}
 						</Text>
 					)}
