@@ -14,20 +14,32 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-	.item {
+	.highlight {
 		user-select: auto;
 		-webkit-user-select: auto;
 	}
 }
 
-.text {
-	color: var(--mantine-color-dark-5);
-	
-	@mixin dark {
-		color: var(--mantine-color-dark-2);
+
+.breadcrumb {
+	flex-wrap: wrap;
+	padding-right: 44px;
+	max-width: 100%;
+	row-gap: var(--mantine-spacing-xxs);
+}
+
+@media (max-width: $mantine-breakpoint-xs) {
+	.breadcrumb {
+		padding-right: 32px;
 	}
 }
 
-.breadcrumb {
-	flex-wrap: nowrap;
+.text {
+	color: var(--mantine-color-dark-5);
+	word-break: break-word;
+	white-space: normal;
+
+	@mixin dark {
+		color: var(--mantine-color-dark-2);
+	}
 }
