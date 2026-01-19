@@ -35,7 +35,7 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 		toggleItemSelection(item);
 	};
 
-	const longPressHandlers = useLongPress(handleLongPress);
+	const longPressHandlers = useLongPress(handleLongPress, { threshold: 800 });
 
 	return (
 		<Box

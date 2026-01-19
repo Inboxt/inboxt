@@ -28,7 +28,7 @@ export const HighlightItem = ({ highlight }: HighlightItemProps) => {
 		toggleItemSelection(highlight);
 	};
 
-	const longPressHandlers = useLongPress(handleLongPress);
+	const longPressHandlers = useLongPress(handleLongPress, { threshold: 800 });
 	const sourceTitle = highlight.savedItem?.title || 'Unknown Title';
 
 	return (

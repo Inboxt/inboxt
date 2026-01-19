@@ -14,13 +14,13 @@ import { useNavigate, useLocation, useSearch } from '@tanstack/react-router';
 
 import { AppName } from '~components/AppName';
 import { DemoLogin } from '~components/DemoLogin';
+import { FooterLinks } from '~components/FooterLinks';
 import { FormCreateAccount } from '~forms/FormCreateAccount';
 import { FormForgotPassword } from '~forms/FormForgotPassword';
 import { FormLogin } from '~forms/FormLogin';
 import { AuthMode, Route } from '~routes/auth.route';
 
 import classes from './Auth.module.css';
-import { FooterLinks } from '~components/FooterLinks';
 
 export type AuthViewProps = {
 	handleChangeAuthMode: (mode: AuthMode, emailAddress?: string) => Promise<void>;

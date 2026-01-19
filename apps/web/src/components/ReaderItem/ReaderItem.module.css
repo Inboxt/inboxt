@@ -6,6 +6,18 @@
 	@mixin dark {
 		border-color: var(--mantine-color-dark-4);
 	}
+
+	-webkit-tap-highlight-color: transparent;
+	-webkit-touch-callout: none;
+	user-select: none;
+	-webkit-user-select: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+	.item {
+		user-select: auto;
+		-webkit-user-select: auto;
+	}
 }
 
 .checkbox {
