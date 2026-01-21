@@ -3,7 +3,7 @@
 		"type": "UPDATE",
 		"badge": "v1.0.0",
 		"date": "2026-01-02",
-		"text": "Introducing v1.0 — a faster, simpler way to sync and read your articles.",
-		"link": "/changelog"
+		"text": "Initial release.\nSave articles and newsletters to read later.",
+		"link": "https://inboxt.app/changelog"
 	}
 ]
