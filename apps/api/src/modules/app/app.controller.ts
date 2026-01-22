@@ -1,9 +1,15 @@
-import { Controller, Get, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Header, HttpStatus } from '@nestjs/common';
+import dayjs from 'dayjs';
+import { ZodError } from 'zod';
 
 import { Public } from '~common/decorators/public.decorator';
 import { AppException } from '~common/utils/app-exception';
 
 import { AppService } from './app.service';
+import { notificationsSchema } from './notifications.schema';
+
+let cachedNotifications: unknown[] | null = null;
+let cacheExpiresAt: dayjs.Dayjs | null = null;
 
 @Controller()
 export class AppController {
@@ -17,7 +23,14 @@ export class AppController {
 
 	@Get('notifications')
 	@Public()
+	@Header('Cache-Control', 'public, max-age=900')
 	async getNotifications() {
+		const now = dayjs();
+
+		if (cachedNotifications && cacheExpiresAt && now.isBefore(cacheExpiresAt)) {
+			return cachedNotifications;
+		}
+
 		const url = process.env.NOTIFICATIONS_URL;
 		if (!url) {
 			throw new AppException(
@@ -26,20 +39,45 @@ export class AppController {
 			);
 		}
 
-		let response: Response;
 		try {
-			response = await fetch(url, { method: 'GET' });
+			const response = await fetch(url);
+
+			if (!response.ok) {
+				throw new Error(`Upstream status ${response.status}`);
+			}
+
+			const rawData = await response.json();
+
+			let data;
+			try {
+				data = notificationsSchema.parse(rawData);
+			} catch (err) {
+				if (err instanceof ZodError) {
+					console.error('Invalid notifications JSON', err.issues);
+
+					if (cachedNotifications) {
+						return cachedNotifications;
+					}
+
+					throw new AppException(
+						'Invalid notifications data format',
+						HttpStatus.BAD_GATEWAY,
+					);
+				}
+
+				throw err;
+			}
+
+			cachedNotifications = data;
+			cacheExpiresAt = now.add(15, 'minute');
+
+			return data;
 		} catch (_err) {
+			if (cachedNotifications) {
+				return cachedNotifications;
+			}
+
 			throw new AppException('Failed to fetch notifications', HttpStatus.BAD_GATEWAY);
 		}
-
-		if (!response.ok) {
-			throw new AppException(
-				`Upstream notifications error (status ${response.status})`,
-				HttpStatus.BAD_GATEWAY,
-			);
-		}
-
-		return await response.json();
 	}
 }

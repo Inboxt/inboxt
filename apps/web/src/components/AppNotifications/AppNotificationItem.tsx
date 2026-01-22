@@ -1,12 +1,12 @@
-import { Text, Group, Badge, Tooltip, Anchor } from '@mantine/core';
+import { Text, Group, Badge, Anchor, Stack } from '@mantine/core';
+import { IconArrowRight } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
 dayjs.extend(relativeTime);
 
-export type NotificationType = 'UPDATE' | 'ALERT';
-
-type AppNotificationItem = {
+export type NotificationType = 'UPDATE' | 'INCIDENT' | 'INCIDENT_RESOLVED';
+export type AppNotificationItemData = {
 	id: number;
 	type: NotificationType;
 	text: string;
@@ -15,79 +15,71 @@ type AppNotificationItem = {
 	link?: string;
 };
 
-export const AppNotificationItem = ({ item }: { item: AppNotificationItem }) => {
-	let itemColor;
-	let badgeText;
-	let badgeVariant = 'dot';
-	let buttonText = 'Learn more';
+const NOTIFICATION_CONFIG = {
+	UPDATE: {
+		color: 'primary',
+		badgeVariant: 'dot' as const,
+		badgeText: null,
+		linkText: "See what's new",
+		textColor: 'dimmed' as const,
+	},
+	INCIDENT: {
+		color: 'red',
+		badgeVariant: 'light' as const,
+		badgeText: 'Incident',
+		textColor: 'red' as const,
+	},
+	INCIDENT_RESOLVED: {
+		color: 'green',
+		badgeVariant: 'light' as const,
+		badgeText: 'Resolved',
+		textColor: 'dimmed' as const,
+	},
+} as const;
 
-	switch (item.type) {
-		case 'UPDATE':
-			badgeText = item.badge || 'UPDATE';
-			buttonText = "See what's new";
-			itemColor = 'primary';
-			break;
-		case 'ALERT':
-			badgeText = 'IMPORTANT';
-			badgeVariant = 'light';
-			buttonText = 'View details';
-			itemColor = 'red';
-			break;
-	}
-
-	const anchorProps = item.link
-		? { href: item.link, c: itemColor || 'primary', target: '_blank' }
-		: {};
-
+export const AppNotificationItem = ({ item }: { item: AppNotificationItemData }) => {
+	const config = NOTIFICATION_CONFIG[item.type];
+	const badgeText = item.type === 'UPDATE' ? item.badge : config.badgeText;
 	const timeAgo = item.date ? dayjs(item.date).fromNow() : '';
+
 	return (
-		<Group key={item.id} gap="xxs" align="center" wrap="nowrap">
-			{badgeText && (
-				<Badge size="xs" radius="sm" color={`${itemColor}.6`} variant={badgeVariant}>
+		<Stack gap="xxs">
+			<Group gap="xxs" align="center">
+				<Badge
+					size="xs"
+					radius="sm"
+					color={`${config.color}.6`}
+					variant={config.badgeVariant}
+				>
 					{badgeText}
 				</Badge>
-			)}
+			</Group>
 
-			<Tooltip
-				label={
-					<>
-						<Text size="xs" mb="xxxs">
-							{item.text}
-						</Text>
-						{timeAgo && (
-							<Text
-								size="xs"
-								c={item.type === 'ALERT' ? 'red.2' : 'dimmed'}
-								fs="italic"
-							>
-								{timeAgo}
-							</Text>
-						)}
-					</>
-				}
-				position="bottom"
-				withArrow
-				multiline
-				maw={320}
-				color={item.type === 'ALERT' ? 'red' : undefined}
-				openDelay={300}
-			>
+			<Stack gap={2} align="flex-start">
 				<Text
 					size="xs"
-					flex={1}
-					lineClamp={1}
-					c={item.type === 'ALERT' ? 'red' : 'dimmed'}
-					fw={item.type === 'ALERT' ? 700 : undefined}
+					lh={1.4}
+					c={config.textColor}
+					td={item.type === 'INCIDENT_RESOLVED' ? 'line-through' : 'none'}
 				>
 					{item.text}
 				</Text>
-			</Tooltip>
 
-			{item.link && (
-				<Anchor {...anchorProps} fz="xs" ml="xxxs">
-					{buttonText}
-				</Anchor>
-			)}
-		</Group>
+				{item.type !== 'UPDATE' && timeAgo && (
+					<Text size="xxs" c="dimmed">
+						{timeAgo}
+					</Text>
+				)}
+
+				{item.link && 'linkText' in config && (
+					<Anchor href={item.link} size="xs" c={config.color} target="_blank" fw={500}>
+						<Group gap={4} wrap="nowrap" align="center">
+							{config.linkText}
+							<IconArrowRight size={12} />
+						</Group>
+					</Anchor>
+				)}
+			</Stack>
+		</Stack>
 	);
 };

@@ -46,7 +46,9 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
 						{children}
 					</Box>
 
-					<Footer visibleFrom="lg" />
+					<Box visibleFrom="lg" pb="md">
+						<Footer />
+					</Box>
 				</Flex>
 			</Center>
 		</Box>

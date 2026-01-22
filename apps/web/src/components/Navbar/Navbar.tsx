@@ -140,7 +140,7 @@ export const Navbar = ({ opened, toggle }: NavbarProps) => {
 			<Box className={classes.mobileNavMain}>{navLinks}</Box>
 
 			<Box bg="body">
-				<AppNotifications />
+				<AppNotifications maxHeight={143} />
 				<FooterLinks justify="center" />
 			</Box>
 		</Drawer>

@@ -12,7 +12,7 @@ export const Footer = (props: BoxProps) => {
 
 			<AppNotifications />
 
-			<Divider size="xs" color="gray.2" my="sm" />
+			<Divider size="xs" color="gray.2" mb="sm" />
 
 			<FooterLinks />
 		</Stack>

@@ -1,25 +1,30 @@
-import { Text, Group, Stack, ActionIcon, Button, Collapse, Skeleton } from '@mantine/core';
+import {
+	Text,
+	Group,
+	Stack,
+	ActionIcon,
+	Button,
+	Collapse,
+	Skeleton,
+	Divider,
+	ScrollArea,
+} from '@mantine/core';
 import { IconChevronDown, IconChevronUp } from '@tabler/icons-react';
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 
-import { AppNotificationItem, NotificationType } from './AppNotificationItem';
+import { AppNotificationItem, AppNotificationItemData } from './AppNotificationItem';
 import classes from './AppNotifications.module.css';
 
-type RemoteNotification = {
-	type: NotificationType;
-	badge?: string;
-	date?: string;
-	text: string;
-	link?: string;
+type NotificationWithId = AppNotificationItemData & { id: number };
+
+type AppNotificationsProps = {
+	maxHeight?: number;
 };
 
-type NotificationWithId = RemoteNotification & { id: number };
-
-export const AppNotifications = () => {
+export const AppNotifications = ({ maxHeight }: AppNotificationsProps) => {
 	const [notificationList, setNotificationList] = useState<NotificationWithId[]>([]);
 	const [expanded, setExpanded] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
-	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
 		let isMounted = true;
@@ -27,33 +32,22 @@ export const AppNotifications = () => {
 		const loadNotifications = async () => {
 			try {
 				setIsLoading(true);
-				setError(null);
 
-				const res = await fetch('/api/notifications', {
-					cache: 'no-store',
-				});
+				const res = await fetch('/api/notifications');
 
-				if (!res.ok) {
+				if (res.ok) {
+					const data = (await res.json()) as AppNotificationItemData[];
+					const withIds: NotificationWithId[] = (data || []).map((item, index) => ({
+						...item,
+						id: index + 1,
+					}));
+
 					if (isMounted) {
-						setError('Unable to load updates right now.');
-						setNotificationList([]);
+						setNotificationList(withIds);
 					}
 				}
-
-				const data: RemoteNotification[] = (await res.json()) as RemoteNotification[];
-				const withIds: NotificationWithId[] = (data || []).map((item, index) => ({
-					...item,
-					id: index + 1,
-				}));
-
-				if (isMounted) {
-					setNotificationList(withIds);
-				}
-			} catch (_err) {
-				if (isMounted) {
-					setError('Unable to load updates right now.');
-					setNotificationList([]);
-				}
+			} catch {
+				// Silently fail
 			} finally {
 				if (isMounted) {
 					setIsLoading(false);
@@ -74,33 +68,17 @@ export const AppNotifications = () => {
 
 	if (isLoading) {
 		return (
-			<Stack my="sm" gap="xxxs">
+			<Stack gap="xs" my="sm">
 				<Text fz="xs" fw={600} c="dimmed" tt="uppercase" lts={0.5}>
 					Updates
 				</Text>
-
-				<Stack gap="xs">
-					<Skeleton height={18} radius="sm" width="100%" animate={true} />
-				</Stack>
-			</Stack>
-		);
-	}
-
-	if (error) {
-		return (
-			<Stack my="sm" gap="xxxs">
-				<Text fz="xs" fw={600} c="dimmed" tt="uppercase" lts={0.5}>
-					Updates
-				</Text>
-				<Text size="xs" c="red">
-					{error}
-				</Text>
+				<Skeleton height={40} radius="sm" width="100%" />
 			</Stack>
 		);
 	}
 
 	return (
-		<Stack my="sm" gap="xs" mih={48} mah={300}>
+		<Stack my="sm" gap="xs" mih={48} mah={maxHeight}>
 			<Group
 				gap="xxxs"
 				align="center"
@@ -133,35 +111,45 @@ export const AppNotifications = () => {
 			</Group>
 
 			{notificationList.length > 0 && latestNotification ? (
-				<Stack
-					gap={expanded ? 'xs' : 4}
-					className={classes.notificationsList}
-					mih={0}
-					pr="xxs"
-				>
-					<AppNotificationItem item={latestNotification} />
+				<ScrollArea.Autosize type="auto" offsetScrollbars>
+					<Stack
+						gap={expanded ? 'md' : 4}
+						className={classes.notificationsList}
+						mih={0}
+						pr="xxs"
+					>
+						<AppNotificationItem item={latestNotification} />
 
-					<Collapse in={expanded}>
-						<Stack gap="xs">
-							{remainingNotifications.map((item) => (
-								<AppNotificationItem item={item} key={item.id} />
-							))}
-						</Stack>
-					</Collapse>
+						{hasMore && expanded && <Divider />}
 
-					{hasMore && !expanded && (
-						<Button
-							variant="subtle"
-							color="gray"
-							size="compact-xs"
-							onClick={() => setExpanded(true)}
-							rightSection={<IconChevronDown size={12} />}
-							fw={400}
-						>
-							Show {notificationList.length - 1} more
-						</Button>
-					)}
-				</Stack>
+						<Collapse in={expanded}>
+							<Stack gap={0}>
+								{remainingNotifications.map((item, index) => (
+									<Fragment key={item.id}>
+										<AppNotificationItem item={item} />
+
+										{index !== remainingNotifications.length - 1 && (
+											<Divider my="md" />
+										)}
+									</Fragment>
+								))}
+							</Stack>
+						</Collapse>
+
+						{hasMore && !expanded && (
+							<Button
+								variant="subtle"
+								color="gray"
+								size="compact-xs"
+								onClick={() => setExpanded(true)}
+								rightSection={<IconChevronDown size={12} />}
+								fw={400}
+							>
+								Show {notificationList.length - 1} more
+							</Button>
+						)}
+					</Stack>
+				</ScrollArea.Autosize>
 			) : (
 				<Group gap="xxxs" align="center" w="100%">
 					<Text size="xs" c="dimmed">
