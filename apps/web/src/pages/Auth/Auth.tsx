@@ -1,15 +1,4 @@
-import {
-	Anchor,
-	Box,
-	Button,
-	Center,
-	Divider,
-	Flex,
-	Group,
-	Stack,
-	Text,
-	Title,
-} from '@mantine/core';
+import { Anchor, Box, Button, Center, Flex, Group, Stack, Text, Title } from '@mantine/core';
 import { useNavigate, useLocation, useSearch } from '@tanstack/react-router';
 
 import { AppName } from '~components/AppName';
@@ -83,8 +72,6 @@ export const Auth = () => {
 						mx="auto"
 						className={classes.loginFooter}
 					>
-						<Divider />
-
 						<Group p="md" pt="xxs" justify="center">
 							<FooterLinks separator="" />
 						</Group>
