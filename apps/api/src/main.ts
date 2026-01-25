@@ -3,12 +3,15 @@ import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import cookieParser from 'cookie-parser';
 import { json } from 'express';
+import { Logger } from 'nestjs-pino';
 
 import { type Config } from '~config/index';
 import { AppModule } from '~modules/app/app.module';
 
 async function bootstrap() {
-	const app = await NestFactory.create<NestExpressApplication>(AppModule);
+	const app = await NestFactory.create<NestExpressApplication>(AppModule, { bufferLogs: true });
+	app.useLogger(app.get(Logger));
+
 	const configService = app.get(ConfigService<Config>);
 	const corsConfig = configService.getOrThrow('cors', { infer: true });
 

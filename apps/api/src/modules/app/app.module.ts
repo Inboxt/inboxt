@@ -1,16 +1,18 @@
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { BullModule as NestBullModule } from '@nestjs/bullmq';
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ScheduleModule } from '@nestjs/schedule';
+import { LoggerModule } from 'nestjs-pino';
 
 import { GlobalExceptionFilter } from '~common/exception-filters/global-exception.filter';
 import { AccountGuard } from '~common/guards/account.guard';
 import { ApiTokenGuard } from '~common/guards/api-token.guard';
 import { GqlAuthGuard } from '~common/guards/auth.guard';
 import { GqlRateLimitGuard } from '~common/guards/rate-limit.guard';
+import { RequestIdMiddleware } from '~common/middleware/request-id.middleware';
 import { config, type Config } from '~config/index';
 import { EntryManagerModule } from '~managers/entry-manager/entry-manager.module';
 import { SavedItemManagerModule } from '~managers/saved-item-manager/saved-item-manager.module';
@@ -37,6 +39,21 @@ import { AppService } from './app.service';
 			isGlobal: true,
 			load: [config],
 			envFilePath: ['../../.env'],
+		}),
+		LoggerModule.forRoot({
+			pinoHttp: {
+				level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
+				transport:
+					process.env.NODE_ENV !== 'production'
+						? { target: 'pino-pretty', options: { singleLine: true, colorize: true } }
+						: undefined,
+				redact: ['req.headers.authorization', 'req.headers.cookie'],
+				customProps: (req) => ({
+					requestId: req.id,
+					userId: (req as any).user?.id,
+				}),
+				messageKey: 'message',
+			},
 		}),
 		GraphQLModule.forRootAsync<ApolloDriverConfig>({
 			driver: ApolloDriver,
@@ -94,4 +111,8 @@ import { AppService } from './app.service';
 	],
 	controllers: [AppController],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+	configure(consumer: MiddlewareConsumer) {
+		consumer.apply(RequestIdMiddleware).forRoutes('*');
+	}
+}

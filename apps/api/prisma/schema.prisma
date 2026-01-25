@@ -1,6 +1,7 @@
 generator client {
   provider = "prisma-client-js"
   output   = "./client"
+  log      = ["warn", "error"]
 }
 
 datasource db {
