@@ -43,13 +43,21 @@ import { AppService } from './app.service';
 		LoggerModule.forRoot({
 			pinoHttp: {
 				level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
+				autoLogging: {
+					ignore: (req) =>
+						req.headers['user-agent']?.includes('Wget') || req.url === '/health',
+				},
+				formatters: {
+					level: (label) => {
+						return { level: label.toUpperCase() };
+					},
+				},
 				transport:
 					process.env.NODE_ENV !== 'production'
 						? { target: 'pino-pretty', options: { singleLine: true, colorize: true } }
 						: undefined,
 				redact: ['req.headers.authorization', 'req.headers.cookie'],
 				customProps: (req) => ({
-					requestId: req.id,
 					userId: (req as any).user?.id,
 				}),
 				messageKey: 'message',
