@@ -1,5 +1,6 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
 import { GqlExceptionFilter, GqlContextType } from '@nestjs/graphql';
+import * as Sentry from '@sentry/nestjs';
 import { GraphQLError } from 'graphql';
 import { ZodError } from 'zod';
 
@@ -22,6 +23,10 @@ export class GlobalExceptionFilter implements ExceptionFilter, GqlExceptionFilte
 					error: 'Bad Request',
 				},
 			};
+		}
+
+		if (process.env.NODE_ENV === 'production') {
+			Sentry.captureException(exception);
 		}
 
 		if (exception instanceof HttpException) {

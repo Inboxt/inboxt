@@ -1,6 +1,7 @@
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import * as Sentry from '@sentry/nestjs';
 import cookieParser from 'cookie-parser';
 import { json } from 'express';
 import { Logger } from 'nestjs-pino';
@@ -9,6 +10,12 @@ import { type Config } from '~config/index';
 import { AppModule } from '~modules/app/app.module';
 
 async function bootstrap() {
+	if (process.env.NODE_ENV === 'production') {
+		Sentry.init({
+			dsn: process.env.API_ERRORS_DSN,
+		});
+	}
+
 	const app = await NestFactory.create<NestExpressApplication>(AppModule, { bufferLogs: true });
 	app.useLogger(app.get(Logger));
 

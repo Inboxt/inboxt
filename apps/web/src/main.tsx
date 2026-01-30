@@ -3,6 +3,7 @@ import './main.css';
 
 import { ApolloProvider } from '@apollo/client';
 import { ModalsProvider } from '@mantine/modals';
+import * as Sentry from '@sentry/react';
 import { RouterProvider } from '@tanstack/react-router';
 import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
@@ -27,6 +28,12 @@ import { StorageHelpModal } from '~modals/StorageHelpModal';
 import { VerifyEmailModal } from '~modals/VerifyEmailModal';
 
 import { router } from './router';
+
+if (import.meta.env.PROD) {
+	Sentry.init({
+		dsn: import.meta.env.VITE_ERRORS_DSN,
+	});
+}
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
 	<StrictMode>

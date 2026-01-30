@@ -30,6 +30,7 @@ jobs:
         run: npm run build --workspace=apps/web
         env:
           NODE_ENV: production
+          VITE_ERRORS_DSN: ${{ secrets.WEB_ERRORS_DSN }}
 
       - name: Deploy to VM
         uses: burnett01/rsync-deployments@v8

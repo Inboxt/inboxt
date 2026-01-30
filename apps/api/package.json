@@ -33,6 +33,7 @@
 		"@nestjs/platform-express": "11.1.9",
 		"@nestjs/schedule": "6.0.1",
 		"@prisma/client": "6.19.0",
+		"@sentry/nestjs": "^10.38.0",
 		"archiver": "7.0.1",
 		"argon2": "0.44.0",
 		"bullmq": "5.64.0",
