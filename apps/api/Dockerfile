@@ -8,8 +8,8 @@ COPY apps/api/package.json ./apps/api/
 COPY apps/web/package.json ./apps/web/
 COPY libs/common/package.json ./libs/common/
 
-# Install dependencies
-RUN npm ci --workspace=apps/api --workspace=apps/web --workspace=libs/common --include-workspace-root
+# Install dependencies for all workspaces
+RUN npm ci
 
 # Copy source code
 COPY apps/api ./apps/api
@@ -34,9 +34,13 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV TZ=UTC
 
-# Copy dependencies from builder
+# Copy ALL node_modules from builder to ensure symlinks and workspace deps are correct
 COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/package-lock.json ./package-lock.json
 COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/libs/common/package.json ./libs/common/package.json
+COPY --from=builder /app/apps/api/package.json ./apps/api/package.json
+COPY --from=builder /app/apps/web/package.json ./apps/web/package.json
 
 # Copy built artifacts
 COPY --from=builder /app/apps/api/dist ./dist
@@ -49,7 +53,6 @@ COPY --from=builder /app/apps/web/dist ./public
 
 # Copy shared libs (runtime)
 COPY --from=builder /app/libs/common/dist ./libs/common/dist
-COPY --from=builder /app/libs/common/package.json ./libs/common/package.json
 
 EXPOSE 7000
 
