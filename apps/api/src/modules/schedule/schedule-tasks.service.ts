@@ -17,11 +17,6 @@ export class ScheduleTasksService {
 		return this.scheduleTasksQueue.add('permanently-delete-saved-items', {});
 	}
 
-	@Cron(CronExpression.EVERY_HOUR)
-	async deleteExpiredDemoAccounts() {
-		return this.scheduleTasksQueue.add('delete-expired-demo-accounts', {});
-	}
-
 	@Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
 	async deleteExpiredUnsubscribedNewsletters() {
 		return this.scheduleTasksQueue.add('delete-expired-unsubscribed-newsletters', {});
@@ -30,15 +25,5 @@ export class ScheduleTasksService {
 	@Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
 	async lastReminderForUnverifiedUsers() {
 		return this.scheduleTasksQueue.add('last-reminder-for-unverified-users', {});
-	}
-
-	@Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
-	async reconcileStorageUsage() {
-		return this.scheduleTasksQueue.add('reconcile-storage-usage', {}, { priority: 5 });
-	}
-
-	@Cron(CronExpression.EVERY_HOUR)
-	async notifyStorageThresholds() {
-		return this.scheduleTasksQueue.add('notify-storage-thresholds', {}, { priority: 5 });
 	}
 }

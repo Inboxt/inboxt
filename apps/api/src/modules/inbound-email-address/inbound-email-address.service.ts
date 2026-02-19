@@ -1,11 +1,12 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { randomBytes } from 'crypto';
 import dayjs from 'dayjs';
 
-import { USER_INBOUND_EMAIL_ADDRESS_LIMIT } from '@inboxt/common';
 import { Prisma } from '@inboxt/prisma';
 
 import { AppException } from '~common/utils/app-exception';
+import { Config } from '~config/index';
 import { NewsletterSubscriptionManagerService } from '~managers/newsletter-subscription-manager/newsletter-subscription-manager.service';
 import { PrismaService } from '~modules/prisma/prisma.service';
 
@@ -14,6 +15,7 @@ export class InboundEmailAddressService {
 	constructor(
 		private readonly prisma: PrismaService,
 		private readonly newsletterSubscriptionManagerService: NewsletterSubscriptionManagerService,
+		private readonly configService: ConfigService<Config>,
 	) {}
 
 	private generateSlug(): string {
@@ -74,23 +76,21 @@ export class InboundEmailAddressService {
 	}
 
 	async create(userId: string) {
-		const existingInboundEmailAddresses = await this.getMany(userId, {
-			where: { deletedAt: null },
-		});
+		const localPart = this.generateSlug();
+		const domain = this.configService.get('inboundEmailAddressDomain', { infer: true });
 
-		if (existingInboundEmailAddresses.length >= USER_INBOUND_EMAIL_ADDRESS_LIMIT) {
+		if (!domain) {
 			throw new AppException(
-				'You have reached the maximum number of inbox newsletter emails',
-				HttpStatus.BAD_REQUEST,
+				'Inbound email addresses are not configured on this instance',
+				HttpStatus.SERVICE_UNAVAILABLE,
 			);
 		}
 
-		const localPart = this.generateSlug();
 		return this.prisma.inbound_email_address.create({
 			data: {
 				userId,
 				localPart,
-				fullAddress: `${localPart}@${process.env.INBOUND_EMAIL_ADDRESS_DOMAIN}`,
+				fullAddress: `${localPart}@${domain}`,
 			},
 		});
 	}

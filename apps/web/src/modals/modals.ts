@@ -124,17 +124,6 @@ export const modals = {
 		});
 	},
 
-	openStorageHelpModal: () => {
-		return mantineModals.openContextModal({
-			modal: 'storageHelp',
-			size: 540,
-			centered: true,
-			title: 'Free Up Storage',
-			innerProps: {},
-			className: 'fullscreen-modal',
-		});
-	},
-
 	openApiTokensModal: () => {
 		return mantineModals.openContextModal({
 			modal: 'apiTokens',

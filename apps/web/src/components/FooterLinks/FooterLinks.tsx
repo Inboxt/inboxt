@@ -4,37 +4,35 @@ import classes from './FooterLinks.module.css';
 
 type FooterLinksProps = {
 	separator?: string;
-	justify?: 'flex-start' | 'center';
+	position?: 'left' | 'center';
 };
 
-export const FooterLinks = ({ separator = '•', justify = 'flex-start' }: FooterLinksProps) => {
+export const FooterLinks = ({ separator = '•', position = 'left' }: FooterLinksProps) => {
 	return (
-		<Flex direction="column" wrap="wrap" gap="xs" align="center">
+		<Flex direction="column" wrap="wrap" gap="xs">
 			<Breadcrumbs
 				separator={separator}
 				classNames={{
 					separator: classes.separator,
 				}}
 				style={{
-					justifyContent: justify,
+					justifyContent: position === 'left' ? 'flex-start' : 'center',
 				}}
 			>
-				<Anchor fz="sm" href="mailto:support@inboxt.app">
+				<Anchor fz="sm" href="https://github.com/Inboxt/inboxt/issues">
 					Help
 				</Anchor>
 				<Anchor fz="sm" href="https://docs.inboxt.app">
 					Docs
 				</Anchor>
-				<Anchor fz="sm">Privacy</Anchor>
-				<Anchor fz="sm">Terms</Anchor>
 				<Anchor fz="sm" href="https://inboxt.app/roadmap">
 					Roadmap
 				</Anchor>
 			</Breadcrumbs>
 
-			<Text size="xs" c="dimmed">
+			<Text size="xs" c="dimmed" ta={position}>
 				<Anchor
-					href="https://github.com/inboxt/inboxt"
+					href="https://github.com/Inboxt/inboxt"
 					target="_blank"
 					rel="noopener noreferrer"
 					size="xs"

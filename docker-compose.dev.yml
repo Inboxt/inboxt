@@ -1,0 +1,69 @@
+services:
+  database:
+    container_name: "database"
+    image: postgres:18
+    ports:
+      - ${DATABASE_PORT}:${DATABASE_PORT}
+    environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_USER}
+      POSTGRES_DB: ${DATABASE_NAME}
+      TZ: "UTC"
+      PGTZ: "UTC"
+      PGUSER: "postgres"
+    volumes:
+      - db-data:/var/lib/postgresql
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  valkey:
+    image: valkey/valkey:8-alpine
+    container_name: "valkey"
+    ports:
+      - ${VALKEY_PORT}:${VALKEY_PORT}
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    container_name: "api"
+    restart: always
+    build:
+      context: .
+      dockerfile: ./apps/api/Dockerfile.dev
+    ports:
+      - ${API_PORT}:${API_PORT}
+    volumes:
+      - ./apps/api/src:/usr/src/app/apps/api/src:cached
+      - ./apps/api/prisma:/usr/src/app/apps/api/prisma:cached
+      - ./.env:/usr/src/app/.env:cached
+      - ./apps/api/migrations:/usr/src/app/apps/api/migrations:cached
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      TZ: "UTC"
+    depends_on:
+      database:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+        
+  mailpit:
+    image: axllent/mailpit
+    container_name: 'mailpit'
+    restart: always
+    ports:
+      - ${MAIL_PORT}:${MAIL_PORT}
+      - ${MAIL_WEB_PORT}:${MAIL_WEB_PORT}
+    environment:
+      MP_MAX_MESSAGES: 5000
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+
+volumes:
+  db-data:
+    driver: local

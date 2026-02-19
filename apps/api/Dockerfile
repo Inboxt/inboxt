@@ -1,26 +1,57 @@
-# Base image
-FROM node:24
+# ---- Build stage ----
+FROM node:24-alpine AS builder
+WORKDIR /app
 
-ENV TZ=UTC
-WORKDIR /usr/src/app
-
-# Copy package.json and other necessary files
-COPY package.json .
-COPY tsconfig*.json .
-COPY .env .
-
-# Copy the apps and libs folders
-COPY apps/api ./apps/api
-COPY libs/common ./libs/common
-
-# Making sure that prisma (with client) is copied over to dist directory, probably this part should be improved, but for now it is needed, as the app breaks without it
-COPY apps/api/prisma ./apps/api/dist/prisma
+# Copy dependency manifests
+COPY package.json package-lock.json ./
+COPY apps/api/package.json ./apps/api/
+COPY apps/web/package.json ./apps/web/
+COPY libs/common/package.json ./libs/common/
 
 # Install dependencies
-RUN npm install --workspace=apps/api --include-workspace-root=true
+RUN npm ci --workspace=apps/api --workspace=apps/web --workspace=libs/common --include-workspace-root
 
-# Build libs packages
+# Copy source code
+COPY apps/api ./apps/api
+COPY apps/web ./apps/web
+COPY libs ./libs
+COPY tsconfig*.json ./
+
+# Generate Prisma client
+RUN cd apps/api && npm run prisma:generate
+
+# Build
 RUN npm run build --workspace=libs/common
+RUN npm run build --workspace=apps/web
+RUN npm run build --workspace=apps/api
 
-# Start the API
-CMD [ "npm", "run", "start:dev", "--workspace=apps/api" ]
+# ---- Runtime stage ----
+FROM node:24-alpine
+RUN apk add --no-cache dumb-init wget
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV TZ=UTC
+
+# Copy dependencies from builder
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/node_modules ./node_modules
+
+# Copy built artifacts
+COPY --from=builder /app/apps/api/dist ./dist
+COPY --from=builder /app/apps/api/prisma ./prisma
+COPY --from=builder /app/apps/api/migrations ./migrations
+COPY --from=builder /app/apps/api/entrypoint.sh ./entrypoint.sh
+COPY --from=builder /app/apps/api/src/assets/* ./public/
+
+# Copy web assets
+COPY --from=builder /app/apps/web/dist ./public
+
+# Copy shared libs (runtime)
+COPY --from=builder /app/libs/common/dist ./libs/common/dist
+COPY --from=builder /app/libs/common/package.json ./libs/common/package.json
+
+EXPOSE 7000
+
+ENTRYPOINT ["dumb-init", "--", "./entrypoint.sh"]

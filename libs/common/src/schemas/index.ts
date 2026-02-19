@@ -10,5 +10,5 @@ export { createLabelSchema } from './createLabel.js';
 export { updateLabelSchema } from './updateLabel.js';
 export { createApiTokenSchema } from './createApiToken.js';
 export { addArticleFromHtmlSnapshotSchema } from './addArticleFromHtmlSnapshot.js';
-export { inboundEmailEventSchema } from './inboundEmailEvent.js';
+export { inboundEmailSchema } from './inboundEmail.js';
 export { createHighlightSchema } from './createHighlight.js';

@@ -1,28 +1,34 @@
 import { GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
+import { AppException } from '~common/utils/app-exception';
 import { Config } from '~config/index';
 
 @Injectable()
 export class S3StorageService {
-	private readonly s3: S3Client;
-	private readonly bucket: string;
+	private readonly s3?: S3Client;
+	private readonly bucket?: string;
 
 	constructor(private readonly configService: ConfigService<Config>) {
-		const storageConfig = this.configService.getOrThrow('storage', { infer: true });
+		const storageConfig = this.configService.get('storage', { infer: true });
+		if (storageConfig && storageConfig.bucket && storageConfig.accessKeyId) {
+			this.bucket = storageConfig.bucket;
+			this.s3 = new S3Client({
+				region: storageConfig.region,
+				endpoint: storageConfig.endpoint,
+				credentials: {
+					accessKeyId: storageConfig.accessKeyId,
+					secretAccessKey: storageConfig.secretAccessKey!,
+				},
+				forcePathStyle: true,
+			});
+		}
+	}
 
-		this.bucket = storageConfig.bucket;
-		this.s3 = new S3Client({
-			region: storageConfig.region,
-			endpoint: storageConfig.endpoint,
-			credentials: {
-				accessKeyId: storageConfig.accessKeyId,
-				secretAccessKey: storageConfig.secretAccessKey,
-			},
-			forcePathStyle: true,
-		});
+	isConfigured(): boolean {
+		return !!this.s3 && !!this.bucket;
 	}
 
 	async upload(params: {
@@ -31,6 +37,10 @@ export class S3StorageService {
 		contentType?: string;
 		acl?: 'private' | 'public-read';
 	}) {
+		if (!this.s3 || !this.bucket) {
+			throw new AppException('S3 Storage is not configured', HttpStatus.SERVICE_UNAVAILABLE);
+		}
+
 		await this.s3.send(
 			new PutObjectCommand({
 				Bucket: this.bucket,
@@ -45,6 +55,10 @@ export class S3StorageService {
 	}
 
 	async getSignedDownloadUrl(key: string) {
+		if (!this.s3 || !this.bucket) {
+			throw new AppException('S3 Storage is not configured', HttpStatus.SERVICE_UNAVAILABLE);
+		}
+
 		return await getSignedUrl(
 			this.s3,
 			new GetObjectCommand({ Bucket: this.bucket, Key: key }),

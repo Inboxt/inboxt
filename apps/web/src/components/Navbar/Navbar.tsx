@@ -11,7 +11,6 @@ import {
 } from '@tabler/icons-react';
 import { clsx } from 'clsx';
 
-import { AppNotifications } from '~components/AppNotifications';
 import { useScreenQuery } from '~hooks/useScreenQuery';
 import { LABELS } from '~lib/graphql';
 import { formatLabelForQuery } from '~utils/formatLabelForQuery.ts';
@@ -140,8 +139,7 @@ export const Navbar = ({ opened, toggle }: NavbarProps) => {
 			<Box className={classes.mobileNavMain}>{navLinks}</Box>
 
 			<Box bg="body">
-				<AppNotifications maxHeight={143} />
-				<FooterLinks justify="center" />
+				<FooterLinks position="center" />
 			</Box>
 		</Drawer>
 	);

@@ -35,7 +35,7 @@ export const passwordChangedTemplate = ({ timestamp }: { timestamp: string }) =>
 					1. Requesting another password reset
 				</mj-text>
 				<mj-text padding-top="0">
-					2. Contacting our support team if needed
+					2. Contacting the administrator of this instance if needed
 				</mj-text>
 			</mj-column>
 		</mj-section>

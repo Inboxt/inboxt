@@ -6,7 +6,6 @@ import { Prisma } from '@inboxt/prisma';
 
 import { AppException } from '~common/utils/app-exception';
 import { PrismaService } from '~modules/prisma/prisma.service';
-import { QuotaOptions, StorageQuotaService } from '~modules/storage/storage-quota.service';
 import { ContentExtractionService } from '~services/content-extraction.service';
 
 export type ProcessNewsletterInput = {
@@ -19,10 +18,48 @@ export class NewsletterService {
 	constructor(
 		private readonly prisma: PrismaService,
 		private readonly contentExtractionService: ContentExtractionService,
-		private readonly storageQuota: StorageQuotaService,
 	) {}
 
+	extractRecipient(payload: any): string | null {
+		if (payload.recipient) {
+			return payload.recipient;
+		}
+
+		const toAddresses: string[] = payload.recipients?.length
+			? payload.recipients
+			: (payload.headers?.To ?? []);
+
+		return toAddresses?.[0] ?? null;
+	}
+
+	extractSubject(payload: any): string | null {
+		if (payload.subject) {
+			return payload.subject;
+		}
+		return payload.headers?.Subject?.[0] ?? null;
+	}
+
+	extractEventId(payload: any): string | null {
+		return payload.eventId || payload._id || null;
+	}
+
+	extractMessageId(payload: any): string | null {
+		return payload.messageId || payload.message_id || null;
+	}
+
+	extractHtml(payload: any): string | null {
+		return payload.html || payload.body?.stripped_html || payload.body?.html || null;
+	}
+
+	extractText(payload: any): string | null {
+		return payload.text || payload.body?.stripped_plaintext || payload.body?.plaintext || null;
+	}
+
 	extractUnsubscribeUrl(payload: any): string | null {
+		if (payload.unsubscribeUrl) {
+			return payload.unsubscribeUrl;
+		}
+
 		const header = payload.headers?.['List-Unsubscribe']?.[0];
 		if (header) {
 			const matches = header.match(/<([^>]+)>/g);
@@ -52,6 +89,10 @@ export class NewsletterService {
 	}
 
 	extractAuthor(payload: any): string {
+		if (payload.from) {
+			return payload.from;
+		}
+
 		const fromHeader = payload.headers?.From?.[0]?.trim();
 		const envelopeSender = payload.envelope_sender?.trim();
 
@@ -92,9 +133,7 @@ export class NewsletterService {
 			| 'newsletter_subscription'
 		>,
 		tx?: Prisma.TransactionClient,
-		opts?: QuotaOptions,
 	) {
-		const skipQuota = opts?.skipQuota ?? false;
 		const run = async (client: Prisma.TransactionClient) => {
 			const owner = await client.saved_item.findUnique({
 				where: { id: savedItemId },
@@ -105,31 +144,13 @@ export class NewsletterService {
 				throw new AppException('Saved item not found', HttpStatus.NOT_FOUND);
 			}
 
-			const sizeBytes = skipQuota
-				? 0n
-				: this.storageQuota.computeSizeBytes({
-						contentHtml: data.contentHtml,
-						contentText: data.contentText,
-					});
-
-			if (!skipQuota) {
-				await this.storageQuota.ensureWithinQuota(owner.userId, sizeBytes);
-			}
-
-			const created = await client.newsletter.create({
+			return client.newsletter.create({
 				data: {
 					...data,
 					savedItemId,
 					inboundEmailAddressId: inboundEmailAddressId ?? null,
-					sizeBytes,
 				},
 			});
-
-			if (!skipQuota) {
-				await this.storageQuota.incrementUsage(client, owner.userId, sizeBytes);
-			}
-
-			return created;
 		};
 
 		if (tx) {

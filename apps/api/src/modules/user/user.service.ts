@@ -1,4 +1,5 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { hash } from 'argon2';
 import dayjs from 'dayjs';
 
@@ -9,15 +10,13 @@ import {
 	EMAIL_ACCOUNT_DELETED,
 	EMAIL_CHANGED_EMAIL,
 	EMAIL_VERIFY,
-	EMAIL_WELCOME,
 } from '~common/constants/email.constants';
-import { UserPlan } from '~common/enums/user-plan.enum';
 import { AppException } from '~common/utils/app-exception';
 import { generateAuthCode } from '~common/utils/generateAuthCode';
+import { Config } from '~config/index';
 import { accountDeletedTemplate } from '~mail-templates/accountDeletedTemplate';
 import { emailChangedTemplate } from '~mail-templates/emailChangedTemplate';
 import { verifyEmailTemplate } from '~mail-templates/verifyEmailTemplate';
-import { welcomeTemplate } from '~mail-templates/welcomeTemplate';
 import { NewsletterSubscriptionManagerService } from '~managers/newsletter-subscription-manager/newsletter-subscription-manager.service';
 import { InboundEmailAddressService } from '~modules/inbound-email-address/inbound-email-address.service';
 import { MailService } from '~modules/mail/mail.service';
@@ -34,6 +33,7 @@ export class UserService {
 		private readonly mailService: MailService,
 		private readonly inboundEmailAddressService: InboundEmailAddressService,
 		private readonly newsletterSubscriptionManagerService: NewsletterSubscriptionManagerService,
+		private readonly configService: ConfigService<Config>,
 	) {}
 
 	async get(query: Prisma.userFindFirstArgs) {
@@ -136,23 +136,12 @@ export class UserService {
 	}
 
 	async create(data: CreateAccountInput) {
-		const user = await this.prisma.user.create({
-			data,
-		});
-
-		await this.mailService.sendTemplate({
-			to: data.emailAddress,
-			subject: EMAIL_WELCOME.subject,
-			template: welcomeTemplate,
-			templateData: {},
-		});
-
-		return user;
-	}
-
-	async createDemoAccount(data: Prisma.userCreateInput) {
+		const securityConfig = this.configService.getOrThrow('security', { infer: true });
 		return this.prisma.user.create({
-			data,
+			data: {
+				...data,
+				isEmailVerified: !securityConfig.requireEmailVerification,
+			},
 		});
 	}
 
@@ -174,11 +163,18 @@ export class UserService {
 			existingUser.emailAddress !== parsedEmailAddress && !!emailAddress;
 
 		if (withEmailAddressChange) {
+			const requireVerification = this.configService.getOrThrow(
+				'security.requireEmailVerification',
+				{
+					infer: true,
+				},
+			);
+
 			await this.prisma.user.update({
 				where: { id },
 				data: {
 					pendingEmailAddress: parsedEmailAddress,
-					isEmailVerified: false,
+					isEmailVerified: !requireVerification,
 				},
 			});
 
@@ -186,7 +182,9 @@ export class UserService {
 				return;
 			}
 
-			await this.sendVerificationEmail(id, true);
+			if (requireVerification) {
+				await this.sendVerificationEmail(id, true);
+			}
 		}
 
 		return this.prisma.user.update({
@@ -196,11 +194,22 @@ export class UserService {
 	}
 
 	async sendVerificationEmail(userId: string, isEmailChange = false) {
+		const requireVerification = this.configService.getOrThrow(
+			'security.requireEmailVerification',
+			{
+				infer: true,
+			},
+		);
+
+		if (!requireVerification) {
+			return;
+		}
+
 		const existingUser = await this.get({
 			where: { id: userId },
 		});
 
-		if (!existingUser || existingUser?.isEmailVerified || existingUser.plan === UserPlan.DEMO) {
+		if (!existingUser || existingUser?.isEmailVerified) {
 			throw new AppException(
 				'There was an issue with your email verification request',
 				HttpStatus.BAD_REQUEST,

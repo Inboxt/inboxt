@@ -1,5 +1,5 @@
 import { useMutation } from '@apollo/client';
-import { Anchor, Button, Divider, PasswordInput, Stack, Text, TextInput } from '@mantine/core';
+import { Button, PasswordInput, Stack, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconAt, IconLock, IconMail } from '@tabler/icons-react';
 import { useLocation, useNavigate } from '@tanstack/react-router';
@@ -70,12 +70,6 @@ export const FormCreateAccount = ({ handleChangeAuthMode }: AuthViewProps) => {
 
 					{error}
 
-					<Text fz="sm">
-						By creating an account you agree to the{' '}
-						<Anchor fz="sm">Terms of Service</Anchor> and{' '}
-						<Anchor fz="sm">Privacy Policy</Anchor>.
-					</Text>
-
 					<ButtonContainer mt="xl">
 						<Button
 							variant="default"
@@ -92,12 +86,6 @@ export const FormCreateAccount = ({ handleChangeAuthMode }: AuthViewProps) => {
 							Create account
 						</Button>
 					</ButtonContainer>
-
-					<Divider my="xxs" />
-
-					<Text fz="sm" ta="center">
-						Having trouble? <Anchor fz="sm">Contact support</Anchor>
-					</Text>
 				</Stack>
 			)}
 		</Form>

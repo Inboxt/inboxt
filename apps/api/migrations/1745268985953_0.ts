@@ -6,7 +6,6 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 	pgm.createExtension('pgcrypto', { ifNotExists: true });
 
 	pgm.createType('saved_item_type', ['NEWSLETTER', 'ARTICLE']);
-	pgm.createType('user_plan', ['DEMO', 'FREE']);
 	pgm.createType('saved_item_status', ['ACTIVE', 'ARCHIVED', 'DELETED']);
 	pgm.createType('newsletter_subscription_status', ['ACTIVE', 'UNSUBSCRIBED']);
 
@@ -33,11 +32,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 		emailVerifyExpiry: 'timestamptz',
 		resetPasswordCode: 'text',
 		resetPasswordExpiry: 'timestamptz',
-		plan: { type: 'user_plan', notNull: true, default: 'FREE' },
 		lastExportAt: 'timestamptz',
-		storageUsageBytes: { type: 'bigint', notNull: true, default: 0 },
-		storageQuotaBytes: { type: 'bigint', notNull: true, default: 104_857_600 },
-		lastNotifiedStorageThreshold: { type: 'integer', notNull: true, default: 0 },
 	});
 
 	pgm.createTable('saved_item', {
@@ -75,7 +70,6 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 			default: 'ACTIVE',
 		},
 		deletedSince: 'timestamptz',
-		sizeBytes: { type: 'bigint', notNull: true, default: 0 },
 	});
 
 	pgm.createIndex('saved_item', 'userId');
@@ -89,7 +83,6 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 		},
 		contentHtml: { type: 'text', notNull: true },
 		contentText: { type: 'text', notNull: true },
-		sizeBytes: { type: 'bigint', notNull: true, default: 0 },
 	});
 
 	pgm.createTable('label', {
@@ -220,7 +213,6 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 			references: 'newsletter_subscription',
 			onDelete: 'SET NULL',
 		},
-		sizeBytes: { type: 'bigint', notNull: true, default: 0 },
 	});
 
 	pgm.createIndex('newsletter', 'messageId');
@@ -276,7 +268,6 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 		endOffset: { type: 'integer', notNull: true },
 		afterText: { type: 'text', notNull: true },
 		text: 'text',
-		sizeBytes: { type: 'bigint', notNull: true, default: 0 },
 	});
 
 	pgm.createIndex('highlight_segment', 'highlightId');
@@ -341,7 +332,6 @@ export async function down(pgm: MigrationBuilder): Promise<void> {
 	// Drop custom types
 	pgm.dropType('newsletter_subscription_status');
 	pgm.dropType('saved_item_status');
-	pgm.dropType('user_plan');
 	pgm.dropType('saved_item_type');
 
 	// Drop extensions

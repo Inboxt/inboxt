@@ -3,7 +3,6 @@ import { EMAIL_CHANGED_EMAIL } from '~common/constants/email.constants';
 import alert from './elements/alert';
 import appHeader from './elements/appHeader';
 import baseStyles from './elements/baseStyles';
-import button from './elements/button';
 import footer from './elements/footer';
 import header from './elements/header';
 
@@ -45,13 +44,8 @@ export const emailChangedTemplate = ({
 				</mj-text>
 				
 				<mj-text>
-					<strong>Did not change your email address?</strong> If you didn't make this change, your account may have been compromised. Please contact our support team for assistance.
+					<strong>Did not change your email address?</strong> If you didn't make this change, your account may have been compromised.
 				</mj-text>
-				
-				${button({
-					text: 'Contact Support',
-					url: 'mailto:support@inboxt.app',
-				})}
 			</mj-column>
 		</mj-section>
 		

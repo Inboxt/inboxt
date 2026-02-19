@@ -28,7 +28,7 @@ export const exportReadyTemplate = ({ downloadUrl }: { downloadUrl: string }) =>
 					<li>Labels</li>
 					<li>Metadata associated with your account</li>
 				</ul>
-				You can download it using the button below. The link will expire in 24 hours, and the file will be automatically deleted from our servers after 3 days.
+				You can download it using the button below. The link will expire in 24 hours.
 			</mj-text>
 			
 			<mj-text font-size="14px" color="#666666">
@@ -40,10 +40,6 @@ export const exportReadyTemplate = ({ downloadUrl }: { downloadUrl: string }) =>
 			<mj-text font-size="14px" color="#666666">
 				If the button doesn't work, copy and paste this URL into your browser:<br/>
 				<a href="${downloadUrl}">${downloadUrl}</a>
-			</mj-text>
-			
-			<mj-text font-size="14px" color="#666666">
-				Need help or didn’t request this export? Contact support at <a href="mailto:support@inboxt.app">support@inboxt.app</a>.
 			</mj-text>
 		</mj-column>
 	</mj-section>

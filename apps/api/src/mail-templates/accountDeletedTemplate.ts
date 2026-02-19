@@ -26,7 +26,7 @@ export const accountDeletedTemplate = ({ timestamp }: { timestamp: string }) => 
 				</mj-text>
 				
 				<mj-text>
-					All your personal data, including saved articles, newsletter subscriptions, reading preferences, and account information, have been permanently removed from our systems in accordance with our privacy policy.
+					All your personal data, including saved articles, newsletter subscriptions, reading preferences, and account information, have been permanently removed from this instance.
 				</mj-text>
 				
 				${alert({
@@ -35,16 +35,16 @@ export const accountDeletedTemplate = ({ timestamp }: { timestamp: string }) => 
 				})}
 				
 				<mj-text>
-					We're sorry to see you go. If you'd like to provide feedback on why you decided to delete your account, please reply to this email. Your insights help us improve our service.
+					We're sorry to see you go.
 				</mj-text>
 				
 				<mj-text>
-					If you deleted your account by mistake or wish to create a new account in the future, you can always register again at <a href="${process.env.WEB_URL as string}">inboxt.app</a>.
+					If you deleted your account by mistake or wish to create a new account in the future, you can always register again.
 				</mj-text>
 				
 				${button({
 					text: 'Create New Account',
-					url: `${process.env.WEB_URL as string}/auth?mode=signup`,
+					url: `${process.env.APP_URL || process.env.API_URL}/auth?mode=signup`,
 				})}
 			</mj-column>
 		</mj-section>

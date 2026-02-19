@@ -6,7 +6,6 @@ import { Prisma } from '@inboxt/prisma';
 import { GetSavedItemsQuery } from '~common/types';
 import { AppException } from '~common/utils/app-exception';
 import { PrismaService } from '~modules/prisma/prisma.service';
-import { QuotaOptions, StorageQuotaService } from '~modules/storage/storage-quota.service';
 
 import { LabelService } from './entities/label/label.service';
 
@@ -15,7 +14,6 @@ export class SavedItemService {
 	constructor(
 		private readonly prisma: PrismaService,
 		private readonly labelService: LabelService,
-		private readonly storageQuota: StorageQuotaService,
 	) {}
 
 	async get(
@@ -171,30 +169,9 @@ export class SavedItemService {
 	async create(
 		userId: string,
 		data: Omit<Prisma.saved_itemCreateArgs['data'], 'userId' | 'user'>,
-		opts?: QuotaOptions,
 	) {
-		const skipQuota = opts?.skipQuota ?? false;
-		const sizeBytes = skipQuota
-			? 0n
-			: this.storageQuota.computeSizeBytes({
-					title: data.title,
-					description: data.description ?? '',
-				});
-
-		return this.prisma.$transaction(async (tx) => {
-			if (!skipQuota) {
-				await this.storageQuota.ensureWithinQuota(userId, sizeBytes);
-			}
-
-			const created = await tx.saved_item.create({
-				data: { ...data, userId, sizeBytes },
-			});
-
-			if (!skipQuota) {
-				await this.storageQuota.incrementUsage(tx, userId, sizeBytes);
-			}
-
-			return created;
+		return this.prisma.saved_item.create({
+			data: { ...data, userId },
 		});
 	}
 
@@ -203,49 +180,19 @@ export class SavedItemService {
 		id: string,
 		data: Omit<Prisma.saved_itemUpdateArgs['data'], 'id' | 'userId'>,
 		tx?: Prisma.TransactionClient,
-		opts?: QuotaOptions,
 	) {
-		const skipQuota = opts?.skipQuota ?? false;
-
 		const run = async (client: Prisma.TransactionClient) => {
 			const existingItem = await this.get(userId, { where: { id } }, client);
 			if (!existingItem) {
 				throw new AppException('Item not found', HttpStatus.NOT_FOUND);
 			}
 
-			const newSizeBytes = skipQuota
-				? existingItem.sizeBytes
-				: this.storageQuota.computeSizeBytes({
-						title:
-							data.title !== undefined ? (data.title as string) : existingItem.title,
-						description:
-							data.description !== undefined
-								? (data.description as string)
-								: (existingItem.description ?? ''),
-					});
-
-			const delta = skipQuota ? 0n : newSizeBytes - existingItem.sizeBytes;
-			if (!skipQuota && delta > 0n) {
-				await this.storageQuota.ensureWithinQuota(userId, delta);
-			}
-
-			const updated = await client.saved_item.update({
+			return client.saved_item.update({
 				where: { id, userId },
 				data: {
 					...data,
-					sizeBytes: newSizeBytes,
 				},
 			});
-
-			if (!skipQuota) {
-				if (delta > 0n) {
-					await this.storageQuota.incrementUsage(client, userId, delta);
-				} else if (delta < 0n) {
-					await this.storageQuota.decrementUsage(client, userId, -delta);
-				}
-			}
-
-			return updated;
 		};
 
 		if (tx) {
@@ -321,36 +268,6 @@ export class SavedItemService {
 		});
 	}
 
-	private async permanentlyDeleteSavedItemTx(
-		tx: Prisma.TransactionClient,
-		userId: string,
-		savedItem: { id: string; sizeBytes: bigint },
-	) {
-		const article = await tx.article.findUnique({
-			where: { savedItemId: savedItem.id, saved_item: { userId } },
-			select: { sizeBytes: true },
-		});
-
-		const newsletter = await tx.newsletter.findUnique({
-			where: { savedItemId: savedItem.id, saved_item: { userId } },
-			select: { sizeBytes: true },
-		});
-
-		const highlightSegmentsAgg = await tx.highlight_segment.aggregate({
-			where: { highlight: { savedItemId: savedItem.id, saved_item: { userId } } },
-			_sum: { sizeBytes: true },
-		});
-
-		const total =
-			savedItem.sizeBytes +
-			(article?.sizeBytes ?? 0n) +
-			(newsletter?.sizeBytes ?? 0n) +
-			(highlightSegmentsAgg._sum.sizeBytes ?? 0n);
-
-		await tx.saved_item.delete({ where: { id: savedItem.id } });
-		return total;
-	}
-
 	async delete(userId: string, id: string) {
 		const savedItem = await this.get(userId, {
 			where: { id, userId, status: 'DELETED', deletedSince: { not: null } },
@@ -363,15 +280,7 @@ export class SavedItemService {
 			);
 		}
 
-		return this.prisma.$transaction(async (tx) => {
-			const total = await this.permanentlyDeleteSavedItemTx(tx, userId, savedItem);
-
-			if (total > 0n) {
-				await this.storageQuota.decrementUsage(tx, userId, total);
-			}
-
-			return { id };
-		});
+		return this.prisma.saved_item.delete({ where: { id, userId } });
 	}
 
 	async emptyTrash(userId: string) {
@@ -383,18 +292,10 @@ export class SavedItemService {
 			return 0;
 		}
 
-		return this.prisma.$transaction(async (tx) => {
-			let totalFreed = 0n;
+		for (const item of trashedItems) {
+			await this.prisma.saved_item.delete({ where: { id: item.id, userId } });
+		}
 
-			for (const item of trashedItems) {
-				totalFreed += await this.permanentlyDeleteSavedItemTx(tx, userId, item);
-			}
-
-			if (totalFreed > 0n) {
-				await this.storageQuota.decrementUsage(tx, userId, totalFreed);
-			}
-
-			return trashedItems.length;
-		});
+		return trashedItems.length;
 	}
 }

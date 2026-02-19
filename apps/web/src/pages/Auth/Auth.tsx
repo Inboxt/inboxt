@@ -1,8 +1,7 @@
-import { Anchor, Box, Button, Center, Flex, Group, Stack, Text, Title } from '@mantine/core';
+import { Box, Button, Center, Flex, Group, Stack, Text, Title } from '@mantine/core';
 import { useNavigate, useLocation, useSearch } from '@tanstack/react-router';
 
 import { AppName } from '~components/AppName';
-import { DemoLogin } from '~components/DemoLogin';
 import { FooterLinks } from '~components/FooterLinks';
 import { FormCreateAccount } from '~forms/FormCreateAccount';
 import { FormForgotPassword } from '~forms/FormForgotPassword';
@@ -40,7 +39,7 @@ export const Auth = () => {
 						</Title>
 					</Stack>
 
-					<Stack>
+					<Stack miw={220}>
 						<Button size="md" onClick={() => handleChangeAuthMode('signup')}>
 							Create account
 						</Button>
@@ -51,17 +50,6 @@ export const Auth = () => {
 						>
 							Sign In
 						</Button>
-
-						<Anchor
-							variant="transparent"
-							size="compact-md"
-							c="dimmed"
-							mt="xs"
-							onClick={() => handleChangeAuthMode('demo')}
-							component="button"
-						>
-							Just curious? Try the demo first!
-						</Anchor>
 					</Stack>
 
 					<Box
@@ -73,7 +61,7 @@ export const Auth = () => {
 						className={classes.loginFooter}
 					>
 						<Group p="md" pt="xxs" justify="center">
-							<FooterLinks separator="" />
+							<FooterLinks separator="" position="center" />
 						</Group>
 					</Box>
 				</Flex>
@@ -97,11 +85,6 @@ export const Auth = () => {
 		case 'forgot-password':
 			title = 'Forgot Password';
 			description = "Let's get your password reset!";
-			break;
-
-		case 'demo':
-			title = 'Demo Account';
-			description = 'Not sure if you will like it? Try it now!';
 			break;
 	}
 
@@ -131,7 +114,6 @@ export const Auth = () => {
 					{mode === 'forgot-password' && (
 						<FormForgotPassword handleChangeAuthMode={handleChangeAuthMode} />
 					)}
-					{mode === 'demo' && <DemoLogin handleChangeAuthMode={handleChangeAuthMode} />}
 				</Stack>
 			</Box>
 		</Flex>
