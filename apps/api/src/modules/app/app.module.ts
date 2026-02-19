@@ -5,7 +5,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ScheduleModule } from '@nestjs/schedule';
+import { ServeStaticModule } from '@nestjs/serve-static';
 import { LoggerModule } from 'nestjs-pino';
+import { join } from 'path';
 
 import { GlobalExceptionFilter } from '~common/exception-filters/global-exception.filter';
 import { AccountGuard } from '~common/guards/account.guard';
@@ -35,6 +37,10 @@ import { AppService } from './app.service';
 
 @Module({
 	imports: [
+		ServeStaticModule.forRoot({
+			rootPath: join(__dirname, '..', '..', '..', 'public'),
+			exclude: ['/api/(.*)', '/graphql'],
+		}),
 		ConfigModule.forRoot({
 			isGlobal: true,
 			load: [config],

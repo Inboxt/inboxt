@@ -1,12 +1,13 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import * as cheerio from 'cheerio';
 
 import { MAX_ARTICLE_WORD_COUNT } from '@inboxt/common';
 import { Prisma } from '@inboxt/prisma';
 
 import { AppException } from '~common/utils/app-exception';
+import { Config } from '~config/index';
 import { PrismaService } from '~modules/prisma/prisma.service';
-import { QuotaOptions, StorageQuotaService } from '~modules/storage/storage-quota.service';
 import { ContentExtractionService } from '~services/content-extraction.service';
 
 export type ProcessArticleInput =
@@ -19,7 +20,7 @@ export class ArticleService {
 	constructor(
 		private readonly prisma: PrismaService,
 		private readonly contentExtractionService: ContentExtractionService,
-		private readonly storageQuota: StorageQuotaService,
+		private readonly configService: ConfigService<Config>,
 	) {}
 
 	/* ------------ Private Helpers ------------ */
@@ -97,9 +98,7 @@ export class ArticleService {
 		savedItemId: string,
 		data: Omit<Prisma.articleCreateInput, 'savedItemId' | 'saved_item'>,
 		tx?: Prisma.TransactionClient,
-		opts?: QuotaOptions,
 	) {
-		const skipQuota = opts?.skipQuota ?? false;
 		const run = async (client: Prisma.TransactionClient) => {
 			const owner = await client.saved_item.findUnique({
 				where: { id: savedItemId },
@@ -110,26 +109,9 @@ export class ArticleService {
 				throw new AppException('Saved item not found', HttpStatus.NOT_FOUND);
 			}
 
-			const sizeBytes = skipQuota
-				? 0n
-				: this.storageQuota.computeSizeBytes({
-						contentHtml: data.contentHtml,
-						contentText: data.contentText,
-					});
-
-			if (!skipQuota) {
-				await this.storageQuota.ensureWithinQuota(owner.userId, sizeBytes);
-			}
-
-			const created = await client.article.create({
-				data: { ...data, savedItemId, sizeBytes },
+			return client.article.create({
+				data: { ...data, savedItemId },
 			});
-
-			if (!skipQuota) {
-				await this.storageQuota.incrementUsage(client, owner.userId, sizeBytes);
-			}
-
-			return created;
 		};
 
 		if (tx) {
@@ -154,7 +136,9 @@ export class ArticleService {
 
 		if (input.url) {
 			const { hostname } = new URL(input.url);
-			const appHostname = process.env.WEB_URL ? new URL(process.env.WEB_URL).hostname : null;
+			const appUrl = this.configService.getOrThrow('appUrl', { infer: true });
+			const appHostname = appUrl ? new URL(appUrl).hostname : null;
+
 			if (appHostname && hostname === appHostname) {
 				throw new AppException(
 					'This page is part of the Inboxt app and can’t be saved for later. Try saving articles from external sites instead.',

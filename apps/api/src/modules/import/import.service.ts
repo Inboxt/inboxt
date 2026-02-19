@@ -8,7 +8,7 @@ import fg from 'fast-glob';
 import { createReadStream, promises as fs } from 'fs';
 import unzipper from 'unzipper';
 
-import { APP_PRIMARY_COLOR, USER_LABELS_LIMIT } from '@inboxt/common';
+import { APP_PRIMARY_COLOR } from '@inboxt/common';
 import { saved_item_status } from '@inboxt/prisma';
 
 import { ImportType } from '~common/enums/import-type.enum';
@@ -109,7 +109,6 @@ export class ImportService {
 		const existing = await this.labelService.getMany(userId, {});
 		const byName = new Map(existing.map((l) => [l.name, l.id]));
 
-		let count = existing.length;
 		const map = new Map<string, string>(byName);
 
 		for (const l of labelsFromExport) {
@@ -122,17 +121,11 @@ export class ImportService {
 				continue;
 			}
 
-			if (count >= USER_LABELS_LIMIT) {
-				this.logger.warn(`Label limit reached. Skipping label: ${name}`);
-				continue;
-			}
-
 			const created = await this.labelService.create(userId, {
 				name,
 				color: l.color || APP_PRIMARY_COLOR,
 			});
 
-			count += 1;
 			map.set(name, created.id);
 		}
 

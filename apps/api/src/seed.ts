@@ -9,7 +9,6 @@ dotenv.config({
 import { PrismaClient } from '@inboxt/prisma';
 
 import { SavedItemType } from '~common/enums/saved-item-type.enum';
-import { UserPlan } from '~common/enums/user-plan.enum';
 
 const prisma = new PrismaClient();
 
@@ -55,16 +54,15 @@ async function seedUsers() {
 	logStep('Seeding users...');
 
 	// Demo account
-	const demoAccountData = {
-		emailAddress: 'demo@inboxt.app',
+	const defaultAccountData = {
+		emailAddress: 'default@inboxt.app',
 		password: await hash('Password1@'),
 		isEmailVerified: true,
-		username: 'demo',
-		plan: UserPlan.DEMO,
+		username: 'default',
 	};
 
 	const demo = await prisma.user.create({
-		data: demoAccountData,
+		data: defaultAccountData,
 	});
 
 	logSuccess('Users seeded');

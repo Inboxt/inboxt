@@ -6,7 +6,7 @@ export const EMAIL_ACCOUNT_DELETED = {
 export const EMAIL_CHANGED_EMAIL = {
 	subject: 'Your Inboxt email address has been changed',
 	description: ({ oldEmail, newEmail }: { oldEmail: string; newEmail: string }) =>
-		`Email changed from ${oldEmail} to ${newEmail}. Contact support if this wasn’t you.`,
+		`Email changed from ${oldEmail} to ${newEmail}.`,
 };
 
 export const EMAIL_FORWARDED = {
@@ -18,8 +18,7 @@ export const EMAIL_FORWARDED = {
 
 export const EMAIL_CHANGED_PASSWORD = {
 	subject: 'Your Inboxt password has been changed',
-	description:
-		'Password changed successfully. Contact support immediately if you didn’t make this change.',
+	description: 'Password changed successfully.',
 };
 
 export const EMAIL_RESET_PASSWORD = {
@@ -38,26 +37,7 @@ export const EMAIL_VERIFY = {
 	description: 'Use the code to verify your email and unlock all Inboxt features.',
 };
 
-export const EMAIL_WELCOME = {
-	subject: 'Welcome to Inboxt!',
-	description:
-		'Explore your new account and see how Inboxt helps you save and read content distraction-free.',
-};
-
 export const EMAIL_EXPORT_READY = {
 	subject: 'Your Inboxt data export is ready',
-	description:
-		'Download your ZIP archive. The link will expire in 24 hours. The file will be automatically deleted from our servers after 3 days.',
-};
-
-export const EMAIL_STORAGE_APPROACHING_LIMIT = {
-	subject: 'You’re nearing your Inboxt storage limit',
-	description:
-		'You have used most of your storage quota. Consider freeing up space to avoid interruptions.',
-};
-
-export const EMAIL_STORAGE_LIMIT_REACHED = {
-	subject: 'You’ve reached your Inboxt storage limit',
-	description:
-		'Your storage quota has been fully used. Some actions may be restricted until you free up space.',
+	description: 'Download your ZIP archive. The link will expire in 24 hours.',
 };

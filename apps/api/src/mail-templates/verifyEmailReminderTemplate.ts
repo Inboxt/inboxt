@@ -30,14 +30,14 @@ export const verifyEmailReminderTemplate = ({ daysRemaining }: { daysRemaining: 
 					To keep your account, saved items, and unlock all features, please log in and request a new verification code:
 				</mj-text>
 				
-				${button({ text: 'Log In Now', url: `${process.env.WEB_URL as string}/auth?mode=login` })}
+				${button({ text: 'Log In Now', url: `${process.env.APP_URL || process.env.API_URL}/auth?mode=login` })}
 				
 				<mj-text>
 					If your email remains unverified, your account and any saved items will be automatically deleted in <strong>${daysRemaining} days</strong>.
 				</mj-text>
 				
 				<mj-text>
-					If you're having trouble with the verification process, you can contact our support team for help.
+					If you're having trouble with the verification process, please contact the administrator of this instance.
 				</mj-text>
 				
 				<mj-text  align="center" font-size="14px" padding-top="20px">

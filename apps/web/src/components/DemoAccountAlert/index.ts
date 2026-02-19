@@ -1,1 +1,0 @@
-export { DemoAccountAlert } from './DemoAccountAlert';

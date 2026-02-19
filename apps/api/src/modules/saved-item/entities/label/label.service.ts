@@ -1,6 +1,6 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 
-import { createLabelSchema, updateLabelSchema, USER_LABELS_LIMIT } from '@inboxt/common';
+import { createLabelSchema, updateLabelSchema } from '@inboxt/common';
 import { Prisma } from '@inboxt/prisma';
 
 import { AppException } from '~common/utils/app-exception';
@@ -24,17 +24,6 @@ export class LabelService {
 
 	async create(userId: string, data: Omit<Prisma.labelCreateInput, 'user' | 'userId'>) {
 		await createLabelSchema.parseAsync(data);
-		const labelCount = await this.prisma.label.count({
-			where: { userId },
-		});
-
-		if (labelCount >= USER_LABELS_LIMIT) {
-			throw new AppException(
-				`You have reached the maximum of ${USER_LABELS_LIMIT} labels.`,
-				HttpStatus.BAD_REQUEST,
-			);
-		}
-
 		return this.prisma.label.create({
 			data: {
 				...data,

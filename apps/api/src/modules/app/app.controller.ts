@@ -1,19 +1,32 @@
-import { Controller, Get, Header, HttpStatus } from '@nestjs/common';
-import dayjs from 'dayjs';
-import { ZodError } from 'zod';
+import { Controller, Get, HttpStatus, Param, Res } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Response } from 'express';
+import { createReadStream } from 'fs';
+import { stat } from 'fs/promises';
+import { join } from 'path';
 
 import { Public } from '~common/decorators/public.decorator';
 import { AppException } from '~common/utils/app-exception';
+import { Config } from '~config/index';
 
 import { AppService } from './app.service';
-import { notificationsSchema } from './notifications.schema';
-
-let cachedNotifications: unknown[] | null = null;
-let cacheExpiresAt: dayjs.Dayjs | null = null;
 
 @Controller()
 export class AppController {
-	constructor(private readonly appService: AppService) {}
+	constructor(
+		private readonly appService: AppService,
+		private readonly configService: ConfigService<Config>,
+	) {}
+
+	@Get('config')
+	@Public()
+	getConfig() {
+		const errors = this.configService.get('errors', { infer: true });
+		return {
+			appUrl: this.configService.get('appUrl', { infer: true }),
+			webErrorsDsn: errors?.webDsn,
+		};
+	}
 
 	@Get()
 	@Public()
@@ -21,63 +34,30 @@ export class AppController {
 		return this.appService.getHello();
 	}
 
-	@Get('notifications')
+	@Get('exports/:userId/:filename')
 	@Public()
-	@Header('Cache-Control', 'public, max-age=900')
-	async getNotifications() {
-		const now = dayjs();
-
-		if (cachedNotifications && cacheExpiresAt && now.isBefore(cacheExpiresAt)) {
-			return cachedNotifications;
-		}
-
-		const url = process.env.NOTIFICATIONS_URL;
-		if (!url) {
-			throw new AppException(
-				'Notifications URL not configured',
-				HttpStatus.INTERNAL_SERVER_ERROR,
-			);
-		}
+	async downloadExport(
+		@Param('userId') userId: string,
+		@Param('filename') filename: string,
+		@Res() res: Response,
+	) {
+		const exportsConfig = this.configService.getOrThrow('exports', { infer: true });
+		const filePath = join(exportsConfig.localPath, userId, filename);
 
 		try {
-			const response = await fetch(url);
-
-			if (!response.ok) {
-				throw new Error(`Upstream status ${response.status}`);
+			const stats = await stat(filePath);
+			if (!stats.isFile()) {
+				throw new Error('Not a file');
 			}
 
-			const rawData = await response.json();
+			res.setHeader('Content-Type', 'application/zip');
+			res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
+			res.setHeader('Content-Length', stats.size);
 
-			let data;
-			try {
-				data = notificationsSchema.parse(rawData);
-			} catch (err) {
-				if (err instanceof ZodError) {
-					console.error('Invalid notifications JSON', err.issues);
-
-					if (cachedNotifications) {
-						return cachedNotifications;
-					}
-
-					throw new AppException(
-						'Invalid notifications data format',
-						HttpStatus.BAD_GATEWAY,
-					);
-				}
-
-				throw err;
-			}
-
-			cachedNotifications = data;
-			cacheExpiresAt = now.add(15, 'minute');
-
-			return data;
+			const stream = createReadStream(filePath);
+			stream.pipe(res);
 		} catch (_err) {
-			if (cachedNotifications) {
-				return cachedNotifications;
-			}
-
-			throw new AppException('Failed to fetch notifications', HttpStatus.BAD_GATEWAY);
+			throw new AppException('Export file not found', HttpStatus.NOT_FOUND);
 		}
 	}
 }

@@ -1,11 +1,23 @@
-import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
-import { GqlExceptionFilter, GqlContextType } from '@nestjs/graphql';
+import {
+	ArgumentsHost,
+	Catch,
+	ExceptionFilter,
+	HttpException,
+	HttpStatus,
+	Inject,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { GqlContextType, GqlExceptionFilter } from '@nestjs/graphql';
 import * as Sentry from '@sentry/nestjs';
 import { GraphQLError } from 'graphql';
 import { ZodError } from 'zod';
 
+import { Config } from '~config/index';
+
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter, GqlExceptionFilter {
+	constructor(@Inject(ConfigService) private readonly configService: ConfigService<Config>) {}
+
 	private handleException(exception: unknown) {
 		if (exception instanceof ZodError) {
 			const errors = exception.issues.map((error) => ({
@@ -25,7 +37,8 @@ export class GlobalExceptionFilter implements ExceptionFilter, GqlExceptionFilte
 			};
 		}
 
-		if (process.env.NODE_ENV === 'production') {
+		const errorsConfig = this.configService.get('errors', { infer: true });
+		if (process.env.NODE_ENV === 'production' && errorsConfig?.apiDsn) {
 			Sentry.captureException(exception);
 		}
 

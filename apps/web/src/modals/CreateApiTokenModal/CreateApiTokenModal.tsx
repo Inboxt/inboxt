@@ -24,6 +24,7 @@ import { ButtonContainer } from '~components/ButtonContainer';
 import { Form } from '~components/Form';
 import { CREATE_API_TOKEN } from '~lib/graphql';
 import { ApiTokenExpiry } from '~lib/graphql';
+import { runtimeConfig } from '~lib/runtime-config';
 
 type CreateApiTokenModalInnerProps = {
 	onCreated?: () => void;
@@ -175,10 +176,49 @@ export const CreateApiTokenModal = ({
 			{secret && (
 				<Stack gap="xl" flex={1}>
 					<Alert color="blue">
-						<Text size="sm" fw={500}>
-							Your new API token
-						</Text>
-						<Group mt="xs" gap="xs" wrap="nowrap">
+						<Stack gap="xs">
+							<Text size="sm" fw={500}>
+								Your new API token
+							</Text>
+							<Group gap="xs" wrap="nowrap">
+								<Text
+									size="xs"
+									style={{
+										fontFamily: 'monospace',
+										overflowWrap: 'anywhere',
+										flex: 1,
+									}}
+								>
+									{secret}
+								</Text>
+
+								<CopyButton value={secret} timeout={2000}>
+									{({ copied, copy }) => (
+										<ActionIcon
+											variant="light"
+											color={copied ? 'teal' : 'blue'}
+											onClick={copy}
+											aria-label="Copy token"
+										>
+											{copied ? (
+												<IconCheck size={16} />
+											) : (
+												<IconCopy size={16} />
+											)}
+										</ActionIcon>
+									)}
+								</CopyButton>
+							</Group>
+
+							<Text size="xs" c="dimmed" mt="xs">
+								This token will not be shown again. Store it somewhere safe and
+								paste it into your external app.
+							</Text>
+						</Stack>
+					</Alert>
+
+					<Alert color="gray" title="API Base URL">
+						<Group gap="xs" wrap="nowrap">
 							<Text
 								size="xs"
 								style={{
@@ -187,26 +227,25 @@ export const CreateApiTokenModal = ({
 									flex: 1,
 								}}
 							>
-								{secret}
+								{`${runtimeConfig.appUrl}/graphql`}
 							</Text>
 
-							<CopyButton value={secret} timeout={2000}>
+							<CopyButton value={`${runtimeConfig.appUrl}/graphql`} timeout={2000}>
 								{({ copied, copy }) => (
 									<ActionIcon
 										variant="light"
 										color={copied ? 'teal' : 'blue'}
 										onClick={copy}
-										aria-label="Copy token"
+										aria-label="Copy API URL"
 									>
 										{copied ? <IconCheck size={16} /> : <IconCopy size={16} />}
 									</ActionIcon>
 								)}
 							</CopyButton>
 						</Group>
-
 						<Text size="xs" c="dimmed" mt="xs">
-							This token will not be shown again. Store it somewhere safe and paste it
-							into your external app.
+							Use this URL in your external application (like Obsidian or a custom
+							script) to make requests to your Inboxt instance.
 						</Text>
 					</Alert>
 

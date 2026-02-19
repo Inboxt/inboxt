@@ -19,7 +19,6 @@ model article {
   savedItemId String     @id @db.Uuid
   contentHtml String
   contentText String
-  sizeBytes   BigInt     @default(0)
   saved_item  saved_item @relation(fields: [savedItemId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
@@ -49,7 +48,6 @@ model saved_item {
   type             saved_item_type
   status           saved_item_status  @default(ACTIVE)
   deletedSince     DateTime?          @db.Timestamptz(6)
-  sizeBytes        BigInt             @default(0)
   article          article?
   highlight        highlight[]
   newsletter       newsletter?
@@ -70,29 +68,25 @@ model saved_item_label {
 }
 
 model user {
-  id                           String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  createdAt                    DateTime                @default(now()) @db.Timestamptz(6)
-  logins                       Int                     @default(0)
-  lastLogin                    DateTime?               @db.Timestamptz(6)
-  emailAddress                 String                  @unique
-  pendingEmailAddress          String?
-  password                     String?
-  username                     String?
-  isEmailVerified              Boolean                 @default(false)
-  emailVerifyCode              String?
-  emailVerifyExpiry            DateTime?               @db.Timestamptz(6)
-  resetPasswordCode            String?
-  resetPasswordExpiry          DateTime?               @db.Timestamptz(6)
-  plan                         user_plan               @default(FREE)
-  lastExportAt                 DateTime?               @db.Timestamptz(6)
-  storageUsageBytes            BigInt                  @default(0)
-  storageQuotaBytes            BigInt                  @default(104857600)
-  lastNotifiedStorageThreshold Int                     @default(0)
-  api_token                    api_token[]
-  highlight                    highlight[]
-  inbound_email_address        inbound_email_address[]
-  label                        label[]
-  saved_item                   saved_item[]
+  id                    String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt             DateTime                @default(now()) @db.Timestamptz(6)
+  logins                Int                     @default(0)
+  lastLogin             DateTime?               @db.Timestamptz(6)
+  emailAddress          String                  @unique
+  pendingEmailAddress   String?
+  password              String?
+  username              String?
+  isEmailVerified       Boolean                 @default(false)
+  emailVerifyCode       String?
+  emailVerifyExpiry     DateTime?               @db.Timestamptz(6)
+  resetPasswordCode     String?
+  resetPasswordExpiry   DateTime?               @db.Timestamptz(6)
+  lastExportAt          DateTime?               @db.Timestamptz(6)
+  api_token             api_token[]
+  highlight             highlight[]
+  inbound_email_address inbound_email_address[]
+  label                 label[]
+  saved_item            saved_item[]
 }
 
 model newsletter {
@@ -103,7 +97,6 @@ model newsletter {
   messageId               String?
   eventId                 String?
   subscriptionId          String?                  @db.Uuid
-  sizeBytes               BigInt                   @default(0)
   inbound_email_address   inbound_email_address?   @relation(fields: [inboundEmailAddressId], references: [id], onUpdate: NoAction)
   saved_item              saved_item               @relation(fields: [savedItemId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   newsletter_subscription newsletter_subscription? @relation(fields: [subscriptionId], references: [id], onUpdate: NoAction)
@@ -165,7 +158,6 @@ model highlight_segment {
   endOffset   Int
   afterText   String
   text        String?
-  sizeBytes   BigInt    @default(0)
   highlight   highlight @relation(fields: [highlightId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@index([highlightId], map: "highlight_segment_highlightId_index")
@@ -193,11 +185,6 @@ enum saved_item_status {
 enum saved_item_type {
   NEWSLETTER
   ARTICLE
-}
-
-enum user_plan {
-  DEMO
-  FREE
 }
 
 enum newsletter_subscription_status {

@@ -3,6 +3,8 @@ import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 
+import { Config } from '~config/index';
+
 import { MailProcessor } from './mail.processor';
 import { MailService } from './mail.service';
 
@@ -23,8 +25,12 @@ import { MailService } from './mail.service';
 		MailProcessor,
 		{
 			provide: 'MAIL_TRANSPORTER',
-			useFactory: (configService: ConfigService) => {
-				const mailConfig = configService.get('mail');
+			useFactory: (configService: ConfigService<Config>) => {
+				const mailConfig = configService.get('mail', { infer: true });
+				if (!mailConfig) {
+					return null;
+				}
+
 				return nodemailer.createTransport({
 					host: mailConfig.host,
 					port: mailConfig.port,

@@ -12,12 +12,9 @@ export const USER_FRAGMENT = gql(`
 		isEmailVerified
 		username
 		pendingEmailAddress
-		plan
 		labelsCount
 		inboundEmailAddressesCount
 		lastExportAt
-		storageUsageBytes
-		storageQuotaBytes
 	}
 `);
 
@@ -370,14 +367,6 @@ export const CREATE_HIGHLIGHT = gql(`
 export const DELETE_HIGHLIGHTS = gql(`
 	mutation DeleteHighlights($data: DeleteHighlightsInput!) {
 		deleteHighlights(data: $data) {
-			success
-		}
-	}
-`);
-
-export const CREATE_DEMO_ACCOUNT = gql(`
-	mutation createDemoAccount {
-		createDemoAccount {
 			success
 		}
 	}

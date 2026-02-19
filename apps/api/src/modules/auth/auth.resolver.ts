@@ -2,7 +2,6 @@ import { Resolver, Args, Mutation, Context } from '@nestjs/graphql';
 
 import { HOURLY_RATE_LIMIT } from '~common/constants/rate-limit.constants';
 import { VOID_RESPONSE } from '~common/constants/void';
-import { NonDemo } from '~common/decorators/account.decorator';
 import { ActiveUserMeta, ActiveUserMetaType } from '~common/decorators/active-user-meta.decorator';
 import { Public } from '~common/decorators/public.decorator';
 import { RateLimit } from '~common/decorators/rate-limit.decorator';
@@ -46,15 +45,6 @@ export class AuthResolver {
 		return VOID_RESPONSE;
 	}
 
-	@Public()
-	@Mutation(() => Void)
-	@RateLimit(HOURLY_RATE_LIMIT)
-	async createDemoAccount(@Context() context: GqlContext) {
-		await this.authService.createDemo(context.req);
-		return VOID_RESPONSE;
-	}
-
-	@NonDemo()
 	@Mutation(() => Void)
 	@RateLimit(HOURLY_RATE_LIMIT)
 	async verifyEmail(

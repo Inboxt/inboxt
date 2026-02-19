@@ -1,8 +1,5 @@
 // CONSTANTS
-/** Maximum number of inbound email addresses a user can create */
-export const USER_INBOUND_EMAIL_ADDRESS_LIMIT = 2;
-/** Maximum number of labels a user can create */
-export const USER_LABELS_LIMIT = 50;
+// TODO: Should these limits be adjusted by .env variables?
 /** Maximum word count for articles before they're considered too large */
 export const MAX_ARTICLE_WORD_COUNT = 15000;
 /** Minimum word count for newsletters to be considered valid content */

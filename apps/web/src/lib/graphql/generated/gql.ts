@@ -14,7 +14,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
-    "\n\tfragment UserFragment on User {\n\t\tid\n\t\tcreatedAt\n\t\temailAddress\n\t\tisEmailVerified\n\t\tusername\n\t\tpendingEmailAddress\n\t\tplan\n\t\tlabelsCount\n\t\tinboundEmailAddressesCount\n\t\tlastExportAt\n\t\tstorageUsageBytes\n\t\tstorageQuotaBytes\n\t}\n": typeof types.UserFragmentFragmentDoc,
+    "\n\tfragment UserFragment on User {\n\t\tid\n\t\tcreatedAt\n\t\temailAddress\n\t\tisEmailVerified\n\t\tusername\n\t\tpendingEmailAddress\n\t\tlabelsCount\n\t\tinboundEmailAddressesCount\n\t\tlastExportAt\n\t}\n": typeof types.UserFragmentFragmentDoc,
     "\n\tfragment SavedItemFragment on SavedItem {\n\t\tid\n\t\tcreatedAt\n\t\ttitle\n\t\toriginalUrl\n\t\tsourceDomain\n\t\tdescription\n\t\tleadImage\n\t\twordCount\n\t\tauthor\n\t\ttype\n\t\tstatus\n\t}\n": typeof types.SavedItemFragmentFragmentDoc,
     "\n\tfragment SavedItemLabelFragment on Label {\n\t\tcreatedAt\n\t\tid\n\t\tname\n\t\tcolor\n\t}\n": typeof types.SavedItemLabelFragmentFragmentDoc,
     "\n\tfragment SavedItemLabelsFragment on SavedItem {\n\t\tid\n\t\tlabels {\n\t\t\tid\n\t\t\t...SavedItemLabelFragment\n\t\t}\n\t}\n": typeof types.SavedItemLabelsFragmentFragmentDoc,
@@ -49,7 +49,6 @@ type Documents = {
     "\n\tmutation updateNewsletterSubscriptionStatus($data: UpdateNewsletterSubscriptionStatusInput!) {\n\t\tupdateNewsletterSubscriptionStatus(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": typeof types.UpdateNewsletterSubscriptionStatusDocument,
     "\n\tmutation createHighlight($data: CreateHighlightInput!) {\n\t\tcreateHighlight(data: $data) {\n\t\t\tid\n\t\t}\n\t}\n": typeof types.CreateHighlightDocument,
     "\n\tmutation DeleteHighlights($data: DeleteHighlightsInput!) {\n\t\tdeleteHighlights(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": typeof types.DeleteHighlightsDocument,
-    "\n\tmutation createDemoAccount {\n\t\tcreateDemoAccount {\n\t\t\tsuccess\n\t\t}\n\t}\n": typeof types.CreateDemoAccountDocument,
     "\n\tmutation requestExport($data: RequestExportInput!) {\n\t\trequestExport(data: $data)\n\t}\n": typeof types.RequestExportDocument,
     "\n    mutation createApiToken($data: CreateApiTokenInput!) {\n    \tcreateApiToken(data: $data) {\n    \t\ttoken {\n    \t\t\t...ApiTokenFragment\n    \t\t}\n    \t\tsecret\n    \t}\n    }\n": typeof types.CreateApiTokenDocument,
     "\n\tmutation deleteApiToken($data: DeleteApiTokenInput!) {\n\t\tdeleteApiToken(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": typeof types.DeleteApiTokenDocument,
@@ -57,7 +56,7 @@ type Documents = {
     "\n\tmutation addArticleFromHtmlSnapshot($data: AddArticleFromHtmlSnapshotInput!) {\n\t\taddArticleFromHtmlSnapshot(data: $data)\n\t}\n": typeof types.AddArticleFromHtmlSnapshotDocument,
 };
 const documents: Documents = {
-    "\n\tfragment UserFragment on User {\n\t\tid\n\t\tcreatedAt\n\t\temailAddress\n\t\tisEmailVerified\n\t\tusername\n\t\tpendingEmailAddress\n\t\tplan\n\t\tlabelsCount\n\t\tinboundEmailAddressesCount\n\t\tlastExportAt\n\t\tstorageUsageBytes\n\t\tstorageQuotaBytes\n\t}\n": types.UserFragmentFragmentDoc,
+    "\n\tfragment UserFragment on User {\n\t\tid\n\t\tcreatedAt\n\t\temailAddress\n\t\tisEmailVerified\n\t\tusername\n\t\tpendingEmailAddress\n\t\tlabelsCount\n\t\tinboundEmailAddressesCount\n\t\tlastExportAt\n\t}\n": types.UserFragmentFragmentDoc,
     "\n\tfragment SavedItemFragment on SavedItem {\n\t\tid\n\t\tcreatedAt\n\t\ttitle\n\t\toriginalUrl\n\t\tsourceDomain\n\t\tdescription\n\t\tleadImage\n\t\twordCount\n\t\tauthor\n\t\ttype\n\t\tstatus\n\t}\n": types.SavedItemFragmentFragmentDoc,
     "\n\tfragment SavedItemLabelFragment on Label {\n\t\tcreatedAt\n\t\tid\n\t\tname\n\t\tcolor\n\t}\n": types.SavedItemLabelFragmentFragmentDoc,
     "\n\tfragment SavedItemLabelsFragment on SavedItem {\n\t\tid\n\t\tlabels {\n\t\t\tid\n\t\t\t...SavedItemLabelFragment\n\t\t}\n\t}\n": types.SavedItemLabelsFragmentFragmentDoc,
@@ -92,7 +91,6 @@ const documents: Documents = {
     "\n\tmutation updateNewsletterSubscriptionStatus($data: UpdateNewsletterSubscriptionStatusInput!) {\n\t\tupdateNewsletterSubscriptionStatus(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": types.UpdateNewsletterSubscriptionStatusDocument,
     "\n\tmutation createHighlight($data: CreateHighlightInput!) {\n\t\tcreateHighlight(data: $data) {\n\t\t\tid\n\t\t}\n\t}\n": types.CreateHighlightDocument,
     "\n\tmutation DeleteHighlights($data: DeleteHighlightsInput!) {\n\t\tdeleteHighlights(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": types.DeleteHighlightsDocument,
-    "\n\tmutation createDemoAccount {\n\t\tcreateDemoAccount {\n\t\t\tsuccess\n\t\t}\n\t}\n": types.CreateDemoAccountDocument,
     "\n\tmutation requestExport($data: RequestExportInput!) {\n\t\trequestExport(data: $data)\n\t}\n": types.RequestExportDocument,
     "\n    mutation createApiToken($data: CreateApiTokenInput!) {\n    \tcreateApiToken(data: $data) {\n    \t\ttoken {\n    \t\t\t...ApiTokenFragment\n    \t\t}\n    \t\tsecret\n    \t}\n    }\n": types.CreateApiTokenDocument,
     "\n\tmutation deleteApiToken($data: DeleteApiTokenInput!) {\n\t\tdeleteApiToken(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": types.DeleteApiTokenDocument,
@@ -117,7 +115,7 @@ export function gql(source: string): unknown;
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n\tfragment UserFragment on User {\n\t\tid\n\t\tcreatedAt\n\t\temailAddress\n\t\tisEmailVerified\n\t\tusername\n\t\tpendingEmailAddress\n\t\tplan\n\t\tlabelsCount\n\t\tinboundEmailAddressesCount\n\t\tlastExportAt\n\t\tstorageUsageBytes\n\t\tstorageQuotaBytes\n\t}\n"): (typeof documents)["\n\tfragment UserFragment on User {\n\t\tid\n\t\tcreatedAt\n\t\temailAddress\n\t\tisEmailVerified\n\t\tusername\n\t\tpendingEmailAddress\n\t\tplan\n\t\tlabelsCount\n\t\tinboundEmailAddressesCount\n\t\tlastExportAt\n\t\tstorageUsageBytes\n\t\tstorageQuotaBytes\n\t}\n"];
+export function gql(source: "\n\tfragment UserFragment on User {\n\t\tid\n\t\tcreatedAt\n\t\temailAddress\n\t\tisEmailVerified\n\t\tusername\n\t\tpendingEmailAddress\n\t\tlabelsCount\n\t\tinboundEmailAddressesCount\n\t\tlastExportAt\n\t}\n"): (typeof documents)["\n\tfragment UserFragment on User {\n\t\tid\n\t\tcreatedAt\n\t\temailAddress\n\t\tisEmailVerified\n\t\tusername\n\t\tpendingEmailAddress\n\t\tlabelsCount\n\t\tinboundEmailAddressesCount\n\t\tlastExportAt\n\t}\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -254,10 +252,6 @@ export function gql(source: "\n\tmutation createHighlight($data: CreateHighlight
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n\tmutation DeleteHighlights($data: DeleteHighlightsInput!) {\n\t\tdeleteHighlights(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n"): (typeof documents)["\n\tmutation DeleteHighlights($data: DeleteHighlightsInput!) {\n\t\tdeleteHighlights(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n"];
-/**
- * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function gql(source: "\n\tmutation createDemoAccount {\n\t\tcreateDemoAccount {\n\t\t\tsuccess\n\t\t}\n\t}\n"): (typeof documents)["\n\tmutation createDemoAccount {\n\t\tcreateDemoAccount {\n\t\t\tsuccess\n\t\t}\n\t}\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

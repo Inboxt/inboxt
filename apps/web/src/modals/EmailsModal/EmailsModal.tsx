@@ -4,8 +4,6 @@ import { ContextModalProps } from '@mantine/modals';
 import { IconAlertTriangleFilled } from '@tabler/icons-react';
 import { useEffect } from 'react';
 
-import { USER_INBOUND_EMAIL_ADDRESS_LIMIT } from '@inboxt/common';
-
 import { ButtonContainer } from '~components/ButtonContainer';
 import { CREATE_INBOUND_EMAIL_ADDRESS, INBOUND_EMAIL_ADDRESSES } from '~lib/graphql';
 import { modals } from '~modals/modals';
@@ -21,7 +19,7 @@ export const EmailsModal = ({ id, context }: ContextModalProps) => {
 	const emails = data?.inboundEmailAddresses || [];
 	useEffect(() => {
 		modals.update(id, {
-			title: `Manage Email Addresses (${emails.length}/${USER_INBOUND_EMAIL_ADDRESS_LIMIT})`,
+			title: `Manage Email Addresses (${emails.length})`,
 		});
 	}, [emails.length, id]);
 
@@ -76,11 +74,7 @@ export const EmailsModal = ({ id, context }: ContextModalProps) => {
 					Close
 				</Button>
 
-				<Button
-					onClick={handleCreate}
-					disabled={emails.length >= USER_INBOUND_EMAIL_ADDRESS_LIMIT}
-					loading={creating}
-				>
+				<Button onClick={handleCreate} loading={creating}>
 					Create Email Address
 				</Button>
 			</ButtonContainer>

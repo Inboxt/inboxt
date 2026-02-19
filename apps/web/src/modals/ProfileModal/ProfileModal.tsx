@@ -7,7 +7,6 @@ import {
 	Card,
 	Flex,
 	MantineColorScheme,
-	Progress,
 	SegmentedControl,
 	SimpleGrid,
 	Skeleton,
@@ -20,7 +19,7 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { ContextModalProps } from '@mantine/modals';
-import { IconBell, IconDatabase, IconHighlight, IconTag, IconPuzzle } from '@tabler/icons-react';
+import { IconBell, IconDatabase, IconHighlight, IconPuzzle } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
@@ -28,12 +27,7 @@ import { useEffect } from 'react';
 
 dayjs.extend(duration);
 
-import {
-	formatBytes,
-	updateAccountSchema,
-	USER_INBOUND_EMAIL_ADDRESS_LIMIT,
-	USER_LABELS_LIMIT,
-} from '@inboxt/common';
+import { updateAccountSchema } from '@inboxt/common';
 
 import { ButtonContainer } from '~components/ButtonContainer';
 import { Form } from '~components/Form';
@@ -42,7 +36,6 @@ import { useScreenQuery } from '~hooks/useScreenQuery.tsx';
 import { ACTIVE_USER, ExportType, UPDATE_ACCOUNT } from '~lib/graphql';
 import { modals } from '~modals/modals';
 import { router } from '~router/index.tsx';
-import { getUserStorage } from '~utils/userStorage.ts';
 
 export const ProfileModal = ({ id, context }: ContextModalProps) => {
 	const { setColorScheme, colorScheme } = useMantineColorScheme();
@@ -50,7 +43,6 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 	const isBelowXsScreen = useScreenQuery('xs', 'below');
 
 	const { data, loading } = useQuery(ACTIVE_USER, { fetchPolicy: 'cache-and-network' });
-	const { storageQuota, storagePercentage, usedStorage } = getUserStorage(data?.me);
 
 	const [updateProfile, { loading: updateProfileLoading, error: updateProfileError }] =
 		useMutation(UPDATE_ACCOUNT);
@@ -217,7 +209,7 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 								<Title order={5}>Email Addresses</Title>
 
 								<Text size="xs" c="dimmed">
-									{`${inboundEmailAddressesUsed} of ${USER_INBOUND_EMAIL_ADDRESS_LIMIT} addresses used`}
+									{`${inboundEmailAddressesUsed} addresses used`}
 								</Text>
 
 								<Text size="xs" c="dimmed">
@@ -242,49 +234,17 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 							>
 								<Stack gap="xxxs">
 									<Title order={5}>Labels</Title>
-									<Text
-										size="xs"
-										c={labelsUsed >= USER_LABELS_LIMIT ? 'red' : 'dimmed'}
-									>
-										{labelsUsed} of {USER_LABELS_LIMIT} labels used
+									<Text size="xs" c="dimmed">
+										{labelsUsed} labels used
 									</Text>
 									<Text size="xs" c="dimmed">
 										Use labels to organize your saved content.
 									</Text>
 								</Stack>
-								<Button
-									onClick={modals.openLabelsModal}
-									size="xs"
-									variant="light"
-									disabled={labelsUsed >= USER_LABELS_LIMIT}
-								>
+								<Button onClick={modals.openLabelsModal} size="xs" variant="light">
 									Manage
 								</Button>
 							</Flex>
-
-							{labelsUsed >= USER_LABELS_LIMIT && (
-								<Alert color="red" icon={<IconTag />} mt="sm">
-									You have reached your label limit. Please delete a label before
-									creating a new one.
-								</Alert>
-							)}
-						</Skeleton>
-					</Card>
-
-					<Card>
-						<Skeleton visible={loading}>
-							<Title order={5}>Storage Usage</Title>
-							<Stack gap="xs" mt="sm">
-								<Progress
-									value={storagePercentage}
-									size="sm"
-									radius="md"
-									color="primary"
-								/>
-								<Text size="xs" c="dimmed">
-									{`${formatBytes(usedStorage)} of ${formatBytes(storageQuota)} used`}
-								</Text>
-							</Stack>
 						</Skeleton>
 					</Card>
 

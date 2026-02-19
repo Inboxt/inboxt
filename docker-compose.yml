@@ -1,69 +1,73 @@
 services:
-  database:
-    container_name: "database"
+  postgres:
     image: postgres:18
-    ports:
-      - ${DATABASE_PORT}:${DATABASE_PORT}
+    container_name: inboxt-postgres
+    restart: unless-stopped
     environment:
-      POSTGRES_USER: ${DATABASE_USER}
-      POSTGRES_PASSWORD: ${DATABASE_USER}
-      POSTGRES_DB: ${DATABASE_NAME}
-      TZ: "UTC"
-      PGTZ: "UTC"
-      PGUSER: "postgres"
+      POSTGRES_DB: ${DATABASE_NAME:-inboxt}
+      POSTGRES_USER: ${DATABASE_USER:-inboxt}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
-      - db-data:/var/lib/postgresql
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - inboxt_network
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready" ]
-      interval: 5s
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER:-inboxt} -d ${DATABASE_NAME:-inboxt}"]
+      interval: 10s
       timeout: 5s
       retries: 5
 
   valkey:
     image: valkey/valkey:8-alpine
-    container_name: "valkey"
-    ports:
-      - ${VALKEY_PORT}:${VALKEY_PORT}
+    container_name: inboxt-valkey
+    restart: unless-stopped
+    command: >
+      valkey-server
+      --save 60 1
+      --loglevel warning
+      --maxmemory 256mb
+      --maxmemory-policy noeviction
+    volumes:
+      - valkey_data:/data
+    networks:
+      - inboxt_network
     healthcheck:
       test: ["CMD", "valkey-cli", "ping"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
       retries: 5
 
-  api:
-    container_name: "api"
-    restart: always
-    build:
-      context: .
-      dockerfile: ./apps/api/Dockerfile
-    ports:
-      - ${API_PORT}:${API_PORT}
-    volumes:
-      - ./apps/api/src:/usr/src/app/apps/api/src:cached
-      - ./apps/api/prisma:/usr/src/app/apps/api/prisma:cached
-      - ./.env:/usr/src/app/.env:cached
-      - ./apps/api/migrations:/usr/src/app/apps/api/migrations:cached
+  inboxt:
+    image: ghcr.io/inboxt/inboxt:${IMAGE_TAG:-latest}
+    container_name: inboxt
+    restart: unless-stopped
     environment:
-      DATABASE_URL: ${DATABASE_URL}
-      TZ: "UTC"
+      DATABASE_URL: postgresql://${DATABASE_USER:-inboxt}:${DATABASE_PASSWORD}@postgres:5432/${DATABASE_NAME:-inboxt}
+    volumes:
+      - .env:/app/.env
+      - exports_data:/app/exports
+    ports:
+      - "7000:7000"
     depends_on:
-      database:
+      postgres:
         condition: service_healthy
       valkey:
         condition: service_healthy
-        
-  mailpit:
-    image: axllent/mailpit
-    container_name: 'mailpit'
-    restart: always
-    ports:
-      - ${MAIL_PORT}:${MAIL_PORT}
-      - ${MAIL_WEB_PORT}:${MAIL_WEB_PORT}
-    environment:
-      MP_MAX_MESSAGES: 5000
-      MP_SMTP_AUTH_ACCEPT_ANY: 1
-      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+    networks:
+      - inboxt_network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:7000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
 volumes:
-  db-data:
-    driver: local
+  postgres_data:
+  valkey_data:
+  exports_data:
+
+networks:
+  inboxt_network:
+    driver: bridge

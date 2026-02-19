@@ -4,7 +4,7 @@ import { ACTIVE_USER } from '~lib/graphql';
 import { client } from '~lib/graphql/client.ts';
 import { Auth } from '~pages/Auth';
 
-export type AuthMode = 'login' | 'signup' | 'demo' | 'forgot-password' | undefined;
+export type AuthMode = 'login' | 'signup' | 'forgot-password' | undefined;
 
 export type AuthSearch = {
 	mode?: AuthMode;

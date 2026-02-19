@@ -1,7 +1,7 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 import { verify } from 'argon2';
-import crypto from 'crypto';
 import dayjs from 'dayjs';
 
 import {
@@ -13,9 +13,9 @@ import {
 } from '@inboxt/common';
 
 import { EMAIL_CHANGED_PASSWORD, EMAIL_RESET_PASSWORD } from '~common/constants/email.constants';
-import { UserPlan } from '~common/enums/user-plan.enum';
 import { GqlContext } from '~common/types/graphql-context';
 import { AppException } from '~common/utils/app-exception';
+import { Config } from '~config/index';
 import { passwordChangedTemplate } from '~mail-templates/passwordChangedTemplate';
 import { passwordResetTemplate } from '~mail-templates/passwordResetTemplate';
 import { SavedItemManagerService } from '~managers/saved-item-manager/saved-item-manager.service';
@@ -36,6 +36,7 @@ export class AuthService {
 		private readonly passwordService: PasswordService,
 		private readonly mailService: MailService,
 		private readonly savedItemManagerService: SavedItemManagerService,
+		private readonly configService: ConfigService<Config>,
 	) {}
 
 	createJwtToken(payload: Record<string, unknown>, options: JwtSignOptions): string {
@@ -45,7 +46,6 @@ export class AuthService {
 	attachJwtToken(name: string, contents: string, context: any, httpOnly = true) {
 		context.res.cookie(name, contents, {
 			secure: process.env.NODE_ENV === 'production',
-			domain: process.env.NODE_ENV === 'production' ? '.inboxt.app' : undefined,
 			httpOnly,
 			maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days
 			sameSite: 'lax',
@@ -93,7 +93,6 @@ export class AuthService {
 	signOut(context: GqlContext) {
 		context.res.clearCookie('token', {
 			secure: process.env.NODE_ENV === 'production',
-			domain: process.env.NODE_ENV === 'production' ? '.inboxt.app' : undefined,
 			httpOnly: true,
 			sameSite: 'lax',
 			path: '/',
@@ -117,7 +116,7 @@ export class AuthService {
 				{
 					sub: user.id,
 				},
-				{ expiresIn: '1d' },
+				{},
 			),
 			context,
 		);
@@ -148,6 +147,11 @@ export class AuthService {
 	}
 
 	async createUser(data: CreateAccountInput, context: any) {
+		const securityConfig = this.configService.getOrThrow('security', { infer: true });
+		if (securityConfig.disableSignup) {
+			throw new AppException('Signup is disabled on this instance', HttpStatus.FORBIDDEN);
+		}
+
 		await createAccountSchema.parseAsync(data);
 		const emailAddress = data.emailAddress.toLowerCase();
 		const existingUser = await this.userService.get({
@@ -166,38 +170,11 @@ export class AuthService {
 		});
 
 		await this.savedItemManagerService.createDefaultItems(user.id);
-		await this.userService.sendVerificationEmail(user.id);
-		await this.createTokens(user.emailAddress, context);
-	}
-
-	async createDemo(context: any) {
-		const demoId = crypto.randomUUID();
-		const username = `demo-${demoId.slice(0, 8)}`;
-		const emailAddress = `${username}@demo.inboxt.app`;
-		const password = crypto.randomBytes(8).toString('hex');
-
-		// Check if a user with this email somehow exists (very unlikely)
-		const existingUser = await this.userService.get({ where: { emailAddress } });
-		if (existingUser) {
-			await this.createTokens(existingUser.emailAddress, context);
-			return existingUser;
+		if (securityConfig.requireEmailVerification) {
+			await this.userService.sendVerificationEmail(user.id);
 		}
 
-		const hashedPassword = await this.passwordService.hashPassword(password);
-
-		const user = await this.userService.createDemoAccount({
-			emailAddress,
-			password: hashedPassword,
-			isEmailVerified: true,
-			username,
-			plan: 'DEMO',
-			storageQuotaBytes: 10_485_760, // 10 MB
-		});
-
-		await this.savedItemManagerService.createDefaultItems(user.id);
 		await this.createTokens(user.emailAddress, context);
-
-		return user;
 	}
 
 	async requestPasswordRecovery(data: RequestPasswordRecoveryInput) {
@@ -207,10 +184,6 @@ export class AuthService {
 		});
 
 		if (!existingUser) {
-			return;
-		}
-
-		if (existingUser.plan == UserPlan.DEMO) {
 			return;
 		}
 
@@ -232,7 +205,7 @@ export class AuthService {
 			where: { emailAddress: data.emailAddress },
 		});
 
-		if (!existingUser || existingUser.plan === UserPlan.DEMO) {
+		if (!existingUser) {
 			throw new AppException(
 				'Invalid or expired code, or no reset request was found for this email address',
 				HttpStatus.BAD_REQUEST,

@@ -10,24 +10,33 @@ import { type Config } from '~config/index';
 import { AppModule } from '~modules/app/app.module';
 
 async function bootstrap() {
-	if (process.env.NODE_ENV === 'production') {
-		Sentry.init({
-			dsn: process.env.API_ERRORS_DSN,
-		});
-	}
-
 	const app = await NestFactory.create<NestExpressApplication>(AppModule, { bufferLogs: true });
 	app.useLogger(app.get(Logger));
 
 	const configService = app.get(ConfigService<Config>);
-	const corsConfig = configService.getOrThrow('cors', { infer: true });
+	const errorsConfig = configService.get('errors', { infer: true });
 
+	if (process.env.NODE_ENV === 'production' && errorsConfig?.apiDsn) {
+		Sentry.init({
+			dsn: errorsConfig.apiDsn,
+		});
+	}
+
+	if (
+		process.env.NODE_ENV === 'production' &&
+		configService.get('security.jwtSecret', { infer: true }) === 'replace-with-a-random-string'
+	) {
+		console.error('ERROR: API_JWT_SECRET is set to the default value. Please change it!');
+		process.exit(1);
+	}
+
+	const corsConfig = configService.get('cors', { infer: true });
 	app.set('trust proxy', 1);
 
 	if (corsConfig?.enabled) {
 		app.enableCors({
 			credentials: true,
-			origin: ['https://use.inboxt.app'],
+			origin: true,
 		});
 	}
 
@@ -36,7 +45,7 @@ async function bootstrap() {
 
 	app.use(cookieParser());
 
-	await app.listen(process.env.PORT ?? 7000);
+	await app.listen(process.env.API_PORT ?? 7000);
 }
 
 void bootstrap();

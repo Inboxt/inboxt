@@ -18,7 +18,7 @@ export default () => `
 		<mj-image
 			padding="0"
 			width="20px"
-			src="${process.env.STORAGE_S3_URL}/github-mark.svg"
+			src="${process.env.APP_URL || process.env.API_URL}/github-mark.svg"
 			alt="GitHub mark"
 			href="https://github.com/Inboxt/inboxt"
 			rel="noopener noreferrer"

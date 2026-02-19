@@ -7,7 +7,7 @@ import {
 	addArticleFromHtmlSnapshotSchema,
 	addItemFromUrlSchema,
 	APP_PRIMARY_COLOR,
-	inboundEmailEventSchema,
+	inboundEmailSchema,
 } from '@inboxt/common';
 import { Prisma } from '@inboxt/prisma';
 
@@ -23,7 +23,6 @@ import {
 import { getDefaultItems } from '~common/content';
 import { SavedItemType } from '~common/enums/saved-item-type.enum';
 import { AppException } from '~common/utils/app-exception';
-import { fetchJsonWithTimeout } from '~common/utils/fetchJsonWithTimeout';
 import { InboundEmailAddressService } from '~modules/inbound-email-address/inbound-email-address.service';
 import { MailService } from '~modules/mail/mail.service';
 import { PrismaService } from '~modules/prisma/prisma.service';
@@ -99,23 +98,19 @@ export class SavedItemManagerService {
 			domain = new URL(input.url).hostname.replace(/^www\./, '');
 		}
 
-		const created = await this.savedItemService.create(
-			userId,
-			{
-				type: SavedItemType.ARTICLE,
-				title:
-					prismaData?.title ||
-					ITEM_PROCESSING_TITLE(prismaData?.originalUrl ?? input.url ?? ''),
-				description:
-					prismaData?.description ||
-					ITEM_PROCESSING_CONTENT(prismaData?.sourceDomain ?? domain ?? ''),
-				wordCount: prismaData?.wordCount ?? 0,
-				originalUrl: prismaData?.originalUrl ?? input.url ?? null,
-				sourceDomain: prismaData?.sourceDomain ?? domain ?? null,
-				...prismaData,
-			},
-			{ skipQuota: true },
-		);
+		const created = await this.savedItemService.create(userId, {
+			type: SavedItemType.ARTICLE,
+			title:
+				prismaData?.title ||
+				ITEM_PROCESSING_TITLE(prismaData?.originalUrl ?? input.url ?? ''),
+			description:
+				prismaData?.description ||
+				ITEM_PROCESSING_CONTENT(prismaData?.sourceDomain ?? domain ?? ''),
+			wordCount: prismaData?.wordCount ?? 0,
+			originalUrl: prismaData?.originalUrl ?? input.url ?? null,
+			sourceDomain: prismaData?.sourceDomain ?? domain ?? null,
+			...prismaData,
+		});
 
 		if (labelIds?.length) {
 			await this.savedItemService.setLabels(userId, created.id, labelIds);
@@ -168,38 +163,21 @@ export class SavedItemManagerService {
 		}
 
 		const title = `Failed to process: ${existingTitle}`;
-		await this.savedItemService.update(
-			userId,
-			savedItemId,
-			{
-				title,
-				description: message,
-			},
-			undefined,
-			{ skipQuota: true },
-		);
+		await this.savedItemService.update(userId, savedItemId, {
+			title,
+			description: message,
+		});
 
 		if (existing.type === SavedItemType.ARTICLE) {
-			await this.articleService.create(
-				savedItemId,
-				{
-					contentHtml: message,
-					contentText: message,
-				},
-				undefined,
-				{ skipQuota: true },
-			);
+			await this.articleService.create(savedItemId, {
+				contentHtml: message,
+				contentText: message,
+			});
 		} else {
-			await this.newsletterService.create(
-				savedItemId,
-				null,
-				{
-					contentHtml: message,
-					contentText: message,
-				},
-				undefined,
-				{ skipQuota: true },
-			);
+			await this.newsletterService.create(savedItemId, null, {
+				contentHtml: message,
+				contentText: message,
+			});
 		}
 	}
 
@@ -323,17 +301,13 @@ export class SavedItemManagerService {
 			Omit<Prisma.saved_itemCreateInput, 'user' | 'saved_item_label' | 'newsletter' | 'id'>
 		>,
 	) {
-		return this.savedItemService.create(
-			userId,
-			{
-				type: SavedItemType.NEWSLETTER,
-				title: prismaData?.title ?? NEWSLETTER_PROCESSING_TITLE,
-				wordCount: prismaData?.wordCount || 0,
-				description: prismaData?.description ?? NEWSLETTER_PROCESSING_CONTENT,
-				...prismaData,
-			},
-			{ skipQuota: true },
-		);
+		return this.savedItemService.create(userId, {
+			type: SavedItemType.NEWSLETTER,
+			title: prismaData?.title ?? NEWSLETTER_PROCESSING_TITLE,
+			wordCount: prismaData?.wordCount || 0,
+			description: prismaData?.description ?? NEWSLETTER_PROCESSING_CONTENT,
+			...prismaData,
+		});
 	}
 
 	async processNewsletter(
@@ -462,61 +436,78 @@ export class SavedItemManagerService {
 	}
 
 	async addNewsletterFromEmail(payload: any) {
-		const parsed = inboundEmailEventSchema.safeParse(payload);
+		const parsed = inboundEmailSchema.safeParse(payload);
 		if (!parsed.success) {
-			this.logger.warn('Invalid Maileroo payload shape. Skipping.');
+			this.logger.warn('Invalid inbound email payload shape. Skipping.');
 			return;
 		}
 
-		const event = parsed.data;
-		const eventId = event._id;
-		const messageId = event.message_id;
-
-		this.logger.log(
-			`Starting to parse incoming newsletter email with eventId: ${eventId || 'unknown'}`,
-		);
-
-		const toAddresses: string[] = event.recipients?.length
-			? event.recipients
-			: (event.headers?.To ?? []);
-		const recipient = toAddresses?.[0] ?? null;
+		const recipient = this.newsletterService.extractRecipient(payload);
 		if (!recipient) {
 			this.logger.warn('No recipient addresses found in payload.');
 			return;
 		}
 
-		const inboundEmailAddress = await this.inboundEmailAddressService.verify(recipient);
-		if (!inboundEmailAddress || !inboundEmailAddress?.userId) {
-			this.logger.warn(`Recipient ${recipient} is not a valid or active inbox address.`);
+		const eventId = this.newsletterService.extractEventId(payload);
+		if (!eventId) {
+			this.logger.warn('No eventId found in payload.');
 			return;
 		}
 
-		const validation = await fetchJsonWithTimeout(event.validation_url, 5000, {
-			allowedHosts: new Set(['inbound-api.maileroo.net']),
-		});
+		const messageId = this.newsletterService.extractMessageId(payload);
+		if (!messageId) {
+			this.logger.warn('No messageId found in payload.');
+			return;
+		}
 
-		if (!validation.ok) {
-			this.logger.warn(`Validation call failed with status ${validation.status}. Skipping.`);
+		return this.processNewsletterPayload({
+			eventId,
+			messageId,
+			recipient,
+			html: this.newsletterService.extractHtml(payload) || undefined,
+			text: this.newsletterService.extractText(payload) || undefined,
+			subject: this.newsletterService.extractSubject(payload) || undefined,
+			from: this.newsletterService.extractAuthor(payload),
+			unsubscribeUrl: this.newsletterService.extractUnsubscribeUrl(payload) || undefined,
+			rawPayload: payload,
+		});
+	}
+
+	private async processNewsletterPayload(data: {
+		eventId: string;
+		messageId: string;
+		recipient: string;
+		html?: string;
+		text?: string;
+		subject?: string;
+		from?: string;
+		unsubscribeUrl?: string;
+		rawPayload: any;
+	}) {
+		this.logger.log(
+			`Starting to process incoming newsletter email with eventId: ${data.eventId}`,
+		);
+
+		const inboundEmailAddress = await this.inboundEmailAddressService.verify(data.recipient);
+		if (!inboundEmailAddress || !inboundEmailAddress?.userId) {
+			this.logger.warn(`Recipient ${data.recipient} is not a valid or active inbox address.`);
 			return;
 		}
 
 		const isDuplicate = await this.newsletterService.get(inboundEmailAddress.userId, {
 			where: {
-				eventId,
+				eventId: data.eventId,
 			},
 		});
 
 		if (isDuplicate) {
-			this.logger.log(`Duplicate event ID: ${eventId}. Skipping.`);
+			this.logger.log(`Duplicate event ID: ${data.eventId}. Skipping.`);
 			return;
 		}
 
-		const strippedHtml = event.body?.stripped_html;
-		const strippedText = event.body?.stripped_plaintext;
-
-		if (!strippedHtml || !this.newsletterService.isPossiblyUnreadable(strippedHtml)) {
+		if (!data.html || !this.newsletterService.isPossiblyUnreadable(data.html)) {
 			this.logger.warn(
-				'No HTML content found in payload or the newsletter is possibly unreadable.. Trying to forward the email to the user.',
+				'No HTML content found or newsletter is possibly unreadable. Forwarding to user.',
 			);
 
 			const user = await this.userService.get({ where: { id: inboundEmailAddress.userId } });
@@ -524,36 +515,24 @@ export class SavedItemManagerService {
 				return;
 			}
 
-			return this.mailService.forward(user.emailAddress, payload);
+			return this.mailService.forward(user.emailAddress, data.rawPayload);
 		}
 
 		try {
 			await this.processAndCreateNewsletter(
 				inboundEmailAddress.userId,
 				inboundEmailAddress.id,
-				messageId,
-				eventId,
-				{ html: strippedHtml, text: strippedText },
+				data.messageId,
+				data.eventId,
+				{ html: data.html, text: data.text },
 				{
-					title: event.headers?.Subject?.[0],
-					author: this.newsletterService.extractAuthor(payload),
+					title: data.subject,
+					author: data.from,
 				},
-				this.newsletterService.extractUnsubscribeUrl(payload),
+				data.unsubscribeUrl,
 			);
 		} catch (error) {
 			this.logger.error(`Error processing incoming newsletter: ${error}`);
-			return;
-		}
-
-		if (event.deletion_url) {
-			try {
-				await fetchJsonWithTimeout(event.deletion_url, 5000, {
-					allowedHosts: new Set(['inbound-api.maileroo.net']),
-					method: 'DELETE',
-				});
-			} catch {
-				// Ignore fetch errors
-			}
 		}
 	}
 

@@ -74,7 +74,6 @@ export class ExportService {
 					isEmailVerified: user.isEmailVerified,
 					logins: user.logins,
 					lastLogin: user.lastLogin ?? null,
-					plan: user.plan,
 				}
 			: null;
 
