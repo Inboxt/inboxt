@@ -43,7 +43,6 @@ COPY --from=builder /app/apps/api/dist ./dist
 COPY --from=builder /app/apps/api/prisma ./prisma
 COPY --from=builder /app/apps/api/migrations ./migrations
 COPY --from=builder /app/apps/api/entrypoint.sh ./entrypoint.sh
-COPY --from=builder /app/apps/api/src/assets/* ./public/
 
 # Copy web assets
 COPY --from=builder /app/apps/web/dist ./public
