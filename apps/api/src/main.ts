@@ -44,6 +44,7 @@ async function bootstrap() {
 	app.use(json({ limit: '1mb' }));
 
 	app.use(cookieParser());
+	app.setGlobalPrefix('api');
 
 	await app.listen(process.env.API_PORT ?? 7000);
 }

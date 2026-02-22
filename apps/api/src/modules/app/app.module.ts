@@ -1,6 +1,6 @@
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { BullModule as NestBullModule } from '@nestjs/bullmq';
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
@@ -38,8 +38,8 @@ import { AppService } from './app.service';
 @Module({
 	imports: [
 		ServeStaticModule.forRoot({
-			rootPath: join(__dirname, '..', '..', '..', 'public'),
-			exclude: ['/api/(.*)', '/graphql'],
+			rootPath: join(process.cwd(), 'public'),
+			exclude: ['/api/*path'],
 		}),
 		ConfigModule.forRoot({
 			isGlobal: true,
@@ -51,7 +51,9 @@ import { AppService } from './app.service';
 				level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
 				autoLogging: {
 					ignore: (req) =>
-						req.headers['user-agent']?.includes('Wget') || req.url === '/health',
+						req.headers['user-agent']?.includes('Wget') ||
+						req.url === '/health' ||
+						!req.url?.startsWith('/api'),
 				},
 				formatters: {
 					level: (label) => {
@@ -68,12 +70,14 @@ import { AppService } from './app.service';
 				}),
 				messageKey: 'message',
 			},
+			forRoutes: [{ method: RequestMethod.ALL, path: '*splat' }],
 		}),
 		GraphQLModule.forRootAsync<ApolloDriverConfig>({
 			driver: ApolloDriver,
 			useFactory: (configService: ConfigService<Config>) => {
 				const graphqlConfig = configService.getOrThrow('graphql', { infer: true });
 				return {
+					path: '/api/graphql',
 					autoSchemaFile: graphqlConfig.autoSchemaFile,
 					sortSchema: graphqlConfig.sortSchema,
 					graphiql: graphqlConfig.graphiql,
@@ -127,6 +131,6 @@ import { AppService } from './app.service';
 })
 export class AppModule implements NestModule {
 	configure(consumer: MiddlewareConsumer) {
-		consumer.apply(RequestIdMiddleware).forRoutes('*');
+		consumer.apply(RequestIdMiddleware).forRoutes('*path');
 	}
 }
