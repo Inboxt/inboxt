@@ -6,7 +6,7 @@ dotenv.config({ path: path.resolve('../../', '.env') });
 
 const config: CodegenConfig = {
 	overwrite: true,
-	schema: `${process.env.API_URL}/graphql`,
+	schema: `${process.env.API_URL}/api/graphql`,
 	documents: 'src/lib/graphql/index.ts',
 	generates: {
 		'src/lib/graphql/generated/': {

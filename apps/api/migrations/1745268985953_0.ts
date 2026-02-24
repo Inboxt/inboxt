@@ -32,7 +32,6 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 		emailVerifyExpiry: 'timestamptz',
 		resetPasswordCode: 'text',
 		resetPasswordExpiry: 'timestamptz',
-		lastExportAt: 'timestamptz',
 	});
 
 	pgm.createTable('saved_item', {

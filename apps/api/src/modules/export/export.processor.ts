@@ -14,7 +14,6 @@ import { Config } from '~config/index';
 import { exportReadyTemplate } from '~mail-templates/exportReadyTemplate';
 import { MailService } from '~modules/mail/mail.service';
 import { S3StorageService } from '~modules/storage/s3-storage.service';
-import { UserService } from '~modules/user/user.service';
 
 import { ExportService } from './export.service';
 
@@ -25,7 +24,6 @@ export class ExportProcessor extends BaseQueueProcessor {
 		private readonly exportService: ExportService,
 		private readonly s3StorageService: S3StorageService,
 		private readonly mail: MailService,
-		private readonly userService: UserService,
 		private readonly configService: ConfigService<Config>,
 	) {
 		super();
@@ -39,6 +37,7 @@ export class ExportProcessor extends BaseQueueProcessor {
 						userId: string;
 						email: string;
 						formatForHighlights: ExportHighlightsFormat;
+						timestamp: string;
 					},
 				);
 			default:
@@ -51,9 +50,12 @@ export class ExportProcessor extends BaseQueueProcessor {
 		userId: string;
 		email: string;
 		formatForHighlights: ExportHighlightsFormat;
+		timestamp: string;
 	}) {
-		const timestamp = dayjs().format('YYYYMMDD_HHmmss');
-		const filename = `inboxt_export_${timestamp}.zip`;
+		const filenameTimestamp = dayjs(data.timestamp).format('YYYYMMDD_HHmmss');
+		const readableTimestamp = dayjs(data.timestamp).format('MMMM D, YYYY [at] HH:mm');
+
+		const filename = `inboxt_export_${filenameTimestamp}.zip`;
 		const key = `exports/${data.userId}/${filename}`;
 
 		const zip = await this.exportService.buildZipForAll({
@@ -62,7 +64,6 @@ export class ExportProcessor extends BaseQueueProcessor {
 		});
 
 		let url: string;
-
 		if (this.s3StorageService.isConfigured()) {
 			await this.s3StorageService.upload({
 				key,
@@ -88,22 +89,17 @@ export class ExportProcessor extends BaseQueueProcessor {
 			to: data.email,
 			subject: EMAIL_EXPORT_READY.subject,
 			template: exportReadyTemplate,
-			templateData: { downloadUrl: url },
+			templateData: { downloadUrl: url, timestamp: readableTimestamp },
 		});
 
-		this.logger.log(`Export ready for user ${data.userId}: ${url}`);
+		this.logger.log(`User export ready for user ${data.userId} at ${data.timestamp}`);
+
 		return { key, url };
 	}
 
 	@OnWorkerEvent('failed')
 	async onJobFailed(job: Job, error: Error) {
 		const maxAttempts = job.opts.attempts ?? 1;
-		const isFinalFailure = job.attemptsMade >= maxAttempts;
-
-		if (isFinalFailure && job.data?.userId) {
-			await this.userService.recordExportRequest(job.data.userId, null);
-		}
-
 		console.error(
 			`Job ${job.id} failed (attempt ${job.attemptsMade}/${maxAttempts}): ${error.message}`,
 		);

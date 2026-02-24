@@ -15,7 +15,4 @@ export class User extends BaseModel {
 
 	@Field()
 	username: string;
-
-	@Field(() => Date, { nullable: true })
-	lastExportAt?: Date;
 }

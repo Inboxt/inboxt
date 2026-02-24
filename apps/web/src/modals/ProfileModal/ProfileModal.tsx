@@ -93,13 +93,6 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 	const labelsUsed = data?.me?.labelsCount ?? 0;
 	const inboundEmailAddressesUsed = data?.me?.inboundEmailAddressesCount ?? 0;
 
-	const lastExportAt = data?.me?.lastExportAt;
-	const now = dayjs();
-	const last = lastExportAt ? dayjs(lastExportAt) : null;
-	const isBlocked = !!last && now.diff(last, 'hour') < 24;
-	const msLeft = isBlocked ? dayjs.duration(24, 'hour').asMilliseconds() - now.diff(last) : 0;
-	const duration = dayjs.duration(msLeft);
-
 	return (
 		<Form onSubmit={form.onSubmit(handleUpdateProfile)} error={updateProfileError}>
 			{({ error }) => (
@@ -274,7 +267,6 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 														type: ExportType.All,
 													})
 												}
-												disabled={isBlocked}
 											>
 												Export Full Account Data
 											</Button>
@@ -293,12 +285,6 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 												Export Highlights
 											</Button>
 										</Flex>
-
-										{isBlocked && (
-											<Text size="xs" c="dimmed" ta="center">
-												{`You recently requested a full export. You can request another full export in ${duration.hours()}h ${duration.minutes()}m.`}
-											</Text>
-										)}
 									</Stack>
 								</Accordion.Panel>
 							</Accordion.Item>

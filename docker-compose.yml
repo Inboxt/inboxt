@@ -24,6 +24,7 @@ services:
     restart: unless-stopped
     command: >
       valkey-server
+      --port ${VALKEY_PORT:-6379}
       --save 60 1
       --loglevel warning
       --maxmemory 256mb
@@ -33,7 +34,7 @@ services:
     networks:
       - inboxt_network
     healthcheck:
-      test: ["CMD", "valkey-cli", "ping"]
+      test: ["CMD", "valkey-cli", "-p", "${VALKEY_PORT:-6379}", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -42,11 +43,17 @@ services:
     image: ghcr.io/inboxt/inboxt:${IMAGE_TAG:-latest}
     container_name: inboxt
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
       DATABASE_URL: postgresql://${DATABASE_USER:-inboxt}:${DATABASE_PASSWORD}@postgres:5432/${DATABASE_NAME:-inboxt}
+      VALKEY_HOST: ${VALKEY_HOST:-valkey}
+      VALKEY_PORT: ${VALKEY_PORT:-6379}
     volumes:
-      - .env:/app/.env
       - exports_data:/app/exports
+    # Exposes the app on http://localhost:7000
+    # If using a reverse proxy (Traefik, Caddy, Nginx Proxy Manager, etc.),
+    # remove this section and attach the container to your proxy network instead.
     ports:
       - "7000:7000"
     depends_on:

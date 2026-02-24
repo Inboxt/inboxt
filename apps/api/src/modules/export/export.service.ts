@@ -1,5 +1,5 @@
 import { InjectQueue } from '@nestjs/bullmq';
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import archiver from 'archiver';
 import { Queue } from 'bullmq';
 import dayjs from 'dayjs';
@@ -10,7 +10,6 @@ import { Prisma } from '@inboxt/prisma';
 import { ExportHighlightsFormat } from '~common/enums/export-highlights-format.enum';
 import { ExportType } from '~common/enums/export-type.enum';
 import { SavedItemExportJson } from '~common/types';
-import { AppException } from '~common/utils/app-exception';
 import { renderHighlightsHtml } from '~common/utils/renderHighlightsHtml';
 import { HighlightService } from '~modules/highlight/highlight.service';
 import { InboundEmailAddressService } from '~modules/inbound-email-address/inbound-email-address.service';
@@ -420,19 +419,13 @@ export class ExportService {
 				return;
 			}
 
-			if (user.lastExportAt && dayjs(user.lastExportAt).add(24, 'hour').isAfter(dayjs())) {
-				throw new AppException(
-					"You've already requested an export within the last 24 hours. Please try again later.",
-					HttpStatus.BAD_REQUEST,
-				);
-			}
-
-			await this.userService.recordExportRequest(userId, new Date());
 			await this.exportQueue.add('export-all-data', {
 				userId,
 				email: user.emailAddress,
 				formatForHighlights: input.formatForHighlights,
+				timestamp: dayjs().toISOString(),
 			});
+
 			return;
 		}
 

@@ -81,7 +81,6 @@ model user {
   emailVerifyExpiry     DateTime?               @db.Timestamptz(6)
   resetPasswordCode     String?
   resetPasswordExpiry   DateTime?               @db.Timestamptz(6)
-  lastExportAt          DateTime?               @db.Timestamptz(6)
   api_token             api_token[]
   highlight             highlight[]
   inbound_email_address inbound_email_address[]

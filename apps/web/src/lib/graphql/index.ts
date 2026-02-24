@@ -14,7 +14,6 @@ export const USER_FRAGMENT = gql(`
 		pendingEmailAddress
 		labelsCount
 		inboundEmailAddressesCount
-		lastExportAt
 	}
 `);
 

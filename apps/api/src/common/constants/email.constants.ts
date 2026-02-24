@@ -39,5 +39,6 @@ export const EMAIL_VERIFY = {
 
 export const EMAIL_EXPORT_READY = {
 	subject: 'Your Inboxt data export is ready',
-	description: 'Download your ZIP archive. The link will expire in 24 hours.',
+	description: ({ timestamp }: { timestamp: string }) =>
+		`Download your ZIP archive. Generated on ${timestamp}`,
 };
