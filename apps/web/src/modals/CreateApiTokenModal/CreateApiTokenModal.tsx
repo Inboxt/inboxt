@@ -227,10 +227,13 @@ export const CreateApiTokenModal = ({
 									flex: 1,
 								}}
 							>
-								{`${runtimeConfig.appUrl}/graphql`}
+								{`${runtimeConfig.appUrl}/api/graphql`}
 							</Text>
 
-							<CopyButton value={`${runtimeConfig.appUrl}/graphql`} timeout={2000}>
+							<CopyButton
+								value={`${runtimeConfig.appUrl}/api/graphql`}
+								timeout={2000}
+							>
 								{({ copied, copy }) => (
 									<ActionIcon
 										variant="light"

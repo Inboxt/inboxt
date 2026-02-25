@@ -5,16 +5,18 @@ import {
 	Card,
 	Group,
 	Loader,
+	PasswordInput,
 	Stack,
 	Text,
 	TextInput,
 	Title,
 } from '@mantine/core';
-import { IconCheck, IconExternalLink } from '@tabler/icons-react';
+import { IconCheck, IconExternalLink, IconSettings } from '@tabler/icons-react';
 import { useState, useEffect } from 'react';
 
 import { graphqlFetch } from '@/utils/graphql';
 import { getApiToken, setApiToken } from '@/utils/token';
+import { getAppUrl, setAppUrl } from '@/utils/url';
 
 const ME_QUERY = `
   query Me {
@@ -26,14 +28,11 @@ const ME_QUERY = `
 
 type TokenStatus = 'loading' | 'valid' | 'invalid' | 'missing';
 
-interface ApiTokenSettingsProps {
-	onBack: () => void;
-}
-
-export const ApiTokenSettings = ({ onBack }: ApiTokenSettingsProps) => {
+export const ApiTokenSettings = () => {
 	const [tokenStatus, setTokenStatus] = useState<TokenStatus>('loading');
 	const [isEditing, setIsEditing] = useState(false);
 	const [newToken, setNewToken] = useState('');
+	const [newAppUrl, setNewAppUrl] = useState('');
 	const [saving, setSaving] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [success, setSuccess] = useState(false);
@@ -50,18 +49,28 @@ export const ApiTokenSettings = ({ onBack }: ApiTokenSettingsProps) => {
 
 			await graphqlFetch<{ me: { id: string } }>(ME_QUERY);
 			setTokenStatus('valid');
-		} catch (err) {
+		} catch (_err) {
 			setTokenStatus('invalid');
 		}
 	};
 
 	useEffect(() => {
 		void validateToken();
+		getAppUrl().then((url) => {
+			if (url) {
+				setNewAppUrl(url);
+			}
+		});
 	}, []);
 
 	const handleSave = async () => {
-		if (!newToken.trim()) {
+		if (isEditing && !newToken.trim()) {
 			setError('Please enter a valid API token');
+			return;
+		}
+
+		if (!newAppUrl.trim()) {
+			setError('Please enter a valid App URL');
 			return;
 		}
 
@@ -70,14 +79,17 @@ export const ApiTokenSettings = ({ onBack }: ApiTokenSettingsProps) => {
 		setSuccess(false);
 
 		try {
-			await setApiToken(newToken.trim());
+			await setAppUrl(newAppUrl.trim());
+			if (isEditing) {
+				await setApiToken(newToken.trim());
+			}
 			await validateToken();
 			setIsEditing(false);
 			setNewToken('');
 			setSuccess(true);
 			setTimeout(() => setSuccess(false), 3000);
 		} catch (err: any) {
-			setError(err?.message ?? 'Failed to save token');
+			setError(err?.message ?? 'Failed to save settings');
 		} finally {
 			setSaving(false);
 		}
@@ -110,25 +122,42 @@ export const ApiTokenSettings = ({ onBack }: ApiTokenSettingsProps) => {
 	return (
 		<Box style={{ width: 420 }} p="md">
 			<Stack gap="md">
-				<Group justify="space-between">
-					<Title order={4}>API Token Settings</Title>
-					<Button variant="subtle" size="xs" onClick={onBack}>
-						Back
-					</Button>
+				<Group gap="xs">
+					<IconSettings size={18} />
+					<Title order={4}>Extension Settings</Title>
 				</Group>
 
 				{success && (
 					<Alert color="green" icon={<IconCheck size={16} />}>
-						API token updated successfully!
+						Settings updated successfully!
 					</Alert>
 				)}
+
+				<Card>
+					<Stack gap="sm">
+						<TextInput
+							label="App URL"
+							placeholder="https://your-inboxt-instance.com"
+							description="The URL of your Inboxt instance GraphQL endpoint"
+							value={newAppUrl}
+							onChange={(e) => setNewAppUrl(e.currentTarget.value)}
+							size="sm"
+						/>
+
+						{!isEditing && (
+							<Button onClick={handleSave} loading={saving} size="xs" variant="light">
+								Save App URL
+							</Button>
+						)}
+					</Stack>
+				</Card>
 
 				<Card>
 					<Stack gap="sm">
 						<Group justify="space-between" align="center">
 							<Stack gap={2}>
 								<Text size="sm" fw={500}>
-									Current Status
+									API Token Status
 								</Text>
 								<Group gap="xs">
 									{tokenStatus === 'loading' && <Loader size="xs" />}
@@ -142,7 +171,10 @@ export const ApiTokenSettings = ({ onBack }: ApiTokenSettingsProps) => {
 								<Button
 									size="xs"
 									variant="light"
-									onClick={() => setIsEditing(true)}
+									onClick={() => {
+										setIsEditing(true);
+										setError(null);
+									}}
 								>
 									{tokenStatus === 'missing' ? 'Add Token' : 'Update Token'}
 								</Button>
@@ -154,7 +186,7 @@ export const ApiTokenSettings = ({ onBack }: ApiTokenSettingsProps) => {
 				{isEditing && (
 					<Card>
 						<Stack gap="sm">
-							<TextInput
+							<PasswordInput
 								label="New API Token"
 								placeholder="Paste your new API token here"
 								value={newToken}
@@ -197,9 +229,21 @@ export const ApiTokenSettings = ({ onBack }: ApiTokenSettingsProps) => {
 							variant="light"
 							size="xs"
 							leftSection={<IconExternalLink size={14} />}
-							onClick={() => {
+							onClick={async () => {
+								const currentAppUrl = await getAppUrl();
+								if (!currentAppUrl) {
+									setError('App URL is not configured');
+									return;
+								}
+								let webUrl = currentAppUrl;
+
+								// If the URL contains /api, remove it and everything after it to get the root web URL
+								if (webUrl.includes('/api')) {
+									webUrl = webUrl.split('/api')[0];
+								}
+
 								browser.tabs.create({
-									url: `${import.meta.env!.VITE_WEB_URL}?modal=api-tokens`,
+									url: `${webUrl}?modal=api-tokens`,
 								});
 								window.close();
 							}}

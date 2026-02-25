@@ -1,6 +1,5 @@
 import { getApiToken } from '@/utils/token.ts';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { getAppUrl } from '@/utils/url.ts';
 
 type GraphQLResponse<T> = {
 	data?: T;
@@ -9,7 +8,17 @@ type GraphQLResponse<T> = {
 
 export async function graphqlFetch<T>(query: string, variables?: Record<string, any>): Promise<T> {
 	const token = await getApiToken();
-	const res = await fetch(`${API_URL}/graphql`, {
+	let apiUrl = await getAppUrl();
+
+	if (!apiUrl) {
+		throw new Error('App URL not configured');
+	}
+
+	if (!apiUrl.endsWith('/api') && !apiUrl.endsWith('/api/')) {
+		apiUrl = `${apiUrl.replace(/\/$/, '')}/api`;
+	}
+
+	const res = await fetch(`${apiUrl}/graphql`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',

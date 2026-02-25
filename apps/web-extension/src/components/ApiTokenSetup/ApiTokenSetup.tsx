@@ -1,7 +1,18 @@
-import { Box, Button, Card, Group, Stack, Text, TextInput, Title } from '@mantine/core';
-import { useState } from 'react';
+import {
+	Box,
+	Button,
+	Card,
+	Group,
+	PasswordInput,
+	Stack,
+	Text,
+	TextInput,
+	Title,
+} from '@mantine/core';
+import { useState, useEffect } from 'react';
 
 import { setApiToken } from '@/utils/token';
+import { getAppUrl, setAppUrl } from '@/utils/url';
 
 interface ApiTokenSetupProps {
 	onTokenSaved: () => void;
@@ -9,8 +20,17 @@ interface ApiTokenSetupProps {
 
 export const ApiTokenSetup = ({ onTokenSaved }: ApiTokenSetupProps) => {
 	const [token, setToken] = useState('');
+	const [appUrl, setAppUrlState] = useState('');
 	const [saving, setSaving] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+
+	useEffect(() => {
+		getAppUrl().then((url) => {
+			if (url) {
+				setAppUrlState(url);
+			}
+		});
+	}, []);
 
 	const handleSave = async () => {
 		if (!token.trim()) {
@@ -18,14 +38,20 @@ export const ApiTokenSetup = ({ onTokenSaved }: ApiTokenSetupProps) => {
 			return;
 		}
 
+		if (!appUrl.trim()) {
+			setError('Please enter a valid App URL');
+			return;
+		}
+
 		setSaving(true);
 		setError(null);
 
 		try {
+			await setAppUrl(appUrl.trim());
 			await setApiToken(token.trim());
 			onTokenSaved();
 		} catch (err: any) {
-			setError(err?.message ?? 'Failed to save token');
+			setError(err?.message ?? 'Failed to save settings');
 		} finally {
 			setSaving(false);
 		}
@@ -37,16 +63,24 @@ export const ApiTokenSetup = ({ onTokenSaved }: ApiTokenSetupProps) => {
 				<Card>
 					<Stack>
 						<Group justify="space-between">
-							<Title order={5}>Connect your Inboxt account</Title>
+							<Title order={5}>Connect your Inboxt instance</Title>
 						</Group>
 
 						<Text size="sm" c="dimmed">
-							To save content from your browser, you need to configure an API token.
-							This allows the extension to securely communicate with your Inboxt
-							account.
+							To save content from your browser, you need to configure your App URL
+							and an API token.
 						</Text>
 
 						<TextInput
+							label="App URL"
+							placeholder="https://your-inboxt-instance.com"
+							description="The URL of your Inboxt instance"
+							value={appUrl}
+							onChange={(e) => setAppUrlState(e.currentTarget.value)}
+							size="sm"
+						/>
+
+						<PasswordInput
 							label="API Token"
 							placeholder="Paste your API token here"
 							value={token}
@@ -55,21 +89,9 @@ export const ApiTokenSetup = ({ onTokenSaved }: ApiTokenSetupProps) => {
 							size="sm"
 						/>
 
-						<Group justify="space-between">
-							<Button
-								variant="default"
-								onClick={() => {
-									browser.tabs.create({
-										url: `${import.meta.env!.VITE_WEB_URL}?modal=api-tokens`,
-									});
-									window.close();
-								}}
-							>
-								Manage API Tokens
-							</Button>
-
+						<Group justify="right">
 							<Button onClick={handleSave} loading={saving}>
-								Save token
+								Save settings
 							</Button>
 						</Group>
 					</Stack>

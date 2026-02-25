@@ -18,11 +18,7 @@ export default defineConfig({
 
 	manifest: {
 		permissions: ['tabs', 'storage'],
-		host_permissions: [
-			'http://localhost:7000/*',
-			'http://192.168.1.19:7000/*',
-			'https://api.inboxt.app/*',
-		],
+		host_permissions: ['<all_urls>'],
 	},
 
 	autoIcons: {

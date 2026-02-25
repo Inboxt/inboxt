@@ -5,12 +5,11 @@ import '@mantine/core/styles.css';
 
 import { AppThemeProvider } from '@inboxt/ui';
 
-import { ApiTokenSettings } from '@/components/ApiTokenSettings';
-import { ApiTokenSetup } from '@/components/ApiTokenSetup';
 import { SavePopup } from '@/components/SavePopup';
 import { getApiToken } from '@/utils/token';
+import { getAppUrl } from '@/utils/url';
 
-type View = 'loading' | 'setup' | 'save' | 'settings';
+type View = 'loading' | 'save';
 
 const App = () => {
 	const [view, setView] = useState<View>('loading');
@@ -19,29 +18,24 @@ const App = () => {
 	useEffect(() => {
 		const checkToken = async () => {
 			const token = await getApiToken();
-			setView(token ? 'save' : 'setup');
+			const url = await getAppUrl();
+			if (token && url) {
+				setView('save');
+			} else {
+				browser.runtime.openOptionsPage();
+				window.close();
+			}
 		};
 		void checkToken();
 	}, []);
 
 	const handleOpenSettings = () => {
-		setView('settings');
-	};
-
-	const handleBackFromSettings = () => {
-		setView('save');
+		browser.runtime.openOptionsPage();
+		window.close();
 	};
 
 	if (view === 'loading') {
 		return null;
-	}
-
-	if (view === 'setup') {
-		return <ApiTokenSetup onTokenSaved={() => setView('save')} />;
-	}
-
-	if (view === 'settings') {
-		return <ApiTokenSettings onBack={handleBackFromSettings} />;
 	}
 
 	return (
