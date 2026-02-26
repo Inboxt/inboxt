@@ -19,7 +19,7 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { ContextModalProps } from '@mantine/modals';
-import { IconBell, IconDatabase, IconHighlight, IconPuzzle } from '@tabler/icons-react';
+import { IconBell, IconDatabase, IconHighlight } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
@@ -157,12 +157,11 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 
 								<Button
 									component="a"
-									href="https://inboxt.app/install"
+									href="https://docs.inboxt.app/installation#browser-extensions"
 									size="xs"
-									variant="light"
-									leftSection={<IconPuzzle size={14} />}
+									variant="default"
 								>
-									Install
+									Install Extension
 								</Button>
 							</Flex>
 
@@ -185,7 +184,7 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 									size="xs"
 									variant="default"
 								>
-									View instructions
+									View Instructions
 								</Button>
 							</Flex>
 						</Stack>
