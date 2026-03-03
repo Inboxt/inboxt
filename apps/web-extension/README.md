@@ -12,6 +12,10 @@ Save articles and content directly to your Inboxt instance with a single click. 
 
 The extension is built with **WXT** (Web Extension Toolbox), providing a modern developer experience:
 - **UI Framework:** React & Mantine.
+- **Auto-Imports:** WXT automatically imports common APIs and your project's components, hooks, and utils. You don't need to manually `import` them:
+    - **WXT APIs:** `browser`, `onMessage`, `defineConfig`, etc.
+    - **Project Files:** Everything in `src/components/*`, `src/hooks/*`, and `src/utils/*`.
+    - Run `npx wxt prepare` to update the helper types in `.wxt/types/imports.d.ts`.
 - **API Sharing:** Shares core types and validation schemas with the monorepo via `@inboxt/common`.
 - **Packaging:** WXT handles manifest generation and cross-browser bundling.
 
