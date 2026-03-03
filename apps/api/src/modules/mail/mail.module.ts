@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 
 import { Config } from '~config/index';
+import { ContentExtractionService } from '~services/content-extraction.service';
 
 import { MailProcessor } from './mail.processor';
 import { MailService } from './mail.service';
@@ -23,6 +24,7 @@ import { MailService } from './mail.service';
 	providers: [
 		MailService,
 		MailProcessor,
+		ContentExtractionService,
 		{
 			provide: 'MAIL_TRANSPORTER',
 			useFactory: (configService: ConfigService<Config>) => {

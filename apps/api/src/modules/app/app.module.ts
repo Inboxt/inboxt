@@ -13,7 +13,6 @@ import { GlobalExceptionFilter } from '~common/exception-filters/global-exceptio
 import { AccountGuard } from '~common/guards/account.guard';
 import { ApiTokenGuard } from '~common/guards/api-token.guard';
 import { GqlAuthGuard } from '~common/guards/auth.guard';
-import { GqlRateLimitGuard } from '~common/guards/rate-limit.guard';
 import { RequestIdMiddleware } from '~common/middleware/request-id.middleware';
 import { config, type Config } from '~config/index';
 import { EntryManagerModule } from '~managers/entry-manager/entry-manager.module';
@@ -27,10 +26,11 @@ import { ImportModule } from '~modules/import/import.module';
 import { InboundEmailAddressModule } from '~modules/inbound-email-address/inbound-email-address.module';
 import { MailModule } from '~modules/mail/mail.module';
 import { PrismaModule } from '~modules/prisma/prisma.module';
+import { GqlRateLimitGuard } from '~modules/rate-limit/rate-limit.guard';
+import { RateLimitModule } from '~modules/rate-limit/rate-limit.module';
 import { SavedItemModule } from '~modules/saved-item/saved-item.module';
 import { ScheduleTasksModule } from '~modules/schedule/schedule-tasks.module';
 import { UserModule } from '~modules/user/user.module';
-import { RateLimitService } from '~services/rate-limit.service';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -101,6 +101,7 @@ import { AppService } from './app.service';
 		}),
 		ScheduleModule.forRoot(),
 		PrismaModule,
+		RateLimitModule,
 		UserModule,
 		AuthModule,
 		ActiveUserModule,
@@ -117,7 +118,6 @@ import { AppService } from './app.service';
 	],
 	providers: [
 		AppService,
-		RateLimitService,
 		{ provide: APP_GUARD, useClass: ApiTokenGuard },
 		{ provide: APP_GUARD, useClass: GqlAuthGuard },
 		{ provide: APP_GUARD, useClass: GqlRateLimitGuard },

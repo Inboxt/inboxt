@@ -26,7 +26,6 @@ interface NewsletterProcessingJobData {
 		savedItemId: string;
 		inboundEmailAddressId: string | null;
 		messageId: string | null;
-		eventId: string | null;
 	};
 	input: ProcessNewsletterInput;
 	prismaData?: Partial<
@@ -39,7 +38,7 @@ type SavedItemJob =
 	| { name: 'process-article'; data: ArticleProcessingJobData }
 	| { name: 'process-newsletter'; data: NewsletterProcessingJobData };
 
-@Processor('saved-item-processing', { concurrency: 5, lockDuration: 120000 })
+@Processor('saved-item-processing', { concurrency: 3, lockDuration: 120000 })
 export class SavedItemManagerProcessor extends BaseQueueProcessor {
 	protected readonly logger = new Logger(SavedItemManagerProcessor.name);
 	constructor(private readonly savedItemManagerService: SavedItemManagerService) {

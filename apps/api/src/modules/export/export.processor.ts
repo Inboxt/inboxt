@@ -2,6 +2,7 @@ import { OnWorkerEvent, Processor } from '@nestjs/bullmq';
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Job } from 'bullmq';
+import { createHmac } from 'crypto';
 import dayjs from 'dayjs';
 import { mkdir, writeFile } from 'fs/promises';
 import { join } from 'path';
@@ -82,7 +83,13 @@ export class ExportProcessor extends BaseQueueProcessor {
 			await writeFile(fullPath, zip);
 
 			const appUrl = this.configService.getOrThrow('appUrl', { infer: true });
-			url = `${appUrl}/api/exports/${data.userId}/${filename}`;
+			const securityConfig = this.configService.getOrThrow('security', { infer: true });
+
+			const signature = createHmac('sha256', securityConfig.jwtSecret)
+				.update(`${data.userId}/${filename}`)
+				.digest('hex');
+
+			url = `${appUrl}/api/exports/${data.userId}/${filename}?sig=${signature}`;
 		}
 
 		await this.mail.sendTemplate({

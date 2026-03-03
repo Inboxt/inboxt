@@ -1,9 +1,10 @@
-import { Controller, Get, HttpStatus, Param, Res } from '@nestjs/common';
+import { Controller, Get, HttpStatus, Param, Query, Res } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { createHmac, timingSafeEqual } from 'crypto';
 import { Response } from 'express';
 import { createReadStream } from 'fs';
 import { stat } from 'fs/promises';
-import { join } from 'path';
+import { join, normalize } from 'path';
 
 import { Public } from '~common/decorators/public.decorator';
 import { AppException } from '~common/utils/app-exception';
@@ -39,10 +40,33 @@ export class AppController {
 	async downloadExport(
 		@Param('userId') userId: string,
 		@Param('filename') filename: string,
+		@Query('sig') sig: string,
 		@Res() res: Response,
 	) {
+		const securityConfig = this.configService.getOrThrow('security', { infer: true });
+		if (!sig) {
+			throw new AppException('Missing signature', HttpStatus.UNAUTHORIZED);
+		}
+
+		const expectedSignature = createHmac('sha256', securityConfig.jwtSecret)
+			.update(`${userId}/${filename}`)
+			.digest('hex');
+
+		try {
+			if (!timingSafeEqual(Buffer.from(sig), Buffer.from(expectedSignature))) {
+				throw new Error('Invalid signature');
+			}
+		} catch (_err) {
+			throw new AppException('Invalid signature', HttpStatus.UNAUTHORIZED);
+		}
+
 		const exportsConfig = this.configService.getOrThrow('exports', { infer: true });
-		const filePath = join(exportsConfig.localPath, userId, filename);
+		const baseDir = normalize(exportsConfig.localPath);
+		const filePath = normalize(join(baseDir, userId, filename));
+
+		if (!filePath.startsWith(baseDir)) {
+			throw new AppException('Invalid file path', HttpStatus.BAD_REQUEST);
+		}
 
 		try {
 			const stats = await stat(filePath);

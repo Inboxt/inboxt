@@ -20,6 +20,8 @@ export const configSchema = z.object({
 			.default('30d'),
 		requireEmailVerification: z.boolean().default(false),
 		disableSignup: z.boolean().default(false),
+		webhookSecret: z.string().optional(),
+		webhookSecretHeader: z.string().default('x-webhook-secret'),
 	}),
 	errors: z
 		.object({
@@ -95,6 +97,8 @@ export const config = (): Config => {
 			expiresIn: process.env.API_JWT_EXPIRES_IN,
 			requireEmailVerification: process.env.REQUIRE_EMAIL_VERIFICATION === 'true',
 			disableSignup: process.env.DISABLE_SIGNUP === 'true',
+			webhookSecret: process.env.WEBHOOK_SECRET,
+			webhookSecretHeader: process.env.WEBHOOK_SECRET_HEADER,
 		},
 		errors:
 			process.env.API_ERRORS_DSN || process.env.WEB_ERRORS_DSN

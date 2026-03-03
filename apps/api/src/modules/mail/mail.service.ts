@@ -6,19 +6,42 @@ import mjml2html from 'mjml';
 
 import { EMAIL_FORWARDED } from '~common/constants/email.constants';
 import { forwardedEmailTemplate } from '~mail-templates/forwardedEmailTemplate';
+import { ContentExtractionService } from '~services/content-extraction.service';
 
 @Injectable()
 export class MailService {
-	constructor(@InjectQueue('mail') private readonly mailQueue: Queue) {}
+	constructor(
+		@InjectQueue('mail') private readonly mailQueue: Queue,
+		private readonly contentExtractionService: ContentExtractionService,
+	) {}
 
-	async forward(to: string, payload: any) {
-		const subject = payload.headers?.Subject?.[0] || 'Email without subject';
-		const from = payload.headers?.From?.[0] || 'Unknown sender';
-		const date = payload.headers?.Date?.[0]
-			? dayjs(payload.headers.Date[0]).format('MMMM D, YYYY [at] h:mm A')
-			: dayjs().format('MMMM D, YYYY [at] h:mm A');
-		const plainText = payload.body?.stripped_plaintext || '';
-		const htmlContent = payload.body?.stripped_html || '';
+	async forward(
+		to: string,
+		data: {
+			subject?: string | null;
+			from?: string | null;
+			date?: string | null;
+			plainText?: string | null;
+			htmlContent?: string | null;
+			messageId?: string | null;
+			toHeader?: string | null;
+			references?: string | null;
+		},
+	) {
+		const subject = data.subject || 'Email without subject';
+		const from = data.from || 'Unknown sender';
+		const date = data.date || dayjs().format('MMMM D, YYYY [at] h:mm A');
+		const plainText = data.plainText || '';
+		const rawHtmlContent = data.htmlContent || '';
+		const messageId = data.messageId || '';
+		const toHeader = data.toHeader || '';
+		const references = data.references || '';
+
+		let htmlContent = rawHtmlContent;
+
+		if (htmlContent) {
+			htmlContent = this.contentExtractionService.sanitizeHtml(htmlContent);
+		}
 
 		await this.sendTemplate({
 			to,
@@ -34,13 +57,12 @@ export class MailService {
 			headers: {
 				'X-Inboxt-Forwarded': 'true',
 				'X-Original-From': from,
-				'X-Original-To': payload.headers?.To?.[0] || '',
+				'X-Original-To': toHeader,
 				'X-Original-Subject': subject,
 				'X-Original-Date': date,
-				'X-Original-Message-ID': payload.headers?.['Message-ID']?.[0] || '',
-				References:
-					payload.headers?.References?.[0] || payload.headers?.['Message-ID']?.[0] || '',
-				'In-Reply-To': payload.headers?.['Message-ID']?.[0] || '',
+				'X-Original-Message-ID': messageId,
+				References: references || messageId,
+				'In-Reply-To': messageId,
 			},
 		});
 	}

@@ -7,7 +7,6 @@ import {
 	addArticleFromHtmlSnapshotSchema,
 	addItemFromUrlSchema,
 	APP_PRIMARY_COLOR,
-	inboundEmailSchema,
 } from '@inboxt/common';
 import { Prisma } from '@inboxt/prisma';
 
@@ -316,7 +315,6 @@ export class SavedItemManagerService {
 			savedItemId: string;
 			inboundEmailAddressId?: string | null;
 			messageId?: string | null;
-			eventId?: string | null;
 		},
 		input: ProcessNewsletterInput,
 		prismaData?: Partial<
@@ -333,7 +331,6 @@ export class SavedItemManagerService {
 					contentHtml: parsed?.contentHtml || DEFAULT_PROCESSED_ITEM_CONTENT,
 					contentText: parsed?.contentText || DEFAULT_PROCESSED_ITEM_CONTENT,
 					messageId: ids.messageId,
-					eventId: ids.eventId,
 				},
 				client,
 			);
@@ -397,7 +394,6 @@ export class SavedItemManagerService {
 		userId: string,
 		inboundEmailAddressId: string | null,
 		messageId: string | null,
-		eventId: string | null,
 		input: ProcessNewsletterInput,
 		prismaData?: Partial<
 			Omit<Prisma.saved_itemCreateInput, 'user' | 'saved_item_label' | 'newsletter' | 'id'>
@@ -419,7 +415,6 @@ export class SavedItemManagerService {
 					userId,
 					inboundEmailAddressId,
 					messageId,
-					eventId,
 					savedItemId: created.id,
 				},
 				input,
@@ -436,21 +431,27 @@ export class SavedItemManagerService {
 	}
 
 	async addNewsletterFromEmail(payload: any) {
-		const parsed = inboundEmailSchema.safeParse(payload);
-		if (!parsed.success) {
-			this.logger.warn('Invalid inbound email payload shape. Skipping.');
-			return;
-		}
+		const items = Array.isArray(payload)
+			? payload
+			: payload.items && Array.isArray(payload.items)
+				? payload.items
+				: [payload];
 
+		for (const item of items) {
+			await this.processSingleInboundEmail(item);
+		}
+	}
+
+	private async processSingleInboundEmail(payload: any) {
 		const recipient = this.newsletterService.extractRecipient(payload);
 		if (!recipient) {
 			this.logger.warn('No recipient addresses found in payload.');
 			return;
 		}
 
-		const eventId = this.newsletterService.extractEventId(payload);
-		if (!eventId) {
-			this.logger.warn('No eventId found in payload.');
+		const inboundEmailAddress = await this.inboundEmailAddressService.verify(recipient);
+		if (!inboundEmailAddress || !inboundEmailAddress?.userId) {
+			this.logger.warn(`Recipient ${recipient} is not a valid or active inbox address.`);
 			return;
 		}
 
@@ -460,11 +461,17 @@ export class SavedItemManagerService {
 			return;
 		}
 
+		const html = this.newsletterService.extractHtml(payload) || undefined;
+		if (html && html.length > 5_000_000) {
+			this.logger.warn('HTML payload too large, skipping heavy processing');
+			return this.forwardNewsletter(inboundEmailAddress.userId, payload);
+		}
+
 		return this.processNewsletterPayload({
-			eventId,
 			messageId,
 			recipient,
-			html: this.newsletterService.extractHtml(payload) || undefined,
+			inboundEmailAddress,
+			html,
 			text: this.newsletterService.extractText(payload) || undefined,
 			subject: this.newsletterService.extractSubject(payload) || undefined,
 			from: this.newsletterService.extractAuthor(payload),
@@ -473,10 +480,31 @@ export class SavedItemManagerService {
 		});
 	}
 
+	private async forwardNewsletter(userId: string, rawPayload: any) {
+		const user = await this.userService.get({
+			where: { id: userId },
+		});
+
+		if (!user) {
+			return;
+		}
+
+		return this.mailService.forward(user.emailAddress, {
+			subject: this.newsletterService.extractSubject(rawPayload),
+			from: this.newsletterService.extractAuthor(rawPayload),
+			date: this.newsletterService.extractDate(rawPayload),
+			plainText: this.newsletterService.extractText(rawPayload),
+			htmlContent: this.newsletterService.extractHtml(rawPayload),
+			messageId: this.newsletterService.extractMessageId(rawPayload),
+			toHeader: this.newsletterService.extractToHeader(rawPayload),
+			references: this.newsletterService.extractReferences(rawPayload),
+		});
+	}
+
 	private async processNewsletterPayload(data: {
-		eventId: string;
 		messageId: string;
 		recipient: string;
+		inboundEmailAddress: Prisma.inbound_email_addressGetPayload<null>;
 		html?: string;
 		text?: string;
 		subject?: string;
@@ -485,23 +513,17 @@ export class SavedItemManagerService {
 		rawPayload: any;
 	}) {
 		this.logger.log(
-			`Starting to process incoming newsletter email with eventId: ${data.eventId}`,
+			`Starting to process incoming newsletter email with messageId: ${data.messageId}`,
 		);
 
-		const inboundEmailAddress = await this.inboundEmailAddressService.verify(data.recipient);
-		if (!inboundEmailAddress || !inboundEmailAddress?.userId) {
-			this.logger.warn(`Recipient ${data.recipient} is not a valid or active inbox address.`);
-			return;
-		}
-
-		const isDuplicate = await this.newsletterService.get(inboundEmailAddress.userId, {
+		const isDuplicate = await this.newsletterService.get(data.inboundEmailAddress.userId!, {
 			where: {
-				eventId: data.eventId,
+				messageId: data.messageId,
 			},
 		});
 
 		if (isDuplicate) {
-			this.logger.log(`Duplicate event ID: ${data.eventId}. Skipping.`);
+			this.logger.log(`Duplicate message ID: ${data.messageId}. Skipping.`);
 			return;
 		}
 
@@ -510,20 +532,14 @@ export class SavedItemManagerService {
 				'No HTML content found or newsletter is possibly unreadable. Forwarding to user.',
 			);
 
-			const user = await this.userService.get({ where: { id: inboundEmailAddress.userId } });
-			if (!user) {
-				return;
-			}
-
-			return this.mailService.forward(user.emailAddress, data.rawPayload);
+			return this.forwardNewsletter(data.inboundEmailAddress.userId!, data.rawPayload);
 		}
 
 		try {
 			await this.processAndCreateNewsletter(
-				inboundEmailAddress.userId,
-				inboundEmailAddress.id,
+				data.inboundEmailAddress.userId!,
+				data.inboundEmailAddress.id,
 				data.messageId,
-				data.eventId,
 				{ html: data.html, text: data.text },
 				{
 					title: data.subject,

@@ -1,6 +1,7 @@
 import { BullModule } from '@nestjs/bullmq';
 import { Module } from '@nestjs/common';
 
+import { WebhookSecretGuard } from '~common/guards/webhook-secret.guard';
 import { InboundEmailAddressModule } from '~modules/inbound-email-address/inbound-email-address.module';
 import { MailModule } from '~modules/mail/mail.module';
 import { ArticleModule } from '~modules/saved-item/entities/article/article.module';
@@ -28,7 +29,12 @@ import { SavedItemManagerService } from './saved-item-manager.service';
 			name: 'saved-item-processing',
 		}),
 	],
-	providers: [SavedItemManagerService, SavedItemManagerProcessor, SavedItemManagerResolver],
+	providers: [
+		SavedItemManagerService,
+		SavedItemManagerProcessor,
+		SavedItemManagerResolver,
+		WebhookSecretGuard,
+	],
 	controllers: [SavedItemManagerController],
 	exports: [SavedItemManagerService],
 })

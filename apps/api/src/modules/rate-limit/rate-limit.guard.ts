@@ -8,13 +8,13 @@ import {
 import { Reflector } from '@nestjs/core';
 import { GqlExecutionContext } from '@nestjs/graphql';
 
-import { RateLimitService } from '~services/rate-limit.service';
-
 import {
 	AuthState,
 	RATE_LIMIT_META_KEY,
 	RateLimitOptions,
-} from '../decorators/rate-limit.decorator';
+} from '~common/decorators/rate-limit.decorator';
+
+import { RateLimitService } from './rate-limit.service';
 
 @Injectable()
 export class GqlRateLimitGuard implements CanActivate {

@@ -18,6 +18,8 @@ export class RateLimitService implements OnModuleDestroy {
 
 	private readonly limiters: Record<AuthState, RateLimiterValkey>;
 
+	private readonly customLimiters = new Map<string, RateLimiterValkey>();
+
 	constructor(private readonly configService: ConfigService<Config>) {
 		const valkeyConfig = this.configService.getOrThrow('valkey', { infer: true });
 		this.valkeyClient = new Valkey({
@@ -54,13 +56,21 @@ export class RateLimitService implements OnModuleDestroy {
 
 	async consumeCustom(authState: AuthState, key: string, options: Partial<RateLimitBucket>) {
 		const base = this.buckets[authState];
+		const points = options.points ?? base.points;
+		const duration = options.duration ?? base.duration;
 
-		const limiter = new RateLimiterValkey({
-			storeClient: this.valkeyClient,
-			keyPrefix: `rl:${authState}:custom`,
-			points: options.points ?? base.points,
-			duration: options.duration ?? base.duration,
-		});
+		const customKey = `${authState}:${points}:${duration}`;
+		let limiter = this.customLimiters.get(customKey);
+
+		if (!limiter) {
+			limiter = new RateLimiterValkey({
+				storeClient: this.valkeyClient,
+				keyPrefix: `rl:${authState}:custom:${points}:${duration}`,
+				points,
+				duration,
+			});
+			this.customLimiters.set(customKey, limiter);
+		}
 
 		return limiter.consume(key);
 	}

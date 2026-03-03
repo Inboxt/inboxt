@@ -40,7 +40,7 @@ async function bootstrap() {
 		});
 	}
 
-	app.use('/inbox/items/mail-webhook', json({ limit: '40mb' }));
+	app.use('/api/inbox/items/mail-webhook', json({ limit: '30mb' }));
 	app.use(json({ limit: '1mb' }));
 
 	app.use(cookieParser());

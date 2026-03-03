@@ -110,6 +110,11 @@ export class ContentExtractionService {
 		};
 	}
 
+	public sanitizeHtml(html: string) {
+		const { window } = this.prepareDom(html);
+		return this.purifyAndSanitizeHtml(html, window);
+	}
+
 	private purifyAndSanitizeHtml(html: string, window: WindowLike) {
 		const purify = DOMPurify(window);
 		return purify.sanitize(html, {

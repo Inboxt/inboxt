@@ -182,7 +182,6 @@ export class ImportService {
 				userId,
 				null,
 				null,
-				null,
 				{
 					html,
 				},
@@ -377,7 +376,6 @@ export class ImportService {
 						if (looksLikeNewsletter) {
 							await this.savedItemManagerService.processAndCreateNewsletter(
 								data.userId,
-								null,
 								null,
 								null,
 								{ html },

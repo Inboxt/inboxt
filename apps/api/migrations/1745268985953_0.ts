@@ -205,7 +205,6 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 		contentHtml: { type: 'text', notNull: true },
 		contentText: { type: 'text', notNull: true },
 		messageId: 'text',
-		eventId: 'text',
 		subscriptionId: {
 			type: 'uuid',
 			notNull: false,
@@ -215,7 +214,6 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 	});
 
 	pgm.createIndex('newsletter', 'messageId');
-	pgm.createIndex('newsletter', 'eventId');
 	pgm.createIndex('newsletter', 'subscriptionId');
 	pgm.createIndex('newsletter', 'inboundEmailAddressId');
 
@@ -306,7 +304,6 @@ export async function down(pgm: MigrationBuilder): Promise<void> {
 	pgm.dropIndex('label', ['userId', 'name'], { unique: true });
 	pgm.dropIndex('newsletter_subscription', 'inboundEmailAddressId');
 	pgm.dropIndex('newsletter', 'messageId');
-	pgm.dropIndex('newsletter', 'eventId');
 	pgm.dropIndex('newsletter', 'subscriptionId');
 	pgm.dropIndex('newsletter', 'inboundEmailAddressId');
 	pgm.dropIndex('highlight', 'userId');

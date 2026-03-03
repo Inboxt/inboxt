@@ -1,11 +1,25 @@
 import { useMutation, useQuery } from '@apollo/client';
-import { Alert, Button, Skeleton, Stack, Text } from '@mantine/core';
+import {
+	Alert,
+	Button,
+	Group,
+	Card,
+	Skeleton,
+	Stack,
+	Text,
+	TextInput,
+	Title,
+	Tooltip,
+	ActionIcon,
+	CopyButton,
+} from '@mantine/core';
 import { ContextModalProps } from '@mantine/modals';
-import { IconAlertTriangleFilled } from '@tabler/icons-react';
+import { IconAlertTriangleFilled, IconCheck, IconCopy } from '@tabler/icons-react';
 import { useEffect } from 'react';
 
 import { ButtonContainer } from '~components/ButtonContainer';
 import { CREATE_INBOUND_EMAIL_ADDRESS, INBOUND_EMAIL_ADDRESSES } from '~lib/graphql';
+import { runtimeConfig } from '~lib/runtime-config';
 import { modals } from '~modals/modals';
 import { parseError } from '~utils/parse-error';
 
@@ -17,6 +31,8 @@ export const EmailsModal = ({ id, context }: ContextModalProps) => {
 	});
 
 	const emails = data?.inboundEmailAddresses || [];
+	const webhookUrl = `${runtimeConfig.appUrl}/inbox/items/mail-webhook`;
+
 	useEffect(() => {
 		modals.update(id, {
 			title: `Manage Email Addresses (${emails.length})`,
@@ -44,7 +60,46 @@ export const EmailsModal = ({ id, context }: ContextModalProps) => {
 			</Alert>
 
 			<Skeleton visible={loading}>
-				{emails.length === 0 && (
+				{webhookUrl && (
+					<Card mb="xl">
+						<Stack gap="xs">
+							<Title order={5}>Webhook URL:</Title>
+							<Group gap="xs" wrap="nowrap">
+								<TextInput
+									value={webhookUrl}
+									readOnly
+									size="sm"
+									variant="unstyled"
+									style={{ flex: 1 }}
+								/>
+								<CopyButton value={webhookUrl} timeout={2000}>
+									{({ copied, copy }) => (
+										<Tooltip label={copied ? 'Copied' : 'Copy URL'}>
+											<ActionIcon
+												color={copied ? 'teal' : undefined}
+												variant="light"
+												size="lg"
+												onClick={copy}
+											>
+												{copied ? (
+													<IconCheck size={18} />
+												) : (
+													<IconCopy size={18} />
+												)}
+											</ActionIcon>
+										</Tooltip>
+									)}
+								</CopyButton>
+							</Group>
+							<Text size="xs" c="dimmed">
+								Use this URL in your email provider's settings to forward emails to
+								the app.
+							</Text>
+						</Stack>
+					</Card>
+				)}
+
+				{emails.length === 0 && !loading && (
 					<Text size="sm" c="dimmed">
 						You haven't created any email addresses yet.
 					</Text>

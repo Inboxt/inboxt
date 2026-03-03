@@ -1,5 +1,5 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { JSDOM } from 'jsdom';
+import dayjs from 'dayjs';
 
 import { MAX_NEWSLETTER_WORD_COUNT, MIN_NEWSLETTER_WORD_COUNT } from '@inboxt/common';
 import { Prisma } from '@inboxt/prisma';
@@ -25,34 +25,92 @@ export class NewsletterService {
 			return payload.recipient;
 		}
 
+		if (payload.rcpt_to) {
+			return payload.rcpt_to;
+		}
+
+		if (payload.Recipient) {
+			return payload.Recipient;
+		}
+
+		if (payload.OriginalRecipient) {
+			return payload.OriginalRecipient;
+		}
+
+		const recipients = payload.Recipients || payload.items?.[0]?.Recipients;
+		if (Array.isArray(recipients) && recipients[0]) {
+			return recipients[0];
+		}
+
+		if (payload.msys?.relay_message?.rcpt_to) {
+			return payload.msys.relay_message.rcpt_to;
+		}
+
+		if (payload.ToFull?.length) {
+			return payload.ToFull[0].Email;
+		}
+
 		const toAddresses: string[] = payload.recipients?.length
 			? payload.recipients
 			: (payload.headers?.To ?? []);
 
-		return toAddresses?.[0] ?? null;
+		return toAddresses?.[0] ?? payload.To ?? null;
 	}
 
 	extractSubject(payload: any): string | null {
-		if (payload.subject) {
-			return payload.subject;
-		}
-		return payload.headers?.Subject?.[0] ?? null;
-	}
-
-	extractEventId(payload: any): string | null {
-		return payload.eventId || payload._id || null;
+		return (
+			payload.subject ||
+			payload.Subject ||
+			payload.items?.[0]?.Subject ||
+			payload.msys?.relay_message?.content?.subject ||
+			payload.headers?.Subject?.[0] ||
+			null
+		);
 	}
 
 	extractMessageId(payload: any): string | null {
-		return payload.messageId || payload.message_id || null;
+		return (
+			payload.messageId ||
+			payload.message_id ||
+			payload.MessageID ||
+			payload.MessageId ||
+			payload.items?.[0]?.MessageId ||
+			payload.msys?.relay_message?.content?.['Message-ID'] ||
+			payload.headers?.['Message-ID']?.[0] ||
+			payload.eventId ||
+			payload._id ||
+			null
+		);
 	}
 
 	extractHtml(payload: any): string | null {
-		return payload.html || payload.body?.stripped_html || payload.body?.html || null;
+		return (
+			payload.html ||
+			payload.HtmlBody ||
+			payload.RawHtmlBody ||
+			payload.html_body ||
+			payload['Html-part'] ||
+			payload.items?.[0]?.RawHtmlBody ||
+			payload.msys?.relay_message?.content?.html ||
+			payload.body?.stripped_html ||
+			payload.body?.html ||
+			null
+		);
 	}
 
 	extractText(payload: any): string | null {
-		return payload.text || payload.body?.stripped_plaintext || payload.body?.plaintext || null;
+		return (
+			payload.text ||
+			payload.TextBody ||
+			payload.RawTextBody ||
+			payload.plain_body ||
+			payload['Text-part'] ||
+			payload.items?.[0]?.RawTextBody ||
+			payload.msys?.relay_message?.content?.text ||
+			payload.body?.stripped_plaintext ||
+			payload.body?.plaintext ||
+			null
+		);
 	}
 
 	extractUnsubscribeUrl(payload: any): string | null {
@@ -72,16 +130,28 @@ export class NewsletterService {
 		}
 
 		// Fallback: scan HTML content for "unsubscribe" links
-		const html: string = payload?.body?.stripped_html || '';
-		const dom = new JSDOM(html);
-		const doc = dom.window.document;
-		const links = Array.from(doc.querySelectorAll('a[href]'));
+		const html: string =
+			payload?.body?.stripped_html ||
+			payload?.RawHtmlBody ||
+			payload?.html_body ||
+			payload?.['Html-part'] ||
+			payload?.html ||
+			'';
 
-		for (const link of links) {
-			const text = link.textContent?.toLowerCase() || '';
-			const href = link.getAttribute('href') || '';
-			if (text.includes('unsubscribe') || href.includes('unsubscribe')) {
-				return href;
+		if (!html) {
+			return null;
+		}
+
+		const regex = /<a\s+(?:[^>]*?\s+)?href=(["'])(.*?)\1[^>]*>(.*?)<\/a>/gi;
+		let match;
+		while ((match = regex.exec(html)) !== null) {
+			const href = match[2];
+			const text = (match[3] || '').toLowerCase();
+			if (
+				text.includes('unsubscribe') ||
+				(href && href.toLowerCase().includes('unsubscribe'))
+			) {
+				return href || null;
 			}
 		}
 
@@ -93,7 +163,39 @@ export class NewsletterService {
 			return payload.from;
 		}
 
-		const fromHeader = payload.headers?.From?.[0]?.trim();
+		if (payload.FromName) {
+			return payload.FromName;
+		}
+
+		if (payload.FromFull?.Name) {
+			return payload.FromFull.Name;
+		}
+
+		if (payload.FromFull?.Email) {
+			return payload.FromFull.Email;
+		}
+
+		if (payload.Sender) {
+			return payload.Sender;
+		}
+
+		if (payload.msg_from) {
+			return payload.msg_from;
+		}
+
+		const brevoFrom = payload.items?.[0]?.From;
+		if (brevoFrom) {
+			return brevoFrom.Name || brevoFrom.Address || 'Unknown sender';
+		}
+
+		if (payload.msys?.relay_message?.friendly_from) {
+			return payload.msys.relay_message.friendly_from;
+		}
+		if (payload.msys?.relay_message?.msg_from) {
+			return payload.msys.relay_message.msg_from;
+		}
+
+		const fromHeader = payload.headers?.From?.[0]?.trim() || payload.From?.trim();
 		const envelopeSender = payload.envelope_sender?.trim();
 
 		if (fromHeader) {
@@ -158,6 +260,71 @@ export class NewsletterService {
 		}
 
 		return this.prisma.$transaction((client) => run(client));
+	}
+
+	extractDate(payload: any) {
+		let dateHeader =
+			payload.headers?.Date?.[0] ||
+			payload.Date ||
+			payload.SentAtDate ||
+			payload.items?.[0]?.SentAtDate ||
+			payload.date ||
+			null;
+
+		if (!dateHeader && payload.timestamp) {
+			// when timestamp is in seconds with decimals
+			dateHeader = dayjs.unix(payload.timestamp).toDate();
+		}
+
+		if (!dateHeader && payload.msys?.relay_message?.content?.headers) {
+			const header = payload.msys.relay_message.content.headers.find((h: any) => h.Date);
+			if (header) {
+				dateHeader = header.Date;
+			}
+		}
+
+		if (dateHeader) {
+			return dayjs(dateHeader).format('MMMM D, YYYY [at] h:mm A');
+		}
+
+		return dayjs().format('MMMM D, YYYY [at] h:mm A');
+	}
+
+	extractReferences(payload: any) {
+		let references =
+			payload.headers?.References?.[0] ||
+			payload.references ||
+			payload.InReplyTo ||
+			payload.items?.[0]?.InReplyTo ||
+			payload.in_reply_to ||
+			'';
+
+		if (!references && payload.msys?.relay_message?.content?.headers) {
+			const header = payload.msys.relay_message.content.headers.find(
+				(h: any) => h.References || h['In-Reply-To'],
+			);
+			if (header) {
+				references = header.References || header['In-Reply-To'];
+			}
+		}
+
+		return references;
+	}
+
+	extractToHeader(payload: any) {
+		let toHeader = payload.headers?.To?.[0] || payload.To || payload.to || '';
+
+		const brevoTo = payload.items?.[0]?.To?.[0];
+		if (!toHeader && brevoTo) {
+			toHeader = brevoTo.Name ? `${brevoTo.Name} <${brevoTo.Address}>` : brevoTo.Address;
+		}
+
+		const sparkPostTo = payload.msys?.relay_message?.content?.to?.[0];
+		if (!toHeader && sparkPostTo) {
+			toHeader = sparkPostTo;
+		}
+
+		return toHeader;
 	}
 
 	isPossiblyUnreadable(html: string) {

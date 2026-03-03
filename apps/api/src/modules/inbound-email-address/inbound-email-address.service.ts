@@ -18,16 +18,8 @@ export class InboundEmailAddressService {
 		private readonly configService: ConfigService<Config>,
 	) {}
 
-	private generateSlug(): string {
-		const charset = 'abcdefghijklmnopqrstuvwxyz0123456789';
-		const getRandomChars = (length: number) => {
-			const bytes = randomBytes(length);
-			return Array.from(bytes, (b) => charset[b % charset.length]).join('');
-		};
-
-		const part1 = getRandomChars(10);
-		const part2 = getRandomChars(9);
-		return `${part1}_${part2}`;
+	private generateSlug() {
+		return randomBytes(16).toString('hex');
 	}
 
 	async get(userId: string, query: Prisma.inbound_email_addressFindFirstArgs) {
