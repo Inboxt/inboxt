@@ -6,7 +6,6 @@ import {
 	Box,
 	Breadcrumbs,
 	Center,
-	darken,
 	Divider,
 	Flex,
 	Group,
@@ -23,7 +22,7 @@ import { useCanGoBack, useNavigate, useParams, useRouter } from '@tanstack/react
 import dayjs from 'dayjs';
 import { useEffect } from 'react';
 
-import { READER_THEMES } from '@inboxt/common';
+import { APP_PRIMARY_COLOR, READER_THEMES } from '@inboxt/common';
 import { theme } from '@inboxt/ui';
 
 import { AppName } from '~components/AppName';
@@ -212,7 +211,7 @@ export const ReaderView = () => {
 													size="sm"
 													radius="sm"
 													color={label.color}
-													c={darken(label.color, 0.7)}
+													autoContrast={label.color !== APP_PRIMARY_COLOR}
 												>
 													{label.name}
 												</Badge>
