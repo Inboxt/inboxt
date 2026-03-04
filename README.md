@@ -25,6 +25,11 @@ Save what matters and read on your own time. Keep full control of your data. No 
 - **Browser Extension:** One-click saving from your browser.
 - **PWA Support:** Installable on mobile and desktop for an app-like experience.
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./app-dark.png">
+  <img alt="Inboxt app interface" src="./app.png">
+</picture>
+
 ## Tech Stack
 
 Inboxt is a modern monorepo built for speed and type safety using **React**, **Vite**, **Mantine**, and **TanStack Router** on the frontend, with a **NestJS** backend powered by **PostgreSQL**, **Valkey** (Redis), **Prisma**, and **GraphQL**. Background jobs are handled by **BullMQ**, and the browser extension is built with **WXT**.
