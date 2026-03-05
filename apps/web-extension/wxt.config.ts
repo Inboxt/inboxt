@@ -12,12 +12,17 @@ export default defineConfig({
 	},
 
 	manifest: {
+		name: 'Inboxt',
 		permissions: ['tabs', 'storage', 'activeTab'],
 		host_permissions: ['<all_urls>'],
 		homepage_url: 'https://inboxt.app',
 		browser_specific_settings: {
 			gecko: {
-				id: 'inboxt-extension@inboxt.app',
+				id: 'inboxt@inboxt.app',
+				// @ts-expect-error - not supported by WXT yet
+				data_collection_permissions: {
+					required: ['websiteContent', 'browsingActivity', 'authenticationInfo'],
+				},
 			},
 		},
 	},
