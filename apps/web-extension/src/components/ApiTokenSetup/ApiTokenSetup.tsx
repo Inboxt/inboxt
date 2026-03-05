@@ -71,21 +71,21 @@ export const ApiTokenSetup = ({ onTokenSaved }: ApiTokenSetupProps) => {
 							and an API token.
 						</Text>
 
-						<TextInput
-							label="App URL"
-							placeholder="https://your-inboxt-instance.com"
-							description="The URL of your Inboxt instance"
-							value={appUrl}
-							onChange={(e) => setAppUrlState(e.currentTarget.value)}
-							size="sm"
-						/>
-
 						<PasswordInput
 							label="API Token"
 							placeholder="Paste your API token here"
 							value={token}
 							onChange={(e) => setToken(e.currentTarget.value)}
 							error={error}
+							size="sm"
+						/>
+
+						<TextInput
+							label="App URL"
+							placeholder="https://your-inboxt-instance.com"
+							description="The URL of your Inboxt instance"
+							value={appUrl}
+							onChange={(e) => setAppUrlState(e.currentTarget.value)}
 							size="sm"
 						/>
 

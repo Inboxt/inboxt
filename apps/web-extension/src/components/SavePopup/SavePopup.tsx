@@ -40,12 +40,14 @@ export const SavePopup = ({ onOpenSettings, existingJobId, onJobStarted }: SaveP
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 	const [labelsData, setLabelsData] = useState<{ labels: any[] } | null>(null);
 	const [labelsLoading, setLabelsLoading] = useState(false);
+	const [labelsError, setLabelsError] = useState<string | null>(null);
 
 	useEffect(() => {
 		let cancelled = false;
 
 		const fetchLabels = async () => {
 			setLabelsLoading(true);
+			setLabelsError(null);
 			try {
 				const data = await graphqlFetch<{ labels: any[] }>(LABELS_QUERY);
 				if (!cancelled) {
@@ -53,7 +55,7 @@ export const SavePopup = ({ onOpenSettings, existingJobId, onJobStarted }: SaveP
 				}
 			} catch (err: any) {
 				if (!cancelled) {
-					setErrorMessage(err?.message ?? 'Failed to load labels');
+					setLabelsError(err?.message ?? 'Failed to load labels');
 				}
 			} finally {
 				if (!cancelled) {
@@ -184,7 +186,7 @@ export const SavePopup = ({ onOpenSettings, existingJobId, onJobStarted }: SaveP
 	const status = job?.status ?? (jobId ? 'pending' : 'pending');
 	const isSaving = status === 'saving';
 	const isSaved = status === 'saved';
-	const hasError = status === 'error' || !!errorMessage;
+	const hasError = status === 'error' || !!errorMessage || !!labelsError;
 	const pageUrl = job?.pageUrl ?? '';
 
 	const renderStatusChip = () => {
@@ -265,14 +267,14 @@ export const SavePopup = ({ onOpenSettings, existingJobId, onJobStarted }: SaveP
 
 						{renderStatusChip()}
 
-						{hasError && errorMessage && (
+						{hasError && (errorMessage || labelsError) && (
 							<Alert
 								color="red"
 								icon={<IconAlertCircle size={16} />}
 								variant="filled"
 								p="xs"
 							>
-								<Text size="xs">{errorMessage}</Text>
+								<Text size="xs">{errorMessage || labelsError}</Text>
 							</Alert>
 						)}
 					</Stack>

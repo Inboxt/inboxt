@@ -1,7 +1,8 @@
 {
-	"name": "inboxt-web-extension",
-	"description": "manifest.json description",
-	"private": true,
+	"name": "inboxt",
+	"description": "Save articles and newsletters to your Inboxt instance for a clean, focused reading experience.",
+	"homepage": "https://inboxt.app",
+	"license": "AGPL-3.0",
 	"version": "1.0.0",
 	"type": "module",
 	"scripts": {
@@ -16,6 +17,7 @@
 	},
 	"dependencies": {
 		"@inboxt/common": "1.0.0",
+		"@inboxt/ui": "1.0.0",
 		"@mantine/core": "8.3.9",
 		"react": "19.2.0",
 		"react-dom": "19.2.0"

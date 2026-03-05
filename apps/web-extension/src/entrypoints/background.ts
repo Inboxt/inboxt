@@ -63,28 +63,51 @@ export default defineBackground(() => {
 				| { type: 'get_job_status'; jobId: string }
 				| { type: 'set_item_labels'; jobId: string; labelIds: string[] },
 			_sender,
-			_sendResponse,
-		): Promise<SaveJobResponse> | void => {
+			sendResponse,
+		): boolean | void => {
 			if (message.type === 'start_save_for_active_tab') {
-				return (async () => {
-					const [activeTab] = await browser.tabs.query({
-						active: true,
-						currentWindow: true,
-					});
+				(async () => {
+					let activeTab;
+					try {
+						const tabs = await browser.tabs.query({
+							active: true,
+							currentWindow: true,
+						});
+						activeTab = tabs[0];
+					} catch (e: any) {
+						sendResponse({
+							ok: false,
+							error: { message: `Failed to query tabs: ${e.message}` },
+						});
+						return;
+					}
 
 					if (!activeTab?.id) {
-						return {
+						try {
+							const tabs = await browser.tabs.query({ active: true });
+							activeTab = tabs.find((t) => t.id !== undefined) || tabs[0];
+						} catch (e: any) {
+							// Ignore query errors in fallback
+						}
+					}
+
+					if (!activeTab?.id) {
+						sendResponse({
 							ok: false,
 							error: { message: 'No active tab found' },
-						};
+						});
+
+						return;
 					}
 
 					const existingJob = findActiveJobForTab(activeTab.id);
 					if (existingJob) {
-						return {
+						sendResponse({
 							ok: true,
 							jobId: existingJob.id,
-						};
+						});
+
+						return;
 					}
 
 					const job = createJob();
@@ -94,15 +117,37 @@ export default defineBackground(() => {
 						try {
 							job.status = 'saving';
 
-							const captureResponse = await browser.tabs.sendMessage(activeTab.id!, {
-								type: 'capture_page_html',
-							});
+							const captureResponse = await (async () => {
+								try {
+									return await browser.tabs.sendMessage(activeTab.id!, {
+										type: 'capture_page_html',
+									});
+								} catch (e: any) {
+									if (e.message?.includes('Could not establish connection')) {
+										return {
+											ok: false,
+											error: {
+												message:
+													'Content script not found. Please refresh the page and try again.',
+											},
+										};
+									}
+									return {
+										ok: false,
+										error: {
+											message: `Tab communication failed: ${e.message}`,
+										},
+									};
+								}
+							})();
 
 							if (!captureResponse?.ok) {
 								job.status = 'error';
 								job.error =
 									captureResponse?.error?.message ??
-									'Failed to capture page HTML';
+									(captureResponse === undefined
+										? 'Failed to capture page HTML (content script did not respond)'
+										: 'Failed to capture page HTML');
 								return;
 							}
 
@@ -124,6 +169,7 @@ export default defineBackground(() => {
 							job.itemId = savedItemId;
 							job.status = 'saved';
 						} catch (err: unknown) {
+							console.error('Save job failed:', err);
 							job.status = 'error';
 							if (err instanceof Error) {
 								job.error = err.message;
@@ -135,47 +181,53 @@ export default defineBackground(() => {
 						}
 					})();
 
-					return {
+					sendResponse({
 						ok: true,
 						jobId: job.id,
-					};
+					});
 				})();
+
+				return true;
 			}
 
 			if (message.type === 'get_job_status') {
 				const job = jobs.get(message.jobId);
 				if (!job) {
-					return Promise.resolve({
+					sendResponse({
 						ok: false,
 						error: { message: 'Job not found' },
 					});
+					return;
 				}
 
-				return Promise.resolve({
+				sendResponse({
 					ok: true,
 					job: serializeJob(job),
 				});
+				return;
 			}
 
 			if (message.type === 'set_item_labels') {
 				const job = jobs.get(message.jobId);
 				if (!job) {
-					return Promise.resolve({
+					sendResponse({
 						ok: false,
 						error: { message: 'Job not found' },
 					});
+					return;
 				}
 
 				job.labelIds = message.labelIds;
 
 				if (!job.itemId) {
-					return Promise.resolve({
+					sendResponse({
 						ok: true,
 						job: serializeJob(job),
 					});
+					return;
 				}
 
-				return (async () => {
+				(async () => {
 					try {
 						const data = await graphqlFetch<{
 							setSavedItemLabels: { success: boolean };
@@ -190,10 +242,10 @@ export default defineBackground(() => {
 							throw new Error('Failed to set labels');
 						}
 
-						return {
+						sendResponse({
 							ok: true,
 							job: serializeJob(job),
-						};
+						});
 					} catch (err: unknown) {
 						let message = 'Failed to update labels';
 
@@ -204,12 +256,14 @@ export default defineBackground(() => {
 						}
 
 						job.error = message;
-						return {
+						sendResponse({
 							ok: false,
 							error: { message: job.error },
-						};
+						});
 					}
 				})();
+
+				return true;
 			}
 		},
 	);
