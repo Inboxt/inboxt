@@ -19,6 +19,7 @@ export const configSchema = z.object({
 			)
 			.default('30d'),
 		requireEmailVerification: z.boolean().default(false),
+		secureCookies: z.boolean().default(true),
 		disableSignup: z.boolean().default(false),
 		webhookSecret: z.string().optional(),
 		webhookSecretHeader: z.string().default('x-webhook-secret'),
@@ -95,6 +96,11 @@ export const config = (): Config => {
 		security: {
 			jwtSecret: process.env.API_JWT_SECRET,
 			expiresIn: process.env.API_JWT_EXPIRES_IN,
+			secureCookies:
+				process.env.SECURE_COOKIES === 'false'
+					? false
+					: process.env.SECURE_COOKIES === 'true' ||
+						process.env.NODE_ENV === 'production',
 			requireEmailVerification: process.env.REQUIRE_EMAIL_VERIFICATION === 'true',
 			disableSignup: process.env.DISABLE_SIGNUP === 'true',
 			webhookSecret: process.env.WEBHOOK_SECRET,
