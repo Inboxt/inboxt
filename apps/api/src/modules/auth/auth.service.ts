@@ -44,8 +44,9 @@ export class AuthService {
 	}
 
 	attachJwtToken(name: string, contents: string, context: any, httpOnly = true) {
+		const securityConfig = this.configService.getOrThrow('security', { infer: true });
 		context.res.cookie(name, contents, {
-			secure: process.env.NODE_ENV === 'production',
+			secure: securityConfig.secureCookies,
 			httpOnly,
 			maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days
 			sameSite: 'lax',
@@ -91,8 +92,9 @@ export class AuthService {
 	}
 
 	signOut(context: GqlContext) {
+		const securityConfig = this.configService.getOrThrow('security', { infer: true });
 		context.res.clearCookie('token', {
-			secure: process.env.NODE_ENV === 'production',
+			secure: securityConfig.secureCookies,
 			httpOnly: true,
 			sameSite: 'lax',
 			path: '/',
