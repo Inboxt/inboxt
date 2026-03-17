@@ -13,7 +13,7 @@ export default defineConfig({
 
 	manifest: {
 		name: 'Inboxt',
-		permissions: ['tabs', 'storage', 'activeTab'],
+		permissions: ['storage', 'activeTab'],
 		host_permissions: ['<all_urls>'],
 		homepage_url: 'https://inboxt.app',
 		browser_specific_settings: {
