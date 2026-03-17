@@ -3,7 +3,7 @@
 	"description": "Save articles and newsletters to your Inboxt instance for a clean, focused reading experience.",
 	"homepage": "https://inboxt.app",
 	"license": "AGPL-3.0",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"type": "module",
 	"scripts": {
 		"dev": "wxt -b firefox",
