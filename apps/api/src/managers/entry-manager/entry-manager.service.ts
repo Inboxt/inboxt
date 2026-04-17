@@ -84,7 +84,7 @@ export class EntryManagerService {
 				} else if (key === 'has' && value === 'highlights') {
 					result.hasHighlights = !isNegated;
 				} else if (key === 'saved') {
-					const [from, to] = value.split(',');
+					const [from, to] = value.split('..');
 					const saved: { from?: string; to?: string } = {};
 
 					if (from && from !== '*') {
@@ -100,6 +100,14 @@ export class EntryManagerService {
 					}
 				} else if (key === 'site') {
 					result.site = value.toLowerCase();
+				} else if (key === 'no' && ['label', 'labels'].includes(value)) {
+					result.noLabels = !isNegated;
+				} else if (key === 'sort') {
+					const [fieldRaw, direction] = value.split('_');
+					if (fieldRaw && direction) {
+						const field = fieldRaw === 'date' ? 'createdAt' : fieldRaw;
+						result.sort = { field, direction };
+					}
 				} else if (['in', 'type'].includes(key)) {
 					(result as any)[key] = value;
 				} else {
@@ -128,10 +136,19 @@ export class EntryManagerService {
 			in: statusRaw,
 			labels,
 			hasHighlights,
+			noLabels,
 			text,
 			site,
 			saved,
+			sort: sortFromQuery,
 		} = parsed;
+
+		const finalSort = sortFromQuery
+			? {
+					field: sortFromQuery.field as any,
+					direction: sortFromQuery.direction as any,
+				}
+			: sort;
 
 		if (text && text.length > 200) {
 			throw new AppException(
@@ -165,10 +182,11 @@ export class EntryManagerService {
 				status,
 				labels,
 				hasHighlights,
+				noLabels,
 				text,
 				source: site,
 				saved,
-				sort,
+				sort: finalSort,
 			};
 		}
 
@@ -180,7 +198,7 @@ export class EntryManagerService {
 				text,
 				source: site,
 				saved,
-				sort,
+				sort: finalSort,
 			};
 		}
 

@@ -22,7 +22,9 @@
 		"api:docker:generate": "docker compose -f docker-compose.dev.yml exec api sh -c \"cd apps/api && npm run prisma:generate\"",
 		"api:docker:introspect": "docker compose -f docker-compose.dev.yml exec api sh -c \"cd apps/api && npm run prisma:introspect\"",
 		"api:docker:seed": "docker compose -f docker-compose.dev.yml exec -T api sh -c \"cd apps/api && npm run db:seed\"",
-		"api:migrate:up": "npm run migrate:up --workspace=apps/api"
+		"api:migrate:up": "npm run migrate:up --workspace=apps/api",
+		"test:api": "npm run test --workspace=apps/api",
+		"test:api:coverage": "npm run test:coverage --workspace=apps/api"
 	},
 	"dependencies": {
 		"dayjs": "1.11.19",

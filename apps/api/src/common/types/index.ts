@@ -13,6 +13,7 @@ export interface GetSavedItemsQuery {
 	};
 	text?: string;
 	source?: string;
+	noLabels?: boolean;
 	hasHighlights?: boolean;
 	saved?: { from?: string; to?: string };
 	first?: number;
@@ -36,9 +37,11 @@ export interface ParsedQuery {
 		not?: string[]; // labels that must NOT exist
 	};
 	hasHighlights?: boolean;
+	noLabels?: boolean;
 	text?: string;
 	site?: string;
 	saved?: { from?: string; to?: string };
+	sort?: { field: string; direction: string };
 }
 
 export type SavedItemExportJson = {
