@@ -115,6 +115,15 @@ export class SavedItemService {
 			prismaWhere.highlight = { none: { userId } };
 		}
 
+		// ---------- No labels ----------
+		if (query.noLabels === true) {
+			prismaWhere.saved_item_label = { none: {} };
+		}
+
+		if (query.noLabels === false) {
+			prismaWhere.saved_item_label = { some: {} };
+		}
+
 		// ---------- Saved date range ----------
 		if (query.saved) {
 			const createdAt: Prisma.DateTimeFilter = {};
