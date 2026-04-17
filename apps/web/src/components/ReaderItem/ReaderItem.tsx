@@ -1,7 +1,7 @@
 import { Badge, Box, Breadcrumbs, Group, Stack, Text, Center } from '@mantine/core';
 import { useHover, useLocalStorage, useLongPress } from '@mantine/hooks';
 import { IconPhotoOff } from '@tabler/icons-react';
-import { useNavigate } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 import dayjs from 'dayjs';
 
 import { APP_PRIMARY_COLOR } from '@inboxt/common';
@@ -41,17 +41,18 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 
 	return (
 		<Box
+			component={Link}
+			to={`/r/${item.id}`}
 			p="md"
 			className={classes.item}
 			ref={ref}
-			onClick={() => {
+			onClick={(e: React.MouseEvent) => {
 				if (selectedItems.length > 0) {
+					e.preventDefault();
 					toggleItemSelection(item);
-
-					return;
 				}
-				void navigate({ to: `/r/${item.id}` });
 			}}
+			style={{ color: 'inherit', textDecoration: 'none' }}
 			{...longPressHandlers}
 		>
 			<Group wrap="nowrap" maw="100%">
@@ -72,6 +73,7 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 								checked={selected}
 								onChange={() => toggleItemSelection(item)}
 								onClick={(e) => {
+									e.preventDefault();
 									e.stopPropagation();
 								}}
 								px={3}
@@ -83,6 +85,7 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 						checked={selected}
 						onChange={() => toggleItemSelection(item)}
 						onClick={(e) => {
+							e.preventDefault();
 							e.stopPropagation();
 						}}
 						px={3}
@@ -104,7 +107,13 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 					</Breadcrumbs>
 
 					<Group wrap="nowrap" gap="md" justify="space-between" pos="relative">
-						<Text fw="700" lineClamp={1} fz="lg" maw={hovered ? '75%' : 'unset'}>
+						<Text
+							fw="700"
+							lineClamp={1}
+							fz="lg"
+							maw={hovered ? '75%' : 'unset'}
+							c="var(--mantine-color-text)"
+						>
 							{item.title}
 						</Text>
 
@@ -134,6 +143,7 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 											key={id}
 											color={color}
 											autoContrast={color !== APP_PRIMARY_COLOR}
+											component="div"
 										>
 											{name}
 										</Badge>

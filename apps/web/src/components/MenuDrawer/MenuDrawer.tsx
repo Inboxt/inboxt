@@ -35,7 +35,11 @@ export const MenuDrawer = ({ items, children, label, height = 300 }: MenuDrawerP
 			<Menu.Item
 				key={index}
 				leftSection={adjustIconSize(item.icon)}
-				onClick={item.action}
+				onClick={(e) => {
+					e.preventDefault();
+					e.stopPropagation();
+					item.action();
+				}}
 				fz="md"
 			>
 				{item.label}
@@ -46,7 +50,9 @@ export const MenuDrawer = ({ items, children, label, height = 300 }: MenuDrawerP
 		items.map((item, index) => (
 			<Box
 				key={index}
-				onClick={() => {
+				onClick={(e) => {
+					e.preventDefault();
+					e.stopPropagation();
 					closeDrawer();
 					setTimeout(() => {
 						item.action();
@@ -74,7 +80,15 @@ export const MenuDrawer = ({ items, children, label, height = 300 }: MenuDrawerP
 
 	return (
 		<>
-			<Box onClick={openDrawer}>{children}</Box>
+			<Box
+				onClick={(e) => {
+					e.preventDefault();
+					e.stopPropagation();
+					openDrawer();
+				}}
+			>
+				{children}
+			</Box>
 
 			<Drawer
 				opened={drawerOpened}

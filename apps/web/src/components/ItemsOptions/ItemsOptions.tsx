@@ -406,6 +406,7 @@ export const ItemsOptions = ({ items, mode, size = 'md', onActionComplete }: Ite
 	];
 
 	const handleOptionClick = async (option: Option, e?: React.MouseEvent) => {
+		e?.preventDefault();
 		e?.stopPropagation();
 		if (option.clearsSelection ?? true) {
 			setSelectedItems([]);

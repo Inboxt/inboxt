@@ -1,4 +1,7 @@
 .item {
+	display: block;
+	text-decoration: none;
+	color: inherit;
 	border: 0 solid var(--mantine-color-gray-4);
 	border-bottom-width: 1px;
 	cursor: pointer;
