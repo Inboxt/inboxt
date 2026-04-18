@@ -20,7 +20,7 @@ import { useDocumentTitle } from '@mantine/hooks';
 import { IconArrowLeft, IconHighlight } from '@tabler/icons-react';
 import { useCanGoBack, useNavigate, useParams, useRouter } from '@tanstack/react-router';
 import dayjs from 'dayjs';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import { APP_PRIMARY_COLOR, READER_THEMES } from '@inboxt/common';
 import { theme } from '@inboxt/ui';
@@ -29,6 +29,7 @@ import { AppName } from '~components/AppName';
 import { HighlightableArticle } from '~components/HighlightableArticle';
 import { NewsletterSubscriptionButton } from '~components/NewsletterSubscriptionButton';
 import { ReaderSettingsOptions } from '~components/ReaderSettingsOptions';
+import { useAdjacentItems } from '~hooks/useAdjacentItems';
 import { useReaderSettings, makeReaderResolver } from '~hooks/useReaderSettings.tsx';
 import { useScreenQuery } from '~hooks/useScreenQuery';
 import { useTextHighlighting } from '~hooks/useTextSelection';
@@ -49,6 +50,42 @@ export const ReaderView = () => {
 		variables: { query: { id } },
 		fetchPolicy: 'cache-and-network',
 	});
+	const { nextId, prevId } = useAdjacentItems(id);
+
+	const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null);
+	const [touchEnd, setTouchEnd] = useState<{ x: number; y: number } | null>(null);
+
+	const minSwipeDistance = 50;
+
+	const handleTouchStart = (e: React.TouchEvent) => {
+		setTouchEnd(null);
+		setTouchStart({ x: e.targetTouches[0].clientX, y: e.targetTouches[0].clientY });
+	};
+
+	const handleTouchMove = (e: React.TouchEvent) => {
+		setTouchEnd({ x: e.targetTouches[0].clientX, y: e.targetTouches[0].clientY });
+	};
+
+	const handleTouchEnd = () => {
+		if (!touchStart || !touchEnd) {
+			return;
+		}
+		const distanceX = touchStart.x - touchEnd.x;
+		const distanceY = touchStart.y - touchEnd.y;
+		const isHorizontalSwipe = Math.abs(distanceX) > Math.abs(distanceY);
+
+		if (isHorizontalSwipe && Math.abs(distanceX) > minSwipeDistance) {
+			if (distanceX > 0 && nextId) {
+				void navigate({ to: '/r/$id', params: { id: nextId }, replace: true });
+			} else if (distanceX < 0 && prevId) {
+				void navigate({ to: '/r/$id', params: { id: prevId }, replace: true });
+			}
+		}
+	};
+
+	useEffect(() => {
+		window.scrollTo(0, 0);
+	}, [id]);
 
 	useEffect(() => {
 		const html = document.documentElement;
@@ -109,6 +146,9 @@ export const ReaderView = () => {
 			className={classes.readerView}
 			data-reader-theme={effectiveTheme}
 			id="reader-root"
+			onTouchStart={handleTouchStart}
+			onTouchMove={handleTouchMove}
+			onTouchEnd={handleTouchEnd}
 		>
 			<MantineProvider
 				forceColorScheme={effectiveTheme === 'dark' ? 'dark' : 'light'}
