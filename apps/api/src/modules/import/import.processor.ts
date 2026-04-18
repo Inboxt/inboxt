@@ -23,6 +23,7 @@ export class ImportProcessor extends BaseQueueProcessor {
 						userId: string;
 						filePath: string;
 						originalName: string;
+						labelIds?: string[];
 					},
 				);
 			case 'import-app-export':
@@ -31,6 +32,7 @@ export class ImportProcessor extends BaseQueueProcessor {
 						userId: string;
 						filePath: string;
 						originalName: string;
+						labelIds?: string[];
 					},
 				);
 			default:
@@ -60,12 +62,22 @@ export class ImportProcessor extends BaseQueueProcessor {
 	}
 
 	@LogExecutionTime
-	private importCsvFile(data: { userId: string; filePath: string; originalName: string }) {
+	private importCsvFile(data: {
+		userId: string;
+		filePath: string;
+		originalName: string;
+		labelIds?: string[];
+	}) {
 		return this.importService.importCsvFile(data);
 	}
 
 	@LogExecutionTime
-	private importZipArchive(data: { userId: string; filePath: string; originalName: string }) {
+	private importZipArchive(data: {
+		userId: string;
+		filePath: string;
+		originalName: string;
+		labelIds?: string[];
+	}) {
 		return this.importService.importZipArchive(data);
 	}
 }

@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@apollo/client';
-import { Button, Card, Stack, TextInput, Text } from '@mantine/core';
+import { Button, Card, Stack, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { ContextModalProps } from '@mantine/modals';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
@@ -57,18 +57,13 @@ export const AddContentModal = ({ id, context }: ContextModalProps) => {
 								label="Page URL"
 							/>
 
-							<Stack gap={2}>
-								<Text fz="sm" fw={500}>
-									Labels:
-								</Text>
-
-								<LabelsMultiSelect
-									labels={labelsData?.labels as Label[]}
-									loading={labelsLoading}
-									value={form.getValues().labels}
-									onChange={(value) => form.setFieldValue('labels', value)}
-								/>
-							</Stack>
+							<LabelsMultiSelect
+								label="Labels"
+								labels={labelsData?.labels as Label[]}
+								loading={labelsLoading}
+								value={form.getValues().labels}
+								onChange={(value) => form.setFieldValue('labels', value)}
+							/>
 
 							{error}
 						</Stack>

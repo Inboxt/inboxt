@@ -294,19 +294,26 @@ export class SavedItemManagerService {
 		await this.processAndCreateArticle(userId, { url }, labelIds, prismaData);
 	}
 
-	private createPendingNewsletter(
+	private async createPendingNewsletter(
 		userId: string,
+		labelIds?: string[],
 		prismaData?: Partial<
 			Omit<Prisma.saved_itemCreateInput, 'user' | 'saved_item_label' | 'newsletter' | 'id'>
 		>,
 	) {
-		return this.savedItemService.create(userId, {
+		const created = await this.savedItemService.create(userId, {
 			type: SavedItemType.NEWSLETTER,
 			title: prismaData?.title ?? NEWSLETTER_PROCESSING_TITLE,
 			wordCount: prismaData?.wordCount || 0,
 			description: prismaData?.description ?? NEWSLETTER_PROCESSING_CONTENT,
 			...prismaData,
 		});
+
+		if (labelIds?.length) {
+			await this.savedItemService.setLabels(userId, created.id, labelIds);
+		}
+
+		return created;
 	}
 
 	async processNewsletter(
@@ -395,6 +402,7 @@ export class SavedItemManagerService {
 		inboundEmailAddressId: string | null,
 		messageId: string | null,
 		input: ProcessNewsletterInput,
+		labelIds?: string[],
 		prismaData?: Partial<
 			Omit<Prisma.saved_itemCreateInput, 'user' | 'saved_item_label' | 'newsletter' | 'id'>
 		>,
@@ -407,7 +415,7 @@ export class SavedItemManagerService {
 			);
 		}
 
-		const created = await this.createPendingNewsletter(userId, prismaData);
+		const created = await this.createPendingNewsletter(userId, labelIds, prismaData);
 		await this.savedItemProcessingQueue.add(
 			'process-newsletter',
 			{
@@ -541,6 +549,7 @@ export class SavedItemManagerService {
 				data.inboundEmailAddress.id,
 				data.messageId,
 				{ html: data.html, text: data.text },
+				undefined,
 				{
 					title: data.subject,
 					author: data.from,

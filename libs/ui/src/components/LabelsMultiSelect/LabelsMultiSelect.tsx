@@ -1,4 +1,13 @@
-import { Combobox, useCombobox, Pill, PillsInput, Group, Stack, Checkbox } from '@mantine/core';
+import {
+	Combobox,
+	useCombobox,
+	Pill,
+	PillsInput,
+	Group,
+	Stack,
+	Checkbox,
+	Text,
+} from '@mantine/core';
 import { IconLabelImportantFilled } from '@tabler/icons-react';
 import { useState } from 'react';
 
@@ -19,6 +28,7 @@ type LabelsMultiSelectProps = {
 	loading: boolean;
 	value?: string[];
 	onChange?: (value: string[]) => void;
+	label?: string;
 };
 
 export const LabelsMultiSelect = ({
@@ -26,6 +36,7 @@ export const LabelsMultiSelect = ({
 	loading,
 	value = [],
 	onChange = () => {},
+	label,
 }: LabelsMultiSelectProps) => {
 	const [search, setSearch] = useState('');
 	const maxVisibleSelected = 3;
@@ -100,6 +111,12 @@ export const LabelsMultiSelect = ({
 
 	return (
 		<Stack gap={2}>
+			{label && (
+				<Text fz="sm" fw={500}>
+					{label}
+				</Text>
+			)}
+
 			<Combobox store={combobox} onOptionSubmit={handleValueSelect}>
 				<Combobox.DropdownTarget>
 					<PillsInput onClick={() => combobox.openDropdown()}>
