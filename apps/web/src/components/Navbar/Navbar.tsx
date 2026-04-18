@@ -59,7 +59,11 @@ type NavbarProps = {
 };
 
 export const Navbar = ({ opened, toggle }: NavbarProps) => {
-	const { data } = useQuery(LABELS);
+	const { data } = useQuery(LABELS, {
+		fetchPolicy: 'cache-and-network',
+		notifyOnNetworkStatusChange: true,
+	});
+
 	const isAboveLgScreen = useScreenQuery('lg', 'above');
 
 	const navLinks = (

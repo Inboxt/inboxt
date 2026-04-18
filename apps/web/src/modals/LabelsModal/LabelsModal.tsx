@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client';
-import { Button, Card, ScrollArea, Stack, Text } from '@mantine/core';
+import { Button, Card, ScrollArea, Skeleton, Stack, Text } from '@mantine/core';
 import { ContextModalProps } from '@mantine/modals';
 import { useEffect, useState } from 'react';
 
@@ -10,7 +10,10 @@ import { modals } from '~modals/modals';
 
 export const LabelsModal = ({ id, context }: ContextModalProps) => {
 	const [editingLabelId, setEditingLabelId] = useState<string | null>(null);
-	const { data } = useQuery(LABELS);
+	const { data, loading } = useQuery(LABELS, {
+		fetchPolicy: 'cache-and-network',
+		notifyOnNetworkStatusChange: true,
+	});
 
 	useEffect(() => {
 		const handleKeyDown = (event: KeyboardEvent) => {
@@ -32,7 +35,13 @@ export const LabelsModal = ({ id, context }: ContextModalProps) => {
 	return (
 		<Stack gap="xl">
 			<ScrollArea.Autosize mah="50vh" type="auto">
-				{hasLabels ? (
+				{loading && !data ? (
+					<Stack gap="xs" mr="sm">
+						<Skeleton height={42} />
+						<Skeleton height={42} />
+						<Skeleton height={42} />
+					</Stack>
+				) : hasLabels ? (
 					<Card mr="sm">
 						<Stack gap="sm">
 							{labels.map((label) => (

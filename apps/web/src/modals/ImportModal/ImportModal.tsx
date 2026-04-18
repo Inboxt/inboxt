@@ -49,7 +49,10 @@ export const ImportModal = ({ id, context }: ContextModalProps<ImportModalProps>
 	const [loading, setLoading] = useState(false);
 	const [importError, setImportError] = useState<string>();
 
-	const { data: labelsData, loading: labelsLoading } = useQuery(LABELS);
+	const { data: labelsData, loading: labelsLoading } = useQuery(LABELS, {
+		fetchPolicy: 'cache-and-network',
+		notifyOnNetworkStatusChange: true,
+	});
 
 	const selectedOption = importOptions.find((opt) => opt.type === selectedType);
 

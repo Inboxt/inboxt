@@ -1,5 +1,5 @@
 import { useFragment, useMutation, useQuery } from '@apollo/client';
-import { Button, Card, Checkbox, ScrollArea, Stack, Text } from '@mantine/core';
+import { Button, Card, Checkbox, ScrollArea, Skeleton, Stack, Text } from '@mantine/core';
 import { ContextModalProps } from '@mantine/modals';
 import { useState } from 'react';
 
@@ -20,7 +20,10 @@ export const LabelsSelectionModal = ({
 	innerProps,
 }: ContextModalProps<{ itemId: string }>) => {
 	const pathname = window.location.pathname;
-	const { data } = useQuery(LABELS);
+	const { data, loading: labelsLoading } = useQuery(LABELS, {
+		fetchPolicy: 'cache-and-network',
+		notifyOnNetworkStatusChange: true,
+	});
 	const { complete, data: itemLabels } = useFragment({
 		fragment: SAVED_ITEM_LABELS_FRAGMENT,
 		from: { __typename: 'SavedItem', id: innerProps.itemId },
@@ -51,7 +54,13 @@ export const LabelsSelectionModal = ({
 	return (
 		<Stack gap="xl">
 			<ScrollArea.Autosize mah="60vh" type="auto">
-				{data?.labels?.length ? (
+				{labelsLoading && !data ? (
+					<Stack gap="xs" mr="sm">
+						<Skeleton height={42} />
+						<Skeleton height={42} />
+						<Skeleton height={42} />
+					</Stack>
+				) : data?.labels?.length ? (
 					<Card mr="sm">
 						<Checkbox.Group value={value} onChange={setValue}>
 							<Stack gap="xs">
