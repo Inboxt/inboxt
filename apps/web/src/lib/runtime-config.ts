@@ -1,11 +1,13 @@
 export type RuntimeConfig = {
 	appUrl: string;
 	webErrorsDsn?: string;
+	apiErrorsDsnConfigured: boolean;
 };
 
 export const runtimeConfig: RuntimeConfig = {
 	appUrl: window.location.origin,
 	webErrorsDsn: undefined,
+	apiErrorsDsnConfigured: false,
 };
 
 export async function fetchRuntimeConfig() {
@@ -18,6 +20,9 @@ export async function fetchRuntimeConfig() {
 			}
 			if (config.webErrorsDsn) {
 				runtimeConfig.webErrorsDsn = config.webErrorsDsn;
+			}
+			if (typeof config.apiErrorsDsnConfigured === 'boolean') {
+				runtimeConfig.apiErrorsDsnConfigured = config.apiErrorsDsnConfigured;
 			}
 		}
 	} catch (err) {

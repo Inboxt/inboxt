@@ -26,6 +26,21 @@ export class AppController {
 		return {
 			appUrl: this.configService.get('appUrl', { infer: true }),
 			webErrorsDsn: errors?.webDsn,
+			apiErrorsDsnConfigured: Boolean(errors?.apiDsn),
+		};
+	}
+
+	@Get('test-error')
+	testError() {
+		const errorsConfig = this.configService.get('errors', { infer: true });
+
+		if (process.env.NODE_ENV === 'production' && errorsConfig?.apiDsn) {
+			throw new AppException('This is a test error for Sentry (AppException)');
+		}
+
+		return {
+			message:
+				'API error reporting test is disabled outside production or when API_ERRORS_DSN is not configured.',
 		};
 	}
 
