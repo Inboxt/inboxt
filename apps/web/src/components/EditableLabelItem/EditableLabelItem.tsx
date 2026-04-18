@@ -14,7 +14,7 @@ import { useEffect } from 'react';
 import { updateLabelSchema } from '@inboxt/common';
 
 import { useScreenQuery } from '~hooks/useScreenQuery';
-import { DELETE_LABEL, ENTRIES, LABELS, UPDATE_LABEL } from '~lib/graphql';
+import { DELETE_LABEL, UPDATE_LABEL } from '~lib/graphql';
 import { Label } from '~lib/graphql';
 
 import { Form } from '../Form';
@@ -34,12 +34,12 @@ export const EditableLabelItem = ({ label, isEditing, setIsEditing }: EditableLa
 	const [updateLabel, { loading: updateLabelLoading, error: updateLabelError }] = useMutation(
 		UPDATE_LABEL,
 		{
-			refetchQueries: [LABELS, ENTRIES],
+			refetchQueries: ['labels', 'entries'],
 		},
 	);
 
 	const [deleteLabel, { loading: deleteLabelLoading }] = useMutation(DELETE_LABEL, {
-		refetchQueries: [LABELS, ENTRIES],
+		refetchQueries: ['labels', 'entries'],
 	});
 
 	const form = useForm({

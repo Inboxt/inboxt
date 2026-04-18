@@ -10,11 +10,15 @@ import { labelColors } from '@inboxt/ui';
 import { ButtonContainer } from '~components/ButtonContainer';
 import { Form } from '~components/Form';
 import { LabelsColorInput } from '~components/LabelsColorInput';
-import { CREATE_LABEL, LABELS } from '~lib/graphql';
+import { CREATE_LABEL } from '~lib/graphql';
 import { getRandomArrayItem } from '~utils/getRandomArrayItem';
 
 export const CreateLabelModal = ({ id, context }: ContextModalProps) => {
-	const [createLabel, { loading, error }] = useMutation(CREATE_LABEL);
+	const [createLabel, { loading, error }] = useMutation(CREATE_LABEL, {
+		refetchQueries: ['labels', 'entries'],
+		awaitRefetchQueries: true,
+	});
+
 	const form = useForm({
 		mode: 'uncontrolled',
 		initialValues: { name: '', color: getRandomArrayItem(labelColors) as string },
@@ -24,7 +28,6 @@ export const CreateLabelModal = ({ id, context }: ContextModalProps) => {
 	const handleCreateLabel = async (values: typeof form.values) => {
 		await createLabel({
 			variables: { data: values },
-			refetchQueries: [LABELS],
 		});
 		context.closeModal(id);
 	};

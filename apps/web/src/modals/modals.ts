@@ -45,7 +45,6 @@ export const modals = {
 			centered: true,
 			title: 'Create Label',
 			innerProps: {},
-			withinPortal: false,
 		});
 	},
 

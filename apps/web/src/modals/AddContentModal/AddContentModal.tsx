@@ -14,7 +14,10 @@ import { ADD_ARTICLE_FROM_URL, ENTRIES, Label, LABELS } from '~lib/graphql';
 
 export const AddContentModal = ({ id, context }: ContextModalProps) => {
 	const [addItemFromUrlMutation, { loading, error }] = useMutation(ADD_ARTICLE_FROM_URL);
-	const { data: labelsData, loading: labelsLoading } = useQuery(LABELS);
+	const { data: labelsData, loading: labelsLoading } = useQuery(LABELS, {
+		fetchPolicy: 'cache-and-network',
+		notifyOnNetworkStatusChange: true,
+	});
 
 	const form = useForm({
 		mode: 'uncontrolled',
