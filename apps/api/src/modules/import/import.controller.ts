@@ -49,6 +49,7 @@ export class ImportController {
 		@ActiveUserMeta() activeUser: ActiveUserMetaType,
 		@UploadedFile() file: Express.Multer.File,
 		@Body('type') type: ImportType,
+		@Body('labelIds') labelIds?: string[],
 	) {
 		if (!file) {
 			throw new AppException('File is required', HttpStatus.BAD_REQUEST);
@@ -82,6 +83,7 @@ export class ImportController {
 		await this.importService.enqueueImport({
 			userId: activeUser.id,
 			type,
+			labelIds: Array.isArray(labelIds) ? labelIds : labelIds ? [labelIds] : undefined,
 			source: {
 				kind: 'disk',
 				path: file.path,

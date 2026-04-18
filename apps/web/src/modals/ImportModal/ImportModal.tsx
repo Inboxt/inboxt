@@ -1,11 +1,15 @@
+import { useQuery } from '@apollo/client';
 import { Alert, Button, Card, Flex, FileInput, Stack, Text, Title } from '@mantine/core';
 import { ContextModalProps } from '@mantine/modals';
 import { IconCsv, IconZip } from '@tabler/icons-react';
 import { ReactNode, useState } from 'react';
 
+import { LabelsMultiSelect } from '@inboxt/ui';
+
 import { ButtonContainer } from '~components/ButtonContainer';
 import { Form } from '~components/Form';
 import { toastInfo } from '~components/Toast';
+import { Label, LABELS } from '~lib/graphql';
 
 type ImportType = 'CSV' | 'ZIP_ARCHIVE';
 
@@ -41,8 +45,11 @@ const importOptions: {
 export const ImportModal = ({ id, context }: ContextModalProps<ImportModalProps>) => {
 	const [selectedType, setSelectedType] = useState<ImportType | null>(null);
 	const [file, setFile] = useState<File | null>(null);
+	const [selectedLabelIds, setSelectedLabelIds] = useState<string[]>([]);
 	const [loading, setLoading] = useState(false);
 	const [importError, setImportError] = useState<string>();
+
+	const { data: labelsData, loading: labelsLoading } = useQuery(LABELS);
 
 	const selectedOption = importOptions.find((opt) => opt.type === selectedType);
 
@@ -64,6 +71,10 @@ export const ImportModal = ({ id, context }: ContextModalProps<ImportModalProps>
 			const formData = new FormData();
 			formData.append('file', file);
 			formData.append('type', selectedType);
+
+			for (const labelId of selectedLabelIds) {
+				formData.append('labelIds', labelId);
+			}
 
 			const response = await fetch('/api/import', {
 				method: 'POST',
@@ -158,6 +169,14 @@ export const ImportModal = ({ id, context }: ContextModalProps<ImportModalProps>
 									value={file}
 									onChange={setFile}
 									accept={selectedOption?.accept}
+								/>
+
+								<LabelsMultiSelect
+									label="Apply labels"
+									labels={labelsData?.labels as Label[]}
+									loading={labelsLoading}
+									value={selectedLabelIds}
+									onChange={setSelectedLabelIds}
 								/>
 
 								{error}

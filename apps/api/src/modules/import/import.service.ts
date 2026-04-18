@@ -137,8 +137,9 @@ export class ImportService {
 		itemDir: string;
 		itemJson: SavedItemExportJson;
 		labelNameToId: Map<string, string>;
+		selectedLabelIds?: string[];
 	}) {
-		const { userId, itemDir, itemJson, labelNameToId } = params;
+		const { userId, itemDir, itemJson, labelNameToId, selectedLabelIds } = params;
 
 		const type = itemJson?.type as 'ARTICLE' | 'NEWSLETTER';
 		if (type !== 'ARTICLE' && type !== 'NEWSLETTER') {
@@ -151,6 +152,14 @@ export class ImportService {
 		const labelIds = labels
 			.map((l) => labelNameToId.get(l.name.trim()))
 			.filter(Boolean) as string[];
+
+		if (selectedLabelIds?.length) {
+			for (const id of selectedLabelIds) {
+				if (!labelIds.includes(id)) {
+					labelIds.push(id);
+				}
+			}
+		}
 
 		// Content
 		const htmlPath = `${itemDir}/content.html`;
@@ -185,6 +194,7 @@ export class ImportService {
 				{
 					html,
 				},
+				labelIds,
 				{
 					title: itemJson?.title ?? undefined,
 					description: itemJson?.description ?? undefined,
@@ -196,7 +206,12 @@ export class ImportService {
 		}
 	}
 
-	async enqueueImport(input: { userId: string; type: ImportType; source: DiskSource }) {
+	async enqueueImport(input: {
+		userId: string;
+		type: ImportType;
+		source: DiskSource;
+		labelIds?: string[];
+	}) {
 		if (input.type === ImportType.CSV) {
 			await this.importQueue.add('import-csv', {
 				userId: input.userId,
@@ -204,6 +219,7 @@ export class ImportService {
 				originalName: input.source.originalName,
 				mime: input.source.mime,
 				size: input.source.size,
+				labelIds: input.labelIds,
 			});
 			return;
 		}
@@ -215,12 +231,18 @@ export class ImportService {
 				originalName: input.source.originalName,
 				mime: input.source.mime,
 				size: input.source.size,
+				labelIds: input.labelIds,
 			});
 			return;
 		}
 	}
 
-	async importCsvFile(data: { userId: string; filePath: string; originalName: string }) {
+	async importCsvFile(data: {
+		userId: string;
+		filePath: string;
+		originalName: string;
+		labelIds?: string[];
+	}) {
 		const user = await this.userService.get({ where: { id: data.userId } });
 		if (!user) {
 			return;
@@ -289,6 +311,14 @@ export class ImportService {
 				}
 			}
 
+			if (data.labelIds?.length) {
+				for (const id of data.labelIds) {
+					if (!labelIds.includes(id)) {
+						labelIds.push(id);
+					}
+				}
+			}
+
 			await this.savedItemManagerService.addArticleFromUrl(data.userId, url, labelIds, {
 				description,
 				title,
@@ -300,7 +330,12 @@ export class ImportService {
 		this.logger.log(`CSV import completed for user ${data.userId} from ${data.originalName}`);
 	}
 
-	async importZipArchive(data: { userId: string; filePath: string; originalName: string }) {
+	async importZipArchive(data: {
+		userId: string;
+		filePath: string;
+		originalName: string;
+		labelIds?: string[];
+	}) {
 		this.logger.log(
 			`Zip archive import started for user ${data.userId} from ${data.originalName}`,
 		);
@@ -349,6 +384,7 @@ export class ImportService {
 						itemDir,
 						itemJson,
 						labelNameToId,
+						selectedLabelIds: data.labelIds,
 					});
 				} catch (e: any) {
 					this.logger.error(`Failed to import item ${oldId}: ${e?.message || e}`);
@@ -373,12 +409,14 @@ export class ImportService {
 						const looksLikeNewsletter = /newsletter|email/i.test(baseName);
 
 						const title = baseName || fileName;
+						const labelIds = data.labelIds ? [...data.labelIds] : [];
 						if (looksLikeNewsletter) {
 							await this.savedItemManagerService.processAndCreateNewsletter(
 								data.userId,
 								null,
 								null,
 								{ html },
+								labelIds,
 								{
 									title,
 								},
@@ -387,7 +425,7 @@ export class ImportService {
 							await this.savedItemManagerService.processAndCreateArticle(
 								data.userId,
 								{ html },
-								[],
+								labelIds,
 								{
 									title,
 								},
