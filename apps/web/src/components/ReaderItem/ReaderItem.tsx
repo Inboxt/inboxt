@@ -1,7 +1,7 @@
 import { Badge, Box, Breadcrumbs, Group, Stack, Text, Center } from '@mantine/core';
 import { useHover, useLocalStorage, useLongPress } from '@mantine/hooks';
 import { IconPhotoOff } from '@tabler/icons-react';
-import { Link, useNavigate } from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router';
 import dayjs from 'dayjs';
 
 import { APP_PRIMARY_COLOR } from '@inboxt/common';
@@ -9,7 +9,6 @@ import { APP_PRIMARY_COLOR } from '@inboxt/common';
 import { useContentSelection } from '~context/content-selection';
 import { useScreenQuery } from '~hooks/useScreenQuery';
 import { SavedItem } from '~lib/graphql';
-import { Route } from '~routes/_auth.index';
 
 import { ItemsOptions } from '../ItemsOptions';
 import { ReaderCheckbox } from '../ReaderCheckbox';
@@ -24,7 +23,6 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 	const { hovered, ref } = useHover();
 	const { selectedItems, toggleItemSelection, isSelected } = useContentSelection();
 	const isBelowLgScreen = useScreenQuery('lg', 'below');
-	const navigate = useNavigate({ from: Route.fullPath });
 
 	const [display] = useLocalStorage({
 		key: 'display',
