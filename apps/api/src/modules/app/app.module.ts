@@ -46,31 +46,73 @@ import { AppService } from './app.service';
 			load: [config],
 			envFilePath: ['../../.env'],
 		}),
-		LoggerModule.forRoot({
-			pinoHttp: {
-				level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
-				autoLogging: {
-					ignore: (req) =>
-						req.headers['user-agent']?.includes('Wget') ||
-						req.url === '/health' ||
-						!req.url?.startsWith('/api'),
-				},
-				formatters: {
-					level: (label) => {
-						return { level: label.toUpperCase() };
+		LoggerModule.forRootAsync({
+			useFactory: (configService: ConfigService<Config>) => {
+				const loggingConfig = configService.getOrThrow('logging', { infer: true });
+				return {
+					pinoHttp: {
+						level: loggingConfig.level,
+						autoLogging: loggingConfig.autoLogging
+							? {
+									ignore: (req) =>
+										req.headers['user-agent']?.includes('Wget') ||
+										req.url === '/health' ||
+										!req.url?.startsWith('/api'),
+								}
+							: false,
+						customLogLevel: (_req, res, err) => {
+							if (err || (res.statusCode && res.statusCode >= 500)) {
+								return 'error';
+							}
+							if (res.statusCode && res.statusCode >= 400) {
+								return 'warn';
+							}
+							return 'debug';
+						},
+						serializers: {
+							req: (req) => ({
+								id: req.id,
+								method: req.method,
+								url: req.url,
+								query: req.query,
+								remoteAddress: req.remoteAddress || req.socket?.remoteAddress,
+								remotePort: req.remotePort || req.socket?.remotePort,
+								headers: req.headers,
+							}),
+							res: (res) => ({
+								statusCode: res.statusCode,
+								headers: res.getHeaders?.(),
+							}),
+						},
+						formatters: {
+							level: (label) => {
+								return { level: label.toUpperCase() };
+							},
+						},
+						transport:
+							process.env.NODE_ENV !== 'production'
+								? {
+										target: 'pino-pretty',
+										options: {
+											singleLine: true,
+											colorize: true,
+										},
+									}
+								: undefined,
+						redact: [
+							'req.headers.authorization',
+							'req.headers.cookie',
+							'res.headers["set-cookie"]',
+						],
+						customProps: (req) => ({
+							userId: (req as any).user?.id,
+						}),
+						messageKey: 'message',
 					},
-				},
-				transport:
-					process.env.NODE_ENV !== 'production'
-						? { target: 'pino-pretty', options: { singleLine: true, colorize: true } }
-						: undefined,
-				redact: ['req.headers.authorization', 'req.headers.cookie'],
-				customProps: (req) => ({
-					userId: (req as any).user?.id,
-				}),
-				messageKey: 'message',
+					forRoutes: [{ method: RequestMethod.ALL, path: '*splat' }],
+				};
 			},
-			forRoutes: [{ method: RequestMethod.ALL, path: '*splat' }],
+			inject: [ConfigService],
 		}),
 		GraphQLModule.forRootAsync<ApolloDriverConfig>({
 			driver: ApolloDriver,

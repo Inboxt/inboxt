@@ -58,6 +58,12 @@ export const configSchema = z.object({
 	exports: z.object({
 		localPath: z.string().default('exports'),
 	}),
+	logging: z.object({
+		level: z
+			.enum(['trace', 'debug', 'info', 'warn', 'error', 'fatal', 'silent'])
+			.default('info'),
+		autoLogging: z.boolean().default(true),
+	}),
 	mail: z
 		.object({
 			host: z.string().min(1, 'MAIL_HOST is required'),
@@ -132,6 +138,11 @@ export const config = (): Config => {
 			: undefined,
 		exports: {
 			localPath: process.env.EXPORTS_LOCAL_PATH,
+		},
+		logging: {
+			level:
+				process.env.LOG_LEVEL || (process.env.NODE_ENV === 'production' ? 'info' : 'debug'),
+			autoLogging: process.env.LOG_AUTO_LOGGING !== 'false',
 		},
 		mail: process.env.MAIL_HOST
 			? {

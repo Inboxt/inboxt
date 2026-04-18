@@ -107,7 +107,7 @@ export class ExportProcessor extends BaseQueueProcessor {
 	@OnWorkerEvent('failed')
 	async onJobFailed(job: Job, error: Error) {
 		const maxAttempts = job.opts.attempts ?? 1;
-		console.error(
+		this.logger.error(
 			`Job ${job.id} failed (attempt ${job.attemptsMade}/${maxAttempts}): ${error.message}`,
 		);
 	}
