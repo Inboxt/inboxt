@@ -1,7 +1,9 @@
 import { Box, Divider, Flex } from '@mantine/core';
 import { IconLetterCase, IconPaint, IconX } from '@tabler/icons-react';
 import { useCanGoBack, useNavigate, useRouter } from '@tanstack/react-router';
+import { useEffect, useRef } from 'react';
 
+import { useContentSelection } from '~context/content-selection';
 import { FormReadingSettings } from '~forms/FormReadingSettings';
 import { FormReadingThemeSettings } from '~forms/FormReadingThemeSettings';
 import { useScreenQuery } from '~hooks/useScreenQuery';
@@ -26,6 +28,47 @@ export const ReaderSettingsOptions = ({
 	const canGoBack = useCanGoBack();
 	const navigate = useNavigate({ from: Route.fullPath });
 	const isBelowXsScreen = useScreenQuery('xs', 'below');
+	const { visibleItems } = useContentSelection();
+	const nextItemRef = useRef<string | null>(null);
+
+	useEffect(() => {
+		const currentIndex = visibleItems.findIndex((i) => {
+			if (i.__typename === 'SavedItem') {
+				return i.id === item?.id;
+			}
+
+			if (i.__typename === 'Highlight') {
+				return i.savedItem?.id === item?.id;
+			}
+
+			return false;
+		});
+
+		const nextItem = visibleItems[currentIndex + 1];
+
+		if (!nextItem) {
+			nextItemRef.current = null;
+			return;
+		}
+
+		if (nextItem.__typename === 'SavedItem') {
+			nextItemRef.current = nextItem.id;
+		} else if (nextItem.__typename === 'Highlight') {
+			nextItemRef.current = nextItem.savedItem?.id ?? null;
+		}
+	}, [visibleItems, item?.id]);
+
+	const handleActionComplete = async () => {
+		if (nextItemRef.current && nextItemRef.current !== item?.id) {
+			await navigate({
+				to: '/r/$id',
+				params: { id: nextItemRef.current },
+				replace: true,
+			});
+		} else {
+			handleGoBack();
+		}
+	};
 
 	const handleGoBack = () => {
 		if (canGoBack) {
@@ -69,12 +112,20 @@ export const ReaderSettingsOptions = ({
 						orientation={direction === 'column' ? 'horizontal' : 'vertical'}
 					/>
 
-					<ItemsOptions items={[item]} mode="reader" onActionComplete={handleGoBack} />
+					<ItemsOptions
+						items={[item]}
+						mode="reader"
+						onActionComplete={handleActionComplete}
+					/>
 				</>
 			)}
 
 			{variant === 'menu' && (
-				<ItemsOptions items={[item]} mode="reader-menu" onActionComplete={handleGoBack} />
+				<ItemsOptions
+					items={[item]}
+					mode="reader-menu"
+					onActionComplete={handleActionComplete}
+				/>
 			)}
 		</Flex>
 	);
