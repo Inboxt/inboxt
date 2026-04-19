@@ -140,16 +140,17 @@ export const ItemsOptions = ({ items, mode, size = 'md', onActionComplete }: Ite
 		{
 			label: 'Edit labels',
 			icon: IconTag,
-			modes: ['single', 'reader', 'reader-menu'],
+			modes: ['single', 'bulk', 'reader', 'reader-menu'],
 			clearsSelection: false,
 			runsOnActionComplete: false,
 			visible: () =>
-				savedItems.length === 1 && savedItems[0]?.status !== SavedItemStatus.Deleted,
+				savedItems.length >= 1 &&
+				savedItems.every((i) => i.status !== SavedItemStatus.Deleted),
 			onClick: () => {
-				const [item] = savedItems;
-				if (item) {
+				const ids = savedItems.map((i) => i.id);
+				if (ids.length) {
 					modals.openLabelsSelectionModal({
-						itemId: item.id,
+						itemIds: ids,
 						onClose: () => {
 							setSelectedItems([]);
 						},

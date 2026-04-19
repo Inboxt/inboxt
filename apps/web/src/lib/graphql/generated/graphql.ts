@@ -466,8 +466,11 @@ export type SavedQuery = {
 };
 
 export type SetSavedItemLabelsInput = {
-  id: Scalars['String']['input'];
-  labelIds: Array<Scalars['String']['input']>;
+  addLabelIds?: InputMaybe<Array<Scalars['String']['input']>>;
+  id?: InputMaybe<Scalars['String']['input']>;
+  ids?: InputMaybe<Array<Scalars['String']['input']>>;
+  labelIds?: InputMaybe<Array<Scalars['String']['input']>>;
+  removeLabelIds?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 export type SignInInput = {
