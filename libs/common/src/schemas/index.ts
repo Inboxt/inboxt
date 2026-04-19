@@ -11,3 +11,5 @@ export { updateLabelSchema } from './updateLabel.js';
 export { createApiTokenSchema } from './createApiToken.js';
 export { addArticleFromHtmlSnapshotSchema } from './addArticleFromHtmlSnapshot.js';
 export { createHighlightSchema } from './createHighlight.js';
+export { createSavedQuerySchema } from './createSavedQuery.js';
+export { updateSavedQuerySchema } from './updateSavedQuery.js';

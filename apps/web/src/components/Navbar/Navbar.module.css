@@ -49,3 +49,17 @@
 	flex-direction: column;
 	overflow: hidden;
 }
+
+.navLinkRoot {
+	height: 44px;
+	white-space: nowrap;
+}
+
+.navLinkLabel {
+	font-size: var(--mantine-font-size-lg);
+}
+
+.navLinkLabel div {
+	overflow: hidden;
+	text-overflow: ellipsis;
+}

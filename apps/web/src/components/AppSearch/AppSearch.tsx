@@ -1,9 +1,10 @@
-import { TextInput } from '@mantine/core';
+import { ActionIcon, TextInput, Tooltip } from '@mantine/core';
 import { useDebouncedCallback } from '@mantine/hooks';
-import { IconSearch } from '@tabler/icons-react';
+import { IconDeviceFloppy, IconSearch } from '@tabler/icons-react';
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import { useState } from 'react';
 
+import { modals } from '~modals/modals';
 import { Route } from '~routes/_auth.index.tsx';
 
 export function AppSearch({ variant }: { variant: 'filled' | 'default' }) {
@@ -35,8 +36,21 @@ export function AppSearch({ variant }: { variant: 'filled' | 'default' }) {
 				handleSearch(e.currentTarget.value);
 			}}
 			variant={variant}
+			maxLength={500}
 			placeholder="Search for keywords or labels..."
 			leftSection={<IconSearch size={18} />}
+			rightSection={
+				input ? (
+					<Tooltip label="Save search">
+						<ActionIcon
+							variant="subtle"
+							onClick={() => modals.openCreateSavedQueryModal({ query: input })}
+						>
+							<IconDeviceFloppy size={18} />
+						</ActionIcon>
+					</Tooltip>
+				) : undefined
+			}
 			flex="1"
 		/>
 	);

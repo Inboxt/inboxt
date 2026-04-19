@@ -29,6 +29,7 @@ import { PrismaModule } from '~modules/prisma/prisma.module';
 import { GqlRateLimitGuard } from '~modules/rate-limit/rate-limit.guard';
 import { RateLimitModule } from '~modules/rate-limit/rate-limit.module';
 import { SavedItemModule } from '~modules/saved-item/saved-item.module';
+import { SavedQueryModule } from '~modules/saved-query/saved-query.module';
 import { ScheduleTasksModule } from '~modules/schedule/schedule-tasks.module';
 import { UserModule } from '~modules/user/user.module';
 
@@ -150,6 +151,7 @@ import { AppService } from './app.service';
 		MailModule,
 		ScheduleTasksModule,
 		SavedItemModule,
+		SavedQueryModule,
 		InboundEmailAddressModule,
 		SavedItemManagerModule,
 		HighlightModule,

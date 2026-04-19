@@ -114,6 +114,15 @@ export const API_TOKEN_FRAGMENT = gql(`
     }
 `);
 
+export const SAVED_QUERY_FRAGMENT = gql(`
+	fragment SavedQueryFragment on SavedQuery {
+		id
+		createdAt
+		name
+		query
+	}
+`);
+
 /*----------  Queries  ----------*/
 export const ACTIVE_USER = gql(`
 	query me {
@@ -198,6 +207,14 @@ export const API_TOKENS = gql(`
     		...ApiTokenFragment
     	}
     }
+`);
+
+export const SAVED_QUERIES = gql(`
+	query savedQueries {
+		savedQueries {
+			...SavedQueryFragment
+		}
+	}
 `);
 
 /*----------  Mutations  ----------*/
@@ -407,5 +424,29 @@ export const ADD_ARTICLE_FROM_URL = gql(`
 export const ADD_ARTICLE_FROM_HTML_SNAPSHOT = gql(`
 	mutation addArticleFromHtmlSnapshot($data: AddArticleFromHtmlSnapshotInput!) {
 		addArticleFromHtmlSnapshot(data: $data)
+	}
+`);
+
+export const CREATE_SAVED_QUERY = gql(`
+	mutation createSavedQuery($data: CreateSavedQueryInput!) {
+		createSavedQuery(data: $data) {
+			...SavedQueryFragment
+		}
+	}
+`);
+
+export const UPDATE_SAVED_QUERY = gql(`
+	mutation updateSavedQuery($data: UpdateSavedQueryInput!) {
+		updateSavedQuery(data: $data) {
+			...SavedQueryFragment
+		}
+	}
+`);
+
+export const DELETE_SAVED_QUERY = gql(`
+	mutation deleteSavedQuery($data: DeleteSavedQueryInput!) {
+		deleteSavedQuery(data: $data) {
+			success
+		}
 	}
 `);

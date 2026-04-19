@@ -38,7 +38,12 @@ export const CreateLabelModal = ({ id, context }: ContextModalProps) => {
 				<Stack gap="xl">
 					<Card>
 						<Flex gap="md" direction={{ base: 'column', xs: 'row' }}>
-							<TextInput label="Name" flex={1} {...form.getInputProps('name')} />
+							<TextInput
+								label="Name"
+								flex={1}
+								maxLength={30}
+								{...form.getInputProps('name')}
+							/>
 							<LabelsColorInput
 								label="Color"
 								{...form.getInputProps('color')}

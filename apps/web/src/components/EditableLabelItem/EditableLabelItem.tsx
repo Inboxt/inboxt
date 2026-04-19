@@ -88,6 +88,7 @@ export const EditableLabelItem = ({ label, isEditing, setIsEditing }: EditableLa
 									placeholder="Label name"
 									flex={1}
 									w="100%"
+									maxLength={30}
 								/>
 
 								<Group wrap="nowrap" w={isAboveSmScreen ? undefined : '100%'}>
@@ -125,7 +126,7 @@ export const EditableLabelItem = ({ label, isEditing, setIsEditing }: EditableLa
 			) : (
 				<>
 					<IconLabelImportantFilled
-						size={21}
+						size={18}
 						style={{
 							color: label.color,
 						}}

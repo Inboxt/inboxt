@@ -5,6 +5,7 @@ import {
 	IconKey,
 	IconLogout,
 	IconMail,
+	IconSearch,
 	IconSettings,
 	IconTags,
 } from '@tabler/icons-react';
@@ -45,6 +46,11 @@ export const UserMenu = () => {
 			label: 'Labels',
 			icon: <IconTags />,
 			action: modals.openLabelsModal,
+		},
+		{
+			label: 'Saved Queries',
+			icon: <IconSearch />,
+			action: modals.openSavedQueriesModal,
 		},
 		{
 			label: 'Import',
