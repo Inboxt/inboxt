@@ -50,6 +50,7 @@
 	text-align: var(--reader-text-align, left);
 	font-family: var(--reader-font-family, var(--mantine-font-family));
 	font-weight: var(--reader-font-weight, 400);
+	overflow-wrap: anywhere;
 }
 
 .readerContent {
@@ -107,4 +108,37 @@
 
 .readerContent section:not(section section) {
 	margin-top: var(--mantine-spacing-lg);
+}
+
+.readerContent table {
+	width: 100% !important;
+	max-width: 100%;
+	border-collapse: collapse;
+	margin-bottom: var(--mantine-spacing-md);
+	display: block;
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+}
+
+.readerContent td {
+	word-break: break-word;
+	overflow-wrap: break-word;
+}
+
+.readerContent div {
+	max-width: 100%;
+}
+
+.readerContent pre,
+.readerContent code {
+	max-width: 100%;
+	overflow-x: auto;
+}
+
+.readerContent pre {
+	white-space: pre-wrap;
+}
+
+.readerContent iframe {
+	max-width: 100%;
 }
