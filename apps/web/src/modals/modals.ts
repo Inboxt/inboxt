@@ -145,6 +145,27 @@ export const modals = {
 		});
 	},
 
+	openSavedQueriesModal: () => {
+		return mantineModals.openContextModal({
+			modal: 'savedQueries',
+			size: 540,
+			centered: true,
+			title: 'Manage Saved Queries',
+			closeOnEscape: false,
+			innerProps: {},
+		});
+	},
+
+	openCreateSavedQueryModal: (innerProps: { query?: string } = {}) => {
+		return mantineModals.openContextModal({
+			modal: 'createSavedQuery',
+			size: 540,
+			centered: true,
+			title: 'Save Search',
+			innerProps,
+		});
+	},
+
 	closeAll: () => {
 		mantineModals.closeAll();
 	},

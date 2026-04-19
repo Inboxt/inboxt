@@ -1,18 +1,32 @@
 import { useQuery } from '@apollo/client';
-import { Box, Burger, Divider, Drawer, Group, Stack } from '@mantine/core';
+import {
+	Box,
+	Burger,
+	Collapse,
+	Divider,
+	Drawer,
+	Group,
+	Stack,
+	Text,
+	UnstyledButton,
+} from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import {
 	IconArchive,
+	IconChevronDown,
+	IconChevronUp,
 	IconHighlight,
 	IconHome,
 	IconLabelImportantFilled,
 	IconMail,
+	IconSearch,
 	IconTrash,
 	IconX,
 } from '@tabler/icons-react';
 import { clsx } from 'clsx';
 
 import { useScreenQuery } from '~hooks/useScreenQuery';
-import { LABELS } from '~lib/graphql';
+import { LABELS, SAVED_QUERIES } from '~lib/graphql';
 import { formatLabelForQuery } from '~utils/formatLabelForQuery.ts';
 
 import { FooterLinks } from '../FooterLinks';
@@ -59,7 +73,15 @@ type NavbarProps = {
 };
 
 export const Navbar = ({ opened, toggle }: NavbarProps) => {
-	const { data } = useQuery(LABELS, {
+	const [savedQueriesOpened, { toggle: toggleSavedQueries }] = useDisclosure(true);
+	const [labelsOpened, { toggle: toggleLabels }] = useDisclosure(true);
+
+	const { data: labelsData } = useQuery(LABELS, {
+		fetchPolicy: 'cache-and-network',
+		notifyOnNetworkStatusChange: true,
+	});
+
+	const { data: queriesData } = useQuery(SAVED_QUERIES, {
 		fetchPolicy: 'cache-and-network',
 		notifyOnNetworkStatusChange: true,
 	});
@@ -79,22 +101,91 @@ export const Navbar = ({ opened, toggle }: NavbarProps) => {
 				/>
 			))}
 
-			{data?.labels?.length ? (
-				<Divider m="sm" label={opened ? 'Labels' : undefined} my={opened ? 0 : 'xxs'} />
-			) : null}
-
 			<Box className={classes.navbarLabelsList}>
-				{data?.labels?.map((label) => (
-					<NavbarLink
-						key={label.id}
-						label={label.name}
-						icon={<IconLabelImportantFilled size={21} />}
-						opened={opened}
-						query={`in:inbox ${formatLabelForQuery(label.name)}`}
-						color={label.color}
-						toggleDrawer={toggle}
-					/>
-				))}
+				{queriesData?.savedQueries?.length ? (
+					<>
+						<UnstyledButton
+							onClick={toggleSavedQueries}
+							w="100%"
+							display={opened ? 'block' : 'none'}
+						>
+							<Divider
+								m="sm"
+								label={
+									<Group gap={4}>
+										<Text size="xs" fw={500} c="dimmed">
+											Saved Queries
+										</Text>
+										{savedQueriesOpened ? (
+											<IconChevronUp size={12} />
+										) : (
+											<IconChevronDown size={12} />
+										)}
+									</Group>
+								}
+								my={1}
+							/>
+						</UnstyledButton>
+
+						{!opened && <Divider m="sm" my="xxs" />}
+
+						<Collapse in={savedQueriesOpened || !opened}>
+							{queriesData.savedQueries.map((query) => (
+								<NavbarLink
+									key={query.id}
+									label={query.name}
+									icon={<IconSearch size={21} />}
+									opened={opened}
+									query={query.query}
+									toggleDrawer={toggle}
+								/>
+							))}
+						</Collapse>
+					</>
+				) : null}
+
+				{labelsData?.labels?.length ? (
+					<>
+						<UnstyledButton
+							onClick={toggleLabels}
+							w="100%"
+							display={opened ? 'block' : 'none'}
+						>
+							<Divider
+								m="sm"
+								label={
+									<Group gap={4}>
+										<Text size="xs" fw={500} c="dimmed">
+											Labels
+										</Text>
+										{labelsOpened ? (
+											<IconChevronUp size={12} />
+										) : (
+											<IconChevronDown size={12} />
+										)}
+									</Group>
+								}
+								my={1}
+							/>
+						</UnstyledButton>
+
+						{!opened && <Divider m="sm" my="xxs" />}
+
+						<Collapse in={labelsOpened || !opened}>
+							{labelsData.labels.map((label) => (
+								<NavbarLink
+									key={label.id}
+									label={label.name}
+									icon={<IconLabelImportantFilled size={21} />}
+									opened={opened}
+									query={`in:inbox ${formatLabelForQuery(label.name)}`}
+									color={label.color}
+									toggleDrawer={toggle}
+								/>
+							))}
+						</Collapse>
+					</>
+				) : null}
 			</Box>
 		</Stack>
 	);

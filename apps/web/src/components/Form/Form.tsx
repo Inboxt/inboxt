@@ -1,5 +1,5 @@
 import { ApolloError } from '@apollo/client';
-import { Alert } from '@mantine/core';
+import { Alert, Box, BoxProps, ElementProps } from '@mantine/core';
 import { IconAlertTriangleFilled } from '@tabler/icons-react';
 import { ReactNode, FormEvent, useEffect } from 'react';
 
@@ -12,9 +12,10 @@ type FormProps = {
 	onSubmit: (e: FormEvent<HTMLFormElement>) => void;
 	error?: ApolloError | string;
 	setErrors?: (errors: Record<string, string>) => void;
-};
+} & Omit<BoxProps, 'children'> &
+	Omit<ElementProps<'form', 'onSubmit'>, 'children' | 'onSubmit'>;
 
-export const Form = ({ children, onSubmit, error, setErrors }: FormProps) => {
+export const Form = ({ children, onSubmit, error, setErrors, ...others }: FormProps) => {
 	useEffect(() => {
 		if (error && setErrors) {
 			const parsed = parseError(error);
@@ -55,8 +56,8 @@ export const Form = ({ children, onSubmit, error, setErrors }: FormProps) => {
 	};
 
 	return (
-		<form onSubmit={onSubmit} noValidate className={classes.form}>
+		<Box component="form" onSubmit={onSubmit} noValidate className={classes.form} {...others}>
 			{typeof children === 'function' ? children({ error: renderError() }) : children}
-		</form>
+		</Box>
 	);
 };

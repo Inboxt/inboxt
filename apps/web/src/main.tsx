@@ -18,6 +18,7 @@ import { AddContentModal } from '~modals/AddContentModal';
 import { ApiTokensModal } from '~modals/ApiTokensModal';
 import { CreateApiTokenModal } from '~modals/CreateApiTokenModal';
 import { CreateLabelModal } from '~modals/CreateLabelModal';
+import { CreateSavedQueryModal } from '~modals/CreateSavedQueryModal';
 import { DeleteAccountModal } from '~modals/DeleteAccountModal';
 import { EmailsModal } from '~modals/EmailsModal/EmailsModal';
 import { ExportDataModal } from '~modals/ExportDataModal';
@@ -25,6 +26,7 @@ import { ImportModal } from '~modals/ImportModal';
 import { LabelsModal } from '~modals/LabelsModal';
 import { LabelsSelectionModal } from '~modals/LabelsSelectionModal';
 import { ProfileModal } from '~modals/ProfileModal';
+import { SavedQueriesModal } from '~modals/SavedQueriesModal';
 import { VerifyEmailModal } from '~modals/VerifyEmailModal';
 
 import { router } from './router';
@@ -57,6 +59,8 @@ async function init() {
 								import: ImportModal,
 								apiTokens: ApiTokensModal,
 								createApiToken: CreateApiTokenModal,
+								savedQueries: SavedQueriesModal,
+								createSavedQuery: CreateSavedQueryModal,
 							}}
 						>
 							<RouterProvider router={router} />
