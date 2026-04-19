@@ -277,6 +277,86 @@ export class SavedItemService {
 		});
 	}
 
+	async setManyLabels(
+		userId: string,
+		ids: string[],
+		labels?: { add?: string[]; remove?: string[]; set?: string[] },
+	) {
+		const items = await this.getMany(userId, {
+			where: {
+				id: { in: ids },
+			},
+			select: { id: true },
+		});
+
+		if (items.length === 0) {
+			return;
+		}
+
+		const itemIds = items.map((i) => i.id);
+
+		if (labels?.set) {
+			const validLabels = await this.labelService.getMany(userId, {
+				where: {
+					id: { in: labels.set },
+				},
+				select: { id: true },
+			});
+			const validLabelIds = validLabels.map((l) => l.id);
+
+			await this.prisma.$transaction(async (tx) => {
+				await tx.saved_item_label.deleteMany({
+					where: { savedItemId: { in: itemIds } },
+				});
+
+				const data: Prisma.saved_item_labelCreateManyInput[] = [];
+				for (const itemId of itemIds) {
+					for (const labelId of validLabelIds) {
+						data.push({ labelId, savedItemId: itemId });
+					}
+				}
+
+				await tx.saved_item_label.createMany({
+					data,
+					skipDuplicates: true,
+				});
+			});
+
+			return;
+		}
+
+		if (labels?.add?.length) {
+			const validLabels = await this.labelService.getMany(userId, {
+				where: {
+					id: { in: labels.add },
+				},
+				select: { id: true },
+			});
+			const validLabelIds = validLabels.map((l) => l.id);
+
+			const data: Prisma.saved_item_labelCreateManyInput[] = [];
+			for (const itemId of itemIds) {
+				for (const labelId of validLabelIds) {
+					data.push({ labelId, savedItemId: itemId });
+				}
+			}
+
+			await this.prisma.saved_item_label.createMany({
+				data,
+				skipDuplicates: true,
+			});
+		}
+
+		if (labels?.remove?.length) {
+			await this.prisma.saved_item_label.deleteMany({
+				where: {
+					savedItemId: { in: itemIds },
+					labelId: { in: labels.remove },
+				},
+			});
+		}
+	}
+
 	async delete(userId: string, id: string) {
 		const savedItem = await this.get(userId, {
 			where: { id, userId, status: 'DELETED', deletedSince: { not: null } },

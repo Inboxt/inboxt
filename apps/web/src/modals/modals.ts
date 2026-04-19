@@ -14,7 +14,13 @@ export const modals = {
 		});
 	},
 
-	openLabelsSelectionModal: ({ itemId, onClose }: { itemId: string; onClose?: () => void }) => {
+	openLabelsSelectionModal: ({
+		itemIds,
+		onClose,
+	}: {
+		itemIds: string[];
+		onClose?: () => void;
+	}) => {
 		return mantineModals.openContextModal({
 			modal: 'labelsSelection',
 			size: 540,
@@ -22,7 +28,7 @@ export const modals = {
 			title: 'Label as',
 			onClose,
 			innerProps: {
-				itemId,
+				itemIds,
 			},
 		});
 	},

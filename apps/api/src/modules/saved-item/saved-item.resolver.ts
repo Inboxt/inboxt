@@ -57,7 +57,19 @@ export class SavedItemResolver {
 		@ActiveUserMeta() activeUser: ActiveUserMetaType,
 		@Args('data') data: SetSavedItemLabelsInput,
 	) {
-		await this.savedItemService.setLabels(activeUser.id, data.id, data.labelIds);
+		const { id, ids, labelIds, addLabelIds, removeLabelIds } = data;
+		const allIds = ids ?? (id ? [id] : []);
+
+		if (allIds.length === 0) {
+			return VOID_RESPONSE;
+		}
+
+		await this.savedItemService.setManyLabels(activeUser.id, allIds, {
+			set: labelIds,
+			add: addLabelIds,
+			remove: removeLabelIds,
+		});
+
 		return VOID_RESPONSE;
 	}
 
