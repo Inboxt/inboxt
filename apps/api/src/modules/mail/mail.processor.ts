@@ -30,19 +30,15 @@ export class MailProcessor extends BaseQueueProcessor {
 
 	@LogExecutionTime
 	private async sendEmail(mailOptions: Mail.Options) {
-		const appUrl = this.configService.getOrThrow('appUrl', { infer: true });
-
-		const domain = new URL(appUrl).hostname;
-		const from = `"Inboxt" <no-reply@${domain}>`;
-
 		if (!this.transporter) {
 			this.logger.warn(`SMTP is not configured. Email to ${mailOptions.to} was not sent.`);
 			this.logger.debug(`Email content: ${JSON.stringify(mailOptions)}`);
 			return;
 		}
 
+		const mailConfig = this.configService.getOrThrow('mail', { infer: true });
 		await this.transporter.sendMail({
-			from,
+			from: mailConfig.from,
 			...mailOptions,
 		});
 	}
