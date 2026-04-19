@@ -67,7 +67,7 @@ export const ExportDataModal = ({
 						<Stack gap="md">
 							<Text size="sm">
 								{type === ExportType.All
-									? 'Request a full account export once per day. It includes your saved items, highlights, labels, and metadata. The export will be prepared and sent to your email address. Large exports can take a while to complete.'
+									? 'Request a full account export. It includes your saved items, highlights, labels, and metadata. We’ll email you a download link when it’s ready. Large exports can take a while to complete.'
 									: 'Export your highlights instantly in your chosen format. The file will download directly in your browser.'}
 							</Text>
 
