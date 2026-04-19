@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { formatEmailFrom } from '~common/utils/formatEmailFrom';
+
 export const configSchema = z.object({
 	cors: z.object({
 		enabled: z.boolean().default(true),
@@ -77,6 +79,7 @@ export const configSchema = z.object({
 					'MAIL_PORT must be a positive integer',
 				),
 			secure: z.boolean().optional(),
+			from: z.string(),
 			auth: z
 				.object({
 					user: z.string(),
@@ -144,19 +147,31 @@ export const config = (): Config => {
 				process.env.LOG_LEVEL || (process.env.NODE_ENV === 'production' ? 'info' : 'debug'),
 			autoLogging: process.env.LOG_AUTO_LOGGING !== 'false',
 		},
-		mail: process.env.MAIL_HOST
-			? {
-					host: process.env.MAIL_HOST,
-					port: process.env.MAIL_PORT,
-					secure: process.env.MAIL_SECURE === 'true' ? true : undefined,
-					auth:
-						process.env.MAIL_USER && process.env.MAIL_PASSWORD
-							? {
-									user: process.env.MAIL_USER,
-									pass: process.env.MAIL_PASSWORD,
-								}
-							: undefined,
-				}
-			: undefined,
+		mail: (() => {
+			if (!process.env.MAIL_HOST) {
+				return undefined;
+			}
+
+			const appUrl = process.env.APP_URL || process.env.API_URL || 'http://localhost:7000';
+			const domain = new URL(appUrl).hostname;
+
+			return {
+				host: process.env.MAIL_HOST,
+				port: process.env.MAIL_PORT,
+				secure: process.env.MAIL_SECURE === 'true' ? true : undefined,
+				from:
+					process.env.MAIL_FROM ??
+					(process.env.MAIL_USER
+						? formatEmailFrom(process.env.MAIL_USER)
+						: formatEmailFrom(`no-reply@${domain}`)),
+				auth:
+					process.env.MAIL_USER && process.env.MAIL_PASSWORD
+						? {
+								user: process.env.MAIL_USER,
+								pass: process.env.MAIL_PASSWORD,
+							}
+						: undefined,
+			};
+		})(),
 	});
 };
