@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { modals } from '~modals/modals';
 
 export const useModalFromUrl = () => {
-	const search = useSearch({ from: '/_auth/' });
+	const search = useSearch({ from: '/_auth/_main' });
 	const navigate = useNavigate();
 
 	useEffect(() => {

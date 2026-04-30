@@ -5,7 +5,7 @@ import { useNavigate, useSearch } from '@tanstack/react-router';
 import { useState } from 'react';
 
 import { modals } from '~modals/modals';
-import { Route } from '~routes/_auth.index.tsx';
+import { Route } from '~routes/_auth._main';
 
 export function AppSearch({ variant }: { variant: 'filled' | 'default' }) {
 	const navigate = useNavigate();

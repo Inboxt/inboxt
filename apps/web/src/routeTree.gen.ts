@@ -11,9 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as AuthRouteRouteImport } from './routes/auth.route'
-import { Route as AuthIndexRouteImport } from './routes/_auth.index'
-import { Route as RIdRouteImport } from './routes/r.$id'
 import { Route as AuthShareTargetRouteImport } from './routes/_auth.share-target'
+import { Route as AuthMainRouteImport } from './routes/_auth._main'
+import { Route as AuthMainIndexRouteImport } from './routes/_auth._main.index'
+import { Route as AuthMainRIdRouteImport } from './routes/_auth._main.r.$id'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/_auth',
@@ -24,60 +25,65 @@ const AuthRouteRoute = AuthRouteRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthIndexRoute = AuthIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AuthRoute,
-} as any)
-const RIdRoute = RIdRouteImport.update({
-  id: '/r/$id',
-  path: '/r/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthShareTargetRoute = AuthShareTargetRouteImport.update({
   id: '/share-target',
   path: '/share-target',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthMainRoute = AuthMainRouteImport.update({
+  id: '/_main',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthMainIndexRoute = AuthMainIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthMainRoute,
+} as any)
+const AuthMainRIdRoute = AuthMainRIdRouteImport.update({
+  id: '/r/$id',
+  path: '/r/$id',
+  getParentRoute: () => AuthMainRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/auth': typeof AuthRouteRoute
   '/share-target': typeof AuthShareTargetRoute
-  '/r/$id': typeof RIdRoute
-  '/': typeof AuthIndexRoute
+  '/': typeof AuthMainIndexRoute
+  '/r/$id': typeof AuthMainRIdRoute
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRouteRoute
   '/share-target': typeof AuthShareTargetRoute
-  '/r/$id': typeof RIdRoute
-  '/': typeof AuthIndexRoute
+  '/': typeof AuthMainIndexRoute
+  '/r/$id': typeof AuthMainRIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/auth': typeof AuthRouteRoute
   '/_auth': typeof AuthRouteWithChildren
+  '/_auth/_main': typeof AuthMainRouteWithChildren
   '/_auth/share-target': typeof AuthShareTargetRoute
-  '/r/$id': typeof RIdRoute
-  '/_auth/': typeof AuthIndexRoute
+  '/_auth/_main/': typeof AuthMainIndexRoute
+  '/_auth/_main/r/$id': typeof AuthMainRIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/auth' | '/share-target' | '/r/$id' | '/'
+  fullPaths: '/auth' | '/share-target' | '/' | '/r/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/auth' | '/share-target' | '/r/$id' | '/'
+  to: '/auth' | '/share-target' | '/' | '/r/$id'
   id:
     | '__root__'
     | '/auth'
     | '/_auth'
+    | '/_auth/_main'
     | '/_auth/share-target'
-    | '/r/$id'
-    | '/_auth/'
+    | '/_auth/_main/'
+    | '/_auth/_main/r/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AuthRouteRoute: typeof AuthRouteRoute
   AuthRoute: typeof AuthRouteWithChildren
-  RIdRoute: typeof RIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -96,20 +102,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_auth/': {
-      id: '/_auth/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof AuthIndexRouteImport
-      parentRoute: typeof AuthRoute
-    }
-    '/r/$id': {
-      id: '/r/$id'
-      path: '/r/$id'
-      fullPath: '/r/$id'
-      preLoaderRoute: typeof RIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_auth/share-target': {
       id: '/_auth/share-target'
       path: '/share-target'
@@ -117,17 +109,52 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthShareTargetRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/_main': {
+      id: '/_auth/_main'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthMainRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/_main/': {
+      id: '/_auth/_main/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof AuthMainIndexRouteImport
+      parentRoute: typeof AuthMainRoute
+    }
+    '/_auth/_main/r/$id': {
+      id: '/_auth/_main/r/$id'
+      path: '/r/$id'
+      fullPath: '/r/$id'
+      preLoaderRoute: typeof AuthMainRIdRouteImport
+      parentRoute: typeof AuthMainRoute
+    }
   }
 }
 
+interface AuthMainRouteChildren {
+  AuthMainIndexRoute: typeof AuthMainIndexRoute
+  AuthMainRIdRoute: typeof AuthMainRIdRoute
+}
+
+const AuthMainRouteChildren: AuthMainRouteChildren = {
+  AuthMainIndexRoute: AuthMainIndexRoute,
+  AuthMainRIdRoute: AuthMainRIdRoute,
+}
+
+const AuthMainRouteWithChildren = AuthMainRoute._addFileChildren(
+  AuthMainRouteChildren,
+)
+
 interface AuthRouteChildren {
+  AuthMainRoute: typeof AuthMainRouteWithChildren
   AuthShareTargetRoute: typeof AuthShareTargetRoute
-  AuthIndexRoute: typeof AuthIndexRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
+  AuthMainRoute: AuthMainRouteWithChildren,
   AuthShareTargetRoute: AuthShareTargetRoute,
-  AuthIndexRoute: AuthIndexRoute,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
@@ -135,7 +162,6 @@ const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   AuthRouteRoute: AuthRouteRoute,
   AuthRoute: AuthRouteWithChildren,
-  RIdRoute: RIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

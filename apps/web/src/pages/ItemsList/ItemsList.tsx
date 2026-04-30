@@ -11,7 +11,7 @@ import { useModalFromUrl } from '~hooks/useModalFromUrl.tsx';
 import { AppLayout } from '~layouts/AppLayout';
 import { ENTRIES, EntrySortField, SortDirection, EMPTY_TRASH } from '~lib/graphql';
 import { modals } from '~modals/modals';
-import { Route } from '~routes/_auth.index';
+import { Route } from '~routes/_auth._main';
 
 import { ItemRenderer } from './ItemRenderers';
 import classes from './ItemsList.module.css';

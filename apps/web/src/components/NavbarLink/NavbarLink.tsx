@@ -4,7 +4,6 @@ import { ReactNode } from 'react';
 
 import { useContentSelection } from '~context/content-selection';
 import { useScreenQuery } from '~hooks/useScreenQuery';
-import { Route } from '~routes/_auth.index';
 
 import classes from './NavbarLink.module.css';
 
@@ -58,7 +57,7 @@ export const NavbarLink = ({
 					setSelectedItems([]);
 				}}
 				renderRoot={(props: Omit<NavLinkProps, 'style' | 'onChange'>) => {
-					return <Link from={Route.fullPath} search={{ q: query }} {...props} />;
+					return <Link to="/" search={{ q: query }} {...props} />;
 				}}
 			/>
 		</Tooltip>
