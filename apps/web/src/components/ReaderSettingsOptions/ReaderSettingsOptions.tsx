@@ -7,7 +7,6 @@ import { FormReadingThemeSettings } from '~forms/FormReadingThemeSettings';
 import { useAdjacentItems } from '~hooks/useAdjacentItems';
 import { useScreenQuery } from '~hooks/useScreenQuery';
 import { SavedItem } from '~lib/graphql';
-import { Route } from '~routes/r.$id';
 
 import { ItemsOptions } from '../ItemsOptions';
 import { ReaderSettingsPopover } from '../ReaderSettingsPopover';
@@ -25,7 +24,7 @@ export const ReaderSettingsOptions = ({
 }: ReaderSettingsOptionsProps) => {
 	const router = useRouter();
 	const canGoBack = useCanGoBack();
-	const navigate = useNavigate({ from: Route.fullPath });
+	const navigate = useNavigate();
 	const isBelowXsScreen = useScreenQuery('xs', 'below');
 	const { nextId } = useAdjacentItems(item?.id);
 
@@ -34,6 +33,7 @@ export const ReaderSettingsOptions = ({
 			await navigate({
 				to: '/r/$id',
 				params: { id: nextId },
+				search: (prev) => prev,
 				replace: true,
 			});
 		} else {

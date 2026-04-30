@@ -33,11 +33,12 @@
 }
 
 .readerView {
-	height: 100%;
+	position: fixed;
+	inset: 0;
+	overflow-y: auto;
+	z-index: 200;
 	background: var(--mantine-color-body);
 	color: var(--mantine-color-text);
-	flex: 1;
-	min-height: 100vh;
 	display: flex;
 	flex-direction: column;
 }

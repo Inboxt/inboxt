@@ -1,19 +1,19 @@
 import { readLocalStorageValue } from '@mantine/hooks';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, Outlet } from '@tanstack/react-router';
 
 import { SORT_VALUES } from '@inboxt/common';
 
 import { ItemsList } from '~pages/ItemsList';
 
 type SortOption = (typeof SORT_VALUES)[number];
+
 export type RouteSearchParams = {
 	sort?: SortOption;
 	q?: string;
 	modal?: 'api-tokens';
 };
 
-export const Route = createFileRoute('/_auth/')({
-	component: ItemsList,
+export const Route = createFileRoute('/_auth/_main')({
 	validateSearch: (search: Record<string, unknown>): RouteSearchParams => {
 		let sort = search.sort as SortOption | undefined;
 
@@ -38,4 +38,10 @@ export const Route = createFileRoute('/_auth/')({
 			modal: search.modal === 'api-tokens' ? 'api-tokens' : undefined,
 		};
 	},
+	component: () => (
+		<>
+			<ItemsList />
+			<Outlet />
+		</>
+	),
 });

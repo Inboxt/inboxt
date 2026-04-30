@@ -22,7 +22,7 @@ import { AppSearch } from '~components/AppSearch';
 import { useContentSelection } from '~context/content-selection';
 import { useScreenQuery } from '~hooks/useScreenQuery';
 import { modals } from '~modals/modals';
-import { RouteSearchParams, Route } from '~routes/_auth.index';
+import { RouteSearchParams, Route } from '~routes/_auth._main';
 
 import { ItemsOptions } from '../ItemsOptions';
 import { ReaderCheckbox } from '../ReaderCheckbox';
@@ -191,7 +191,7 @@ export const Header = ({ opened, toggle }: HeaderProps) => {
 
 								setSort(val as typeof searchParams.sort);
 								void router.navigate({
-									to: Route.fullPath,
+									to: '/',
 									search: {
 										...searchParams,
 										sort: val as typeof searchParams.sort,

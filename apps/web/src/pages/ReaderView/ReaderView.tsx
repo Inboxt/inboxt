@@ -20,7 +20,7 @@ import { useDocumentTitle } from '@mantine/hooks';
 import { IconArrowLeft, IconHighlight } from '@tabler/icons-react';
 import { useCanGoBack, useNavigate, useParams, useRouter } from '@tanstack/react-router';
 import dayjs from 'dayjs';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { APP_PRIMARY_COLOR, READER_THEMES } from '@inboxt/common';
 import { theme } from '@inboxt/ui';
@@ -34,7 +34,7 @@ import { useReaderSettings, makeReaderResolver } from '~hooks/useReaderSettings.
 import { useScreenQuery } from '~hooks/useScreenQuery';
 import { useTextHighlighting } from '~hooks/useTextSelection';
 import { SAVED_ITEM, SavedItemType } from '~lib/graphql';
-import { Route } from '~routes/r.$id';
+import { Route } from '~routes/_auth._main.r.$id';
 
 import classes from './ReaderView.module.css';
 
@@ -42,10 +42,10 @@ export const ReaderView = () => {
 	const isAboveXsScreen = useScreenQuery('xs', 'above');
 	const router = useRouter();
 	const canGoBack = useCanGoBack();
-	const navigate = useNavigate({ from: Route.fullPath });
+	const navigate = useNavigate();
 	const { effectiveTheme, contentSettings } = useReaderSettings();
 
-	const { id } = useParams({ from: Route.fullPath });
+	const { id } = useParams({ from: Route.id });
 	const { data, loading, error } = useQuery(SAVED_ITEM, {
 		variables: { query: { id } },
 		fetchPolicy: 'cache-and-network',
@@ -76,15 +76,28 @@ export const ReaderView = () => {
 
 		if (isHorizontalSwipe && Math.abs(distanceX) > minSwipeDistance) {
 			if (distanceX > 0 && nextId) {
-				void navigate({ to: '/r/$id', params: { id: nextId }, replace: true });
+				void navigate({
+					to: '/r/$id',
+					params: { id: nextId },
+					search: (prev) => prev,
+					replace: true,
+				});
 			} else if (distanceX < 0 && prevId) {
-				void navigate({ to: '/r/$id', params: { id: prevId }, replace: true });
+				void navigate({
+					to: '/r/$id',
+					params: { id: prevId },
+					search: (prev) => prev,
+					replace: true,
+				});
 			}
 		}
 	};
 
+	const readerRef = useRef<HTMLDivElement>(null);
 	useEffect(() => {
-		window.scrollTo(0, 0);
+		if (readerRef.current) {
+			readerRef.current.scrollTop = 0;
+		}
 	}, [id]);
 
 	useEffect(() => {
@@ -120,18 +133,6 @@ export const ReaderView = () => {
 		}
 	};
 
-	if (loading) {
-		return (
-			<Center py="xxl" mt="lg">
-				<Stack w={isAboveXsScreen ? '45em' : '100%'} gap="xxl">
-					<Skeleton visible height={120} animate />
-
-					<Skeleton visible height={560} animate />
-				</Stack>
-			</Center>
-		);
-	}
-
 	const content =
 		savedItem?.type === SavedItemType.Article
 			? savedItem.article?.contentHtml
@@ -141,6 +142,7 @@ export const ReaderView = () => {
 
 	return (
 		<Box
+			ref={readerRef}
 			pt="md"
 			px={isAboveXsScreen ? 'xl' : 'md'}
 			className={classes.readerView}
@@ -159,131 +161,146 @@ export const ReaderView = () => {
 				theme={theme}
 				cssVariablesSelector="#reader-root"
 			>
-				<Box className={classes.headerContainer}>
-					<Group onClick={handleGoBack} align="center" justify="center">
-						<Flex hiddenFrom="md">
-							<IconArrowLeft />
-						</Flex>
-						<AppName size="md" variant={isAboveXsScreen ? 'full' : 'short'} />
-					</Group>
-
-					{selectedText && rangeRect && hasValidSelection ? (
-						<ActionIcon
-							variant="subtle"
-							color="text"
-							size="lg"
-							onClick={(e) => {
-								e.preventDefault();
-								void highlightSelection();
-							}}
-							onTouchEnd={(e) => {
-								e.preventDefault();
-								void highlightSelection();
-							}}
-							hiddenFrom="md"
-						>
-							<IconHighlight />
-						</ActionIcon>
-					) : (
-						<Box hiddenFrom="md">
-							<ReaderSettingsOptions
-								direction="row"
-								variant="menu"
-								item={(savedItem as any) || null}
-							/>
-						</Box>
-					)}
-				</Box>
-
-				<Box visibleFrom="md" className={classes.readerSettingsContainer}>
-					<ReaderSettingsOptions item={(data?.savedItem as any) || null} />
-				</Box>
-
-				<Center pt="xxl">
-					<Box className={classes.readerContent}>
-						<Stack gap="xl">
-							{savedItem && (
-								<>
-									<Stack gap="xxs">
-										<Breadcrumbs separator="•">
-											<Text>
-												{dayjs(savedItem.createdAt).format(
-													'MMMM D, YYYY HH:mm',
-												)}
-											</Text>
-											<Text>{`${Math.ceil((savedItem.wordCount || 0) / 240)} min read`}</Text>
-										</Breadcrumbs>
-
-										<Title order={2}>{savedItem.title}</Title>
-
-										<Group gap={6}>
-											{savedItem.author && (
-												<Text>
-													{`By ${savedItem.author}`}
-													{savedItem.sourceDomain ? ',' : ''}
-												</Text>
-											)}
-											{savedItem.sourceDomain && (
-												<Text>{savedItem.sourceDomain}</Text>
-											)}
-											{savedItem.originalUrl && (
-												<>
-													<Text>•</Text>
-													<Anchor
-														href={savedItem.originalUrl}
-														target="_blank"
-													>
-														See original
-													</Anchor>
-												</>
-											)}
-
-											{savedItem.newsletter?.subscription && (
-												<NewsletterSubscriptionButton
-													subscription={savedItem.newsletter.subscription}
-												/>
-											)}
-										</Group>
-
-										<Group gap={6}>
-											{(savedItem.labels || []).map((label) => (
-												<Badge
-													size="sm"
-													radius="sm"
-													color={label.color}
-													autoContrast={label.color !== APP_PRIMARY_COLOR}
-												>
-													{label.name}
-												</Badge>
-											))}
-										</Group>
-									</Stack>
-									<Divider color="var(--reader-border-color)" />
-								</>
-							)}
-
-							{!error && savedItem && !content && (
-								<Text ta="center">{savedItem.description ?? ''}</Text>
-							)}
-
-							{!error && savedItem && content && (
-								<Typography className={classes.typography}>
-									<HighlightableArticle
-										content={content || null}
-										data={savedItem as any}
-									/>
-								</Typography>
-							)}
-
-							{(error || !savedItem) && (
-								<Text ta="center">
-									Something went wrong, and the article content couldn't be
-									loaded. Please try again or contact support.
-								</Text>
-							)}
+				{loading ? (
+					<Center py="xxl" mt="lg">
+						<Stack w={isAboveXsScreen ? '45em' : '100%'} gap="xxl">
+							<Skeleton visible height={120} animate />
+							<Skeleton visible height={560} animate />
 						</Stack>
-					</Box>
-				</Center>
+					</Center>
+				) : (
+					<>
+						<Box className={classes.headerContainer}>
+							<Group onClick={handleGoBack} align="center" justify="center">
+								<Flex hiddenFrom="md">
+									<IconArrowLeft />
+								</Flex>
+								<AppName size="md" variant={isAboveXsScreen ? 'full' : 'short'} />
+							</Group>
+
+							{selectedText && rangeRect && hasValidSelection ? (
+								<ActionIcon
+									variant="subtle"
+									color="text"
+									size="lg"
+									onClick={(e) => {
+										e.preventDefault();
+										void highlightSelection();
+									}}
+									onTouchEnd={(e) => {
+										e.preventDefault();
+										void highlightSelection();
+									}}
+									hiddenFrom="md"
+								>
+									<IconHighlight />
+								</ActionIcon>
+							) : (
+								<Box hiddenFrom="md">
+									<ReaderSettingsOptions
+										direction="row"
+										variant="menu"
+										item={(savedItem as any) || null}
+									/>
+								</Box>
+							)}
+						</Box>
+
+						<Box visibleFrom="md" className={classes.readerSettingsContainer}>
+							<ReaderSettingsOptions item={(data?.savedItem as any) || null} />
+						</Box>
+
+						<Center pt="xxl">
+							<Box className={classes.readerContent}>
+								<Stack gap="xl">
+									{savedItem && (
+										<>
+											<Stack gap="xxs">
+												<Breadcrumbs separator="•">
+													<Text>
+														{dayjs(savedItem.createdAt).format(
+															'MMMM D, YYYY HH:mm',
+														)}
+													</Text>
+													<Text>{`${Math.ceil((savedItem.wordCount || 0) / 240)} min read`}</Text>
+												</Breadcrumbs>
+
+												<Title order={2}>{savedItem.title}</Title>
+
+												<Group gap={6}>
+													{savedItem.author && (
+														<Text>
+															{`By ${savedItem.author}`}
+															{savedItem.sourceDomain ? ',' : ''}
+														</Text>
+													)}
+													{savedItem.sourceDomain && (
+														<Text>{savedItem.sourceDomain}</Text>
+													)}
+													{savedItem.originalUrl && (
+														<>
+															<Text>•</Text>
+															<Anchor
+																href={savedItem.originalUrl}
+																target="_blank"
+															>
+																See original
+															</Anchor>
+														</>
+													)}
+
+													{savedItem.newsletter?.subscription && (
+														<NewsletterSubscriptionButton
+															subscription={
+																savedItem.newsletter.subscription
+															}
+														/>
+													)}
+												</Group>
+
+												<Group gap={6}>
+													{(savedItem.labels || []).map((label) => (
+														<Badge
+															size="sm"
+															radius="sm"
+															color={label.color}
+															autoContrast={
+																label.color !== APP_PRIMARY_COLOR
+															}
+														>
+															{label.name}
+														</Badge>
+													))}
+												</Group>
+											</Stack>
+											<Divider color="var(--reader-border-color)" />
+										</>
+									)}
+
+									{!error && savedItem && !content && (
+										<Text ta="center">{savedItem.description ?? ''}</Text>
+									)}
+
+									{!error && savedItem && content && (
+										<Typography className={classes.typography}>
+											<HighlightableArticle
+												content={content || null}
+												data={savedItem as any}
+											/>
+										</Typography>
+									)}
+
+									{(error || !savedItem) && (
+										<Text ta="center">
+											Something went wrong, and the article content couldn't
+											be loaded. Please try again or contact support.
+										</Text>
+									)}
+								</Stack>
+							</Box>
+						</Center>
+					</>
+				)}
 			</MantineProvider>
 		</Box>
 	);
