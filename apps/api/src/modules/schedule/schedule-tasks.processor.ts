@@ -87,6 +87,7 @@ export class ScheduleTasksProcessor extends BaseQueueProcessor {
 		const thresholdDate = dayjs().subtract(30, 'days').toDate();
 		const savedItems = await this.prisma.saved_item.findMany({
 			where: {
+				status: 'DELETED',
 				deletedSince: {
 					lte: thresholdDate,
 				},
