@@ -1,7 +1,7 @@
 {
 	"name": "web",
 	"private": true,
-	"version": "0.0.0",
+	"version": "1.1.0",
 	"type": "module",
 	"scripts": {
 		"dev": "vite",
@@ -12,7 +12,7 @@
 	},
 	"dependencies": {
 		"@apollo/client": "3.13.8",
-		"@inboxt/common": "1.0.0",
+		"@inboxt/common": "1.1.0",
 		"@mantine/core": "8.3.9",
 		"@mantine/form": "8.3.9",
 		"@mantine/hooks": "8.3.9",
