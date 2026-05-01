@@ -58,12 +58,24 @@ export const ReaderView = () => {
 	const minSwipeDistance = 50;
 
 	const handleTouchStart = (e: React.TouchEvent) => {
+		const touch = e.targetTouches[0];
+
+		if (!touch) {
+			return;
+		}
+
 		setTouchEnd(null);
-		setTouchStart({ x: e.targetTouches[0].clientX, y: e.targetTouches[0].clientY });
+		setTouchStart({ x: touch.clientX, y: touch.clientY });
 	};
 
 	const handleTouchMove = (e: React.TouchEvent) => {
-		setTouchEnd({ x: e.targetTouches[0].clientX, y: e.targetTouches[0].clientY });
+		const touch = e.targetTouches[0];
+
+		if (!touch) {
+			return;
+		}
+
+		setTouchEnd({ x: touch.clientX, y: touch.clientY });
 	};
 
 	const handleTouchEnd = () => {

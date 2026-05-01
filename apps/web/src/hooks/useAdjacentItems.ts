@@ -1,6 +1,22 @@
 import { useMemo } from 'react';
 
-import { useContentSelection } from '~context/content-selection';
+import { SelectableItem, useContentSelection } from '~context/content-selection';
+
+const getSavedItemId = (item: SelectableItem | undefined): string | null => {
+	if (!item) {
+		return null;
+	}
+
+	if (item.__typename === 'SavedItem') {
+		return item.id;
+	}
+
+	if ('savedItem' in item) {
+		return item.savedItem?.id ?? null;
+	}
+
+	return null;
+};
 
 export const useAdjacentItems = (currentId: string | undefined) => {
 	const { visibleItems } = useContentSelection();
@@ -10,17 +26,7 @@ export const useAdjacentItems = (currentId: string | undefined) => {
 			return { nextId: null, prevId: null };
 		}
 
-		const currentIndex = visibleItems.findIndex((i) => {
-			if (i.__typename === 'SavedItem') {
-				return i.id === currentId;
-			}
-
-			if (i.__typename === 'Highlight') {
-				return i.savedItem?.id === currentId;
-			}
-
-			return false;
-		});
+		const currentIndex = visibleItems.findIndex((item) => getSavedItemId(item) === currentId);
 
 		if (currentIndex === -1) {
 			return { nextId: null, prevId: null };
@@ -29,13 +35,7 @@ export const useAdjacentItems = (currentId: string | undefined) => {
 		// Find next item with a different ID
 		let nextId: string | null = null;
 		for (let i = currentIndex + 1; i < visibleItems.length; i++) {
-			const item = visibleItems[i];
-			const itemId =
-				item.__typename === 'SavedItem'
-					? item.id
-					: item.__typename === 'Highlight'
-						? item.savedItem?.id
-						: null;
+			const itemId = getSavedItemId(visibleItems[i]);
 			if (itemId && itemId !== currentId) {
 				nextId = itemId;
 				break;
@@ -45,13 +45,7 @@ export const useAdjacentItems = (currentId: string | undefined) => {
 		// Find previous item with a different ID
 		let prevId: string | null = null;
 		for (let i = currentIndex - 1; i >= 0; i--) {
-			const item = visibleItems[i];
-			const itemId =
-				item.__typename === 'SavedItem'
-					? item.id
-					: item.__typename === 'Highlight'
-						? item.savedItem?.id
-						: null;
+			const itemId = getSavedItemId(visibleItems[i]);
 			if (itemId && itemId !== currentId) {
 				prevId = itemId;
 				break;
