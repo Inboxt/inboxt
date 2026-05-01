@@ -173,6 +173,10 @@ export class ImportService {
 		}
 
 		if (type === 'ARTICLE') {
+			const articleStatus = Object.values(saved_item_status).includes(itemJson.status as any)
+				? (itemJson.status as saved_item_status)
+				: undefined;
+
 			await this.savedItemManagerService.processAndCreateArticle(userId, { html }, labelIds, {
 				title: itemJson.title ?? undefined,
 				originalUrl: itemJson.originalUrl ?? undefined,
@@ -181,12 +185,22 @@ export class ImportService {
 				leadImage: itemJson.leadImage ?? undefined,
 				wordCount: typeof itemJson.wordCount === 'number' ? itemJson.wordCount : undefined,
 				author: itemJson.author ?? undefined,
-				status: Object.values(saved_item_status).includes(itemJson.status as any)
-					? (itemJson.status as saved_item_status)
-					: undefined,
+				status: articleStatus,
+				deletedSince:
+					articleStatus === 'DELETED'
+						? itemJson.deletedSince
+							? new Date(itemJson.deletedSince)
+							: new Date()
+						: undefined,
 				createdAt: itemJson.createdAt ? new Date(itemJson.createdAt) : undefined,
 			});
 		} else {
+			const newsletterStatus = Object.values(saved_item_status).includes(
+				itemJson?.status as any,
+			)
+				? (itemJson.status as saved_item_status)
+				: undefined;
+
 			await this.savedItemManagerService.processAndCreateNewsletter(
 				userId,
 				null,
@@ -201,6 +215,13 @@ export class ImportService {
 					wordCount:
 						typeof itemJson?.wordCount === 'number' ? itemJson?.wordCount : undefined,
 					author: itemJson?.author ?? undefined,
+					status: newsletterStatus,
+					deletedSince:
+						newsletterStatus === 'DELETED'
+							? itemJson?.deletedSince
+								? new Date(itemJson.deletedSince)
+								: new Date()
+							: undefined,
 				},
 			);
 		}
