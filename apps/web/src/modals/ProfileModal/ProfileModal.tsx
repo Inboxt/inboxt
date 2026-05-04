@@ -241,81 +241,6 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 						</Skeleton>
 					</Card>
 
-					{import.meta.env.PROD &&
-						(runtimeConfig.webErrorsDsn || runtimeConfig.apiErrorsDsnConfigured) && (
-							<Card>
-								<Stack gap="md">
-									<Stack gap="xxxs">
-										<Title order={5}>Sentry Error Reporting</Title>
-										<Text size="xs" c="dimmed">
-											Ensure your Sentry DSN connection is working correctly
-											by triggering a test error.
-										</Text>
-									</Stack>
-									<Stack gap="sm">
-										{runtimeConfig.webErrorsDsn && (
-											<Flex
-												justify="space-between"
-												align={{ base: 'stretch', xs: 'center' }}
-												gap="md"
-												direction={{ base: 'column', xs: 'row' }}
-											>
-												<Text size="sm">Web (Frontend)</Text>
-												<Button
-													variant="light"
-													size="xs"
-													w={{ base: '100%', xs: 130 }}
-													onClick={() => {
-														toastSuccess({
-															title: 'Test Web error triggered.',
-															description:
-																'Check your Sentry dashboard.',
-														});
-
-														throw new Error(
-															'This is a test frontend error for Sentry',
-														);
-													}}
-												>
-													Test Web Error
-												</Button>
-											</Flex>
-										)}
-										{runtimeConfig.apiErrorsDsnConfigured && (
-											<Flex
-												justify="space-between"
-												align={{ base: 'stretch', xs: 'center' }}
-												gap="md"
-												direction={{ base: 'column', xs: 'row' }}
-											>
-												<Text size="sm">API (Backend)</Text>
-												<Button
-													variant="light"
-													size="xs"
-													w={{ base: '100%', xs: 130 }}
-													onClick={async () => {
-														try {
-															await fetch('/api/test-error');
-														} catch (_err) {
-															// Error is expected as it throws on server
-														}
-
-														toastSuccess({
-															title: 'Test API error triggered.',
-															description:
-																'Check your Sentry dashboard.',
-														});
-													}}
-												>
-													Test API Error
-												</Button>
-											</Flex>
-										)}
-									</Stack>
-								</Stack>
-							</Card>
-						)}
-
 					{loading ? (
 						<Skeleton visible={loading} height={48} />
 					) : (
@@ -363,6 +288,69 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 									</Stack>
 								</Accordion.Panel>
 							</Accordion.Item>
+
+							{import.meta.env.PROD &&
+								(runtimeConfig.webErrorsDsn ||
+									runtimeConfig.apiErrorsDsnConfigured) && (
+									<Accordion.Item value="diagnostics">
+										<Accordion.Control>Diagnostics</Accordion.Control>
+										<Accordion.Panel>
+											<Stack gap="xs">
+												<Text size="sm">
+													Test that Sentry error reporting is configured
+													correctly by triggering a web or API error.
+												</Text>
+
+												<Flex
+													gap="md"
+													direction={{ base: 'column', xs: 'row' }}
+												>
+													{runtimeConfig.webErrorsDsn && (
+														<Button
+															variant="default"
+															fullWidth
+															onClick={() => {
+																toastSuccess({
+																	title: 'Test Web error triggered.',
+																	description:
+																		'Check your Sentry dashboard.',
+																});
+
+																throw new Error(
+																	'This is a test frontend error for Sentry',
+																);
+															}}
+														>
+															Test Web Error
+														</Button>
+													)}
+
+													{runtimeConfig.apiErrorsDsnConfigured && (
+														<Button
+															variant="default"
+															fullWidth
+															onClick={async () => {
+																try {
+																	await fetch('/api/test-error');
+																} catch (_err) {
+																	// Error is expected as it throws on server
+																}
+
+																toastSuccess({
+																	title: 'Test API error triggered.',
+																	description:
+																		'Check your Sentry dashboard.',
+																});
+															}}
+														>
+															Test API Error
+														</Button>
+													)}
+												</Flex>
+											</Stack>
+										</Accordion.Panel>
+									</Accordion.Item>
+								)}
 						</Accordion>
 					)}
 
