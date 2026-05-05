@@ -33,8 +33,14 @@ export const SavedQueriesModal = ({ id, context }: ContextModalProps) => {
 	const hasQueries = queries.length > 0;
 
 	return (
-		<Stack gap="xl">
-			<ScrollArea.Autosize mah="50vh" type="auto">
+		<Stack gap="xl" flex={1} h="100%" mih={0} style={{ overflow: 'hidden' }}>
+			<ScrollArea.Autosize
+				flex={1}
+				mih={0}
+				mah={{ base: '100%', sm: '50vh' }}
+				type="auto"
+				scrollbars="y"
+			>
 				{loading && !data ? (
 					<Stack gap="xs" pr="sm">
 						<Skeleton height={60} />

@@ -12,6 +12,7 @@ import {
 	Tooltip,
 	ActionIcon,
 	CopyButton,
+	ScrollArea,
 } from '@mantine/core';
 import { ContextModalProps } from '@mantine/modals';
 import { IconAlertTriangleFilled, IconCheck, IconCopy } from '@tabler/icons-react';
@@ -48,8 +49,8 @@ export const EmailsModal = ({ id, context }: ContextModalProps) => {
 	};
 
 	return (
-		<Stack gap="xl" flex={1}>
-			<Alert color="gray">
+		<Stack gap="xl" flex={1} h="100%" mih={0} style={{ overflow: 'hidden' }}>
+			<Alert color="gray" style={{ flexShrink: 0 }}>
 				You can use these email addresses to receive newsletters and other messages directly
 				within the app. When emails are sent to these addresses, we’ll do our best to
 				process and save their content so you can easily access them in the app.
@@ -59,57 +60,65 @@ export const EmailsModal = ({ id, context }: ContextModalProps) => {
 				</Text>
 			</Alert>
 
-			<Skeleton visible={loading}>
-				{webhookUrl && (
-					<Card mb="xl">
-						<Stack gap="xs">
-							<Title order={5}>Webhook URL:</Title>
-							<Group gap="xs" wrap="nowrap">
-								<TextInput
-									value={webhookUrl}
-									readOnly
-									size="sm"
-									variant="unstyled"
-									style={{ flex: 1 }}
-								/>
-								<CopyButton value={webhookUrl} timeout={2000}>
-									{({ copied, copy }) => (
-										<Tooltip label={copied ? 'Copied' : 'Copy URL'}>
-											<ActionIcon
-												color={copied ? 'teal' : undefined}
-												variant="light"
-												size="lg"
-												onClick={copy}
-											>
-												{copied ? (
-													<IconCheck size={18} />
-												) : (
-													<IconCopy size={18} />
-												)}
-											</ActionIcon>
-										</Tooltip>
-									)}
-								</CopyButton>
-							</Group>
-							<Text size="xs" c="dimmed">
-								Use this URL in your email provider's settings to forward emails to
-								the app.
-							</Text>
-						</Stack>
-					</Card>
-				)}
+			<Skeleton visible={loading} flex={1} mih={0}>
+				<ScrollArea.Autosize
+					flex={1}
+					mih={0}
+					mah={{ base: '100%', sm: '50vh' }}
+					type="auto"
+					scrollbars="y"
+				>
+					{webhookUrl && (
+						<Card mb="xl" mr="sm">
+							<Stack gap="xs">
+								<Title order={5}>Webhook URL:</Title>
+								<Group gap="xs" wrap="nowrap">
+									<TextInput
+										value={webhookUrl}
+										readOnly
+										size="sm"
+										variant="unstyled"
+										style={{ flex: 1 }}
+									/>
+									<CopyButton value={webhookUrl} timeout={2000}>
+										{({ copied, copy }) => (
+											<Tooltip label={copied ? 'Copied' : 'Copy URL'}>
+												<ActionIcon
+													color={copied ? 'teal' : undefined}
+													variant="light"
+													size="lg"
+													onClick={copy}
+												>
+													{copied ? (
+														<IconCheck size={18} />
+													) : (
+														<IconCopy size={18} />
+													)}
+												</ActionIcon>
+											</Tooltip>
+										)}
+									</CopyButton>
+								</Group>
+								<Text size="xs" c="dimmed">
+									Use this URL in your email provider's settings to forward emails
+									to the app.
+								</Text>
+							</Stack>
+						</Card>
+					)}
 
-				{emails.length === 0 && !loading && (
-					<Text size="sm" c="dimmed">
-						You haven't created any email addresses yet.
-					</Text>
-				)}
+					{emails.length === 0 && !loading && (
+						<Text size="sm" c="dimmed">
+							You haven't created any email addresses yet.
+						</Text>
+					)}
 
-				<Stack gap="md">
-					{emails.map((email) => (
-						<EmailCard email={email} key={email.id} />
-					))}
-				</Stack>
+					<Stack gap="md" pr="sm">
+						{emails.map((email) => (
+							<EmailCard email={email} key={email.id} />
+						))}
+					</Stack>
+				</ScrollArea.Autosize>
 			</Skeleton>
 
 			{error && (
@@ -118,13 +127,13 @@ export const EmailsModal = ({ id, context }: ContextModalProps) => {
 					color="red"
 					variant="light"
 					p="xs"
-					style={{ whiteSpace: 'pre-line' }}
+					style={{ whiteSpace: 'pre-line', flexShrink: 0 }}
 				>
 					{parseError(error)?.message}
 				</Alert>
 			)}
 
-			<ButtonContainer mt="auto">
+			<ButtonContainer>
 				<Button variant="default" onClick={() => context.closeModal(id)}>
 					Close
 				</Button>

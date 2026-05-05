@@ -1,5 +1,5 @@
 import { useMutation } from '@apollo/client';
-import { Group, Text, TextInput, ActionIcon, Flex, Stack } from '@mantine/core';
+import { Group, Text, TextInput, ActionIcon, Flex, Stack, Button } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import {
 	IconLabelImportantFilled,
@@ -29,7 +29,7 @@ type EditableLabelItemProps = {
 };
 
 export const EditableLabelItem = ({ label, isEditing, setIsEditing }: EditableLabelItemProps) => {
-	const isAboveSmScreen = useScreenQuery('sm', 'above');
+	const isBelowXsScreen = useScreenQuery('xs', 'below');
 
 	const [updateLabel, { loading: updateLabelLoading, error: updateLabelError }] = useMutation(
 		UPDATE_LABEL,
@@ -71,7 +71,7 @@ export const EditableLabelItem = ({ label, isEditing, setIsEditing }: EditableLa
 	};
 
 	return (
-		<Group wrap="nowrap">
+		<Flex gap="sm" w="100%" direction="row" align="center">
 			{isEditing ? (
 				<Form onSubmit={form.onSubmit(handleSave)} error={updateLabelError}>
 					{({ error }) => (
@@ -80,7 +80,7 @@ export const EditableLabelItem = ({ label, isEditing, setIsEditing }: EditableLa
 								gap="xs"
 								flex={1}
 								direction={{ base: 'column', sm: 'row' }}
-								align="flex-start"
+								align={{ base: 'stretch', sm: 'flex-start' }}
 							>
 								<TextInput
 									{...form.getInputProps('name')}
@@ -91,32 +91,58 @@ export const EditableLabelItem = ({ label, isEditing, setIsEditing }: EditableLa
 									maxLength={30}
 								/>
 
-								<Group wrap="nowrap" w={isAboveSmScreen ? undefined : '100%'}>
+								<Flex
+									gap="xs"
+									w={{ base: '100%', sm: 'auto' }}
+									direction={{ base: 'column', xs: 'row' }}
+									align={{ base: 'stretch', xs: 'flex-start' }}
+								>
 									<LabelsColorInput
 										{...form.getInputProps('color')}
 										key={form.key('color')}
 										className={classes.editableLabelColorInput}
 									/>
 
-									<Group ml={isAboveSmScreen ? 'auto' : 0} gap="xs" wrap="nowrap">
-										<ActionIcon
-											type="submit"
-											size={36}
-											loading={updateLabelLoading}
-										>
-											<IconCheck size={18} />
-										</ActionIcon>
+									{isBelowXsScreen ? (
+										<Flex gap="xs" w="100%">
+											<Button
+												type="submit"
+												flex={1}
+												loading={updateLabelLoading}
+											>
+												Save
+											</Button>
 
-										<ActionIcon
-											variant="default"
-											onClick={() => setIsEditing(false)}
-											size={36}
-											loading={updateLabelLoading}
-										>
-											<IconX size={18} />
-										</ActionIcon>
-									</Group>
-								</Group>
+											<Button
+												variant="default"
+												flex={1}
+												onClick={() => setIsEditing(false)}
+												loading={updateLabelLoading}
+											>
+												Cancel
+											</Button>
+										</Flex>
+									) : (
+										<Group gap="xs" wrap="nowrap" justify="flex-end">
+											<ActionIcon
+												type="submit"
+												size={36}
+												loading={updateLabelLoading}
+											>
+												<IconCheck size={18} />
+											</ActionIcon>
+
+											<ActionIcon
+												variant="default"
+												onClick={() => setIsEditing(false)}
+												size={36}
+												loading={updateLabelLoading}
+											>
+												<IconX size={18} />
+											</ActionIcon>
+										</Group>
+									)}
+								</Flex>
 							</Flex>
 
 							{error}
@@ -125,17 +151,21 @@ export const EditableLabelItem = ({ label, isEditing, setIsEditing }: EditableLa
 				</Form>
 			) : (
 				<>
-					<IconLabelImportantFilled
-						size={18}
-						style={{
-							color: label.color,
-						}}
-					/>
+					<Group gap="xs" wrap="nowrap" flex={1} miw={0}>
+						<IconLabelImportantFilled
+							size={18}
+							style={{
+								color: label.color,
+								flexShrink: 0,
+							}}
+						/>
 
-					<Text flex={1} size="lg" className={classes.editableLabelText}>
-						{label.name}
-					</Text>
-					<Group ml="auto" gap="xs">
+						<Text size="lg" className={classes.editableLabelText}>
+							{label.name}
+						</Text>
+					</Group>
+
+					<Group gap="xs" justify="flex-end" wrap="nowrap">
 						<ActionIcon variant="light" onClick={() => setIsEditing(true)} size={36}>
 							<IconEdit size={18} />
 						</ActionIcon>
@@ -154,6 +184,6 @@ export const EditableLabelItem = ({ label, isEditing, setIsEditing }: EditableLa
 					</Group>
 				</>
 			)}
-		</Group>
+		</Flex>
 	);
 };

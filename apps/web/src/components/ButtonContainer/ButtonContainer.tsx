@@ -1,8 +1,6 @@
 import { BoxProps, Flex } from '@mantine/core';
 import { ReactNode } from 'react';
 
-import classes from './ButtonContainer.module.css';
-
 type ButtonContainerProps = {
 	children: ReactNode;
 	mt?: BoxProps['mt'];
@@ -10,7 +8,13 @@ type ButtonContainerProps = {
 
 export const ButtonContainer = ({ children, mt }: ButtonContainerProps) => {
 	return (
-		<Flex gap="md" mt={mt} className={classes.container} justify="space-between">
+		<Flex
+			gap="md"
+			mt={mt}
+			direction={{ base: 'column-reverse', xs: 'row' }}
+			justify="space-between"
+			style={{ flexShrink: 0 }}
+		>
 			{children}
 		</Flex>
 	);

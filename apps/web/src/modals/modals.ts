@@ -11,6 +11,7 @@ export const modals = {
 			title: 'Manage Labels',
 			closeOnEscape: false,
 			innerProps: {},
+			className: 'fullscreen-modal fullscreen-modal-fixed-footer',
 		});
 	},
 
@@ -71,7 +72,7 @@ export const modals = {
 			title: 'Emails',
 			centered: true,
 			innerProps: {},
-			className: 'fullscreen-modal',
+			className: 'fullscreen-modal fullscreen-modal-fixed-footer',
 		});
 	},
 
@@ -136,7 +137,7 @@ export const modals = {
 			title: 'API Tokens',
 			centered: true,
 			innerProps: {},
-			className: 'fullscreen-modal',
+			className: 'fullscreen-modal fullscreen-modal-fixed-footer',
 		});
 	},
 
@@ -159,6 +160,7 @@ export const modals = {
 			title: 'Manage Saved Queries',
 			closeOnEscape: false,
 			innerProps: {},
+			className: 'fullscreen-modal fullscreen-modal-fixed-footer',
 		});
 	},
 

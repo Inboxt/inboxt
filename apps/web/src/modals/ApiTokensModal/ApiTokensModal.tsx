@@ -84,8 +84,8 @@ export const ApiTokensModal = ({ id, context }: ContextModalProps) => {
 	};
 
 	return (
-		<Stack gap="xl" justify="space-between" flex={1}>
-			<Alert color="gray">
+		<Stack gap="xl" flex={1} h="100%" mih={0} style={{ overflow: 'hidden' }}>
+			<Alert color="gray" style={{ flexShrink: 0 }}>
 				API tokens allow you to develop plugins, extensions, and connect your account to
 				other services. Treat these tokens like your password - anyone with a token can
 				access your account.
@@ -95,8 +95,14 @@ export const ApiTokensModal = ({ id, context }: ContextModalProps) => {
 				</Text>
 			</Alert>
 
-			<Skeleton visible={loading}>
-				<ScrollArea.Autosize mah="50vh" type="auto" scrollbars="y">
+			<Skeleton visible={loading} flex={1} mih={0}>
+				<ScrollArea.Autosize
+					flex={1}
+					mih={0}
+					mah={{ base: '100%', sm: '50vh' }}
+					type="auto"
+					scrollbars="y"
+				>
 					{tokens.length === 0 && (
 						<Text size="sm" c="dimmed">
 							You haven't created any API tokens yet.
@@ -170,7 +176,7 @@ export const ApiTokensModal = ({ id, context }: ContextModalProps) => {
 				</ScrollArea.Autosize>
 			</Skeleton>
 
-			<ButtonContainer mt="auto">
+			<ButtonContainer>
 				<Button variant="default" onClick={() => context.closeModal(id)}>
 					Close
 				</Button>

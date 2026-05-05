@@ -1,4 +1,3 @@
-
 .highlight::selection {
 	background: transparent;
 	color: inherit;
@@ -18,8 +17,24 @@
 	.fullscreen-modal .mantine-Modal-inner {
 		padding: 0 !important;
 	}
-	
+
 	.fullscreen-modal .mantine-Modal-body {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.fullscreen-modal-fixed-footer .mantine-Modal-content,
+	.fullscreen-modal-fixed-footer .mantine-Modal-body {
+		overflow: hidden;
+	}
+
+	.fullscreen-modal-fixed-footer .mantine-Modal-body,
+	.fullscreen-modal-fixed-footer .mantine-Modal-body > div {
+		min-height: 0;
+	}
+
+	.fullscreen-modal-fixed-footer .mantine-Modal-body > div {
 		flex: 1;
 		display: flex;
 		flex-direction: column;
