@@ -18,6 +18,7 @@ import React, { useMemo } from 'react';
 
 import { ConfirmWithAlert } from '~components/ConfirmWithAlert';
 import { toastSuccess } from '~components/Toast';
+import { ToastProps } from '~components/Toast/type.ts';
 import { SelectableItem, useContentSelection } from '~context/content-selection';
 import {
 	PERMANENTLY_DELETE_SAVED_ITEMS,
@@ -41,12 +42,15 @@ type ItemsOptionsProps = {
 	onActionComplete?: () => void | Promise<void>;
 };
 
+type SuccessToastOptions = Partial<Omit<ToastProps, 'id' | 'variant'>>;
+type OptionResult = boolean | SuccessToastOptions | undefined;
+
 type Option = {
 	label: string;
 	icon: React.ComponentType<IconProps>;
 	modes: ItemsOptionsMode[];
 	visible?: () => boolean;
-	onClick: () => boolean | Promise<boolean | undefined> | undefined;
+	onClick: () => OptionResult | Promise<OptionResult>;
 	clearsSelection?: boolean;
 	runsOnActionComplete?: boolean;
 };
@@ -80,6 +84,19 @@ export const ItemsOptions = ({ items, mode, size = 'md', onActionComplete }: Ite
 
 	const getSavedItemIds = (list: SavedItem[], predicate: (status: SavedItemStatus) => boolean) =>
 		list.filter((i) => predicate(i.status)).map((i) => i.id);
+
+	const shouldDeferSuccessToasts = Boolean(
+		onActionComplete && ['reader', 'reader-menu'].includes(mode),
+	);
+
+	const showSuccessToast = (opts: SuccessToastOptions) => {
+		if (shouldDeferSuccessToasts) {
+			return opts;
+		}
+
+		toastSuccess(opts);
+		return undefined;
+	};
 
 	const confirm = (opts: {
 		title: string;
@@ -182,14 +199,12 @@ export const ItemsOptions = ({ items, mode, size = 'md', onActionComplete }: Ite
 					},
 				});
 
-				toastSuccess({
+				return showSuccessToast({
 					title:
 						savedItems.length > 1
 							? `${savedItems.length} items were restored.`
 							: 'Item was restored.',
 				});
-
-				return undefined;
 			},
 		},
 		{
@@ -217,15 +232,13 @@ export const ItemsOptions = ({ items, mode, size = 'md', onActionComplete }: Ite
 					},
 				});
 
-				toastSuccess({
+				return showSuccessToast({
 					title:
 						savedItems.length > 1
 							? `${savedItems.length} items were archived.`
 							: 'Item was archived.',
 					action: createUndoAction(savedItemIds, previousById),
 				});
-
-				return undefined;
 			},
 		},
 		{
@@ -253,15 +266,13 @@ export const ItemsOptions = ({ items, mode, size = 'md', onActionComplete }: Ite
 					},
 				});
 
-				toastSuccess({
+				return showSuccessToast({
 					title:
 						savedItems.length > 1
 							? `${savedItems.length} items were moved to trash.`
 							: 'Item was moved to trash.',
 					action: createUndoAction(savedItemIds, previousById),
 				});
-
-				return undefined;
 			},
 		},
 		{
@@ -298,14 +309,14 @@ export const ItemsOptions = ({ items, mode, size = 'md', onActionComplete }: Ite
 					variables: { data: { ids: savedItemIds } },
 				});
 
-				toastSuccess({
-					title:
-						count > 1
-							? `${count} items were deleted permanently`
-							: 'Item was deleted permanently',
-				});
-
-				return true;
+				return (
+					showSuccessToast({
+						title:
+							count > 1
+								? `${count} items were deleted permanently`
+								: 'Item was deleted permanently',
+					}) ?? true
+				);
 			},
 		},
 		{
@@ -379,14 +390,14 @@ export const ItemsOptions = ({ items, mode, size = 'md', onActionComplete }: Ite
 					},
 				});
 
-				toastSuccess({
-					title:
-						count > 1
-							? `${count} highlights were deleted permanently`
-							: 'Highlight was deleted permanently',
-				});
-
-				return true;
+				return (
+					showSuccessToast({
+						title:
+							count > 1
+								? `${count} highlights were deleted permanently`
+								: 'Highlight was deleted permanently',
+					}) ?? true
+				);
 			},
 		},
 		{
@@ -417,6 +428,10 @@ export const ItemsOptions = ({ items, mode, size = 'md', onActionComplete }: Ite
 		if (result !== false && (option.runsOnActionComplete ?? true) && onActionComplete) {
 			await onActionComplete();
 		}
+
+		if (result && typeof result === 'object') {
+			window.setTimeout(() => toastSuccess(result), 350);
+		}
 	};
 
 	const filteredOptions = OPTIONS.filter(
@@ -431,7 +446,8 @@ export const ItemsOptions = ({ items, mode, size = 'md', onActionComplete }: Ite
 						key={option.label}
 						label={option.label}
 						icon={<option.icon />}
-						onClick={(e) => void handleOptionClick(option, e)}
+						disabled={loading}
+						onClick={(e) => handleOptionClick(option, e)}
 					/>
 				))}
 			</>
@@ -444,12 +460,14 @@ export const ItemsOptions = ({ items, mode, size = 'md', onActionComplete }: Ite
 				items={filteredOptions.map((option) => ({
 					icon: <option.icon />,
 					label: option.label,
+					disabled: loading,
 					action: () => handleOptionClick(option),
 				}))}
 				label="More options"
 				height={220}
+				disabled={loading}
 			>
-				<ActionIcon variant="subtle" color="text" size="lg">
+				<ActionIcon variant="subtle" color="text" size="lg" disabled={loading}>
 					<IconDots />
 				</ActionIcon>
 			</MenuDrawer>
@@ -466,7 +484,7 @@ export const ItemsOptions = ({ items, mode, size = 'md', onActionComplete }: Ite
 						size={isSmall ? 'md' : 38}
 						radius="xl"
 						disabled={loading}
-						onClick={(e) => void handleOptionClick(option, e)}
+						onClick={(e) => handleOptionClick(option, e)}
 					>
 						<option.icon size={isSmall ? 18 : undefined} />
 					</ActionIcon>

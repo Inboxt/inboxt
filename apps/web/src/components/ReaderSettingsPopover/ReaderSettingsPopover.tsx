@@ -11,14 +11,22 @@ type ReaderSettingsOptionProps = {
 	onClick?: (e: MouseEvent<HTMLButtonElement>) => void;
 	label: string;
 	icon: ReactNode;
+	disabled?: boolean;
 };
 
 const ReaderSettingsOption = forwardRef<HTMLButtonElement, ReaderSettingsOptionProps>(
-	({ onClick, label, icon }, ref) => {
+	({ onClick, label, icon, disabled }, ref) => {
 		return (
-			<Tooltip label={label} position="right" offset={16}>
+			<Tooltip label={label} position="right" offset={16} disabled={disabled}>
 				<Box>
-					<ActionIcon variant="subtle" color="text" onClick={onClick} size="lg" ref={ref}>
+					<ActionIcon
+						variant="subtle"
+						color="text"
+						onClick={onClick}
+						size="lg"
+						ref={ref}
+						disabled={disabled}
+					>
 						{icon}
 					</ActionIcon>
 				</Box>
@@ -36,12 +44,15 @@ export const ReaderSettingsPopover = ({
 	onClick,
 	label,
 	icon,
+	disabled,
 }: ReaderSettingsPopoverProps) => {
 	const isAboveXsScreen = useScreenQuery('xs', 'above');
 	const [drawerOpened, { open: openDrawer, close: closeDrawer }] = useDisclosure(false);
 
 	if (onClick) {
-		return <ReaderSettingsOption onClick={onClick} icon={icon} label={label} />;
+		return (
+			<ReaderSettingsOption onClick={onClick} icon={icon} label={label} disabled={disabled} />
+		);
 	}
 
 	if (isAboveXsScreen) {
@@ -49,12 +60,12 @@ export const ReaderSettingsPopover = ({
 			<Popover
 				width={440}
 				position="right-start"
-				disabled={!children}
+				disabled={!children || disabled}
 				offset={16}
 				shadow="lg"
 			>
 				<Popover.Target>
-					<ReaderSettingsOption icon={icon} label={label} />
+					<ReaderSettingsOption icon={icon} label={label} disabled={disabled} />
 				</Popover.Target>
 				<Popover.Dropdown>{children}</Popover.Dropdown>
 			</Popover>
@@ -63,7 +74,12 @@ export const ReaderSettingsPopover = ({
 
 	return (
 		<>
-			<ReaderSettingsOption icon={icon} label={label} onClick={openDrawer} />
+			<ReaderSettingsOption
+				icon={icon}
+				label={label}
+				onClick={openDrawer}
+				disabled={disabled}
+			/>
 
 			<Drawer
 				opened={drawerOpened}

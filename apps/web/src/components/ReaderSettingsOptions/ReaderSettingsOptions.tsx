@@ -37,15 +37,15 @@ export const ReaderSettingsOptions = ({
 				replace: true,
 			});
 		} else {
-			handleGoBack();
+			await handleGoBack();
 		}
 	};
 
-	const handleGoBack = () => {
+	const handleGoBack = async () => {
 		if (canGoBack) {
 			router.history.back();
 		} else {
-			void navigate({
+			await navigate({
 				to: '/',
 			});
 		}

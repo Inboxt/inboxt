@@ -11,6 +11,7 @@ type MenuItem = {
 	icon: ReactElement<{ size: number }>;
 	label: string;
 	action: () => void;
+	disabled?: boolean;
 };
 
 type MenuDrawerProps = {
@@ -18,9 +19,10 @@ type MenuDrawerProps = {
 	children: ReactNode;
 	label: string;
 	height?: number;
+	disabled?: boolean;
 };
 
-export const MenuDrawer = ({ items, children, label, height = 300 }: MenuDrawerProps) => {
+export const MenuDrawer = ({ items, children, label, height = 300, disabled }: MenuDrawerProps) => {
 	const isAboveXsScreen = useScreenQuery('xs', 'above');
 	const iconSize = isAboveXsScreen ? 16 : 21;
 
@@ -41,6 +43,7 @@ export const MenuDrawer = ({ items, children, label, height = 300 }: MenuDrawerP
 					item.action();
 				}}
 				fz="md"
+				disabled={item.disabled}
 			>
 				{item.label}
 			</Menu.Item>
@@ -51,6 +54,10 @@ export const MenuDrawer = ({ items, children, label, height = 300 }: MenuDrawerP
 			<Box
 				key={index}
 				onClick={(e) => {
+					if (item.disabled) {
+						return;
+					}
+
 					e.preventDefault();
 					e.stopPropagation();
 					closeDrawer();
@@ -59,6 +66,10 @@ export const MenuDrawer = ({ items, children, label, height = 300 }: MenuDrawerP
 					}, 300);
 				}}
 				className={classes.drawerItem}
+				style={{
+					opacity: item.disabled ? 0.5 : 1,
+					cursor: item.disabled ? 'not-allowed' : 'pointer',
+				}}
 			>
 				{adjustIconSize(item.icon)}
 
@@ -70,7 +81,7 @@ export const MenuDrawer = ({ items, children, label, height = 300 }: MenuDrawerP
 
 	if (isAboveXsScreen) {
 		return (
-			<Menu shadow="md" offset={4} withArrow width={180}>
+			<Menu shadow="md" offset={4} withArrow width={180} disabled={disabled}>
 				<Menu.Target>{children}</Menu.Target>
 
 				<Menu.Dropdown>{renderMenuItems()}</Menu.Dropdown>
@@ -82,10 +93,15 @@ export const MenuDrawer = ({ items, children, label, height = 300 }: MenuDrawerP
 		<>
 			<Box
 				onClick={(e) => {
+					if (disabled) {
+						return;
+					}
+
 					e.preventDefault();
 					e.stopPropagation();
 					openDrawer();
 				}}
+				style={{ cursor: disabled ? 'not-allowed' : 'pointer' }}
 			>
 				{children}
 			</Box>
