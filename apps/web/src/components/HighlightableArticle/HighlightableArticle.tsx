@@ -9,6 +9,8 @@ import { useTextHighlighting } from '~hooks/useTextSelection';
 import { SavedItem } from '~lib/graphql';
 import { applyHighlightsToDOM } from '~utils/highlightsDOM.ts';
 
+import { ReaderImageLightbox, ReaderLightboxImage } from './ReaderImageLightbox';
+
 type ArticleWithHighlightsProps = {
 	content: string | null;
 	data: SavedItem;
@@ -18,6 +20,7 @@ export const HighlightableArticle = ({ content, data }: ArticleWithHighlightsPro
 	const isAboveMdScreen = useScreenQuery('md', 'above');
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [applyingHighlights, setApplyingHighlights] = useState(false);
+	const [lightboxImage, setLightboxImage] = useState<ReaderLightboxImage | null>(null);
 
 	const {
 		selectedText,
@@ -80,6 +83,27 @@ export const HighlightableArticle = ({ content, data }: ArticleWithHighlightsPro
 		{ threshold: 700 },
 	);
 
+	const handleContainerClick = (event: React.MouseEvent<HTMLDivElement>) => {
+		const target = event.target as HTMLElement | null;
+		const image = target?.closest('img') as HTMLImageElement | null;
+
+		if (!image?.src) {
+			return;
+		}
+
+		if (image.closest('a')) {
+			event.preventDefault();
+			event.stopPropagation();
+		}
+
+		setLightboxImage({
+			src: image.currentSrc || image.src,
+			alt: image.alt || 'Article image',
+			naturalWidth: image.naturalWidth || 0,
+			naturalHeight: image.naturalHeight || 0,
+		});
+	};
+
 	return (
 		<>
 			<Skeleton visible={applyingHighlights} mih={560}>
@@ -89,9 +113,12 @@ export const HighlightableArticle = ({ content, data }: ArticleWithHighlightsPro
 					dangerouslySetInnerHTML={sanitizedContent}
 					style={{ visibility: applyingHighlights ? 'hidden' : 'visible' }}
 					pb="xxl"
+					onClick={handleContainerClick}
 					{...longPressHandlers}
 				/>
 			</Skeleton>
+
+			<ReaderImageLightbox image={lightboxImage} onClose={() => setLightboxImage(null)} />
 
 			<HighlightPopover
 				visible={!!selectedText && !!rangeRect && hasValidSelection && isAboveMdScreen}
