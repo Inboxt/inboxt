@@ -40,6 +40,7 @@ import classes from './ReaderView.module.css';
 
 export const ReaderView = () => {
 	const isAboveXsScreen = useScreenQuery('xs', 'above');
+	const isAboveMdScreen = useScreenQuery('md', 'above');
 	const router = useRouter();
 	const canGoBack = useCanGoBack();
 	const navigate = useNavigate();
@@ -155,7 +156,7 @@ export const ReaderView = () => {
 	return (
 		<Box
 			ref={readerRef}
-			pt="md"
+			pt={isAboveMdScreen ? 'md' : 0}
 			px={isAboveXsScreen ? 'xl' : 'md'}
 			className={classes.readerView}
 			data-reader-theme={effectiveTheme}
