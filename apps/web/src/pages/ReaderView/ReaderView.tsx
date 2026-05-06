@@ -20,7 +20,7 @@ import { useDocumentTitle } from '@mantine/hooks';
 import { IconArrowLeft, IconHighlight } from '@tabler/icons-react';
 import { useCanGoBack, useNavigate, useParams, useRouter } from '@tanstack/react-router';
 import dayjs from 'dayjs';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { APP_PRIMARY_COLOR, READER_THEMES } from '@inboxt/common';
 import { theme } from '@inboxt/ui';
@@ -30,6 +30,7 @@ import { HighlightableArticle } from '~components/HighlightableArticle';
 import { NewsletterSubscriptionButton } from '~components/NewsletterSubscriptionButton';
 import { ReaderSettingsOptions } from '~components/ReaderSettingsOptions';
 import { useAdjacentItems } from '~hooks/useAdjacentItems';
+import { useReaderSwipeNavigation } from '~hooks/useReaderSwipeNavigation';
 import { useReaderSettings, makeReaderResolver } from '~hooks/useReaderSettings.tsx';
 import { useScreenQuery } from '~hooks/useScreenQuery';
 import { useTextHighlighting } from '~hooks/useTextSelection';
@@ -53,58 +54,34 @@ export const ReaderView = () => {
 	});
 	const { nextId, prevId } = useAdjacentItems(id);
 
-	const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null);
-	const [touchEnd, setTouchEnd] = useState<{ x: number; y: number } | null>(null);
-
-	const minSwipeDistance = 50;
-
-	const handleTouchStart = (e: React.TouchEvent) => {
-		const touch = e.targetTouches[0];
-
-		if (!touch) {
-			return;
-		}
-
-		setTouchEnd(null);
-		setTouchStart({ x: touch.clientX, y: touch.clientY });
-	};
-
-	const handleTouchMove = (e: React.TouchEvent) => {
-		const touch = e.targetTouches[0];
-
-		if (!touch) {
-			return;
-		}
-
-		setTouchEnd({ x: touch.clientX, y: touch.clientY });
-	};
-
-	const handleTouchEnd = () => {
-		if (!touchStart || !touchEnd) {
-			return;
-		}
-		const distanceX = touchStart.x - touchEnd.x;
-		const distanceY = touchStart.y - touchEnd.y;
-		const isHorizontalSwipe = Math.abs(distanceX) > Math.abs(distanceY);
-
-		if (isHorizontalSwipe && Math.abs(distanceX) > minSwipeDistance) {
-			if (distanceX > 0 && nextId) {
-				void navigate({
-					to: '/r/$id',
-					params: { id: nextId },
-					search: (prev) => prev,
-					replace: true,
-				});
-			} else if (distanceX < 0 && prevId) {
-				void navigate({
-					to: '/r/$id',
-					params: { id: prevId },
-					search: (prev) => prev,
-					replace: true,
-				});
+	const { handleTouchStart, handleTouchMove, handleTouchEnd } = useReaderSwipeNavigation({
+		nextId,
+		prevId,
+		onNavigateToNext: () => {
+			if (!nextId) {
+				return;
 			}
-		}
-	};
+
+			void navigate({
+				to: '/r/$id',
+				params: { id: nextId },
+				search: (prev) => prev,
+				replace: true,
+			});
+		},
+		onNavigateToPrev: () => {
+			if (!prevId) {
+				return;
+			}
+
+			void navigate({
+				to: '/r/$id',
+				params: { id: prevId },
+				search: (prev) => prev,
+				replace: true,
+			});
+		},
+	});
 
 	const readerRef = useRef<HTMLDivElement>(null);
 	useEffect(() => {
