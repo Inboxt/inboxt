@@ -28,6 +28,7 @@ interface NewsletterProcessingJobData {
 		messageId: string | null;
 	};
 	input: ProcessNewsletterInput;
+	rawPayload?: any;
 	prismaData?: Partial<
 		Omit<Prisma.saved_itemCreateInput, 'user' | 'saved_item_label' | 'newsletter' | 'id'>
 	>;
@@ -93,10 +94,11 @@ export class SavedItemManagerProcessor extends BaseQueueProcessor {
 			);
 		} else if (job.name === 'process-newsletter') {
 			const data = job.data as NewsletterProcessingJobData;
-			void this.savedItemManagerService.createFailedItem(
+			void this.savedItemManagerService.handleFailedNewsletterProcessing(
 				data.ids.userId,
 				data.ids.savedItemId,
 				error,
+				data.rawPayload,
 			);
 		}
 	}

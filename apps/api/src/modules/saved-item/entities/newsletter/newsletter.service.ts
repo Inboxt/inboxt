@@ -327,10 +327,6 @@ export class NewsletterService {
 		return toHeader;
 	}
 
-	isPossiblyUnreadable(html: string) {
-		return this.contentExtractionService.isProbablyReaderable(html);
-	}
-
 	parse(input: ProcessNewsletterInput) {
 		const result = this.contentExtractionService.extractReadableContent(input.html, {
 			maxWords: MAX_NEWSLETTER_WORD_COUNT,

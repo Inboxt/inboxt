@@ -1,4 +1,4 @@
-import { isProbablyReaderable, Readability } from '@mozilla/readability';
+import { Readability } from '@mozilla/readability';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import DOMPurify, { WindowLike } from 'dompurify';
 import { JSDOM, VirtualConsole } from 'jsdom';
@@ -155,11 +155,6 @@ export class ContentExtractionService {
 		return clipped.endsWith('.') ? clipped : `${clipped}…`;
 	}
 
-	isProbablyReaderable = (html: string) => {
-		const { doc } = this.prepareDom(html);
-		return isProbablyReaderable(doc);
-	};
-
 	extractReadableContent(
 		html: string,
 		options: {
@@ -188,11 +183,8 @@ export class ContentExtractionService {
 			);
 		}
 
-		if (
-			!isProbablyReaderable(doc, {
-				minContentLength: 5,
-			})
-		) {
+		const readabilityResult = new Readability(doc).parse();
+		if (!readabilityResult?.content || !readabilityResult?.textContent?.trim()) {
 			throw new AppException(
 				'We were unable to extract the readable portion of this content. \n The page or document may not contain structured text, or it may be unsupported. \n\n Please check the source and try again. If the issue persists, contact support for assistance.',
 				HttpStatus.BAD_REQUEST,
@@ -200,7 +192,6 @@ export class ContentExtractionService {
 			);
 		}
 
-		const readabilityResult = new Readability(doc).parse();
 		const sanitizedHtml = this.purifyAndSanitizeHtml(
 			(readabilityResult?.content as string) || html,
 			window,

@@ -118,7 +118,12 @@ export class SavedItemManagerService {
 		return created;
 	}
 
-	async createFailedItem(userId: string, savedItemId: string, error: any) {
+	async createFailedItem(
+		userId: string,
+		savedItemId: string,
+		error: any,
+		options?: { newsletterForwarded?: boolean },
+	) {
 		this.logger.warn(
 			`Processing of item failed after all retries. Creating failed item: ${savedItemId} for user: ${userId}`,
 		);
@@ -140,6 +145,10 @@ export class SavedItemManagerService {
 		} else if (code === 'STORAGE_QUOTA_EXCEEDED') {
 			message =
 				'You’ve reached your storage limit, so we couldn’t save this item. Delete items you no longer need to free up space.';
+		} else if (code === 'NOT_READABLE' && existing.type === SavedItemType.NEWSLETTER) {
+			message = options?.newsletterForwarded
+				? 'We couldn’t extract a readable newsletter view from this email. We saved this failed item so you can review it, and forwarded the original message to your configured email address.'
+				: 'We couldn’t extract a readable newsletter view from this email. We saved this failed item so you can review it.';
 		}
 
 		const isArticleProcessing = existing.title.startsWith(ITEM_PROCESSING_BASE_TITLE);
@@ -407,6 +416,7 @@ export class SavedItemManagerService {
 			Omit<Prisma.saved_itemCreateInput, 'user' | 'saved_item_label' | 'newsletter' | 'id'>
 		>,
 		unsubscribeUrl?: string | null,
+		rawPayload?: any,
 	) {
 		if (!input.html && !input.text) {
 			throw new AppException(
@@ -426,6 +436,7 @@ export class SavedItemManagerService {
 					savedItemId: created.id,
 				},
 				input,
+				rawPayload,
 				prismaData,
 				unsubscribeUrl,
 			},
@@ -535,11 +546,8 @@ export class SavedItemManagerService {
 			return;
 		}
 
-		if (!data.html || !this.newsletterService.isPossiblyUnreadable(data.html)) {
-			this.logger.warn(
-				'No HTML content found or newsletter is possibly unreadable. Forwarding to user.',
-			);
-
+		if (!data.html) {
+			this.logger.warn('No HTML content found. Forwarding to user.');
 			return this.forwardNewsletter(data.inboundEmailAddress.userId!, data.rawPayload);
 		}
 
@@ -555,10 +563,35 @@ export class SavedItemManagerService {
 					author: data.from,
 				},
 				data.unsubscribeUrl,
+				data.rawPayload,
 			);
 		} catch (error) {
 			this.logger.error(`Error processing incoming newsletter: ${error}`);
 		}
+	}
+
+	async handleFailedNewsletterProcessing(
+		userId: string,
+		savedItemId: string,
+		error: any,
+		rawPayload?: any,
+	) {
+		let newsletterForwarded = false;
+		try {
+			if (rawPayload) {
+				await this.forwardNewsletter(userId, rawPayload);
+				newsletterForwarded = true;
+				this.logger.log(
+					`Forwarded failed newsletter ${savedItemId} to user mailbox after processing failure.`,
+				);
+			}
+		} catch (forwardError) {
+			this.logger.error(
+				`Failed to forward newsletter ${savedItemId} after processing failure: ${forwardError}`,
+			);
+		}
+
+		await this.createFailedItem(userId, savedItemId, error, { newsletterForwarded });
 	}
 
 	async addArticleFromHtmlSnapshot(userId: string, input: AddArticleFromHtmlSnapshotInput) {
