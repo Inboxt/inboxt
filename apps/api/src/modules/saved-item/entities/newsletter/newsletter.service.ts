@@ -1,10 +1,11 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import dayjs from 'dayjs';
 
-import { MAX_NEWSLETTER_WORD_COUNT, MIN_NEWSLETTER_WORD_COUNT } from '@inboxt/common';
 import { Prisma } from '@inboxt/prisma';
 
 import { AppException } from '~common/utils/app-exception';
+import { Config } from '~config/index';
 import { PrismaService } from '~modules/prisma/prisma.service';
 import { ContentExtractionService } from '~services/content-extraction.service';
 
@@ -18,6 +19,7 @@ export class NewsletterService {
 	constructor(
 		private readonly prisma: PrismaService,
 		private readonly contentExtractionService: ContentExtractionService,
+		private readonly configService: ConfigService<Config>,
 	) {}
 
 	extractRecipient(payload: any): string | null {
@@ -329,8 +331,8 @@ export class NewsletterService {
 
 	parse(input: ProcessNewsletterInput) {
 		const result = this.contentExtractionService.extractReadableContent(input.html, {
-			maxWords: MAX_NEWSLETTER_WORD_COUNT,
-			minWords: MIN_NEWSLETTER_WORD_COUNT,
+			maxWords: this.configService.get('content.newsletterMaxWordCount', { infer: true }),
+			minWords: this.configService.get('content.newsletterMinWordCount', { infer: true }),
 		});
 
 		const contentHtml = result?.contentHtml || input.html || null;

@@ -1,5 +1,11 @@
 import { z } from 'zod';
 
+import {
+	MAX_ARTICLE_WORD_COUNT,
+	MAX_NEWSLETTER_WORD_COUNT,
+	MIN_NEWSLETTER_WORD_COUNT,
+} from '@inboxt/common';
+
 import { formatEmailFrom } from '~common/utils/formatEmailFrom';
 
 export const configSchema = z.object({
@@ -59,6 +65,17 @@ export const configSchema = z.object({
 		.optional(),
 	exports: z.object({
 		localPath: z.string().default('exports'),
+	}),
+	content: z.object({
+		articleMaxWordCount: z
+			.preprocess((val) => (typeof val === 'string' ? parseInt(val, 10) : val), z.number())
+			.default(MAX_ARTICLE_WORD_COUNT),
+		newsletterMinWordCount: z
+			.preprocess((val) => (typeof val === 'string' ? parseInt(val, 10) : val), z.number())
+			.default(MIN_NEWSLETTER_WORD_COUNT),
+		newsletterMaxWordCount: z
+			.preprocess((val) => (typeof val === 'string' ? parseInt(val, 10) : val), z.number())
+			.default(MAX_NEWSLETTER_WORD_COUNT),
 	}),
 	logging: z.object({
 		level: z
@@ -141,6 +158,11 @@ export const config = (): Config => {
 			: undefined,
 		exports: {
 			localPath: process.env.EXPORTS_LOCAL_PATH,
+		},
+		content: {
+			articleMaxWordCount: process.env.ARTICLE_MAX_WORD_COUNT,
+			newsletterMinWordCount: process.env.NEWSLETTER_MIN_WORD_COUNT,
+			newsletterMaxWordCount: process.env.NEWSLETTER_MAX_WORD_COUNT,
 		},
 		logging: {
 			level:
