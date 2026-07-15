@@ -16,6 +16,8 @@ export interface GetSavedItemsQuery {
 	noLabels?: boolean;
 	hasHighlights?: boolean;
 	saved?: { from?: string; to?: string };
+	progress?: { from?: number; to?: number };
+	readingTime?: { from?: number; to?: number };
 	first?: number;
 	after?: string;
 }
@@ -25,6 +27,8 @@ export interface GetHighlightsQuery {
 	text?: string;
 	source?: string;
 	saved?: { from?: string; to?: string };
+	progress?: { from?: number; to?: number };
+	readingTime?: { from?: number; to?: number };
 	first?: number;
 	after?: string;
 }
@@ -41,6 +45,8 @@ export interface ParsedQuery {
 	text?: string;
 	site?: string;
 	saved?: { from?: string; to?: string };
+	progress?: { from?: number; to?: number };
+	readingTime?: { from?: number; to?: number };
 	sort?: { field: string; direction: string };
 }
 

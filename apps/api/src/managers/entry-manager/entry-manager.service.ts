@@ -100,12 +100,60 @@ export class EntryManagerService {
 					}
 				} else if (key === 'site') {
 					result.site = value.toLowerCase();
+				} else if (key === 'progress') {
+					const parts = value.split('..');
+					const progress: { from?: number; to?: number } = {};
+
+					if (parts.length === 2) {
+						const [from, to] = parts;
+						if (from && from !== '*') {
+							progress.from = parseFloat(from);
+						}
+						if (to && to !== '*') {
+							progress.to = parseFloat(to);
+						}
+					} else {
+						const val = parseFloat(value);
+						progress.from = val;
+						progress.to = val;
+					}
+
+					if (Object.keys(progress).length) {
+						result.progress = progress;
+					}
+				} else if (key === 'reading-time') {
+					const parts = value.split('..');
+					const readingTime: { from?: number; to?: number } = {};
+
+					if (parts.length === 2) {
+						const [from, to] = parts;
+						if (from && from !== '*') {
+							readingTime.from = parseInt(from);
+						}
+						if (to && to !== '*') {
+							readingTime.to = parseInt(to);
+						}
+					} else {
+						const val = parseInt(value);
+						readingTime.from = val;
+						readingTime.to = val;
+					}
+
+					if (Object.keys(readingTime).length) {
+						result.readingTime = readingTime;
+					}
 				} else if (key === 'no' && ['label', 'labels'].includes(value)) {
 					result.noLabels = !isNegated;
 				} else if (key === 'sort') {
 					const [fieldRaw, direction] = value.split('_');
 					if (fieldRaw && direction) {
-						const field = fieldRaw === 'date' ? 'createdAt' : fieldRaw;
+						let field = fieldRaw === 'date' ? 'createdAt' : fieldRaw;
+						if (field === 'reading-progress') {
+							field = 'readingProgress';
+						}
+						if (field === 'reading-time') {
+							field = 'wordCount';
+						}
 						result.sort = { field, direction };
 					}
 				} else if (['in', 'type'].includes(key)) {
@@ -140,6 +188,8 @@ export class EntryManagerService {
 			text,
 			site,
 			saved,
+			progress,
+			readingTime,
 			sort: sortFromQuery,
 		} = parsed;
 
@@ -186,6 +236,8 @@ export class EntryManagerService {
 				text,
 				source: site,
 				saved,
+				progress,
+				readingTime,
 				sort: finalSort,
 			};
 		}
@@ -198,6 +250,8 @@ export class EntryManagerService {
 				text,
 				source: site,
 				saved,
+				progress,
+				readingTime,
 				sort: finalSort,
 			};
 		}

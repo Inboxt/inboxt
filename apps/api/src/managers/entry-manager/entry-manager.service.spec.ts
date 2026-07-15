@@ -220,6 +220,37 @@ describe('EntryManagerService', () => {
 
 				result = (service as any).parseQuery('sort:title_asc');
 				expect(result.sort).toEqual({ field: 'title', direction: 'asc' });
+
+				result = (service as any).parseQuery('sort:reading-progress_desc');
+				expect(result.sort).toEqual({ field: 'readingProgress', direction: 'desc' });
+
+				result = (service as any).parseQuery('sort:reading-time_asc');
+				expect(result.sort).toEqual({ field: 'wordCount', direction: 'asc' });
+			});
+
+			it('should parse progress filters', () => {
+				let result = (service as any).parseQuery('progress:50..*');
+				expect(result.progress).toEqual({ from: 50 });
+
+				result = (service as any).parseQuery('progress:20..80');
+				expect(result.progress).toEqual({ from: 20, to: 80 });
+
+				result = (service as any).parseQuery('progress:0');
+				expect(result.progress).toEqual({ from: 0, to: 0 });
+
+				result = (service as any).parseQuery('progress:35');
+				expect(result.progress).toEqual({ from: 35, to: 35 });
+			});
+
+			it('should parse reading-time filters', () => {
+				let result = (service as any).parseQuery('reading-time:10..*');
+				expect(result.readingTime).toEqual({ from: 10 });
+
+				result = (service as any).parseQuery('reading-time:*..5');
+				expect(result.readingTime).toEqual({ to: 5 });
+
+				result = (service as any).parseQuery('reading-time:15');
+				expect(result.readingTime).toEqual({ from: 15, to: 15 });
 			});
 
 			it('should parse combined filters', () => {

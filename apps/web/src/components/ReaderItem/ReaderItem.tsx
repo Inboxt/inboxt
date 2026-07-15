@@ -70,7 +70,7 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 							<ReaderCheckbox
 								checked={selected}
 								onChange={() => toggleItemSelection(item)}
-								onClick={(e) => {
+								onClick={(e: React.MouseEvent) => {
 									e.preventDefault();
 									e.stopPropagation();
 								}}
@@ -82,7 +82,7 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 					<ReaderCheckbox
 						checked={selected}
 						onChange={() => toggleItemSelection(item)}
-						onClick={(e) => {
+						onClick={(e: React.MouseEvent) => {
 							e.preventDefault();
 							e.stopPropagation();
 						}}
@@ -101,7 +101,13 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 						<Text
 							fz="sm"
 							className={classes.text}
-						>{`${Math.ceil(item.wordCount / 240)} min read`}</Text>
+						>{`${Math.ceil(item.wordCount / 240)} min`}</Text>
+
+						{typeof item.readingProgress === 'number' && item.readingProgress > 0 && (
+							<Text fz="sm" className={classes.text}>
+								{Math.round(item.readingProgress * 100)}% read
+							</Text>
+						)}
 					</Breadcrumbs>
 
 					<Group wrap="nowrap" gap="md" justify="space-between" pos="relative">

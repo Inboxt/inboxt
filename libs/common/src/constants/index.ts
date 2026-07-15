@@ -7,11 +7,22 @@ export const MIN_NEWSLETTER_WORD_COUNT = 100;
 /** Maximum word count for newsletters before they're considered too large */
 export const MAX_NEWSLETTER_WORD_COUNT = 15000;
 /** Sort options for saved items. Backend uses a separate DTO structure with field and direction. */
+export const SORT_FIELDS = [
+	{ value: 'date', label: 'Date' },
+	{ value: 'title', label: 'Title' },
+	{ value: 'reading-progress', label: 'Progress' },
+	{ value: 'reading-time', label: 'Reading time' },
+] as const;
+
 export const SORT_OPTIONS = [
 	{ value: 'date_desc', label: 'Date (newest first)' },
 	{ value: 'date_asc', label: 'Date (oldest first)' },
 	{ value: 'title_asc', label: 'Title (A–Z)' },
 	{ value: 'title_desc', label: 'Title (Z–A)' },
+	{ value: 'reading-progress_desc', label: 'Progress (most read first)' },
+	{ value: 'reading-progress_asc', label: 'Progress (least read first)' },
+	{ value: 'reading-time_asc', label: 'Reading time (shortest first)' },
+	{ value: 'reading-time_desc', label: 'Reading time (longest first)' },
 ] as const;
 export const SORT_VALUES = SORT_OPTIONS.map((option) => option.value);
 
