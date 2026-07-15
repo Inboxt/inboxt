@@ -10,6 +10,7 @@ import { GetSavedItemInput } from './dto/get-saved-item.input';
 import { PermanentlyDeleteSavedItemsInput } from './dto/permanently-delete-saved-items.input';
 import { SetSavedItemLabelsInput } from './dto/set-saved-item-labels.input';
 import { UpdateSavedItemStatusInput } from './dto/update-saved-item-status.input';
+import { UpdateReadingProgressInput } from './dto/update-reading-progress.input';
 import { Article } from './entities/article/article.model';
 import { ArticleService } from './entities/article/article.service';
 import { Label } from './entities/label/label.model';
@@ -49,6 +50,15 @@ export class SavedItemResolver {
 		}
 
 		return VOID_RESPONSE;
+	}
+
+	@ApiTokenAllowed()
+	@Mutation(() => SavedItem)
+	async updateReadingProgress(
+		@ActiveUserMeta() activeUser: ActiveUserMetaType,
+		@Args('data') data: UpdateReadingProgressInput,
+	) {
+		return this.savedItemService.updateReadingProgress(activeUser.id, data.id, data.progress);
 	}
 
 	@ApiTokenAllowed()

@@ -38,4 +38,7 @@ export class SavedItem implements Entry {
 
 	@Field(() => SavedItemStatus)
 	status: SavedItemStatus;
+
+	@Field({ nullable: true })
+	readingProgress?: number;
 }

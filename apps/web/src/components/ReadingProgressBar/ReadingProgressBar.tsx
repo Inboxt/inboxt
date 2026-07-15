@@ -1,0 +1,21 @@
+import { Progress } from '@mantine/core';
+import { clsx } from 'clsx';
+
+import classes from './ReadingProgressBar.module.css';
+
+interface ReadingProgressBarProps {
+	progress: number;
+	className?: string;
+}
+
+export const ReadingProgressBar = ({ progress, className }: ReadingProgressBarProps) => {
+	return (
+		<Progress
+			value={progress * 100}
+			size={2}
+			radius={0}
+			className={clsx(classes.progressBar, className)}
+			color="var(--mantine-primary-color-filled)"
+		/>
+	);
+};
