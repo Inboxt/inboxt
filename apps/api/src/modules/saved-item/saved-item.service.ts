@@ -226,6 +226,20 @@ export class SavedItemService {
 		});
 	}
 
+	async updateReadingProgress(userId: string, id: string, readingProgress: number) {
+		const existingItem = await this.get(userId, { where: { id } });
+		if (!existingItem) {
+			throw new AppException('Item not found', HttpStatus.NOT_FOUND);
+		}
+
+		return this.prisma.saved_item.update({
+			where: { id, userId },
+			data: {
+				readingProgress,
+			},
+		});
+	}
+
 	async getLabels(userId: string, id: string) {
 		const savedItem = await this.get(userId, { where: { id } });
 		if (!savedItem) {

@@ -30,6 +30,7 @@ export const SAVED_ITEM_FRAGMENT = gql(`
 		author
 		type
 		status
+		readingProgress
 	}
 `);
 
@@ -302,6 +303,15 @@ export const UPDATE_SAVED_ITEM_STATUS = gql(`
 	mutation updateSavedItemStatus($data: UpdateSavedItemStatusInput!) {
 		updateSavedItemStatus(data: $data) {
 			success
+		}
+	}
+`);
+
+export const UPDATE_READING_PROGRESS = gql(`
+	mutation updateReadingProgress($data: UpdateReadingProgressInput!) {
+		updateReadingProgress(data: $data) {
+			id
+			readingProgress
 		}
 	}
 `);

@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import {
 	ActionIcon,
 	Anchor,
@@ -16,11 +16,11 @@ import {
 	Title,
 	Typography,
 } from '@mantine/core';
-import { useDocumentTitle } from '@mantine/hooks';
+import { useDebouncedCallback, useDocumentTitle } from '@mantine/hooks';
 import { IconArrowLeft, IconHighlight } from '@tabler/icons-react';
 import { useCanGoBack, useNavigate, useParams, useRouter } from '@tanstack/react-router';
 import dayjs from 'dayjs';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState, UIEvent } from 'react';
 
 import { APP_PRIMARY_COLOR, READER_THEMES } from '@inboxt/common';
 import { theme } from '@inboxt/ui';
@@ -29,12 +29,13 @@ import { AppName } from '~components/AppName';
 import { HighlightableArticle } from '~components/HighlightableArticle';
 import { NewsletterSubscriptionButton } from '~components/NewsletterSubscriptionButton';
 import { ReaderSettingsOptions } from '~components/ReaderSettingsOptions';
+import { ReadingProgressBar } from '~components/ReadingProgressBar';
 import { useAdjacentItems } from '~hooks/useAdjacentItems';
-import { useReaderSwipeNavigation } from '~hooks/useReaderSwipeNavigation';
 import { useReaderSettings, makeReaderResolver } from '~hooks/useReaderSettings.tsx';
+import { useReaderSwipeNavigation } from '~hooks/useReaderSwipeNavigation';
 import { useScreenQuery } from '~hooks/useScreenQuery';
 import { useTextHighlighting } from '~hooks/useTextSelection';
-import { SAVED_ITEM, SavedItemType } from '~lib/graphql';
+import { SAVED_ITEM, SavedItemType, UPDATE_READING_PROGRESS } from '~lib/graphql';
 import { Route } from '~routes/_auth._main.r.$id';
 
 import classes from './ReaderView.module.css';
@@ -52,7 +53,39 @@ export const ReaderView = () => {
 		variables: { query: { id } },
 		fetchPolicy: 'cache-and-network',
 	});
+	const [updateReadingProgress] = useMutation(UPDATE_READING_PROGRESS);
 	const { nextId, prevId } = useAdjacentItems(id);
+
+	const [lastResumedId, setLastResumedId] = useState<string | null>(null);
+	const [currentProgress, setCurrentProgress] = useState(0);
+
+	const isRestoringScroll =
+		!!data?.savedItem && lastResumedId !== id && (data.savedItem.readingProgress || 0) > 0;
+
+	const debouncedUpdateProgress = useDebouncedCallback((progress: number) => {
+		void updateReadingProgress({
+			variables: {
+				data: {
+					id,
+					progress,
+				},
+			},
+		});
+	}, 1000);
+
+	const handleScroll = (e: UIEvent<HTMLDivElement>) => {
+		const container = e.currentTarget;
+		const { scrollTop, scrollHeight, clientHeight } = container;
+		const maxScroll = scrollHeight - clientHeight;
+
+		if (maxScroll <= 0) {
+			return;
+		}
+
+		const progress = Math.min(1, Math.max(0, scrollTop / maxScroll));
+		setCurrentProgress(progress);
+		debouncedUpdateProgress(progress);
+	};
 
 	const { handleTouchStart, handleTouchMove, handleTouchEnd } = useReaderSwipeNavigation({
 		nextId,
@@ -84,11 +117,42 @@ export const ReaderView = () => {
 	});
 
 	const readerRef = useRef<HTMLDivElement>(null);
+
 	useEffect(() => {
-		if (readerRef.current) {
+		const savedItem = data?.savedItem;
+		if (savedItem && readerRef.current && lastResumedId !== id) {
+			const progress = savedItem.readingProgress || 0;
+			const container = readerRef.current;
+
+			if (progress === 0 && loading) {
+				return;
+			}
+
+			if (progress === 0) {
+				setLastResumedId(id);
+				setCurrentProgress(0);
+				return;
+			}
+
+			// Immediately set the progress bar to the correct value
+			setCurrentProgress(progress);
+
+			// We need to wait a bit for the content to be rendered to get accurate scrollHeight
+			// But since we are using useEffect with data as dependency, it should be mostly fine.
+			// However, images might still be loading.
+			setTimeout(() => {
+				const { scrollHeight, clientHeight } = container;
+				container.scrollTop = progress * (scrollHeight - clientHeight);
+				setLastResumedId(id);
+			}, 100);
+		}
+	}, [data?.savedItem, id, lastResumedId, loading]);
+
+	useEffect(() => {
+		if (readerRef.current && lastResumedId !== id) {
 			readerRef.current.scrollTop = 0;
 		}
-	}, [id]);
+	}, [id, lastResumedId]);
 
 	useEffect(() => {
 		const html = document.documentElement;
@@ -130,6 +194,15 @@ export const ReaderView = () => {
 				? savedItem.newsletter?.contentHtml
 				: undefined;
 
+	const loadingSkeleton = (
+		<Center py="xxl" mt="lg">
+			<Stack w={isAboveXsScreen ? '45em' : '100%'} gap="xxl">
+				<Skeleton visible height={120} animate />
+				<Skeleton visible height={560} animate />
+			</Stack>
+		</Center>
+	);
+
 	return (
 		<Box
 			ref={readerRef}
@@ -141,6 +214,7 @@ export const ReaderView = () => {
 			onTouchStart={handleTouchStart}
 			onTouchMove={handleTouchMove}
 			onTouchEnd={handleTouchEnd}
+			onScroll={handleScroll}
 		>
 			<MantineProvider
 				forceColorScheme={effectiveTheme === 'dark' ? 'dark' : 'light'}
@@ -152,12 +226,7 @@ export const ReaderView = () => {
 				cssVariablesSelector="#reader-root"
 			>
 				{loading ? (
-					<Center py="xxl" mt="lg">
-						<Stack w={isAboveXsScreen ? '45em' : '100%'} gap="xxl">
-							<Skeleton visible height={120} animate />
-							<Skeleton visible height={560} animate />
-						</Stack>
-					</Center>
+					loadingSkeleton
 				) : (
 					<>
 						<Box className={classes.headerContainer}>
@@ -194,101 +263,140 @@ export const ReaderView = () => {
 									/>
 								</Box>
 							)}
+
+							<ReadingProgressBar
+								progress={currentProgress}
+								className={classes.headerProgressBar}
+							/>
 						</Box>
 
 						<Box visibleFrom="md" className={classes.readerSettingsContainer}>
 							<ReaderSettingsOptions item={(data?.savedItem as any) || null} />
 						</Box>
 
-						<Center pt="xxl">
-							<Box className={classes.readerContent}>
-								<Stack gap="xl">
-									{savedItem && (
-										<>
-											<Stack gap="xxs">
-												<Breadcrumbs separator="•">
-													<Text>
-														{dayjs(savedItem.createdAt).format(
-															'MMMM D, YYYY HH:mm',
-														)}
-													</Text>
-													<Text>{`${Math.ceil((savedItem.wordCount || 0) / 240)} min read`}</Text>
-												</Breadcrumbs>
+						<Box style={{ position: 'relative', flex: 1 }}>
+							{isRestoringScroll && (
+								<Box
+									style={{
+										position: 'absolute',
+										inset: 0,
+										zIndex: 10,
+										background: 'var(--mantine-color-body)',
+									}}
+								>
+									{loadingSkeleton}
+								</Box>
+							)}
 
-												<Title order={2}>{savedItem.title}</Title>
+							<Box
+								style={{
+									visibility: isRestoringScroll ? 'hidden' : 'visible',
+									opacity: isRestoringScroll ? 0 : 1,
+									transition: 'opacity 0.2s ease-in-out',
+								}}
+							>
+								<Center pt="xxl">
+									<Box className={classes.readerContent}>
+										<Stack gap="xl">
+											{savedItem && (
+												<>
+													<Stack gap="xxs">
+														<Breadcrumbs separator="•">
+															<Text>
+																{dayjs(savedItem.createdAt).format(
+																	'MMMM D, YYYY HH:mm',
+																)}
+															</Text>
+															<Text>{`${Math.ceil((savedItem.wordCount || 0) / 240)} min read`}</Text>
+														</Breadcrumbs>
 
-												<Group gap={6}>
-													{savedItem.author && (
-														<Text>
-															{`By ${savedItem.author}`}
-															{savedItem.sourceDomain ? ',' : ''}
-														</Text>
-													)}
-													{savedItem.sourceDomain && (
-														<Text>{savedItem.sourceDomain}</Text>
-													)}
-													{savedItem.originalUrl && (
-														<>
-															<Text>•</Text>
-															<Anchor
-																href={savedItem.originalUrl}
-																target="_blank"
-															>
-																See original
-															</Anchor>
-														</>
-													)}
+														<Title order={2}>{savedItem.title}</Title>
 
-													{savedItem.newsletter?.subscription && (
-														<NewsletterSubscriptionButton
-															subscription={
-																savedItem.newsletter.subscription
-															}
-														/>
-													)}
-												</Group>
+														<Group gap={6}>
+															{savedItem.author && (
+																<Text>
+																	{`By ${savedItem.author}`}
+																	{savedItem.sourceDomain
+																		? ','
+																		: ''}
+																</Text>
+															)}
+															{savedItem.sourceDomain && (
+																<Text>
+																	{savedItem.sourceDomain}
+																</Text>
+															)}
+															{savedItem.originalUrl && (
+																<>
+																	<Text>•</Text>
+																	<Anchor
+																		href={savedItem.originalUrl}
+																		target="_blank"
+																	>
+																		See original
+																	</Anchor>
+																</>
+															)}
 
-												<Group gap={6}>
-													{(savedItem.labels || []).map((label) => (
-														<Badge
-															size="sm"
-															radius="sm"
-															color={label.color}
-															autoContrast={
-																label.color !== APP_PRIMARY_COLOR
-															}
-														>
-															{label.name}
-														</Badge>
-													))}
-												</Group>
-											</Stack>
-											<Divider color="var(--reader-border-color)" />
-										</>
-									)}
+															{savedItem.newsletter?.subscription && (
+																<NewsletterSubscriptionButton
+																	subscription={
+																		savedItem.newsletter
+																			.subscription
+																	}
+																/>
+															)}
+														</Group>
 
-									{!error && savedItem && !content && (
-										<Text ta="center">{savedItem.description ?? ''}</Text>
-									)}
+														<Group gap={6}>
+															{(savedItem.labels || []).map(
+																(label) => (
+																	<Badge
+																		size="sm"
+																		radius="sm"
+																		color={label.color}
+																		autoContrast={
+																			label.color !==
+																			APP_PRIMARY_COLOR
+																		}
+																	>
+																		{label.name}
+																	</Badge>
+																),
+															)}
+														</Group>
+													</Stack>
+													<Divider color="var(--reader-border-color)" />
+												</>
+											)}
 
-									{!error && savedItem && content && (
-										<Typography className={classes.typography}>
-											<HighlightableArticle
-												content={content || null}
-												data={savedItem as any}
-											/>
-										</Typography>
-									)}
+											{!error && savedItem && !content && (
+												<Text ta="center">
+													{savedItem.description ?? ''}
+												</Text>
+											)}
 
-									{(error || !savedItem) && (
-										<Text ta="center">
-											Something went wrong, and the article content couldn't
-											be loaded. Please try again or contact support.
-										</Text>
-									)}
-								</Stack>
+											{!error && savedItem && content && (
+												<Typography className={classes.typography}>
+													<HighlightableArticle
+														content={content || null}
+														data={savedItem as any}
+													/>
+												</Typography>
+											)}
+
+											{(error || !savedItem) && (
+												<Text ta="center">
+													Something went wrong, and the article content
+													couldn't be loaded. Please try again or contact
+													support.
+												</Text>
+											)}
+										</Stack>
+									</Box>
+								</Center>
 							</Box>
-						</Center>
+						</Box>
 					</>
 				)}
 			</MantineProvider>

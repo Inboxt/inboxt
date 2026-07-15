@@ -51,7 +51,6 @@ export const HighlightableArticle = ({ content, data }: ArticleWithHighlightsPro
 		const container = containerRef.current;
 		const highlights = data.highlights;
 
-		container.innerHTML = content || '';
 		container.normalize();
 
 		if (!highlights || highlights.length === 0) {
