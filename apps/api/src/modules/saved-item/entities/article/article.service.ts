@@ -2,7 +2,6 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as cheerio from 'cheerio';
 
-import { MAX_ARTICLE_WORD_COUNT } from '@inboxt/common';
 import { Prisma } from '@inboxt/prisma';
 
 import { AppException } from '~common/utils/app-exception';
@@ -156,7 +155,7 @@ export class ArticleService {
 
 		const result = this.contentExtractionService.extractReadableContent(cleanedHtml, {
 			url: input.url,
-			maxWords: MAX_ARTICLE_WORD_COUNT,
+			maxWords: this.configService.get('content.articleMaxWordCount', { infer: true }),
 		});
 
 		return {

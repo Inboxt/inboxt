@@ -1,10 +1,9 @@
 // CONSTANTS
-// TODO: Should these limits be adjusted by .env variables?
-/** Maximum word count for articles before they're considered too large */
+/** Default maximum word count for articles before they're considered too large. Can be overridden by ARTICLE_MAX_WORD_COUNT env variable. */
 export const MAX_ARTICLE_WORD_COUNT = 15000;
-/** Minimum word count for newsletters to be considered valid content */
+/** Default minimum word count for newsletters to be considered valid content. Can be overridden by NEWSLETTER_MIN_WORD_COUNT env variable. */
 export const MIN_NEWSLETTER_WORD_COUNT = 100;
-/** Maximum word count for newsletters before they're considered too large */
+/** Default maximum word count for newsletters before they're considered too large. Can be overridden by NEWSLETTER_MAX_WORD_COUNT env variable. */
 export const MAX_NEWSLETTER_WORD_COUNT = 15000;
 /** Sort options for saved items. Backend uses a separate DTO structure with field and direction. */
 export const SORT_FIELDS = [
