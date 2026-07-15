@@ -1,7 +1,6 @@
 import { createRootRoute, Outlet } from '@tanstack/react-router';
 
-import { AppError } from '~pages/AppError.tsx';
-import { NotFound } from '~pages/NotFound.tsx';
+import { AppError, NotFound } from '~pages/StatusPage.tsx';
 
 export const Route = createRootRoute({
 	component: () => <Outlet />,
