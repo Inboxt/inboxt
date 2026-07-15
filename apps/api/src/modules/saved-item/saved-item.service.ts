@@ -151,6 +151,22 @@ export class SavedItemService {
 			prismaWhere.sourceDomain = { contains: query.source, mode: 'insensitive' };
 		}
 
+		// ---------- Reading Progress ----------
+		if (query.progress) {
+			prismaWhere.readingProgress = {
+				gte: query.progress.from !== undefined ? (query.progress.from - 0.5) / 100 : undefined,
+				lte: query.progress.to !== undefined ? (query.progress.to + 0.5) / 100 : undefined,
+			};
+		}
+
+		// ---------- Reading Time ----------
+		if (query.readingTime) {
+			prismaWhere.wordCount = {
+				gte: query.readingTime.from ? (query.readingTime.from - 1) * 240 + 1 : undefined,
+				lte: query.readingTime.to ? query.readingTime.to * 240 : undefined,
+			};
+		}
+
 		// ---------- Pagination & Sorting ----------
 		const take = query.first ?? 20;
 		const prismaQuery: Prisma.saved_itemFindManyArgs = {

@@ -20,14 +20,21 @@ export const ItemsList = () => {
 	const { q, sort } = useSearch({ from: Route.id });
 	useModalFromUrl();
 
-	const [field, dir] = (sort?.split('_') ?? 'date_desc') as [string, string];
+	const [field, dir] = (sort ?? 'date_desc').split('_') as [string, string];
 	const direction = dir === 'asc' ? SortDirection.Asc : SortDirection.Desc;
 	const baseQuery = useMemo(
 		() => ({
 			q,
 			first: 20,
 			sort: {
-				field: field === 'date' ? EntrySortField.CreatedAt : (field as EntrySortField),
+				field:
+					field === 'date'
+						? EntrySortField.CreatedAt
+						: field === 'reading-progress'
+							? EntrySortField.ReadingProgress
+							: field === 'reading-time'
+								? EntrySortField.WordCount
+								: (field as EntrySortField),
 				direction,
 			},
 		}),

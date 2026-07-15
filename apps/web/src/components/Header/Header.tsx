@@ -12,10 +12,16 @@ import {
 	rem,
 } from '@mantine/core';
 import { useLocalStorage } from '@mantine/hooks';
-import { IconArrowLeft, IconList, IconPhoto } from '@tabler/icons-react';
+import {
+	IconArrowLeft,
+	IconList,
+	IconPhoto,
+	IconSortAscending,
+	IconSortDescending,
+} from '@tabler/icons-react';
 import { useSearch, useRouter } from '@tanstack/react-router';
 
-import { SORT_OPTIONS } from '@inboxt/common';
+import { SORT_FIELDS } from '@inboxt/common';
 
 import { AppName } from '~components/AppName';
 import { AppSearch } from '~components/AppSearch';
@@ -55,6 +61,24 @@ export const Header = ({ opened, toggle }: HeaderProps) => {
 		getInitialValueInEffect: false,
 		serialize: (value) => value || '',
 	});
+
+	const [currentField, currentDir] = (sort?.split('_') ?? ['date', 'desc']) as [
+		string,
+		'asc' | 'desc',
+	];
+
+	const handleSortChange = (field: string, direction: 'asc' | 'desc') => {
+		const val = `${field}_${direction}` as typeof searchParams.sort;
+		setSort(val);
+		void router.navigate({
+			to: '/',
+			search: {
+				...searchParams,
+				sort: val,
+			},
+			replace: true,
+		});
+	};
 
 	if (selectedItems.length > 0 && isBelowLgScreen) {
 		return (
@@ -180,28 +204,45 @@ export const Header = ({ opened, toggle }: HeaderProps) => {
 							</ActionIcon>
 						</Tooltip>
 
-						<Select
-							size="xs"
-							value={sort}
-							aria-label="Sort items"
-							onChange={(val) => {
-								if (!val) {
-									return;
-								}
-
-								setSort(val as typeof searchParams.sort);
-								void router.navigate({
-									to: '/',
-									search: {
-										...searchParams,
-										sort: val as typeof searchParams.sort,
-									},
-									replace: true,
-								});
-							}}
-							data={SORT_OPTIONS}
-							className={classes.sortInput}
-						/>
+						<Group gap={4} className={classes.sortInput}>
+							<Select
+								size="xs"
+								value={currentField}
+								aria-label="Sort field"
+								onChange={(val) => {
+									if (!val) {
+										return;
+									}
+									handleSortChange(val, currentDir);
+								}}
+								data={SORT_FIELDS}
+								style={{ flex: 1 }}
+							/>
+							<Tooltip
+								label={currentDir === 'asc' ? 'Sort ascending' : 'Sort descending'}
+							>
+								<ActionIcon
+									variant="default"
+									size="md"
+									onClick={() =>
+										handleSortChange(
+											currentField,
+											currentDir === 'asc' ? 'desc' : 'asc',
+										)
+									}
+								>
+									{currentDir === 'asc' ? (
+										<IconSortAscending
+											style={{ width: rem(18), height: rem(18) }}
+										/>
+									) : (
+										<IconSortDescending
+											style={{ width: rem(18), height: rem(18) }}
+										/>
+									)}
+								</ActionIcon>
+							</Tooltip>
+						</Group>
 
 						<Flex
 							ml="auto"

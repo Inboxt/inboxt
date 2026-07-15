@@ -97,6 +97,29 @@ export class HighlightService {
 			}
 		}
 
+		// ---------- Reading Progress ----------
+		if (query.progress) {
+			prismaWhere.saved_item = prismaWhere.saved_item || { is: {} };
+			prismaWhere.saved_item.is = prismaWhere.saved_item.is || {};
+			prismaWhere.saved_item.is.readingProgress = {
+				gte:
+					query.progress.from !== undefined
+						? (query.progress.from - 0.5) / 100
+						: undefined,
+				lte: query.progress.to !== undefined ? (query.progress.to + 0.5) / 100 : undefined,
+			};
+		}
+
+		// ---------- Reading Time ----------
+		if (query.readingTime) {
+			prismaWhere.saved_item = prismaWhere.saved_item || { is: {} };
+			prismaWhere.saved_item.is = prismaWhere.saved_item.is || {};
+			prismaWhere.saved_item.is.wordCount = {
+				gte: query.readingTime.from ? (query.readingTime.from - 1) * 240 + 1 : undefined,
+				lte: query.readingTime.to ? query.readingTime.to * 240 : undefined,
+			};
+		}
+
 		// ---------- Pagination & Sorting ----------
 		const prismaQuery: Prisma.highlightFindManyArgs = {
 			where: prismaWhere,
@@ -105,10 +128,10 @@ export class HighlightService {
 		};
 
 		if (query.sort?.field && query.sort?.direction) {
-			if (query.sort.field === 'title') {
+			if (['title', 'readingProgress', 'wordCount'].includes(query.sort.field)) {
 				prismaQuery.orderBy = {
 					saved_item: {
-						title: query.sort.direction,
+						[query.sort.field]: query.sort.direction,
 					},
 				};
 			} else {

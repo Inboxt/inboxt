@@ -153,7 +153,9 @@ export type EntrySort = {
 /** Properties by which entries can be sorted. */
 export enum EntrySortField {
   CreatedAt = 'createdAt',
-  Title = 'title'
+  ReadingProgress = 'readingProgress',
+  Title = 'title',
+  WordCount = 'wordCount'
 }
 
 /** Possible export request highlights format */

@@ -5,6 +5,8 @@ import { Sort } from '~common/dto/sort';
 export enum EntrySortField {
 	title = 'title',
 	createdAt = 'createdAt',
+	readingProgress = 'readingProgress',
+	wordCount = 'wordCount',
 }
 
 registerEnumType(EntrySortField, {
