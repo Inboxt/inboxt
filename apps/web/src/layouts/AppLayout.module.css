@@ -9,7 +9,7 @@
 	border-bottom-width: 0;
 	width: 600px;
 
-	@media (min-width: 120em) {
+	@media (min-width: 125em) {
 		width: 45em;
 	}
 
