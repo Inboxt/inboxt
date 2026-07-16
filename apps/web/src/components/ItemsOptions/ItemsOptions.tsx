@@ -14,7 +14,7 @@ import {
 	IconWorld,
 } from '@tabler/icons-react';
 import { useNavigate } from '@tanstack/react-router';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import { ConfirmWithAlert } from '~components/ConfirmWithAlert';
 import { toastSuccess } from '~components/Toast';
@@ -33,13 +33,20 @@ import { modals } from '~modals/modals';
 import { MenuDrawer } from '../MenuDrawer';
 import { ReaderSettingsPopover } from '../ReaderSettingsPopover';
 
-export type ItemsOptionsMode = 'single' | 'bulk' | 'reader' | 'reader-menu' | 'highlights';
+export type ItemsOptionsMode =
+	| 'single'
+	| 'bulk'
+	| 'reader'
+	| 'reader-menu'
+	| 'reader-toolbar'
+	| 'highlights';
 
 type ItemsOptionsProps = {
 	items: SelectableItem[];
 	mode: ItemsOptionsMode;
 	size?: 'sm' | 'md';
 	onActionComplete?: () => void | Promise<void>;
+	onLoadingChange?: (loading: boolean) => void;
 };
 
 type SuccessToastOptions = Partial<Omit<ToastProps, 'id' | 'variant'>>;
@@ -58,7 +65,13 @@ type Option = {
 type SavedSelectable = Extract<SelectableItem, { __typename: 'SavedItem' }>;
 type HighlightSelectable = Extract<SelectableItem, { __typename: 'Highlight' }>;
 
-export const ItemsOptions = ({ items, mode, size = 'md', onActionComplete }: ItemsOptionsProps) => {
+export const ItemsOptions = ({
+	items,
+	mode,
+	size = 'md',
+	onActionComplete,
+	onLoadingChange,
+}: ItemsOptionsProps) => {
 	const isSmall = size === 'sm';
 	const [updateStatus, { loading: updateLoading }] = useMutation(UPDATE_SAVED_ITEM_STATUS, {
 		refetchQueries: [ENTRIES],
@@ -71,7 +84,12 @@ export const ItemsOptions = ({ items, mode, size = 'md', onActionComplete }: Ite
 	});
 	const { setSelectedItems } = useContentSelection();
 	const navigate = useNavigate();
-	const loading = updateLoading || deleteLoading;
+	const [activeOptionLabel, setActiveOptionLabel] = useState<string | null>(null);
+	const loading = updateLoading || deleteLoading || activeOptionLabel !== null;
+
+	React.useEffect(() => {
+		onLoadingChange?.(loading);
+	}, [loading, onLoadingChange]);
 
 	const savedItems: SavedItem[] = useMemo(
 		() => items.filter((i): i is SavedSelectable => i.__typename === 'SavedItem'),
@@ -179,7 +197,7 @@ export const ItemsOptions = ({ items, mode, size = 'md', onActionComplete }: Ite
 		{
 			label: 'Restore',
 			icon: IconArrowBackUp,
-			modes: ['single', 'bulk', 'reader', 'reader-menu'],
+			modes: ['single', 'bulk', 'reader', 'reader-menu', 'reader-toolbar'],
 			visible: () =>
 				savedItems.length > 0 &&
 				savedItems.some((i) => i.status !== SavedItemStatus.Active),
@@ -210,7 +228,7 @@ export const ItemsOptions = ({ items, mode, size = 'md', onActionComplete }: Ite
 		{
 			label: 'Move to archive',
 			icon: IconArchive,
-			modes: ['single', 'bulk', 'reader', 'reader-menu'],
+			modes: ['single', 'bulk', 'reader', 'reader-menu', 'reader-toolbar'],
 			visible: () =>
 				savedItems.length > 0 &&
 				savedItems.some((i) => i.status !== SavedItemStatus.Archived),
@@ -244,7 +262,7 @@ export const ItemsOptions = ({ items, mode, size = 'md', onActionComplete }: Ite
 		{
 			label: 'Move to trash',
 			icon: IconTrash,
-			modes: ['single', 'bulk', 'reader', 'reader-menu'],
+			modes: ['single', 'bulk', 'reader', 'reader-menu', 'reader-toolbar'],
 			visible: () =>
 				savedItems.length > 0 &&
 				savedItems.some((i) => i.status !== SavedItemStatus.Deleted),
@@ -424,13 +442,18 @@ export const ItemsOptions = ({ items, mode, size = 'md', onActionComplete }: Ite
 			setSelectedItems([]);
 		}
 
-		const result = await option.onClick();
-		if (result !== false && (option.runsOnActionComplete ?? true) && onActionComplete) {
-			await onActionComplete();
-		}
+		setActiveOptionLabel(option.label);
+		try {
+			const result = await option.onClick();
+			if (result !== false && (option.runsOnActionComplete ?? true) && onActionComplete) {
+				await onActionComplete();
+			}
 
-		if (result && typeof result === 'object') {
-			window.setTimeout(() => toastSuccess(result), 350);
+			if (result && typeof result === 'object') {
+				window.setTimeout(() => toastSuccess(result), 350);
+			}
+		} finally {
+			setActiveOptionLabel(null);
 		}
 	};
 
@@ -471,6 +494,24 @@ export const ItemsOptions = ({ items, mode, size = 'md', onActionComplete }: Ite
 					<IconDots />
 				</ActionIcon>
 			</MenuDrawer>
+		);
+	}
+
+	if (mode === 'reader-toolbar') {
+		return (
+			<>
+				{filteredOptions.map((option) => (
+					<ReaderSettingsPopover
+						key={option.label}
+						label={option.label}
+						icon={<option.icon />}
+						disabled={loading}
+						radius="xl"
+						size={40}
+						onClick={(e) => handleOptionClick(option, e)}
+					/>
+				))}
+			</>
 		);
 	}
 

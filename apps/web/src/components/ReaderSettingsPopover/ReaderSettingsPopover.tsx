@@ -1,4 +1,4 @@
-import { ActionIcon, Box, Drawer, Popover, Title, Tooltip } from '@mantine/core';
+import { ActionIcon, Box, Drawer, MantineRadius, Popover, Title, Tooltip } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconX } from '@tabler/icons-react';
 import { forwardRef, ReactNode, MouseEvent } from 'react';
@@ -12,24 +12,25 @@ type ReaderSettingsOptionProps = {
 	label: string;
 	icon: ReactNode;
 	disabled?: boolean;
+	radius?: MantineRadius;
+	size?: string | number;
 };
 
 const ReaderSettingsOption = forwardRef<HTMLButtonElement, ReaderSettingsOptionProps>(
-	({ onClick, label, icon, disabled }, ref) => {
+	({ onClick, label, icon, disabled, radius, size = 'lg' }, ref) => {
 		return (
 			<Tooltip label={label} position="right" offset={16} disabled={disabled}>
-				<Box>
-					<ActionIcon
-						variant="subtle"
-						color="text"
-						onClick={onClick}
-						size="lg"
-						ref={ref}
-						disabled={disabled}
-					>
-						{icon}
-					</ActionIcon>
-				</Box>
+				<ActionIcon
+					variant="subtle"
+					color="text"
+					onClick={onClick}
+					size={size}
+					ref={ref}
+					disabled={disabled}
+					radius={radius}
+				>
+					{icon}
+				</ActionIcon>
 			</Tooltip>
 		);
 	},
@@ -45,13 +46,22 @@ export const ReaderSettingsPopover = ({
 	label,
 	icon,
 	disabled,
+	radius,
+	size,
 }: ReaderSettingsPopoverProps) => {
 	const isAboveXsScreen = useScreenQuery('xs', 'above');
 	const [drawerOpened, { open: openDrawer, close: closeDrawer }] = useDisclosure(false);
 
 	if (onClick) {
 		return (
-			<ReaderSettingsOption onClick={onClick} icon={icon} label={label} disabled={disabled} />
+			<ReaderSettingsOption
+				onClick={onClick}
+				icon={icon}
+				label={label}
+				disabled={disabled}
+				radius={radius}
+				size={size}
+			/>
 		);
 	}
 
@@ -65,7 +75,13 @@ export const ReaderSettingsPopover = ({
 				shadow="lg"
 			>
 				<Popover.Target>
-					<ReaderSettingsOption icon={icon} label={label} disabled={disabled} />
+					<ReaderSettingsOption
+						icon={icon}
+						label={label}
+						disabled={disabled}
+						radius={radius}
+						size={size}
+					/>
 				</Popover.Target>
 				<Popover.Dropdown>{children}</Popover.Dropdown>
 			</Popover>
@@ -79,6 +95,8 @@ export const ReaderSettingsPopover = ({
 				label={label}
 				onClick={openDrawer}
 				disabled={disabled}
+				radius={radius}
+				size={size}
 			/>
 
 			<Drawer
