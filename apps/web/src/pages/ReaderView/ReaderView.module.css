@@ -2,13 +2,16 @@
 	cursor: pointer;
 	position: fixed;
 	z-index: 100;
+	transition:
+		transform 0.3s ease,
+		opacity 0.3s ease,
+		top 0.3s ease;
 
 	@media (max-width: $mantine-breakpoint-md) {
 		position: sticky;
 		top: 0;
 		left: 0;
 		right: 0;
-		transition: top 0.3s;
 		display: flex;
 		justify-content: space-between;
 		background-color: var(--mantine-color-body);
@@ -25,16 +28,18 @@
 	}
 }
 
+.headerHidden {
+	transform: translateY(-100%);
+	opacity: 0;
+	pointer-events: none;
+}
+
 .headerProgressBar {
 	position: absolute;
 	bottom: -1px; /* Align with the border */
 	left: 0;
 	right: 0;
-	z-index: 101;
-
-	@media (min-width: $mantine-breakpoint-md) {
-		display: none;
-	}
+	z-index: 10;
 }
 
 .readerSettingsContainer {
@@ -54,6 +59,41 @@
 	color: var(--mantine-color-text);
 	display: flex;
 	flex-direction: column;
+	padding-bottom: env(safe-area-inset-bottom);
+
+	@media (max-width: $mantine-breakpoint-md) {
+		padding-bottom: calc(80px + env(safe-area-inset-bottom));
+	}
+}
+
+.bottomToolbar {
+	position: fixed;
+	bottom: calc(var(--mantine-spacing-md) + env(safe-area-inset-bottom));
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 100;
+	background-color: var(--mantine-color-body);
+	border: 1px solid var(--reader-border-color);
+	border-radius: 100px;
+	padding: 4px var(--mantine-spacing-md);
+	display: flex;
+	gap: var(--mantine-spacing-xs);
+	align-items: center;
+	min-height: 48px;
+	box-shadow: var(--mantine-shadow-md);
+	transition:
+		transform 0.3s ease,
+		opacity 0.3s ease;
+
+	@media (min-width: $mantine-breakpoint-md) {
+		display: none;
+	}
+}
+
+.bottomToolbarHidden {
+	transform: translate(-50%, calc(100% + var(--mantine-spacing-xl) + env(safe-area-inset-bottom)));
+	opacity: 0;
+	pointer-events: none;
 }
 
 .readerContent {
@@ -156,4 +196,15 @@
 
 .readerContent iframe {
 	max-width: 100%;
+}
+
+.headerContainer button:disabled,
+.headerContainer button[data-disabled],
+.readerSettingsContainer button:disabled,
+.readerSettingsContainer button[data-disabled],
+.bottomToolbar button:disabled,
+.bottomToolbar button[data-disabled] {
+	border: none !important;
+	background-color: transparent !important;
+	cursor: not-allowed;
 }

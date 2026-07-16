@@ -5,11 +5,12 @@ type ReaderSwipeNavigationParams = {
 	prevId: string | null;
 	onNavigateToNext: () => void;
 	onNavigateToPrev: () => void;
+	disabled?: boolean;
 };
 
-const minSwipeDistance = 80;
-const minHorizontalRatio = 1.3;
-const edgeExclusionDistance = 40;
+const minSwipeDistance = 50;
+const minHorizontalRatio = 1.2;
+const edgeExclusionDistance = 30;
 
 const isInteractiveTouchTarget = (target: EventTarget | null) => {
 	if (!(target instanceof Element)) {
@@ -28,13 +29,14 @@ export const useReaderSwipeNavigation = ({
 	prevId,
 	onNavigateToNext,
 	onNavigateToPrev,
+	disabled,
 }: ReaderSwipeNavigationParams) => {
 	const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null);
 	const [touchEnd, setTouchEnd] = useState<{ x: number; y: number } | null>(null);
 	const [swipeBlocked, setSwipeBlocked] = useState(false);
 
 	const handleTouchStart = (e: React.TouchEvent) => {
-		if (e.targetTouches.length !== 1) {
+		if (disabled || e.targetTouches.length !== 1) {
 			setSwipeBlocked(true);
 			setTouchStart(null);
 			setTouchEnd(null);
@@ -63,7 +65,7 @@ export const useReaderSwipeNavigation = ({
 	};
 
 	const handleTouchEnd = () => {
-		if (!touchStart || !touchEnd || swipeBlocked) {
+		if (disabled || !touchStart || !touchEnd || swipeBlocked) {
 			setTouchStart(null);
 			setTouchEnd(null);
 			setSwipeBlocked(false);

@@ -1,6 +1,7 @@
 import { Box, Divider, Flex } from '@mantine/core';
-import { IconLetterCase, IconPaint, IconX } from '@tabler/icons-react';
+import { IconArrowDown, IconArrowUp, IconLetterCase, IconPaint, IconX } from '@tabler/icons-react';
 import { useCanGoBack, useNavigate, useRouter } from '@tanstack/react-router';
+import { useState } from 'react';
 
 import { FormReadingSettings } from '~forms/FormReadingSettings';
 import { FormReadingThemeSettings } from '~forms/FormReadingThemeSettings';
@@ -15,18 +16,43 @@ type ReaderSettingsOptionsProps = {
 	item: SavedItem | null;
 	direction?: 'column' | 'row';
 	variant?: 'full' | 'menu';
+	loading?: boolean;
+	onLoadingChange?: (loading: boolean) => void;
 };
 
 export const ReaderSettingsOptions = ({
 	item,
 	direction = 'column',
 	variant = 'full',
+	loading: externalLoading,
+	onLoadingChange,
 }: ReaderSettingsOptionsProps) => {
 	const router = useRouter();
 	const canGoBack = useCanGoBack();
 	const navigate = useNavigate();
 	const isBelowXsScreen = useScreenQuery('xs', 'below');
-	const { nextId } = useAdjacentItems(item?.id);
+	const { nextId, prevId } = useAdjacentItems(item?.id);
+	const [internalLoading, setInternalLoading] = useState(false);
+
+	const isActionsLoading = externalLoading ?? internalLoading;
+
+	const handleLoadingChange = (loading: boolean) => {
+		setInternalLoading(loading);
+		onLoadingChange?.(loading);
+	};
+
+	const handleNavigate = (id: string | null) => {
+		if (!id) {
+			return;
+		}
+
+		void navigate({
+			to: '/r/$id',
+			params: { id },
+			search: (prev) => prev,
+			replace: true,
+		});
+	};
 
 	const handleActionComplete = async () => {
 		if (nextId) {
@@ -62,6 +88,7 @@ export const ReaderSettingsOptions = ({
 					onClick={handleGoBack}
 					label="Close reader view"
 					icon={<IconX />}
+					disabled={isActionsLoading}
 				/>
 			</Box>
 
@@ -83,10 +110,30 @@ export const ReaderSettingsOptions = ({
 						orientation={direction === 'column' ? 'horizontal' : 'vertical'}
 					/>
 
+					<ReaderSettingsPopover
+						onClick={() => handleNavigate(prevId)}
+						label="Previous article"
+						icon={<IconArrowUp />}
+						disabled={!prevId || isActionsLoading}
+					/>
+
+					<ReaderSettingsPopover
+						onClick={() => handleNavigate(nextId)}
+						label="Next article"
+						icon={<IconArrowDown />}
+						disabled={!nextId || isActionsLoading}
+					/>
+
+					<Divider
+						color="var(--reader-border-color)"
+						orientation={direction === 'column' ? 'horizontal' : 'vertical'}
+					/>
+
 					<ItemsOptions
 						items={[item]}
 						mode="reader"
 						onActionComplete={handleActionComplete}
+						onLoadingChange={handleLoadingChange}
 					/>
 				</>
 			)}
@@ -96,6 +143,7 @@ export const ReaderSettingsOptions = ({
 					items={[item]}
 					mode="reader-menu"
 					onActionComplete={handleActionComplete}
+					onLoadingChange={handleLoadingChange}
 				/>
 			)}
 		</Flex>

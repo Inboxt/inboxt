@@ -19,6 +19,7 @@ import {
 import { useDebouncedCallback, useDocumentTitle } from '@mantine/hooks';
 import { IconArrowLeft, IconHighlight } from '@tabler/icons-react';
 import { useCanGoBack, useNavigate, useParams, useRouter } from '@tanstack/react-router';
+import clsx from 'clsx';
 import dayjs from 'dayjs';
 import { useEffect, useRef, useState, UIEvent } from 'react';
 
@@ -27,6 +28,7 @@ import { theme } from '@inboxt/ui';
 
 import { AppName } from '~components/AppName';
 import { HighlightableArticle } from '~components/HighlightableArticle';
+import { ItemsOptions } from '~components/ItemsOptions';
 import { NewsletterSubscriptionButton } from '~components/NewsletterSubscriptionButton';
 import { ReaderSettingsOptions } from '~components/ReaderSettingsOptions';
 import { ReadingProgressBar } from '~components/ReadingProgressBar';
@@ -35,7 +37,7 @@ import { useReaderSettings, makeReaderResolver } from '~hooks/useReaderSettings.
 import { useReaderSwipeNavigation } from '~hooks/useReaderSwipeNavigation';
 import { useScreenQuery } from '~hooks/useScreenQuery';
 import { useTextHighlighting } from '~hooks/useTextSelection';
-import { SAVED_ITEM, SavedItemType, UPDATE_READING_PROGRESS } from '~lib/graphql';
+import { SAVED_ITEM, SavedItemType, UPDATE_READING_PROGRESS, SavedItem } from '~lib/graphql';
 import { Route } from '~routes/_auth._main.r.$id';
 
 import classes from './ReaderView.module.css';
@@ -58,6 +60,23 @@ export const ReaderView = () => {
 
 	const [lastResumedId, setLastResumedId] = useState<string | null>(null);
 	const [currentProgress, setCurrentProgress] = useState(0);
+	const [toolbarVisible, setToolbarVisible] = useState(false);
+	const [headerVisible, setHeaderVisible] = useState(true);
+	const [isActionsLoading, setIsActionsLoading] = useState(false);
+	const hideHeaderTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+	const showToolbarDebounced = useDebouncedCallback(() => {
+		const container = readerRef.current;
+		if (container) {
+			const { scrollTop, scrollHeight, clientHeight } = container;
+			const isAtTop = scrollTop < 100;
+			const isAtBottom = scrollTop + clientHeight >= scrollHeight - 50;
+
+			if (!isAtTop || isAtBottom) {
+				setToolbarVisible(true);
+			}
+		}
+	}, 500);
 
 	const isRestoringScroll =
 		!!data?.savedItem && lastResumedId !== id && (data.savedItem.readingProgress || 0) > 0;
@@ -85,11 +104,35 @@ export const ReaderView = () => {
 		const progress = Math.min(1, Math.max(0, scrollTop / maxScroll));
 		setCurrentProgress(progress);
 		debouncedUpdateProgress(progress);
+
+		const isAtBottom = scrollTop + clientHeight >= scrollHeight - 50;
+		const isAtTop = scrollTop < 50;
+
+		if (isAtBottom) {
+			setToolbarVisible(true);
+		} else {
+			setToolbarVisible(false);
+		}
+
+		// Header Focus Mode: Always show while scrolling, hide after delay when stopped
+		setHeaderVisible(true);
+		if (hideHeaderTimeoutRef.current) {
+			clearTimeout(hideHeaderTimeoutRef.current);
+		}
+
+		if (!isAtTop && !isAtBottom) {
+			hideHeaderTimeoutRef.current = setTimeout(() => {
+				setHeaderVisible(false);
+			}, 2500);
+		}
+
+		showToolbarDebounced();
 	};
 
 	const { handleTouchStart, handleTouchMove, handleTouchEnd } = useReaderSwipeNavigation({
 		nextId,
 		prevId,
+		disabled: isActionsLoading,
 		onNavigateToNext: () => {
 			if (!nextId) {
 				return;
@@ -150,9 +193,17 @@ export const ReaderView = () => {
 
 	useEffect(() => {
 		if (readerRef.current && lastResumedId !== id) {
-			readerRef.current.scrollTop = 0;
+			readerRef.current.scrollTo(0, 0);
 		}
 	}, [id, lastResumedId]);
+
+	useEffect(() => {
+		return () => {
+			if (hideHeaderTimeoutRef.current) {
+				clearTimeout(hideHeaderTimeoutRef.current);
+			}
+		};
+	}, []);
 
 	useEffect(() => {
 		const html = document.documentElement;
@@ -166,6 +217,30 @@ export const ReaderView = () => {
 			}
 		};
 	}, []);
+
+	useEffect(() => {
+		const container = readerRef.current;
+		if (container && data?.savedItem && !loading) {
+			const { scrollHeight, clientHeight, scrollTop } = container;
+			const maxScroll = scrollHeight - clientHeight;
+			if (maxScroll <= 0) {
+				setTimeout(() => {
+					setToolbarVisible(true);
+					setHeaderVisible(true);
+				}, 0);
+			} else if (scrollTop >= 100) {
+				setTimeout(() => {
+					setToolbarVisible(true);
+					setHeaderVisible(true);
+				}, 0);
+			} else {
+				setTimeout(() => {
+					setToolbarVisible(false);
+					setHeaderVisible(true);
+				}, 0);
+			}
+		}
+	}, [data?.savedItem, loading, id]);
 
 	const savedItem = data?.savedItem;
 	const title = savedItem?.title || '';
@@ -184,6 +259,19 @@ export const ReaderView = () => {
 			void navigate({
 				to: '/',
 			});
+		}
+	};
+
+	const handleActionComplete = async () => {
+		if (nextId) {
+			await navigate({
+				to: '/r/$id',
+				params: { id: nextId },
+				search: (prev) => prev,
+				replace: true,
+			});
+		} else {
+			handleGoBack();
 		}
 	};
 
@@ -229,7 +317,12 @@ export const ReaderView = () => {
 					loadingSkeleton
 				) : (
 					<>
-						<Box className={classes.headerContainer}>
+						<Box
+							className={clsx(
+								classes.headerContainer,
+								!headerVisible && classes.headerHidden,
+							)}
+						>
 							<Group onClick={handleGoBack} align="center" justify="center">
 								<Flex hiddenFrom="md">
 									<IconArrowLeft />
@@ -259,19 +352,27 @@ export const ReaderView = () => {
 									<ReaderSettingsOptions
 										direction="row"
 										variant="menu"
-										item={(savedItem as any) || null}
+										item={(savedItem as SavedItem) || null}
+										loading={isActionsLoading}
+										onLoadingChange={setIsActionsLoading}
 									/>
 								</Box>
 							)}
 
-							<ReadingProgressBar
-								progress={currentProgress}
-								className={classes.headerProgressBar}
-							/>
+							{!isAboveMdScreen && (
+								<ReadingProgressBar
+									progress={currentProgress}
+									className={classes.headerProgressBar}
+								/>
+							)}
 						</Box>
 
 						<Box visibleFrom="md" className={classes.readerSettingsContainer}>
-							<ReaderSettingsOptions item={(data?.savedItem as any) || null} />
+							<ReaderSettingsOptions
+								item={(data?.savedItem as SavedItem) || null}
+								loading={isActionsLoading}
+								onLoadingChange={setIsActionsLoading}
+							/>
 						</Box>
 
 						<Box style={{ position: 'relative', flex: 1 }}>
@@ -380,7 +481,7 @@ export const ReaderView = () => {
 												<Typography className={classes.typography}>
 													<HighlightableArticle
 														content={content || null}
-														data={savedItem as any}
+														data={savedItem as SavedItem}
 													/>
 												</Typography>
 											)}
@@ -397,6 +498,24 @@ export const ReaderView = () => {
 								</Center>
 							</Box>
 						</Box>
+
+						{savedItem && (
+							<Box
+								className={clsx(
+									classes.bottomToolbar,
+									(!toolbarVisible || !headerVisible) &&
+										classes.bottomToolbarHidden,
+								)}
+								hiddenFrom="md"
+							>
+								<ItemsOptions
+									items={[savedItem as SavedItem]}
+									mode="reader-toolbar"
+									onActionComplete={handleActionComplete}
+									onLoadingChange={setIsActionsLoading}
+								/>
+							</Box>
+						)}
 					</>
 				)}
 			</MantineProvider>
