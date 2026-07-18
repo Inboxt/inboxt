@@ -3,7 +3,7 @@ import { Field, InputType } from '@nestjs/graphql';
 import { SavedItemStatus } from '~common/enums/saved-item-status.enum';
 
 @InputType()
-export class UpdateSavedItemStatusInput {
+export class UpdateSavedItemsStatusInput {
 	@Field(() => [String])
 	ids!: string[];
 

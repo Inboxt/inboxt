@@ -15,7 +15,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  */
 type Documents = {
     "\n\tfragment UserFragment on User {\n\t\tid\n\t\tcreatedAt\n\t\temailAddress\n\t\tisEmailVerified\n\t\tusername\n\t\tpendingEmailAddress\n\t\tlabelsCount\n\t\tinboundEmailAddressesCount\n\t}\n": typeof types.UserFragmentFragmentDoc,
-    "\n\tfragment SavedItemFragment on SavedItem {\n\t\tid\n\t\tcreatedAt\n\t\ttitle\n\t\toriginalUrl\n\t\tsourceDomain\n\t\tdescription\n\t\tleadImage\n\t\twordCount\n\t\tauthor\n\t\ttype\n\t\tstatus\n\t\treadingProgress\n\t}\n": typeof types.SavedItemFragmentFragmentDoc,
+    "\n\tfragment SavedItemFragment on SavedItem {\n\t\tid\n\t\tcreatedAt\n\t\ttitle\n\t\toriginalUrl\n\t\tsourceDomain\n\t\tdescription\n\t\tleadImage\n\t\twordCount\n\t\tauthor\n\t\ttype\n\t\tstatus\n\t\treadingProgress\n\t\treadAt\n\t\tisReadManual\n\t}\n": typeof types.SavedItemFragmentFragmentDoc,
     "\n\tfragment SavedItemLabelFragment on Label {\n\t\tcreatedAt\n\t\tid\n\t\tname\n\t\tcolor\n\t}\n": typeof types.SavedItemLabelFragmentFragmentDoc,
     "\n\tfragment SavedItemLabelsFragment on SavedItem {\n\t\tid\n\t\tlabels {\n\t\t\tid\n\t\t\t...SavedItemLabelFragment\n\t\t}\n\t}\n": typeof types.SavedItemLabelsFragmentFragmentDoc,
     "\n\tfragment NewsletterFragment on Newsletter {\n\t\tcontentHtml\n\t\tcontentText\n\t\tsubscription {\n\t\t\tid\n\t\t\tcreatedAt\n\t\t\tname\n\t\t\tstatus\n\t\t\tlastReceivedAt\n\t\t\tunsubscribeUrl\n\t\t\tunsubscribeAttemptedAt\n\t\t}\n\t}\n": typeof types.NewsletterFragmentFragmentDoc,
@@ -24,6 +24,7 @@ type Documents = {
     "\n    fragment ApiTokenFragment on ApiToken {\n    \tid\n    \tcreatedAt\n    \tlastUsedAt\n    \tname\n    \texpiresAt\n    }\n": typeof types.ApiTokenFragmentFragmentDoc,
     "\n\tfragment SavedQueryFragment on SavedQuery {\n\t\tid\n\t\tcreatedAt\n\t\tname\n\t\tquery\n\t}\n": typeof types.SavedQueryFragmentFragmentDoc,
     "\n\tquery me {\n\t\tme {\n\t\t\tid\n\t\t\t...UserFragment\n\t\t}\n\t}\n": typeof types.MeDocument,
+    "\n\tquery getUserStats {\n\t\tme {\n\t\t\tid\n\t\t\tstats {\n\t\t\t\titemsReadCountAllTime\n\t\t\t\titemsReadCountMonth\n\t\t\t\titemsReadCountWeek\n\t\t\t\testimatedReadingTimeCompleted\n\t\t\t\twordsReadCount\n\t\t\t\tunreadCount\n\t\t\t\treadCount\n\t\t\t\taverageArticleLength\n\t\t\t\taverageTimeToFinish\n\t\t\t}\n\t\t}\n\t}\n": typeof types.GetUserStatsDocument,
     "\n\tquery labels {\n\t\tlabels {\n\t\t\tid\n\t\t\t...SavedItemLabelFragment\n\t\t}\n\t}\n": typeof types.LabelsDocument,
     "\n\tquery savedItem($query: GetSavedItemInput!) {\n\t\tsavedItem(query: $query) {\n\t\t\tid\n\t\t\t...SavedItemFragment\n\t\t\tlabels {\n\t\t\t\tid\n\t\t\t\t...SavedItemLabelFragment\n\t\t\t}\n\t\t\tarticle {\n\t\t\t\tcontentHtml\n\t\t\t\tcontentText\n\t\t\t}\n\t\t\tnewsletter {\n\t\t\t\t...NewsletterFragment\n\t\t\t}\n\t\t\thighlights {\n\t\t\t\t...HighlightFragment\n\t\t\t}\n\t\t}\n\t}\n": typeof types.SavedItemDocument,
     "\n\tquery inboundEmailAddresses {\n\t\tinboundEmailAddresses {\n\t\t\tid\n\t\t\tcreatedAt\n\t\t\tfullAddress\n\t\t\tsubscriptions {\n\t\t\t\tid\n\t\t\t\tcreatedAt\n\t\t\t\tname\n\t\t\t\tstatus\n\t\t\t\tlastReceivedAt\n\t\t\t\tunsubscribeUrl\n\t\t\t\tunsubscribeAttemptedAt\n\t\t\t}\n\t\t}\n\t}\n": typeof types.InboundEmailAddressesDocument,
@@ -39,9 +40,10 @@ type Documents = {
     "\n\tmutation resetPassword($data: ResetPasswordInput!) {\n\t\tresetPassword(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": typeof types.ResetPasswordDocument,
     "\n\tmutation updateAccount($data: UpdateAccountInput!) {\n\t\tupdateAccount(data: $data) {\n\t\t\t...UserFragment\n\t\t}\n\t}\n": typeof types.UpdateAccountDocument,
     "\n\tmutation deleteAccount($data: DeleteAccountInput!) {\n\t\tdeleteAccount(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": typeof types.DeleteAccountDocument,
-    "\n\tmutation setSavedItemLabels($data: SetSavedItemLabelsInput!) {\n\t\tsetSavedItemLabels(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": typeof types.SetSavedItemLabelsDocument,
-    "\n\tmutation updateSavedItemStatus($data: UpdateSavedItemStatusInput!) {\n\t\tupdateSavedItemStatus(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": typeof types.UpdateSavedItemStatusDocument,
-    "\n\tmutation updateReadingProgress($data: UpdateReadingProgressInput!) {\n\t\tupdateReadingProgress(data: $data) {\n\t\t\tid\n\t\t\treadingProgress\n\t\t}\n\t}\n": typeof types.UpdateReadingProgressDocument,
+    "\n\tmutation updateSavedItemsReadStatus($data: UpdateSavedItemsReadStatusInput!) {\n\t\tupdateSavedItemsReadStatus(data: $data) {\n\t\t\t...SavedItemFragment\n\t\t}\n\t}\n": typeof types.UpdateSavedItemsReadStatusDocument,
+    "\n\tmutation setSavedItemLabels($data: SetSavedItemLabelsInput!) {\n\t\tsetSavedItemLabels(data: $data) {\n\t\t\t...SavedItemLabelsFragment\n\t\t}\n\t}\n": typeof types.SetSavedItemLabelsDocument,
+    "\n\tmutation updateSavedItemsStatus($data: UpdateSavedItemsStatusInput!) {\n\t\tupdateSavedItemsStatus(data: $data) {\n\t\t\t...SavedItemFragment\n\t\t}\n\t}\n": typeof types.UpdateSavedItemsStatusDocument,
+    "\n\tmutation updateReadingProgress($data: UpdateReadingProgressInput!) {\n\t\tupdateReadingProgress(data: $data) {\n\t\t\t...SavedItemFragment\n\t\t}\n\t}\n": typeof types.UpdateReadingProgressDocument,
     "\n\tmutation permanentlyDeleteSavedItems($data: PermanentlyDeleteSavedItemsInput!) {\n\t\tpermanentlyDeleteSavedItems(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": typeof types.PermanentlyDeleteSavedItemsDocument,
     "\n\tmutation emptyTrash {\n\t\temptyTrash {\n\t\t\tsuccess\n\t\t\tcount\n\t\t}\n\t}\n": typeof types.EmptyTrashDocument,
     "\n\tmutation createLabel($data: CreateLabelInput!) {\n\t\tcreateLabel(data: $data) {\n\t\t\t...SavedItemLabelFragment\n\t\t}\n\t}\n": typeof types.CreateLabelDocument,
@@ -63,7 +65,7 @@ type Documents = {
 };
 const documents: Documents = {
     "\n\tfragment UserFragment on User {\n\t\tid\n\t\tcreatedAt\n\t\temailAddress\n\t\tisEmailVerified\n\t\tusername\n\t\tpendingEmailAddress\n\t\tlabelsCount\n\t\tinboundEmailAddressesCount\n\t}\n": types.UserFragmentFragmentDoc,
-    "\n\tfragment SavedItemFragment on SavedItem {\n\t\tid\n\t\tcreatedAt\n\t\ttitle\n\t\toriginalUrl\n\t\tsourceDomain\n\t\tdescription\n\t\tleadImage\n\t\twordCount\n\t\tauthor\n\t\ttype\n\t\tstatus\n\t\treadingProgress\n\t}\n": types.SavedItemFragmentFragmentDoc,
+    "\n\tfragment SavedItemFragment on SavedItem {\n\t\tid\n\t\tcreatedAt\n\t\ttitle\n\t\toriginalUrl\n\t\tsourceDomain\n\t\tdescription\n\t\tleadImage\n\t\twordCount\n\t\tauthor\n\t\ttype\n\t\tstatus\n\t\treadingProgress\n\t\treadAt\n\t\tisReadManual\n\t}\n": types.SavedItemFragmentFragmentDoc,
     "\n\tfragment SavedItemLabelFragment on Label {\n\t\tcreatedAt\n\t\tid\n\t\tname\n\t\tcolor\n\t}\n": types.SavedItemLabelFragmentFragmentDoc,
     "\n\tfragment SavedItemLabelsFragment on SavedItem {\n\t\tid\n\t\tlabels {\n\t\t\tid\n\t\t\t...SavedItemLabelFragment\n\t\t}\n\t}\n": types.SavedItemLabelsFragmentFragmentDoc,
     "\n\tfragment NewsletterFragment on Newsletter {\n\t\tcontentHtml\n\t\tcontentText\n\t\tsubscription {\n\t\t\tid\n\t\t\tcreatedAt\n\t\t\tname\n\t\t\tstatus\n\t\t\tlastReceivedAt\n\t\t\tunsubscribeUrl\n\t\t\tunsubscribeAttemptedAt\n\t\t}\n\t}\n": types.NewsletterFragmentFragmentDoc,
@@ -72,6 +74,7 @@ const documents: Documents = {
     "\n    fragment ApiTokenFragment on ApiToken {\n    \tid\n    \tcreatedAt\n    \tlastUsedAt\n    \tname\n    \texpiresAt\n    }\n": types.ApiTokenFragmentFragmentDoc,
     "\n\tfragment SavedQueryFragment on SavedQuery {\n\t\tid\n\t\tcreatedAt\n\t\tname\n\t\tquery\n\t}\n": types.SavedQueryFragmentFragmentDoc,
     "\n\tquery me {\n\t\tme {\n\t\t\tid\n\t\t\t...UserFragment\n\t\t}\n\t}\n": types.MeDocument,
+    "\n\tquery getUserStats {\n\t\tme {\n\t\t\tid\n\t\t\tstats {\n\t\t\t\titemsReadCountAllTime\n\t\t\t\titemsReadCountMonth\n\t\t\t\titemsReadCountWeek\n\t\t\t\testimatedReadingTimeCompleted\n\t\t\t\twordsReadCount\n\t\t\t\tunreadCount\n\t\t\t\treadCount\n\t\t\t\taverageArticleLength\n\t\t\t\taverageTimeToFinish\n\t\t\t}\n\t\t}\n\t}\n": types.GetUserStatsDocument,
     "\n\tquery labels {\n\t\tlabels {\n\t\t\tid\n\t\t\t...SavedItemLabelFragment\n\t\t}\n\t}\n": types.LabelsDocument,
     "\n\tquery savedItem($query: GetSavedItemInput!) {\n\t\tsavedItem(query: $query) {\n\t\t\tid\n\t\t\t...SavedItemFragment\n\t\t\tlabels {\n\t\t\t\tid\n\t\t\t\t...SavedItemLabelFragment\n\t\t\t}\n\t\t\tarticle {\n\t\t\t\tcontentHtml\n\t\t\t\tcontentText\n\t\t\t}\n\t\t\tnewsletter {\n\t\t\t\t...NewsletterFragment\n\t\t\t}\n\t\t\thighlights {\n\t\t\t\t...HighlightFragment\n\t\t\t}\n\t\t}\n\t}\n": types.SavedItemDocument,
     "\n\tquery inboundEmailAddresses {\n\t\tinboundEmailAddresses {\n\t\t\tid\n\t\t\tcreatedAt\n\t\t\tfullAddress\n\t\t\tsubscriptions {\n\t\t\t\tid\n\t\t\t\tcreatedAt\n\t\t\t\tname\n\t\t\t\tstatus\n\t\t\t\tlastReceivedAt\n\t\t\t\tunsubscribeUrl\n\t\t\t\tunsubscribeAttemptedAt\n\t\t\t}\n\t\t}\n\t}\n": types.InboundEmailAddressesDocument,
@@ -87,9 +90,10 @@ const documents: Documents = {
     "\n\tmutation resetPassword($data: ResetPasswordInput!) {\n\t\tresetPassword(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": types.ResetPasswordDocument,
     "\n\tmutation updateAccount($data: UpdateAccountInput!) {\n\t\tupdateAccount(data: $data) {\n\t\t\t...UserFragment\n\t\t}\n\t}\n": types.UpdateAccountDocument,
     "\n\tmutation deleteAccount($data: DeleteAccountInput!) {\n\t\tdeleteAccount(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": types.DeleteAccountDocument,
-    "\n\tmutation setSavedItemLabels($data: SetSavedItemLabelsInput!) {\n\t\tsetSavedItemLabels(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": types.SetSavedItemLabelsDocument,
-    "\n\tmutation updateSavedItemStatus($data: UpdateSavedItemStatusInput!) {\n\t\tupdateSavedItemStatus(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": types.UpdateSavedItemStatusDocument,
-    "\n\tmutation updateReadingProgress($data: UpdateReadingProgressInput!) {\n\t\tupdateReadingProgress(data: $data) {\n\t\t\tid\n\t\t\treadingProgress\n\t\t}\n\t}\n": types.UpdateReadingProgressDocument,
+    "\n\tmutation updateSavedItemsReadStatus($data: UpdateSavedItemsReadStatusInput!) {\n\t\tupdateSavedItemsReadStatus(data: $data) {\n\t\t\t...SavedItemFragment\n\t\t}\n\t}\n": types.UpdateSavedItemsReadStatusDocument,
+    "\n\tmutation setSavedItemLabels($data: SetSavedItemLabelsInput!) {\n\t\tsetSavedItemLabels(data: $data) {\n\t\t\t...SavedItemLabelsFragment\n\t\t}\n\t}\n": types.SetSavedItemLabelsDocument,
+    "\n\tmutation updateSavedItemsStatus($data: UpdateSavedItemsStatusInput!) {\n\t\tupdateSavedItemsStatus(data: $data) {\n\t\t\t...SavedItemFragment\n\t\t}\n\t}\n": types.UpdateSavedItemsStatusDocument,
+    "\n\tmutation updateReadingProgress($data: UpdateReadingProgressInput!) {\n\t\tupdateReadingProgress(data: $data) {\n\t\t\t...SavedItemFragment\n\t\t}\n\t}\n": types.UpdateReadingProgressDocument,
     "\n\tmutation permanentlyDeleteSavedItems($data: PermanentlyDeleteSavedItemsInput!) {\n\t\tpermanentlyDeleteSavedItems(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": types.PermanentlyDeleteSavedItemsDocument,
     "\n\tmutation emptyTrash {\n\t\temptyTrash {\n\t\t\tsuccess\n\t\t\tcount\n\t\t}\n\t}\n": types.EmptyTrashDocument,
     "\n\tmutation createLabel($data: CreateLabelInput!) {\n\t\tcreateLabel(data: $data) {\n\t\t\t...SavedItemLabelFragment\n\t\t}\n\t}\n": types.CreateLabelDocument,
@@ -131,7 +135,7 @@ export function gql(source: "\n\tfragment UserFragment on User {\n\t\tid\n\t\tcr
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n\tfragment SavedItemFragment on SavedItem {\n\t\tid\n\t\tcreatedAt\n\t\ttitle\n\t\toriginalUrl\n\t\tsourceDomain\n\t\tdescription\n\t\tleadImage\n\t\twordCount\n\t\tauthor\n\t\ttype\n\t\tstatus\n\t\treadingProgress\n\t}\n"): (typeof documents)["\n\tfragment SavedItemFragment on SavedItem {\n\t\tid\n\t\tcreatedAt\n\t\ttitle\n\t\toriginalUrl\n\t\tsourceDomain\n\t\tdescription\n\t\tleadImage\n\t\twordCount\n\t\tauthor\n\t\ttype\n\t\tstatus\n\t\treadingProgress\n\t}\n"];
+export function gql(source: "\n\tfragment SavedItemFragment on SavedItem {\n\t\tid\n\t\tcreatedAt\n\t\ttitle\n\t\toriginalUrl\n\t\tsourceDomain\n\t\tdescription\n\t\tleadImage\n\t\twordCount\n\t\tauthor\n\t\ttype\n\t\tstatus\n\t\treadingProgress\n\t\treadAt\n\t\tisReadManual\n\t}\n"): (typeof documents)["\n\tfragment SavedItemFragment on SavedItem {\n\t\tid\n\t\tcreatedAt\n\t\ttitle\n\t\toriginalUrl\n\t\tsourceDomain\n\t\tdescription\n\t\tleadImage\n\t\twordCount\n\t\tauthor\n\t\ttype\n\t\tstatus\n\t\treadingProgress\n\t\treadAt\n\t\tisReadManual\n\t}\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -164,6 +168,10 @@ export function gql(source: "\n\tfragment SavedQueryFragment on SavedQuery {\n\t
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n\tquery me {\n\t\tme {\n\t\t\tid\n\t\t\t...UserFragment\n\t\t}\n\t}\n"): (typeof documents)["\n\tquery me {\n\t\tme {\n\t\t\tid\n\t\t\t...UserFragment\n\t\t}\n\t}\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n\tquery getUserStats {\n\t\tme {\n\t\t\tid\n\t\t\tstats {\n\t\t\t\titemsReadCountAllTime\n\t\t\t\titemsReadCountMonth\n\t\t\t\titemsReadCountWeek\n\t\t\t\testimatedReadingTimeCompleted\n\t\t\t\twordsReadCount\n\t\t\t\tunreadCount\n\t\t\t\treadCount\n\t\t\t\taverageArticleLength\n\t\t\t\taverageTimeToFinish\n\t\t\t}\n\t\t}\n\t}\n"): (typeof documents)["\n\tquery getUserStats {\n\t\tme {\n\t\t\tid\n\t\t\tstats {\n\t\t\t\titemsReadCountAllTime\n\t\t\t\titemsReadCountMonth\n\t\t\t\titemsReadCountWeek\n\t\t\t\testimatedReadingTimeCompleted\n\t\t\t\twordsReadCount\n\t\t\t\tunreadCount\n\t\t\t\treadCount\n\t\t\t\taverageArticleLength\n\t\t\t\taverageTimeToFinish\n\t\t\t}\n\t\t}\n\t}\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -227,15 +235,19 @@ export function gql(source: "\n\tmutation deleteAccount($data: DeleteAccountInpu
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n\tmutation setSavedItemLabels($data: SetSavedItemLabelsInput!) {\n\t\tsetSavedItemLabels(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n"): (typeof documents)["\n\tmutation setSavedItemLabels($data: SetSavedItemLabelsInput!) {\n\t\tsetSavedItemLabels(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n"];
+export function gql(source: "\n\tmutation updateSavedItemsReadStatus($data: UpdateSavedItemsReadStatusInput!) {\n\t\tupdateSavedItemsReadStatus(data: $data) {\n\t\t\t...SavedItemFragment\n\t\t}\n\t}\n"): (typeof documents)["\n\tmutation updateSavedItemsReadStatus($data: UpdateSavedItemsReadStatusInput!) {\n\t\tupdateSavedItemsReadStatus(data: $data) {\n\t\t\t...SavedItemFragment\n\t\t}\n\t}\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n\tmutation updateSavedItemStatus($data: UpdateSavedItemStatusInput!) {\n\t\tupdateSavedItemStatus(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n"): (typeof documents)["\n\tmutation updateSavedItemStatus($data: UpdateSavedItemStatusInput!) {\n\t\tupdateSavedItemStatus(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n"];
+export function gql(source: "\n\tmutation setSavedItemLabels($data: SetSavedItemLabelsInput!) {\n\t\tsetSavedItemLabels(data: $data) {\n\t\t\t...SavedItemLabelsFragment\n\t\t}\n\t}\n"): (typeof documents)["\n\tmutation setSavedItemLabels($data: SetSavedItemLabelsInput!) {\n\t\tsetSavedItemLabels(data: $data) {\n\t\t\t...SavedItemLabelsFragment\n\t\t}\n\t}\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n\tmutation updateReadingProgress($data: UpdateReadingProgressInput!) {\n\t\tupdateReadingProgress(data: $data) {\n\t\t\tid\n\t\t\treadingProgress\n\t\t}\n\t}\n"): (typeof documents)["\n\tmutation updateReadingProgress($data: UpdateReadingProgressInput!) {\n\t\tupdateReadingProgress(data: $data) {\n\t\t\tid\n\t\t\treadingProgress\n\t\t}\n\t}\n"];
+export function gql(source: "\n\tmutation updateSavedItemsStatus($data: UpdateSavedItemsStatusInput!) {\n\t\tupdateSavedItemsStatus(data: $data) {\n\t\t\t...SavedItemFragment\n\t\t}\n\t}\n"): (typeof documents)["\n\tmutation updateSavedItemsStatus($data: UpdateSavedItemsStatusInput!) {\n\t\tupdateSavedItemsStatus(data: $data) {\n\t\t\t...SavedItemFragment\n\t\t}\n\t}\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n\tmutation updateReadingProgress($data: UpdateReadingProgressInput!) {\n\t\tupdateReadingProgress(data: $data) {\n\t\t\t...SavedItemFragment\n\t\t}\n\t}\n"): (typeof documents)["\n\tmutation updateReadingProgress($data: UpdateReadingProgressInput!) {\n\t\tupdateReadingProgress(data: $data) {\n\t\t\t...SavedItemFragment\n\t\t}\n\t}\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

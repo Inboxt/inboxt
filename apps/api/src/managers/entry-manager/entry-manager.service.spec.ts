@@ -195,6 +195,13 @@ describe('EntryManagerService', () => {
 				expect(result.labels.and).toEqual([['Books']]);
 			});
 
+			it('should parse is:read and is:unread', () => {
+				expect((service as any).parseQuery('is:read').isRead).toBe(true);
+				expect((service as any).parseQuery('is:unread').isRead).toBe(false);
+				expect((service as any).parseQuery('-is:read').isRead).toBe(false);
+				expect((service as any).parseQuery('-is:unread').isRead).toBe(true);
+			});
+
 			it('should parse site filter', () => {
 				const result = (service as any).parseQuery('site:theverge.com');
 				expect(result.site).toBe('theverge.com');

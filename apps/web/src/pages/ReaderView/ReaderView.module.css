@@ -84,10 +84,6 @@
 	transition:
 		transform 0.3s ease,
 		opacity 0.3s ease;
-
-	@media (min-width: $mantine-breakpoint-md) {
-		display: none;
-	}
 }
 
 .bottomToolbarHidden {

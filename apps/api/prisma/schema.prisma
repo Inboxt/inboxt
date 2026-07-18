@@ -49,6 +49,8 @@ model saved_item {
   status           saved_item_status  @default(ACTIVE)
   deletedSince     DateTime?          @db.Timestamptz(6)
   readingProgress  Float?             @db.Real
+  readAt           DateTime?          @db.Timestamptz(6)
+  isReadManual     Boolean            @default(false)
   article          article?
   highlight        highlight[]
   newsletter       newsletter?

@@ -9,8 +9,9 @@ import { EmptyTrash } from './dto/empty-trash.model';
 import { GetSavedItemInput } from './dto/get-saved-item.input';
 import { PermanentlyDeleteSavedItemsInput } from './dto/permanently-delete-saved-items.input';
 import { SetSavedItemLabelsInput } from './dto/set-saved-item-labels.input';
-import { UpdateSavedItemStatusInput } from './dto/update-saved-item-status.input';
 import { UpdateReadingProgressInput } from './dto/update-reading-progress.input';
+import { UpdateSavedItemsReadStatusInput } from './dto/update-saved-items-read-status.input';
+import { UpdateSavedItemsStatusInput } from './dto/update-saved-items-status.input';
 import { Article } from './entities/article/article.model';
 import { ArticleService } from './entities/article/article.service';
 import { Label } from './entities/label/label.model';
@@ -39,17 +40,38 @@ export class SavedItemResolver {
 	}
 
 	@ApiTokenAllowed()
-	@Mutation(() => Void)
-	async updateSavedItemStatus(
+	@Mutation(() => [SavedItem])
+	async updateSavedItemsStatus(
 		@ActiveUserMeta() activeUser: ActiveUserMetaType,
-		@Args('data') data: UpdateSavedItemStatusInput,
+		@Args('data') data: UpdateSavedItemsStatusInput,
 	) {
 		const { ids, ...input } = data;
+		const results: SavedItem[] = [];
+
 		for (const id of ids) {
-			await this.savedItemService.updateStatus(activeUser.id, id, input.status);
+			results.push(
+				(await this.savedItemService.updateStatus(
+					activeUser.id,
+					id,
+					input.status,
+				)) as SavedItem,
+			);
 		}
 
-		return VOID_RESPONSE;
+		return results;
+	}
+
+	@ApiTokenAllowed()
+	@Mutation(() => [SavedItem])
+	async updateSavedItemsReadStatus(
+		@ActiveUserMeta() activeUser: ActiveUserMetaType,
+		@Args('data') data: UpdateSavedItemsReadStatusInput,
+	) {
+		return (await this.savedItemService.updateManyReadStatus(
+			activeUser.id,
+			data.ids,
+			data.isRead,
+		)) as SavedItem[];
 	}
 
 	@ApiTokenAllowed()
@@ -62,7 +84,7 @@ export class SavedItemResolver {
 	}
 
 	@ApiTokenAllowed()
-	@Mutation(() => Void)
+	@Mutation(() => [SavedItem])
 	async setSavedItemLabels(
 		@ActiveUserMeta() activeUser: ActiveUserMetaType,
 		@Args('data') data: SetSavedItemLabelsInput,
@@ -71,16 +93,14 @@ export class SavedItemResolver {
 		const allIds = ids ?? (id ? [id] : []);
 
 		if (allIds.length === 0) {
-			return VOID_RESPONSE;
+			return [];
 		}
 
-		await this.savedItemService.setManyLabels(activeUser.id, allIds, {
+		return (await this.savedItemService.setManyLabels(activeUser.id, allIds, {
 			set: labelIds,
 			add: addLabelIds,
 			remove: removeLabelIds,
-		});
-
-		return VOID_RESPONSE;
+		})) as SavedItem[];
 	}
 
 	@Mutation(() => Void)
