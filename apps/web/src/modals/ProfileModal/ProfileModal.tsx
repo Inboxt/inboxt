@@ -141,6 +141,25 @@ export const ProfileModal = ({ id, context }: ContextModalProps) => {
 					</Card>
 
 					<Card>
+						<Flex
+							justify="space-between"
+							align={{ base: 'stretch', xs: 'center' }}
+							gap="md"
+							direction={{ base: 'column', xs: 'row' }}
+						>
+							<Stack gap="xxxs">
+								<Title order={5}>Statistics</Title>
+								<Text size="xs" c="dimmed">
+									Detailed overview of your reading activity and habits.
+								</Text>
+							</Stack>
+							<Button onClick={modals.openStatsModal} size="xs" variant="light">
+								View Stats
+							</Button>
+						</Flex>
+					</Card>
+
+					<Card>
 						<Stack gap="md">
 							<Title order={5}>Install & access</Title>
 							<Flex

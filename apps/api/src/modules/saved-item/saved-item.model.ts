@@ -41,4 +41,10 @@ export class SavedItem implements Entry {
 
 	@Field({ nullable: true })
 	readingProgress?: number;
+
+	@Field({ nullable: true })
+	readAt?: Date;
+
+	@Field()
+	isReadManual: boolean;
 }

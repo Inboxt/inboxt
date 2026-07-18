@@ -106,9 +106,9 @@ export const ReaderView = () => {
 		debouncedUpdateProgress(progress);
 
 		const isAtBottom = scrollTop + clientHeight >= scrollHeight - 50;
-		const isAtTop = scrollTop < 50;
+		const isAtTop = scrollTop < 100;
 
-		if (isAtBottom) {
+		if (isAtBottom || !isAtTop) {
 			setToolbarVisible(true);
 		} else {
 			setToolbarVisible(false);
@@ -351,7 +351,6 @@ export const ReaderView = () => {
 								<Box hiddenFrom="md">
 									<ReaderSettingsOptions
 										direction="row"
-										variant="menu"
 										item={(savedItem as SavedItem) || null}
 										loading={isActionsLoading}
 										onLoadingChange={setIsActionsLoading}
@@ -372,6 +371,8 @@ export const ReaderView = () => {
 								item={(data?.savedItem as SavedItem) || null}
 								loading={isActionsLoading}
 								onLoadingChange={setIsActionsLoading}
+								onActionComplete={handleActionComplete}
+								showAllOptions
 							/>
 						</Box>
 
@@ -503,8 +504,7 @@ export const ReaderView = () => {
 							<Box
 								className={clsx(
 									classes.bottomToolbar,
-									(!toolbarVisible || !headerVisible) &&
-										classes.bottomToolbarHidden,
+									!toolbarVisible && classes.bottomToolbarHidden,
 								)}
 								hiddenFrom="md"
 							>

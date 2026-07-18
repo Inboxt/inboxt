@@ -7,6 +7,7 @@ import {
 	IconMail,
 	IconSearch,
 	IconSettings,
+	IconChartBar,
 	IconTags,
 } from '@tabler/icons-react';
 import { useNavigate } from '@tanstack/react-router';
@@ -36,6 +37,11 @@ export const UserMenu = () => {
 			label: 'Profile',
 			icon: <IconSettings />,
 			action: modals.openProfileModal,
+		},
+		{
+			label: 'Stats',
+			icon: <IconChartBar />,
+			action: modals.openStatsModal,
 		},
 		{
 			label: 'Emails',
@@ -70,7 +76,7 @@ export const UserMenu = () => {
 	];
 
 	return (
-		<MenuDrawer items={USER_MENU_ITEMS} label="Quick Actions" height={386}>
+		<MenuDrawer items={USER_MENU_ITEMS} label="Quick Actions" height={440}>
 			<Avatar
 				name={data?.me?.username || 'User'}
 				color="initials"

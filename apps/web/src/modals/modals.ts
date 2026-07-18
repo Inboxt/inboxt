@@ -44,6 +44,16 @@ export const modals = {
 			className: 'fullscreen-modal',
 		});
 	},
+	openStatsModal: () => {
+		return mantineModals.openContextModal({
+			modal: 'stats',
+			size: 640,
+			centered: true,
+			title: 'Reading Stats',
+			innerProps: {},
+			className: 'fullscreen-modal',
+		});
+	},
 
 	openCreateLabelModal: () => {
 		return mantineModals.openContextModal({

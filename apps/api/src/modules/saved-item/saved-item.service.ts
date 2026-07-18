@@ -16,6 +16,14 @@ export class SavedItemService {
 		private readonly labelService: LabelService,
 	) {}
 
+	async count(userId: string, query: Prisma.saved_itemCountArgs) {
+		return this.prisma.saved_item.count({ ...query, where: { ...query.where, userId } });
+	}
+
+	async aggregate(userId: string, query: Prisma.Saved_itemAggregateArgs) {
+		return this.prisma.saved_item.aggregate({ ...query, where: { ...query.where, userId } });
+	}
+
 	async get(
 		userId: string,
 		query: Prisma.saved_itemFindUniqueArgs,
@@ -52,6 +60,11 @@ export class SavedItemService {
 		// ---------- Type ----------
 		if (query?.type) {
 			prismaWhere.type = query.type;
+		}
+
+		// ---------- Read Status ----------
+		if (query?.isRead !== undefined) {
+			prismaWhere.readAt = query.isRead ? { not: null } : null;
 		}
 
 		// ---------- Labels ----------
@@ -154,7 +167,10 @@ export class SavedItemService {
 		// ---------- Reading Progress ----------
 		if (query.progress) {
 			prismaWhere.readingProgress = {
-				gte: query.progress.from !== undefined ? (query.progress.from - 0.5) / 100 : undefined,
+				gte:
+					query.progress.from !== undefined
+						? (query.progress.from - 0.5) / 100
+						: undefined,
 				lte: query.progress.to !== undefined ? (query.progress.to + 0.5) / 100 : undefined,
 			};
 		}
@@ -248,12 +264,30 @@ export class SavedItemService {
 			throw new AppException('Item not found', HttpStatus.NOT_FOUND);
 		}
 
+		const data: Prisma.saved_itemUpdateInput = {
+			readingProgress,
+		};
+
+		if (readingProgress > 0.95 && !existingItem.isReadManual && !existingItem.readAt) {
+			data.readAt = dayjs().toDate();
+		}
+
 		return this.prisma.saved_item.update({
 			where: { id, userId },
+			data,
+		});
+	}
+
+	async updateManyReadStatus(userId: string, ids: string[], isRead: boolean) {
+		await this.prisma.saved_item.updateMany({
+			where: { id: { in: ids }, userId },
 			data: {
-				readingProgress,
+				readAt: isRead ? dayjs().toDate() : null,
+				isReadManual: true,
 			},
 		});
+
+		return this.getMany(userId, { where: { id: { in: ids } } });
 	}
 
 	async getLabels(userId: string, id: string) {
@@ -320,7 +354,7 @@ export class SavedItemService {
 		});
 
 		if (items.length === 0) {
-			return;
+			return [];
 		}
 
 		const itemIds = items.map((i) => i.id);
@@ -351,40 +385,40 @@ export class SavedItemService {
 					skipDuplicates: true,
 				});
 			});
+		} else {
+			if (labels?.add?.length) {
+				const validLabels = await this.labelService.getMany(userId, {
+					where: {
+						id: { in: labels.add },
+					},
+					select: { id: true },
+				});
+				const validLabelIds = validLabels.map((l) => l.id);
 
-			return;
-		}
-
-		if (labels?.add?.length) {
-			const validLabels = await this.labelService.getMany(userId, {
-				where: {
-					id: { in: labels.add },
-				},
-				select: { id: true },
-			});
-			const validLabelIds = validLabels.map((l) => l.id);
-
-			const data: Prisma.saved_item_labelCreateManyInput[] = [];
-			for (const itemId of itemIds) {
-				for (const labelId of validLabelIds) {
-					data.push({ labelId, savedItemId: itemId });
+				const data: Prisma.saved_item_labelCreateManyInput[] = [];
+				for (const itemId of itemIds) {
+					for (const labelId of validLabelIds) {
+						data.push({ labelId, savedItemId: itemId });
+					}
 				}
+
+				await this.prisma.saved_item_label.createMany({
+					data,
+					skipDuplicates: true,
+				});
 			}
 
-			await this.prisma.saved_item_label.createMany({
-				data,
-				skipDuplicates: true,
-			});
+			if (labels?.remove?.length) {
+				await this.prisma.saved_item_label.deleteMany({
+					where: {
+						savedItemId: { in: itemIds },
+						labelId: { in: labels.remove },
+					},
+				});
+			}
 		}
 
-		if (labels?.remove?.length) {
-			await this.prisma.saved_item_label.deleteMany({
-				where: {
-					savedItemId: { in: itemIds },
-					labelId: { in: labels.remove },
-				},
-			});
-		}
+		return this.getMany(userId, { where: { id: { in: itemIds } } });
 	}
 
 	async delete(userId: string, id: string) {

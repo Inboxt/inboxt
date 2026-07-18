@@ -15,17 +15,19 @@ import { ReaderSettingsPopover } from '../ReaderSettingsPopover';
 type ReaderSettingsOptionsProps = {
 	item: SavedItem | null;
 	direction?: 'column' | 'row';
-	variant?: 'full' | 'menu';
+	showAllOptions?: boolean;
 	loading?: boolean;
 	onLoadingChange?: (loading: boolean) => void;
+	onActionComplete?: () => void | Promise<void>;
 };
 
 export const ReaderSettingsOptions = ({
 	item,
 	direction = 'column',
-	variant = 'full',
+	showAllOptions = false,
 	loading: externalLoading,
 	onLoadingChange,
+	onActionComplete: externalOnActionComplete,
 }: ReaderSettingsOptionsProps) => {
 	const router = useRouter();
 	const canGoBack = useCanGoBack();
@@ -55,6 +57,11 @@ export const ReaderSettingsOptions = ({
 	};
 
 	const handleActionComplete = async () => {
+		if (externalOnActionComplete) {
+			await externalOnActionComplete();
+			return;
+		}
+
 		if (nextId) {
 			await navigate({
 				to: '/r/$id',
@@ -103,7 +110,7 @@ export const ReaderSettingsOptions = ({
 				<FormReadingThemeSettings />
 			</ReaderSettingsPopover>
 
-			{variant === 'full' && (
+			{showAllOptions && (
 				<>
 					<Divider
 						color="var(--reader-border-color)"
@@ -136,15 +143,6 @@ export const ReaderSettingsOptions = ({
 						onLoadingChange={handleLoadingChange}
 					/>
 				</>
-			)}
-
-			{variant === 'menu' && (
-				<ItemsOptions
-					items={[item]}
-					mode="reader-menu"
-					onActionComplete={handleActionComplete}
-					onLoadingChange={handleLoadingChange}
-				/>
 			)}
 		</Flex>
 	);

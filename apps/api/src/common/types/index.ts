@@ -18,6 +18,7 @@ export interface GetSavedItemsQuery {
 	saved?: { from?: string; to?: string };
 	progress?: { from?: number; to?: number };
 	readingTime?: { from?: number; to?: number };
+	isRead?: boolean;
 	first?: number;
 	after?: string;
 }
@@ -47,6 +48,7 @@ export interface ParsedQuery {
 	saved?: { from?: string; to?: string };
 	progress?: { from?: number; to?: number };
 	readingTime?: { from?: number; to?: number };
+	isRead?: boolean;
 	sort?: { field: string; direction: string };
 }
 

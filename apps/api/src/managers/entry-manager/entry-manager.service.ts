@@ -144,6 +144,12 @@ export class EntryManagerService {
 					}
 				} else if (key === 'no' && ['label', 'labels'].includes(value)) {
 					result.noLabels = !isNegated;
+				} else if (key === 'is') {
+					if (value === 'read') {
+						result.isRead = !isNegated;
+					} else if (value === 'unread') {
+						result.isRead = isNegated;
+					}
 				} else if (key === 'sort') {
 					const [fieldRaw, direction] = value.split('_');
 					if (fieldRaw && direction) {
@@ -190,6 +196,7 @@ export class EntryManagerService {
 			saved,
 			progress,
 			readingTime,
+			isRead,
 			sort: sortFromQuery,
 		} = parsed;
 
@@ -238,6 +245,7 @@ export class EntryManagerService {
 				saved,
 				progress,
 				readingTime,
+				isRead,
 				sort: finalSort,
 			};
 		}

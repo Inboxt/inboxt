@@ -112,11 +112,15 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 
 					<Group wrap="nowrap" gap="md" justify="space-between" pos="relative">
 						<Text
-							fw="700"
+							fw={item.readAt ? '400' : '700'}
 							lineClamp={1}
 							fz="lg"
 							maw={hovered ? '75%' : 'unset'}
-							c="var(--mantine-color-text)"
+							c={
+								item.readAt
+									? 'var(--mantine-color-dimmed)'
+									: 'var(--mantine-color-text)'
+							}
 						>
 							{item.title}
 						</Text>

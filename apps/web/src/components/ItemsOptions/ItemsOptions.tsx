@@ -7,6 +7,8 @@ import {
 	IconDots,
 	IconEraser,
 	IconFileText,
+	IconCircleCheck,
+	IconBook,
 	IconProps,
 	IconTag,
 	IconTrash,
@@ -22,7 +24,8 @@ import { ToastProps } from '~components/Toast/type.ts';
 import { SelectableItem, useContentSelection } from '~context/content-selection';
 import {
 	PERMANENTLY_DELETE_SAVED_ITEMS,
-	UPDATE_SAVED_ITEM_STATUS,
+	UPDATE_SAVED_ITEMS_STATUS,
+	UPDATE_SAVED_ITEMS_READ_STATUS,
 	DELETE_HIGHLIGHTS,
 	ENTRIES,
 	ACTIVE_USER,
@@ -73,7 +76,7 @@ export const ItemsOptions = ({
 	onLoadingChange,
 }: ItemsOptionsProps) => {
 	const isSmall = size === 'sm';
-	const [updateStatus, { loading: updateLoading }] = useMutation(UPDATE_SAVED_ITEM_STATUS, {
+	const [updateStatus, { loading: updateLoading }] = useMutation(UPDATE_SAVED_ITEMS_STATUS, {
 		refetchQueries: [ENTRIES],
 	});
 	const [deleteHighlights, { loading: deleteLoading }] = useMutation(DELETE_HIGHLIGHTS, {
@@ -82,10 +85,18 @@ export const ItemsOptions = ({
 	const [permanentlyDeleteSavedItems] = useMutation(PERMANENTLY_DELETE_SAVED_ITEMS, {
 		refetchQueries: [ENTRIES, ACTIVE_USER],
 	});
+	const [updateReadStatus, { loading: readStatusLoading }] = useMutation(
+		UPDATE_SAVED_ITEMS_READ_STATUS,
+		{
+			refetchQueries: [ENTRIES],
+		},
+	);
+
 	const { setSelectedItems } = useContentSelection();
 	const navigate = useNavigate();
 	const [activeOptionLabel, setActiveOptionLabel] = useState<string | null>(null);
-	const loading = updateLoading || deleteLoading || activeOptionLabel !== null;
+	const loading =
+		updateLoading || deleteLoading || readStatusLoading || activeOptionLabel !== null;
 
 	React.useEffect(() => {
 		onLoadingChange?.(loading);
@@ -175,7 +186,7 @@ export const ItemsOptions = ({
 		{
 			label: 'Edit labels',
 			icon: IconTag,
-			modes: ['single', 'bulk', 'reader', 'reader-menu'],
+			modes: ['single', 'bulk', 'reader', 'reader-toolbar'],
 			clearsSelection: false,
 			runsOnActionComplete: false,
 			visible: () =>
@@ -195,9 +206,55 @@ export const ItemsOptions = ({
 			},
 		},
 		{
+			label: 'Mark as read',
+			icon: IconCircleCheck,
+			modes: ['single', 'bulk', 'reader', 'reader-toolbar'],
+			visible: () => savedItems.length > 0 && savedItems.some((i) => !i.readAt),
+			onClick: async () => {
+				const ids = savedItems.filter((i) => !i.readAt).map((i) => i.id);
+				if (ids.length === 0) {
+					return undefined;
+				}
+
+				await updateReadStatus({
+					variables: { data: { ids, isRead: true } },
+				});
+
+				return showSuccessToast({
+					title:
+						ids.length > 1
+							? `${ids.length} items marked as read.`
+							: 'Item marked as read.',
+				});
+			},
+		},
+		{
+			label: 'Mark as unread',
+			icon: IconBook,
+			modes: ['single', 'bulk', 'reader', 'reader-toolbar'],
+			visible: () => savedItems.length > 0 && savedItems.some((i) => !!i.readAt),
+			onClick: async () => {
+				const ids = savedItems.filter((i) => !!i.readAt).map((i) => i.id);
+				if (ids.length === 0) {
+					return undefined;
+				}
+
+				await updateReadStatus({
+					variables: { data: { ids, isRead: false } },
+				});
+
+				return showSuccessToast({
+					title:
+						ids.length > 1
+							? `${ids.length} items marked as unread.`
+							: 'Item marked as unread.',
+				});
+			},
+		},
+		{
 			label: 'Restore',
 			icon: IconArrowBackUp,
-			modes: ['single', 'bulk', 'reader', 'reader-menu', 'reader-toolbar'],
+			modes: ['single', 'bulk', 'reader', 'reader-toolbar'],
 			visible: () =>
 				savedItems.length > 0 &&
 				savedItems.some((i) => i.status !== SavedItemStatus.Active),
@@ -228,7 +285,7 @@ export const ItemsOptions = ({
 		{
 			label: 'Move to archive',
 			icon: IconArchive,
-			modes: ['single', 'bulk', 'reader', 'reader-menu', 'reader-toolbar'],
+			modes: ['single', 'bulk', 'reader', 'reader-toolbar'],
 			visible: () =>
 				savedItems.length > 0 &&
 				savedItems.some((i) => i.status !== SavedItemStatus.Archived),
@@ -262,7 +319,7 @@ export const ItemsOptions = ({
 		{
 			label: 'Move to trash',
 			icon: IconTrash,
-			modes: ['single', 'bulk', 'reader', 'reader-menu', 'reader-toolbar'],
+			modes: ['single', 'bulk', 'reader', 'reader-toolbar'],
 			visible: () =>
 				savedItems.length > 0 &&
 				savedItems.some((i) => i.status !== SavedItemStatus.Deleted),
@@ -296,7 +353,7 @@ export const ItemsOptions = ({
 		{
 			label: 'Delete permanently',
 			icon: IconTrashX,
-			modes: ['single', 'bulk', 'reader', 'reader-menu'],
+			modes: ['single', 'bulk', 'reader', 'reader-toolbar'],
 			visible: () =>
 				savedItems.length > 0 &&
 				savedItems.some((i) => i.status === SavedItemStatus.Deleted),

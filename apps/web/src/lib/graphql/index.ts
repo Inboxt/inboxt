@@ -31,6 +31,8 @@ export const SAVED_ITEM_FRAGMENT = gql(`
 		type
 		status
 		readingProgress
+		readAt
+		isReadManual
 	}
 `);
 
@@ -130,6 +132,25 @@ export const ACTIVE_USER = gql(`
 		me {
 			id
 			...UserFragment
+		}
+	}
+`);
+
+export const GET_USER_STATS = gql(`
+	query getUserStats {
+		me {
+			id
+			stats {
+				itemsReadCountAllTime
+				itemsReadCountMonth
+				itemsReadCountWeek
+				estimatedReadingTimeCompleted
+				wordsReadCount
+				unreadCount
+				readCount
+				averageArticleLength
+				averageTimeToFinish
+			}
 		}
 	}
 `);
@@ -291,18 +312,26 @@ export const DELETE_ACCOUNT = gql(`
 	}
 `);
 
-export const SET_SAVED_ITEM_LABELS = gql(`
-	mutation setSavedItemLabels($data: SetSavedItemLabelsInput!) {
-		setSavedItemLabels(data: $data) {
-			success
+export const UPDATE_SAVED_ITEMS_READ_STATUS = gql(`
+	mutation updateSavedItemsReadStatus($data: UpdateSavedItemsReadStatusInput!) {
+		updateSavedItemsReadStatus(data: $data) {
+			...SavedItemFragment
 		}
 	}
 `);
 
-export const UPDATE_SAVED_ITEM_STATUS = gql(`
-	mutation updateSavedItemStatus($data: UpdateSavedItemStatusInput!) {
-		updateSavedItemStatus(data: $data) {
-			success
+export const SET_SAVED_ITEM_LABELS = gql(`
+	mutation setSavedItemLabels($data: SetSavedItemLabelsInput!) {
+		setSavedItemLabels(data: $data) {
+			...SavedItemLabelsFragment
+		}
+	}
+`);
+
+export const UPDATE_SAVED_ITEMS_STATUS = gql(`
+	mutation updateSavedItemsStatus($data: UpdateSavedItemsStatusInput!) {
+		updateSavedItemsStatus(data: $data) {
+			...SavedItemFragment
 		}
 	}
 `);
@@ -310,8 +339,7 @@ export const UPDATE_SAVED_ITEM_STATUS = gql(`
 export const UPDATE_READING_PROGRESS = gql(`
 	mutation updateReadingProgress($data: UpdateReadingProgressInput!) {
 		updateReadingProgress(data: $data) {
-			id
-			readingProgress
+			...SavedItemFragment
 		}
 	}
 `);

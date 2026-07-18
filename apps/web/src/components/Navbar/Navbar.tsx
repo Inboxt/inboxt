@@ -13,6 +13,7 @@ import {
 import { useDisclosure } from '@mantine/hooks';
 import {
 	IconArchive,
+	IconCircleCheck,
 	IconChevronDown,
 	IconChevronUp,
 	IconHighlight,
@@ -39,13 +40,19 @@ const NAV_LINKS = [
 		id: 'inbox',
 		label: 'Inbox',
 		icon: <IconHome size={21} />,
-		query: 'in:inbox type:article',
+		query: 'in:inbox type:article is:unread',
 	},
 	{
 		id: 'newsletters',
 		label: 'Newsletters',
 		icon: <IconMail size={21} />,
-		query: 'in:inbox type:newsletter',
+		query: 'in:inbox type:newsletter is:unread',
+	},
+	{
+		id: 'read',
+		label: 'Read',
+		icon: <IconCircleCheck size={21} />,
+		query: 'in:inbox is:read',
 	},
 	{
 		id: 'highlights',
