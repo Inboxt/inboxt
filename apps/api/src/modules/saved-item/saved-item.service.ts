@@ -41,6 +41,7 @@ export class SavedItemService {
 		const prismaWhere: Prisma.saved_itemWhereInput = {
 			userId,
 			status: query?.status,
+			parsingStatus: query?.parsingStatus,
 		};
 
 		// ---------- Free text ----------

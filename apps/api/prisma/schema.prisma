@@ -50,7 +50,8 @@ model saved_item {
   deletedSince     DateTime?          @db.Timestamptz(6)
   readingProgress  Float?             @db.Real
   readAt           DateTime?          @db.Timestamptz(6)
-  isReadManual     Boolean            @default(false)
+  isReadManual     Boolean                   @default(false)
+  parsingStatus    saved_item_parsing_status @default(PROCESSING)
   article          article?
   highlight        highlight[]
   newsletter       newsletter?
@@ -197,6 +198,12 @@ enum saved_item_status {
 enum saved_item_type {
   NEWSLETTER
   ARTICLE
+}
+
+enum saved_item_parsing_status {
+  FAILED
+  PROCESSING
+  PARSED
 }
 
 enum newsletter_subscription_status {
