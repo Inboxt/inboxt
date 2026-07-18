@@ -20,6 +20,7 @@ import {
 	NEWSLETTER_PROCESSING_TITLE,
 } from '~common/constants/content-extraction.constants';
 import { getDefaultItems } from '~common/content';
+import { SavedItemParsingStatus } from '~common/enums/saved-item-parsing-status.enum';
 import { SavedItemType } from '~common/enums/saved-item-type.enum';
 import { AppException } from '~common/utils/app-exception';
 import { InboundEmailAddressService } from '~modules/inbound-email-address/inbound-email-address.service';
@@ -99,6 +100,7 @@ export class SavedItemManagerService {
 
 		const created = await this.savedItemService.create(userId, {
 			type: SavedItemType.ARTICLE,
+			parsingStatus: SavedItemParsingStatus.PROCESSING,
 			title:
 				prismaData?.title ||
 				ITEM_PROCESSING_TITLE(prismaData?.originalUrl ?? input.url ?? ''),
@@ -174,6 +176,7 @@ export class SavedItemManagerService {
 		await this.savedItemService.update(userId, savedItemId, {
 			title,
 			description: message,
+			parsingStatus: SavedItemParsingStatus.FAILED,
 		});
 
 		if (existing.type === SavedItemType.ARTICLE) {
@@ -220,6 +223,7 @@ export class SavedItemManagerService {
 						parsed?.description ??
 						DEFAULT_PROCESSED_ITEM_CONTENT,
 					leadImage: prismaData?.leadImage ?? parsed?.leadImage ?? null,
+					parsingStatus: SavedItemParsingStatus.PARSED,
 				},
 				client,
 			);
@@ -312,8 +316,8 @@ export class SavedItemManagerService {
 	) {
 		const created = await this.savedItemService.create(userId, {
 			type: SavedItemType.NEWSLETTER,
+			parsingStatus: SavedItemParsingStatus.PROCESSING,
 			title: prismaData?.title ?? NEWSLETTER_PROCESSING_TITLE,
-			wordCount: prismaData?.wordCount || 0,
 			description: prismaData?.description ?? NEWSLETTER_PROCESSING_CONTENT,
 			...prismaData,
 		});
@@ -362,6 +366,7 @@ export class SavedItemManagerService {
 						prismaData?.description ??
 						parsed?.description ??
 						DEFAULT_PROCESSED_ITEM_CONTENT,
+					parsingStatus: SavedItemParsingStatus.PARSED,
 				},
 				client,
 			);

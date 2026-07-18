@@ -1,11 +1,13 @@
 import { EntrySort } from '~managers/entry-manager/dto/entry-sort.input';
 
+import { SavedItemParsingStatus } from '../enums/saved-item-parsing-status.enum';
 import { SavedItemStatus } from '../enums/saved-item-status.enum';
 import { SavedItemType } from '../enums/saved-item-type.enum';
 
 export interface GetSavedItemsQuery {
 	status?: SavedItemStatus;
 	type?: SavedItemType;
+	parsingStatus?: SavedItemParsingStatus;
 	sort?: EntrySort;
 	labels?: {
 		and?: string[][];
@@ -49,6 +51,7 @@ export interface ParsedQuery {
 	progress?: { from?: number; to?: number };
 	readingTime?: { from?: number; to?: number };
 	isRead?: boolean;
+	parsingStatus?: string;
 	sort?: { field: string; direction: string };
 }
 

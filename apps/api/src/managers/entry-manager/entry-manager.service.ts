@@ -1,5 +1,6 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 
+import { SavedItemParsingStatus } from '~common/enums/saved-item-parsing-status.enum';
 import { SavedItemStatus } from '~common/enums/saved-item-status.enum';
 import { SavedItemType } from '~common/enums/saved-item-type.enum';
 import { GetHighlightsQuery, GetSavedItemsQuery, ParsedQuery } from '~common/types';
@@ -149,6 +150,18 @@ export class EntryManagerService {
 						result.isRead = !isNegated;
 					} else if (value === 'unread') {
 						result.isRead = isNegated;
+					} else if (value === 'failed') {
+						result.parsingStatus = isNegated
+							? SavedItemParsingStatus.PARSED
+							: SavedItemParsingStatus.FAILED;
+					} else if (value === 'processing') {
+						result.parsingStatus = isNegated
+							? SavedItemParsingStatus.PARSED
+							: SavedItemParsingStatus.PROCESSING;
+					} else if (value === 'parsed') {
+						result.parsingStatus = isNegated
+							? SavedItemParsingStatus.FAILED
+							: SavedItemParsingStatus.PARSED;
 					}
 				} else if (key === 'sort') {
 					const [fieldRaw, direction] = value.split('_');
@@ -197,6 +210,7 @@ export class EntryManagerService {
 			progress,
 			readingTime,
 			isRead,
+			parsingStatus,
 			sort: sortFromQuery,
 		} = parsed;
 
@@ -246,6 +260,7 @@ export class EntryManagerService {
 				progress,
 				readingTime,
 				isRead,
+				parsingStatus: parsingStatus as SavedItemParsingStatus,
 				sort: finalSort,
 			};
 		}
