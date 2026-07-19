@@ -40,7 +40,7 @@ export const FooterLinks = ({ separator = '•', position = 'left' }: FooterLink
 				>
 					Open Source
 				</Anchor>
-				{' · Licensed under AGPL-3.0'}
+				{' · Licensed under AGPL-3.0-only'}
 			</Text>
 		</Flex>
 	);

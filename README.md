@@ -41,6 +41,7 @@ Inboxt is a modern monorepo built for speed and type safety using **React**, **V
 - `apps/web-extension`: Browser extension.
 - `libs/common`: Shared types and logic.
 - `libs/ui`: Shared UI components.
+- `docs`: Official documentation (VitePress).
 
 ## Getting Started
 
@@ -89,7 +90,9 @@ Looking to report a vulnerability? Please refer to our **[SECURITY.md](./SECURIT
 
 ## License
 
-This project is licensed under the **AGPL-3.0**.
+The Inboxt application source code, including the API, web application, browser extension, and shared libraries, is licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**.
+
+The documentation in the `docs` directory is licensed separately under the **MIT License**.
 
 Third-party clients, integrations, and extensions that communicate with the server exclusively via the public API are not considered derivative works.
 
