@@ -40,7 +40,7 @@ import { AppService } from './app.service';
 	imports: [
 		ServeStaticModule.forRoot({
 			rootPath: join(process.cwd(), 'public'),
-			exclude: ['/api/*path'],
+			exclude: ['/api', '/api/*path'],
 		}),
 		ConfigModule.forRoot({
 			isGlobal: true,
@@ -110,7 +110,7 @@ import { AppService } from './app.service';
 						}),
 						messageKey: 'message',
 					},
-					forRoutes: [{ method: RequestMethod.ALL, path: '*splat' }],
+					forRoutes: [{ method: RequestMethod.ALL, path: '*path' }],
 				};
 			},
 			inject: [ConfigService],

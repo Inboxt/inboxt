@@ -6,7 +6,7 @@ import { User } from '~lib/graphql';
 import { modals } from '~modals/modals';
 
 type UnverifiedEmailAlertProps = {
-	user: User | null;
+	user: Omit<User, 'stats'> | null;
 };
 
 export const UnverifiedEmailAlert = ({ user }: UnverifiedEmailAlertProps) => {

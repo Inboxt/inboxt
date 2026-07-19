@@ -2,7 +2,6 @@ import { Controller, Get, HttpStatus, Param, Query, Res } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createHmac, timingSafeEqual } from 'crypto';
 import { Response } from 'express';
-import { createReadStream } from 'fs';
 import { stat } from 'fs/promises';
 import { join, normalize } from 'path';
 
@@ -76,7 +75,7 @@ export class AppController {
 		}
 
 		const exportsConfig = this.configService.getOrThrow('exports', { infer: true });
-		const baseDir = normalize(exportsConfig.localPath);
+		const baseDir = normalize(join(process.cwd(), exportsConfig.localPath));
 		const filePath = normalize(join(baseDir, userId, filename));
 
 		if (!filePath.startsWith(baseDir)) {
@@ -89,12 +88,7 @@ export class AppController {
 				throw new Error('Not a file');
 			}
 
-			res.setHeader('Content-Type', 'application/zip');
-			res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
-			res.setHeader('Content-Length', stats.size);
-
-			const stream = createReadStream(filePath);
-			stream.pipe(res);
+			res.download(filePath, filename);
 		} catch (_err) {
 			throw new AppException('Export file not found', HttpStatus.NOT_FOUND);
 		}
