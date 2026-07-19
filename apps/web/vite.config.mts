@@ -79,6 +79,9 @@ export default defineConfig(({ mode }) => {
 				devOptions: {
 					enabled: mode === 'development',
 				},
+				workbox: {
+					navigateFallbackDenylist: [/^\/api/],
+				},
 			}),
 		],
 		resolve: {
