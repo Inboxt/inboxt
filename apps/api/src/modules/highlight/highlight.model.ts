@@ -13,4 +13,10 @@ export class Highlight implements Entry {
 
 	@Field(() => SavedItem, { nullable: true })
 	savedItem?: SavedItem;
+
+	@Field(() => String, { nullable: true })
+	savedItemTitle?: string;
+
+	@Field(() => String, { nullable: true })
+	savedItemOriginalUrl?: string;
 }

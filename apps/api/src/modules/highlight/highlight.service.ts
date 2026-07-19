@@ -7,13 +7,17 @@ import { Prisma } from '@inboxt/prisma';
 import { GetHighlightsQuery } from '~common/types';
 import { AppException } from '~common/utils/app-exception';
 import { PrismaService } from '~modules/prisma/prisma.service';
+import { SavedItemService } from '~modules/saved-item/saved-item.service';
 
 import { CreateHighlightInput } from './dto/create-highlight.input';
 import { DeleteHighlightsInput } from './dto/delete-highlights.input';
 
 @Injectable()
 export class HighlightService {
-	constructor(private readonly prisma: PrismaService) {}
+	constructor(
+		private readonly prisma: PrismaService,
+		private readonly savedItemService: SavedItemService,
+	) {}
 
 	async get(userId: string, query: Prisma.highlightFindFirstArgs) {
 		return this.prisma.highlight.findFirst({ ...query, where: { ...query.where, userId } });
@@ -158,9 +162,16 @@ export class HighlightService {
 	async create(userId: string, data: CreateHighlightInput) {
 		await createHighlightSchema.parseAsync(data);
 		return this.prisma.$transaction(async (prisma) => {
+			const savedItem = await this.savedItemService.get(userId, {
+				where: { id: data.savedItemId },
+				select: { title: true, originalUrl: true },
+			});
+
 			const highlight = await prisma.highlight.create({
 				data: {
 					savedItemId: data.savedItemId,
+					savedItemTitle: savedItem?.title,
+					savedItemOriginalUrl: savedItem?.originalUrl,
 					userId,
 				},
 			});
