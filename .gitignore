@@ -13,17 +13,19 @@ dist
 dist-ssr
 *.local
 .env
+.env.local
 apps/api/prisma/client
 
 # Tests Coverage
 coverage
 apps/api/coverage
 
-# Editor directories and files
+# Editor/OS directories and files
 .vscode/*
 !.vscode/extensions.json
 .idea
 .DS_Store
+Thumbs.db
 *.suo
 *.ntvs*
 *.njsproj
@@ -39,3 +41,7 @@ apps/web/dev-dist
 
 # Tanstack temp
 apps/web/.tanstack/tmp/
+
+# Docs
+docs/.vitepress/dist/
+docs/.vitepress/cache/
