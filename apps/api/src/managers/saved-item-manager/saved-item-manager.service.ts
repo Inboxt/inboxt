@@ -343,6 +343,11 @@ export class SavedItemManagerService {
 		unsubscribeUrl?: string | null,
 	) {
 		const parsed = this.newsletterService.parse(input);
+
+		// By default, we try to use the email original "subject" and "from" fields for these values
+		const author = prismaData?.author ?? parsed?.author ?? null;
+		const title = prismaData?.title ?? parsed?.title ?? DEFAULT_PROCESSED_ITEM_TITLE;
+
 		await this.prisma.$transaction(async (client) => {
 			await this.newsletterService.create(
 				ids.savedItemId,
@@ -359,9 +364,9 @@ export class SavedItemManagerService {
 				ids.userId,
 				ids.savedItemId,
 				{
-					title: prismaData?.title ?? parsed?.title ?? DEFAULT_PROCESSED_ITEM_TITLE,
+					title,
 					wordCount: prismaData?.wordCount ?? parsed.wordCount ?? 0,
-					author: prismaData?.author ?? parsed?.author ?? null,
+					author,
 					description:
 						prismaData?.description ??
 						parsed?.description ??
@@ -372,10 +377,10 @@ export class SavedItemManagerService {
 			);
 		});
 
-		if (!!unsubscribeUrl && parsed?.author && !!ids.inboundEmailAddressId && ids.userId) {
+		if (!!unsubscribeUrl && author && !!ids.inboundEmailAddressId && ids.userId) {
 			let subscription = await this.newsletterSubscriptionService.get(ids.userId, {
 				where: {
-					name: parsed.author,
+					name: author,
 					inboundEmailAddressId: ids.inboundEmailAddressId,
 				},
 			});
@@ -396,7 +401,7 @@ export class SavedItemManagerService {
 					ids.userId,
 					ids.inboundEmailAddressId,
 					{
-						name: parsed.author,
+						name: author,
 						lastReceivedAt: new Date(),
 						unsubscribeUrl,
 					},
