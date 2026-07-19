@@ -75,9 +75,10 @@ export const HIGHLIGHT_FRAGMENT = gql(`
 	fragment HighlightFragment on Highlight {
 		id
 		createdAt
+		savedItemTitle
+		savedItemOriginalUrl
 		savedItem {
         	id
-            title
             createdAt
         }
 		segments {

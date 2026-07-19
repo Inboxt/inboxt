@@ -218,8 +218,8 @@ export class ExportService {
 			id: highlight.id,
 			savedItemId: highlight.savedItemId ?? null,
 			createdAt: highlight.createdAt,
-			savedItemTitle: highlight.saved_item?.title || 'Unknown item',
-			savedItemUrl: highlight.saved_item?.originalUrl || null,
+			savedItemTitle: highlight.savedItemTitle || 'Unknown item',
+			savedItemUrl: highlight.savedItemOriginalUrl || null,
 			text: highlight.highlight_segment
 				.map((s) => (s.text || '').replace(/\t/g, '').replace(/\n/g, ' '))
 				.reverse()
@@ -432,8 +432,8 @@ export class ExportService {
 			id: highlight.id,
 			savedItemId: highlight.savedItemId ?? null,
 			createdAt: highlight.createdAt,
-			savedItemTitle: highlight.saved_item?.title || 'Unknown item',
-			savedItemUrl: highlight.saved_item?.originalUrl || null,
+			savedItemTitle: highlight.savedItemTitle || 'Unknown item',
+			savedItemUrl: highlight.savedItemOriginalUrl || null,
 			text: highlight.highlight_segment
 				.map((s) => (s.text || '').replace(/\t/g, '').replace(/\n/g, ' '))
 				.reverse()

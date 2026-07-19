@@ -29,7 +29,7 @@ export const HighlightItem = ({ highlight }: HighlightItemProps) => {
 	};
 
 	const longPressHandlers = useLongPress(handleLongPress, { threshold: 800 });
-	const sourceTitle = highlight.savedItem?.title || 'Unknown Title';
+	const sourceTitle = highlight.savedItemTitle || 'Unknown Title';
 
 	return (
 		<Stack
