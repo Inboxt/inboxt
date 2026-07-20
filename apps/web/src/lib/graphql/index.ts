@@ -337,6 +337,17 @@ export const UPDATE_SAVED_ITEMS_STATUS = gql(`
 	}
 `);
 
+export const UPDATE_SAVED_ITEM_METADATA = gql(`
+	mutation updateSavedItemMetadata($data: UpdateSavedItemMetadataInput!) {
+		updateSavedItemMetadata(data: $data) {
+			...SavedItemFragment
+			labels {
+				...SavedItemLabelFragment
+			}
+		}
+	}
+`);
+
 export const UPDATE_READING_PROGRESS = gql(`
 	mutation updateReadingProgress($data: UpdateReadingProgressInput!) {
 		updateReadingProgress(data: $data) {

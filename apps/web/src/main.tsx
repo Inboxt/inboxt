@@ -20,6 +20,7 @@ import { CreateApiTokenModal } from '~modals/CreateApiTokenModal';
 import { CreateLabelModal } from '~modals/CreateLabelModal';
 import { CreateSavedQueryModal } from '~modals/CreateSavedQueryModal';
 import { DeleteAccountModal } from '~modals/DeleteAccountModal';
+import { EditInfoModal } from '~modals/EditInfoModal';
 import { EmailsModal } from '~modals/EmailsModal/EmailsModal';
 import { ExportDataModal } from '~modals/ExportDataModal';
 import { ImportModal } from '~modals/ImportModal';
@@ -63,6 +64,7 @@ async function init() {
 								savedQueries: SavedQueriesModal,
 								createSavedQuery: CreateSavedQueryModal,
 								stats: StatsModal,
+								editInfo: EditInfoModal,
 							}}
 						>
 							<RouterProvider router={router} />

@@ -13,3 +13,4 @@ export { addArticleFromHtmlSnapshotSchema } from './addArticleFromHtmlSnapshot.j
 export { createHighlightSchema } from './createHighlight.js';
 export { createSavedQuerySchema } from './createSavedQuery.js';
 export { updateSavedQuerySchema } from './updateSavedQuery.js';
+export { updateSavedItemMetadataSchema } from './updateSavedItemMetadata.js';

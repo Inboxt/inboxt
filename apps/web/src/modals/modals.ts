@@ -1,5 +1,7 @@
 import { modals as mantineModals } from '@mantine/modals';
 
+import { SavedItem } from '~lib/graphql';
+
 import type { ExportDataModalProps } from '~modals/ExportDataModal/ExportDataModal.tsx';
 
 export const modals = {
@@ -181,6 +183,17 @@ export const modals = {
 			centered: true,
 			title: 'Save Search',
 			innerProps,
+		});
+	},
+
+	openEditInfoModal: ({ item }: { item: SavedItem }) => {
+		return mantineModals.openContextModal({
+			modal: 'editInfo',
+			size: 540,
+			centered: true,
+			title: 'Edit Item Metadata',
+			innerProps: { item },
+			className: 'fullscreen-modal',
 		});
 	},
 
