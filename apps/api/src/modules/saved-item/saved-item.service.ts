@@ -1,6 +1,7 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import dayjs from 'dayjs';
 
+import { updateSavedItemMetadataSchema } from '@inboxt/common';
 import { Prisma } from '@inboxt/prisma';
 
 import { GetSavedItemsQuery } from '~common/types';
@@ -420,6 +421,42 @@ export class SavedItemService {
 		}
 
 		return this.getMany(userId, { where: { id: { in: itemIds } } });
+	}
+
+	async updateMetadata(
+		userId: string,
+		id: string,
+		data: { title?: string | null; description?: string | null; author?: string | null },
+	) {
+		const existingItem = await this.get(userId, { where: { id } });
+		if (!existingItem) {
+			throw new AppException('Item not found', HttpStatus.NOT_FOUND);
+		}
+
+		await updateSavedItemMetadataSchema.parseAsync(data);
+
+		// Title is the only one required, rest can be set back to "null" if needed
+		const updateData: Prisma.saved_itemUpdateInput = {};
+		if (data.title !== null && data.title !== undefined) {
+			updateData.title = data.title;
+		}
+
+		if (data.description !== undefined) {
+			updateData.description = data.description;
+		}
+
+		if (data.author !== undefined) {
+			updateData.author = data.author;
+		}
+
+		if (Object.keys(updateData).length === 0) {
+			return existingItem;
+		}
+
+		return this.prisma.saved_item.update({
+			where: { id, userId },
+			data: updateData,
+		});
 	}
 
 	async delete(userId: string, id: string) {

@@ -14,6 +14,7 @@ import {
 	IconTrash,
 	IconTrashX,
 	IconWorld,
+	IconPencil,
 } from '@tabler/icons-react';
 import { useNavigate } from '@tanstack/react-router';
 import React, { useMemo, useState } from 'react';
@@ -183,6 +184,21 @@ export const ItemsOptions = ({
 	});
 
 	const OPTIONS: Option[] = [
+		{
+			label: 'Edit Item',
+			icon: IconPencil,
+			modes: ['single', 'reader', 'reader-toolbar'],
+			clearsSelection: false,
+			runsOnActionComplete: false,
+			visible: () => savedItems.length === 1,
+			onClick: () => {
+				const [item] = savedItems;
+				if (item) {
+					modals.openEditInfoModal({ item });
+				}
+				return undefined;
+			},
+		},
 		{
 			label: 'Edit labels',
 			icon: IconTag,

@@ -22,7 +22,7 @@ export class SavedItem implements Entry {
 	sourceDomain?: string;
 
 	@Field({ nullable: true })
-	description?: 'text';
+	description?: string;
 
 	@Field({ nullable: true })
 	leadImage?: string;

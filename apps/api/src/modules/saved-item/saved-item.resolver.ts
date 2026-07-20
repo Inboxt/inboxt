@@ -10,6 +10,7 @@ import { GetSavedItemInput } from './dto/get-saved-item.input';
 import { PermanentlyDeleteSavedItemsInput } from './dto/permanently-delete-saved-items.input';
 import { SetSavedItemLabelsInput } from './dto/set-saved-item-labels.input';
 import { UpdateReadingProgressInput } from './dto/update-reading-progress.input';
+import { UpdateSavedItemMetadataInput } from './dto/update-saved-item-metadata.input';
 import { UpdateSavedItemsReadStatusInput } from './dto/update-saved-items-read-status.input';
 import { UpdateSavedItemsStatusInput } from './dto/update-saved-items-status.input';
 import { Article } from './entities/article/article.model';
@@ -101,6 +102,16 @@ export class SavedItemResolver {
 			add: addLabelIds,
 			remove: removeLabelIds,
 		})) as SavedItem[];
+	}
+
+	@ApiTokenAllowed()
+	@Mutation(() => SavedItem)
+	async updateSavedItemMetadata(
+		@ActiveUserMeta() activeUser: ActiveUserMetaType,
+		@Args('data') data: UpdateSavedItemMetadataInput,
+	) {
+		const { id, ...input } = data;
+		return this.savedItemService.updateMetadata(activeUser.id, id, input);
 	}
 
 	@Mutation(() => Void)

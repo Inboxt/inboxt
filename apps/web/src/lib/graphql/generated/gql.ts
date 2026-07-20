@@ -43,6 +43,7 @@ type Documents = {
     "\n\tmutation updateSavedItemsReadStatus($data: UpdateSavedItemsReadStatusInput!) {\n\t\tupdateSavedItemsReadStatus(data: $data) {\n\t\t\t...SavedItemFragment\n\t\t}\n\t}\n": typeof types.UpdateSavedItemsReadStatusDocument,
     "\n\tmutation setSavedItemLabels($data: SetSavedItemLabelsInput!) {\n\t\tsetSavedItemLabels(data: $data) {\n\t\t\t...SavedItemLabelsFragment\n\t\t}\n\t}\n": typeof types.SetSavedItemLabelsDocument,
     "\n\tmutation updateSavedItemsStatus($data: UpdateSavedItemsStatusInput!) {\n\t\tupdateSavedItemsStatus(data: $data) {\n\t\t\t...SavedItemFragment\n\t\t}\n\t}\n": typeof types.UpdateSavedItemsStatusDocument,
+    "\n\tmutation updateSavedItemMetadata($data: UpdateSavedItemMetadataInput!) {\n\t\tupdateSavedItemMetadata(data: $data) {\n\t\t\t...SavedItemFragment\n\t\t\tlabels {\n\t\t\t\t...SavedItemLabelFragment\n\t\t\t}\n\t\t}\n\t}\n": typeof types.UpdateSavedItemMetadataDocument,
     "\n\tmutation updateReadingProgress($data: UpdateReadingProgressInput!) {\n\t\tupdateReadingProgress(data: $data) {\n\t\t\t...SavedItemFragment\n\t\t}\n\t}\n": typeof types.UpdateReadingProgressDocument,
     "\n\tmutation permanentlyDeleteSavedItems($data: PermanentlyDeleteSavedItemsInput!) {\n\t\tpermanentlyDeleteSavedItems(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": typeof types.PermanentlyDeleteSavedItemsDocument,
     "\n\tmutation emptyTrash {\n\t\temptyTrash {\n\t\t\tsuccess\n\t\t\tcount\n\t\t}\n\t}\n": typeof types.EmptyTrashDocument,
@@ -93,6 +94,7 @@ const documents: Documents = {
     "\n\tmutation updateSavedItemsReadStatus($data: UpdateSavedItemsReadStatusInput!) {\n\t\tupdateSavedItemsReadStatus(data: $data) {\n\t\t\t...SavedItemFragment\n\t\t}\n\t}\n": types.UpdateSavedItemsReadStatusDocument,
     "\n\tmutation setSavedItemLabels($data: SetSavedItemLabelsInput!) {\n\t\tsetSavedItemLabels(data: $data) {\n\t\t\t...SavedItemLabelsFragment\n\t\t}\n\t}\n": types.SetSavedItemLabelsDocument,
     "\n\tmutation updateSavedItemsStatus($data: UpdateSavedItemsStatusInput!) {\n\t\tupdateSavedItemsStatus(data: $data) {\n\t\t\t...SavedItemFragment\n\t\t}\n\t}\n": types.UpdateSavedItemsStatusDocument,
+    "\n\tmutation updateSavedItemMetadata($data: UpdateSavedItemMetadataInput!) {\n\t\tupdateSavedItemMetadata(data: $data) {\n\t\t\t...SavedItemFragment\n\t\t\tlabels {\n\t\t\t\t...SavedItemLabelFragment\n\t\t\t}\n\t\t}\n\t}\n": types.UpdateSavedItemMetadataDocument,
     "\n\tmutation updateReadingProgress($data: UpdateReadingProgressInput!) {\n\t\tupdateReadingProgress(data: $data) {\n\t\t\t...SavedItemFragment\n\t\t}\n\t}\n": types.UpdateReadingProgressDocument,
     "\n\tmutation permanentlyDeleteSavedItems($data: PermanentlyDeleteSavedItemsInput!) {\n\t\tpermanentlyDeleteSavedItems(data: $data) {\n\t\t\tsuccess\n\t\t}\n\t}\n": types.PermanentlyDeleteSavedItemsDocument,
     "\n\tmutation emptyTrash {\n\t\temptyTrash {\n\t\t\tsuccess\n\t\t\tcount\n\t\t}\n\t}\n": types.EmptyTrashDocument,
@@ -244,6 +246,10 @@ export function gql(source: "\n\tmutation setSavedItemLabels($data: SetSavedItem
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n\tmutation updateSavedItemsStatus($data: UpdateSavedItemsStatusInput!) {\n\t\tupdateSavedItemsStatus(data: $data) {\n\t\t\t...SavedItemFragment\n\t\t}\n\t}\n"): (typeof documents)["\n\tmutation updateSavedItemsStatus($data: UpdateSavedItemsStatusInput!) {\n\t\tupdateSavedItemsStatus(data: $data) {\n\t\t\t...SavedItemFragment\n\t\t}\n\t}\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n\tmutation updateSavedItemMetadata($data: UpdateSavedItemMetadataInput!) {\n\t\tupdateSavedItemMetadata(data: $data) {\n\t\t\t...SavedItemFragment\n\t\t\tlabels {\n\t\t\t\t...SavedItemLabelFragment\n\t\t\t}\n\t\t}\n\t}\n"): (typeof documents)["\n\tmutation updateSavedItemMetadata($data: UpdateSavedItemMetadataInput!) {\n\t\tupdateSavedItemMetadata(data: $data) {\n\t\t\t...SavedItemFragment\n\t\t\tlabels {\n\t\t\t\t...SavedItemLabelFragment\n\t\t\t}\n\t\t}\n\t}\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
