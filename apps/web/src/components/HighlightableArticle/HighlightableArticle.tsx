@@ -181,7 +181,6 @@ export const HighlightableArticle = ({ content, data }: ArticleWithHighlightsPro
 						labelIds: [],
 					},
 				},
-				refetchQueries: [ENTRIES],
 			});
 
 			// todo: make this re-usable as it's already duplicated 3 times.

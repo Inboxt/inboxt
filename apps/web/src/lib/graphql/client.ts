@@ -15,7 +15,8 @@ export const client = new ApolloClient({
 							const sort = args?.query?.sort ?? null;
 							const field = sort?.field ?? null;
 							const direction = sort?.direction ?? null;
-							return ['entries', q, field, direction];
+
+							return `entries:${q}:${field}:${direction}`;
 						},
 						merge(existing, incoming, { args }) {
 							if (!args?.query?.after) {

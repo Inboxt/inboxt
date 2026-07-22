@@ -78,19 +78,95 @@ export const ItemsOptions = ({
 }: ItemsOptionsProps) => {
 	const isSmall = size === 'sm';
 	const [updateStatus, { loading: updateLoading }] = useMutation(UPDATE_SAVED_ITEMS_STATUS, {
-		refetchQueries: [ENTRIES],
+		update(cache, { data }) {
+			const updated = (data?.updateSavedItemsStatus || []) as SavedItem[];
+			const ids = updated.map((item) => item.id);
+
+			cache.modify({
+				fields: {
+					entries(existing: any, { readField }: any) {
+						if (!existing || !existing.edges) return existing;
+						const newEdges = existing.edges.filter((edge: any) => {
+							const node = readField('node', edge);
+							if (!node) return false;
+							const nodeId = readField('id', node);
+							return !ids.includes(nodeId as string);
+						});
+						return newEdges.length === existing.edges.length
+							? existing
+							: { ...existing, edges: newEdges };
+					},
+				},
+			});
+
+			updated.forEach((item) => {
+				cache.evict({ id: cache.identify(item) });
+			});
+			cache.gc();
+		},
 	});
 	const [deleteHighlights, { loading: deleteLoading }] = useMutation(DELETE_HIGHLIGHTS, {
-		refetchQueries: [ENTRIES, ACTIVE_USER],
+		update(cache, { data }, { variables }) {
+			if (data?.deleteHighlights?.success) {
+				const ids = (variables?.data?.ids || []) as string[];
+
+				cache.modify({
+					fields: {
+						entries(existing: any, { readField }: any) {
+							if (!existing || !existing.edges) return existing;
+							const newEdges = existing.edges.filter((edge: any) => {
+								const node = readField('node', edge);
+								if (!node) return false;
+								const nodeId = readField('id', node);
+								return !ids.includes(nodeId as string);
+							});
+							return newEdges.length === existing.edges.length
+								? existing
+								: { ...existing, edges: newEdges };
+						},
+					},
+				});
+
+				ids.forEach((id) => {
+					cache.evict({ id: cache.identify({ __typename: 'Highlight', id }) });
+				});
+				cache.gc();
+			}
+		},
+		refetchQueries: [ACTIVE_USER],
 	});
 	const [permanentlyDeleteSavedItems] = useMutation(PERMANENTLY_DELETE_SAVED_ITEMS, {
-		refetchQueries: [ENTRIES, ACTIVE_USER],
+		update(cache, { data }, { variables }) {
+			if (data?.permanentlyDeleteSavedItems?.success) {
+				const ids = (variables?.data?.ids || []) as string[];
+
+				cache.modify({
+					fields: {
+						entries(existing: any, { readField }: any) {
+							if (!existing || !existing.edges) return existing;
+							const newEdges = existing.edges.filter((edge: any) => {
+								const node = readField('node', edge);
+								if (!node) return false;
+								const nodeId = readField('id', node);
+								return !ids.includes(nodeId as string);
+							});
+							return newEdges.length === existing.edges.length
+								? existing
+								: { ...existing, edges: newEdges };
+						},
+					},
+				});
+
+				ids.forEach((id) => {
+					cache.evict({ id: cache.identify({ __typename: 'SavedItem', id }) });
+				});
+				cache.gc();
+			}
+		},
+		refetchQueries: [ACTIVE_USER],
 	});
 	const [updateReadStatus, { loading: readStatusLoading }] = useMutation(
 		UPDATE_SAVED_ITEMS_READ_STATUS,
-		{
-			refetchQueries: [ENTRIES],
-		},
 	);
 
 	const { setSelectedItems } = useContentSelection();
@@ -499,7 +575,11 @@ export const ItemsOptions = ({
 			onClick: async () => {
 				const [highlight] = highlightItems;
 				if (highlight?.savedItem?.id) {
-					await navigate({ to: '/r/$id', params: { id: highlight.savedItem.id } });
+					await navigate({
+						to: '/r/$id',
+						params: { id: highlight.savedItem.id },
+						search: (prev) => prev,
+					});
 					return undefined;
 				}
 

@@ -80,6 +80,7 @@ export const ReaderSettingsOptions = ({
 		} else {
 			await navigate({
 				to: '/',
+				search: (prev) => prev,
 			});
 		}
 	};

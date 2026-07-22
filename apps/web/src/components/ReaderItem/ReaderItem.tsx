@@ -41,6 +41,7 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 		<Box
 			component={Link}
 			to={`/r/${item.id}`}
+			search={(prev: any) => prev}
 			p="md"
 			className={classes.item}
 			ref={ref}
