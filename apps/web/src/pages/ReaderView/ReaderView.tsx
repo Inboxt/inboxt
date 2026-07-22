@@ -258,6 +258,7 @@ export const ReaderView = () => {
 		} else {
 			void navigate({
 				to: '/',
+				search: (prev) => prev,
 			});
 		}
 	};

@@ -51,7 +51,11 @@ export const ItemsList = () => {
 		refetchQueries: [ENTRIES],
 	});
 
-	const items = data?.entries.edges || [];
+	const items = useMemo(
+		() => (data?.entries.edges || []).filter((edge) => !!edge.node),
+		[data?.entries.edges],
+	);
+
 	const hasNextPage = data?.entries.pageInfo.hasNextPage ?? false;
 	const endCursor = data?.entries.pageInfo.endCursor;
 
@@ -105,8 +109,13 @@ export const ItemsList = () => {
 			.join(',');
 
 		if (currentItemIds !== prevItemIdsRef.current) {
-			if (prevItemIdsRef.current && !currentItemIds.startsWith(prevItemIdsRef.current)) {
-				deselectAll();
+			if (prevItemIdsRef.current) {
+				const prevIds = prevItemIdsRef.current.split(',');
+				const currentIds = new Set(currentItemIds.split(','));
+				const allOldItemsStillPresent = prevIds.every((id) => currentIds.has(id));
+				if (!allOldItemsStillPresent) {
+					deselectAll();
+				}
 			}
 
 			setVisibleItems(itemsNode);
@@ -115,12 +124,13 @@ export const ItemsList = () => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [items]);
 
+	const prevSearchRef = useRef({ q, sort });
 	useEffect(() => {
-		if (q || sort) {
+		if (prevSearchRef.current.q !== q || prevSearchRef.current.sort !== sort) {
 			virtualizer.scrollToIndex(0);
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [q, sort]);
+		prevSearchRef.current = { q, sort };
+	}, [q, sort, virtualizer]);
 
 	const handleEmptyTrash = async () => {
 		const confirmed = await new Promise<boolean>((resolve) => {

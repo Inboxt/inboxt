@@ -43,7 +43,7 @@ export const HighlightItem = ({ highlight }: HighlightItemProps) => {
 				}
 
 				if (highlight.savedItem?.id) {
-					void navigate({ to: `/r/${highlight.savedItem.id}` });
+					void navigate({ to: `/r/${highlight.savedItem.id}`, search: (prev) => prev });
 				}
 			}}
 			ref={ref}
