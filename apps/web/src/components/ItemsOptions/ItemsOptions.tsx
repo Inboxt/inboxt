@@ -28,7 +28,6 @@ import {
 	UPDATE_SAVED_ITEMS_STATUS,
 	UPDATE_SAVED_ITEMS_READ_STATUS,
 	DELETE_HIGHLIGHTS,
-	ENTRIES,
 	ACTIVE_USER,
 } from '~lib/graphql';
 import { SavedItem, SavedItemStatus, Highlight } from '~lib/graphql';
@@ -36,6 +35,7 @@ import { modals } from '~modals/modals';
 
 import { MenuDrawer } from '../MenuDrawer';
 import { ReaderSettingsPopover } from '../ReaderSettingsPopover';
+import { useScreenQuery } from '~hooks/useScreenQuery.tsx';
 
 export type ItemsOptionsMode =
 	| 'single'
@@ -77,6 +77,8 @@ export const ItemsOptions = ({
 	onLoadingChange,
 }: ItemsOptionsProps) => {
 	const isSmall = size === 'sm';
+	const isBelowMdScreen = useScreenQuery('md', 'below');
+
 	const [updateStatus, { loading: updateLoading }] = useMutation(UPDATE_SAVED_ITEMS_STATUS, {
 		update(cache, { data }) {
 			const updated = (data?.updateSavedItemsStatus || []) as SavedItem[];
@@ -85,13 +87,19 @@ export const ItemsOptions = ({
 			cache.modify({
 				fields: {
 					entries(existing: any, { readField }: any) {
-						if (!existing || !existing.edges) return existing;
+						if (!existing || !existing.edges) {
+							return existing;
+						}
+
 						const newEdges = existing.edges.filter((edge: any) => {
 							const node = readField('node', edge);
-							if (!node) return false;
+							if (!node) {
+								return false;
+							}
 							const nodeId = readField('id', node);
 							return !ids.includes(nodeId as string);
 						});
+
 						return newEdges.length === existing.edges.length
 							? existing
 							: { ...existing, edges: newEdges };
@@ -113,13 +121,19 @@ export const ItemsOptions = ({
 				cache.modify({
 					fields: {
 						entries(existing: any, { readField }: any) {
-							if (!existing || !existing.edges) return existing;
+							if (!existing || !existing.edges) {
+								return existing;
+							}
+
 							const newEdges = existing.edges.filter((edge: any) => {
 								const node = readField('node', edge);
-								if (!node) return false;
+								if (!node) {
+									return false;
+								}
 								const nodeId = readField('id', node);
 								return !ids.includes(nodeId as string);
 							});
+
 							return newEdges.length === existing.edges.length
 								? existing
 								: { ...existing, edges: newEdges };
@@ -143,13 +157,19 @@ export const ItemsOptions = ({
 				cache.modify({
 					fields: {
 						entries(existing: any, { readField }: any) {
-							if (!existing || !existing.edges) return existing;
+							if (!existing || !existing.edges) {
+								return existing;
+							}
+
 							const newEdges = existing.edges.filter((edge: any) => {
 								const node = readField('node', edge);
-								if (!node) return false;
+								if (!node) {
+									return false;
+								}
 								const nodeId = readField('id', node);
 								return !ids.includes(nodeId as string);
 							});
+
 							return newEdges.length === existing.edges.length
 								? existing
 								: { ...existing, edges: newEdges };
@@ -200,7 +220,7 @@ export const ItemsOptions = ({
 			return opts;
 		}
 
-		toastSuccess(opts);
+		toastSuccess({ ...opts, position: isBelowMdScreen ? 'top-center' : undefined });
 		return undefined;
 	};
 
@@ -603,7 +623,14 @@ export const ItemsOptions = ({
 			}
 
 			if (result && typeof result === 'object') {
-				window.setTimeout(() => toastSuccess(result), 350);
+				window.setTimeout(
+					() =>
+						toastSuccess({
+							...result,
+							position: isBelowMdScreen ? 'top-center' : undefined,
+						}),
+					350,
+				);
 			}
 		} finally {
 			setActiveOptionLabel(null);
