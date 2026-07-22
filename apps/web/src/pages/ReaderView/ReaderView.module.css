@@ -3,9 +3,9 @@
 	position: fixed;
 	z-index: 100;
 	transition:
-		transform 0.3s ease,
-		opacity 0.3s ease,
-		top 0.3s ease;
+		transform 0.5s ease,
+		opacity 0.5s ease,
+		top 0.5s ease;
 
 	@media (max-width: $mantine-breakpoint-md) {
 		position: sticky;
@@ -32,6 +32,10 @@
 	transform: translateY(-100%);
 	opacity: 0;
 	pointer-events: none;
+}
+
+.headerCollapsed {
+	transform: translateY(calc(-100% + 3px));
 }
 
 .headerProgressBar {
@@ -82,8 +86,8 @@
 	min-height: 48px;
 	box-shadow: var(--mantine-shadow-md);
 	transition:
-		transform 0.3s ease,
-		opacity 0.3s ease;
+		transform 0.5s ease,
+		opacity 0.5s ease;
 }
 
 .bottomToolbarHidden {
