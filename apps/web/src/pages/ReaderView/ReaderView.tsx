@@ -60,23 +60,11 @@ export const ReaderView = () => {
 
 	const [lastResumedId, setLastResumedId] = useState<string | null>(null);
 	const [currentProgress, setCurrentProgress] = useState(0);
-	const [toolbarVisible, setToolbarVisible] = useState(false);
+	const [toolbarVisible, setToolbarVisible] = useState(true);
 	const [headerVisible, setHeaderVisible] = useState(true);
+	const [headerCollapsed, setHeaderCollapsed] = useState(false);
 	const [isActionsLoading, setIsActionsLoading] = useState(false);
-	const hideHeaderTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-	const showToolbarDebounced = useDebouncedCallback(() => {
-		const container = readerRef.current;
-		if (container) {
-			const { scrollTop, scrollHeight, clientHeight } = container;
-			const isAtTop = scrollTop < 100;
-			const isAtBottom = scrollTop + clientHeight >= scrollHeight - 50;
-
-			if (!isAtTop || isAtBottom) {
-				setToolbarVisible(true);
-			}
-		}
-	}, 500);
+	const prevScrollTop = useRef(0);
 
 	const isRestoringScroll =
 		!!data?.savedItem && lastResumedId !== id && (data.savedItem.readingProgress || 0) > 0;
@@ -105,28 +93,27 @@ export const ReaderView = () => {
 		setCurrentProgress(progress);
 		debouncedUpdateProgress(progress);
 
-		const isAtBottom = scrollTop + clientHeight >= scrollHeight - 50;
-		const isAtTop = scrollTop < 100;
+		if (!isAboveMdScreen) {
+			const isScrollingDown = scrollTop > prevScrollTop.current;
 
-		if (isAtBottom || !isAtTop) {
-			setToolbarVisible(true);
+			if (scrollTop > 50) {
+				if (isScrollingDown && !headerCollapsed) {
+					setHeaderCollapsed(true);
+				} else if (!isScrollingDown && headerCollapsed) {
+					setHeaderCollapsed(false);
+				}
+			} else {
+				setHeaderCollapsed(false);
+			}
+
+			setHeaderVisible(true);
 		} else {
-			setToolbarVisible(false);
+			// Desktop: "just sits there" and doesn't care about scrolling
+			setHeaderVisible(true);
+			setHeaderCollapsed(false);
 		}
 
-		// Header Focus Mode: Always show while scrolling, hide after delay when stopped
-		setHeaderVisible(true);
-		if (hideHeaderTimeoutRef.current) {
-			clearTimeout(hideHeaderTimeoutRef.current);
-		}
-
-		if (!isAtTop && !isAtBottom) {
-			hideHeaderTimeoutRef.current = setTimeout(() => {
-				setHeaderVisible(false);
-			}, 2500);
-		}
-
-		showToolbarDebounced();
+		prevScrollTop.current = scrollTop;
 	};
 
 	const { handleTouchStart, handleTouchMove, handleTouchEnd } = useReaderSwipeNavigation({
@@ -187,6 +174,8 @@ export const ReaderView = () => {
 				const { scrollHeight, clientHeight } = container;
 				container.scrollTop = progress * (scrollHeight - clientHeight);
 				setLastResumedId(id);
+				setHeaderCollapsed(false);
+				prevScrollTop.current = container.scrollTop;
 			}, 100);
 		}
 	}, [data?.savedItem, id, lastResumedId, loading]);
@@ -196,14 +185,6 @@ export const ReaderView = () => {
 			readerRef.current.scrollTo(0, 0);
 		}
 	}, [id, lastResumedId]);
-
-	useEffect(() => {
-		return () => {
-			if (hideHeaderTimeoutRef.current) {
-				clearTimeout(hideHeaderTimeoutRef.current);
-			}
-		};
-	}, []);
 
 	useEffect(() => {
 		const html = document.documentElement;
@@ -219,28 +200,10 @@ export const ReaderView = () => {
 	}, []);
 
 	useEffect(() => {
-		const container = readerRef.current;
-		if (container && data?.savedItem && !loading) {
-			const { scrollHeight, clientHeight, scrollTop } = container;
-			const maxScroll = scrollHeight - clientHeight;
-			if (maxScroll <= 0) {
-				setTimeout(() => {
-					setToolbarVisible(true);
-					setHeaderVisible(true);
-				}, 0);
-			} else if (scrollTop >= 100) {
-				setTimeout(() => {
-					setToolbarVisible(true);
-					setHeaderVisible(true);
-				}, 0);
-			} else {
-				setTimeout(() => {
-					setToolbarVisible(false);
-					setHeaderVisible(true);
-				}, 0);
-			}
-		}
-	}, [data?.savedItem, loading, id]);
+		setToolbarVisible(true);
+		setHeaderVisible(true);
+		setHeaderCollapsed(false);
+	}, [id]);
 
 	const savedItem = data?.savedItem;
 	const title = savedItem?.title || '';
@@ -322,6 +285,7 @@ export const ReaderView = () => {
 							className={clsx(
 								classes.headerContainer,
 								!headerVisible && classes.headerHidden,
+								headerCollapsed && classes.headerCollapsed,
 							)}
 						>
 							<Group onClick={handleGoBack} align="center" justify="center">
