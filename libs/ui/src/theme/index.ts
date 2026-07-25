@@ -11,7 +11,6 @@ import {
 
 import { fontSizes } from './fontSizes';
 import { spacing } from './spacing';
-
 import classes from './theme.module.css';
 
 type ExtendedCustomColors = 'primary' | DefaultMantineColor;
@@ -23,6 +22,10 @@ declare module '@mantine/core' {
 }
 
 export const theme = createTheme({
+	fontWeights: {
+		medium: '500',
+	},
+	defaultRadius: 'sm',
 	colors: {
 		dark: [
 			'#C1C2C5',

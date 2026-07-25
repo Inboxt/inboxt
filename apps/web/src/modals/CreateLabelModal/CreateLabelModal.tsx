@@ -1,8 +1,7 @@
 import { useMutation } from '@apollo/client';
 import { Stack, TextInput, Button, Flex, Card } from '@mantine/core';
-import { useForm } from '@mantine/form';
+import { useForm, schemaResolver } from '@mantine/form';
 import { ContextModalProps } from '@mantine/modals';
-import { zod4Resolver } from 'mantine-form-zod-resolver';
 
 import { createLabelSchema } from '@inboxt/common';
 import { labelColors } from '@inboxt/ui';
@@ -22,7 +21,7 @@ export const CreateLabelModal = ({ id, context }: ContextModalProps) => {
 	const form = useForm({
 		mode: 'uncontrolled',
 		initialValues: { name: '', color: getRandomArrayItem(labelColors) as string },
-		validate: zod4Resolver(createLabelSchema),
+		validate: schemaResolver(createLabelSchema),
 	});
 
 	const handleCreateLabel = async (values: typeof form.values) => {

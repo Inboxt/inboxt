@@ -1,6 +1,5 @@
 import { defineConfig, loadEnv } from 'vite';
-import react from '@vitejs/plugin-react-swc';
-import tsconfigPaths from 'vite-tsconfig-paths';
+import react from '@vitejs/plugin-react';
 import { tanstackRouter } from '@tanstack/router-plugin/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
@@ -26,7 +25,6 @@ export default defineConfig(({ mode }) => {
 				autoCodeSplitting: true,
 			}),
 			react(),
-			tsconfigPaths(),
 			VitePWA({
 				registerType: 'autoUpdate',
 				includeAssets: ['favicon.svg', 'favicon.ico', 'apple-touch-icon.png'],
@@ -88,6 +86,7 @@ export default defineConfig(({ mode }) => {
 			alias: {
 				'@tabler/icons-react': '@tabler/icons-react/dist/esm/icons/index.mjs',
 			},
+			tsconfigPaths: true,
 		},
 		optimizeDeps: {
 			include: ['@inboxt/common', '@inboxt/ui'],
