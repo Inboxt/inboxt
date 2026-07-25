@@ -136,7 +136,7 @@ export const Navbar = ({ opened, toggle }: NavbarProps) => {
 
 						{!opened && <Divider m="sm" my="xxs" />}
 
-						<Collapse in={savedQueriesOpened || !opened}>
+						<Collapse expanded={savedQueriesOpened || !opened}>
 							{queriesData.savedQueries.map((query) => (
 								<NavbarLink
 									key={query.id}
@@ -178,7 +178,7 @@ export const Navbar = ({ opened, toggle }: NavbarProps) => {
 
 						{!opened && <Divider m="sm" my="xxs" />}
 
-						<Collapse in={labelsOpened || !opened}>
+						<Collapse expanded={labelsOpened || !opened}>
 							{labelsData.labels.map((label) => (
 								<NavbarLink
 									key={label.id}

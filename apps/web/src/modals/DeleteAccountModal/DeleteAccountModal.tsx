@@ -1,9 +1,8 @@
 import { useMutation } from '@apollo/client';
 import { Button, Text, Stack, TextInput, Card, Alert, Box } from '@mantine/core';
-import { useForm } from '@mantine/form';
+import { useForm, schemaResolver } from '@mantine/form';
 import { ContextModalProps } from '@mantine/modals';
 import { IconAlertTriangleFilled } from '@tabler/icons-react';
-import { zod4Resolver } from 'mantine-form-zod-resolver';
 
 import { deleteAccountSchema } from '@inboxt/common';
 
@@ -20,7 +19,7 @@ export const DeleteAccountModal = ({ id, context }: ContextModalProps) => {
 		initialValues: {
 			emailAddress: '',
 		},
-		validate: zod4Resolver(deleteAccountSchema),
+		validate: schemaResolver(deleteAccountSchema),
 	});
 
 	const handleDeleteAccount = async (values: typeof form.values) => {

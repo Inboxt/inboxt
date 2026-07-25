@@ -19,7 +19,6 @@ export default defineConfig({
 		browser_specific_settings: {
 			gecko: {
 				id: 'inboxt@inboxt.app',
-				// @ts-expect-error - not supported by WXT yet
 				data_collection_permissions: {
 					required: ['websiteContent', 'browsingActivity', 'authenticationInfo'],
 				},

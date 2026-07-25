@@ -1,8 +1,7 @@
 import { useMutation } from '@apollo/client';
 import { Group, Text, TextInput, ActionIcon, Stack, Box } from '@mantine/core';
-import { useForm } from '@mantine/form';
+import { useForm, schemaResolver } from '@mantine/form';
 import { IconSearch, IconEdit, IconTrash, IconCheck, IconX } from '@tabler/icons-react';
-import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useEffect } from 'react';
 
 import { updateSavedQuerySchema } from '@inboxt/common';
@@ -40,7 +39,7 @@ export const EditableSavedQueryItem = ({
 			name: '',
 			query: '',
 		},
-		validate: zod4Resolver(updateSavedQuerySchema),
+		validate: schemaResolver(updateSavedQuerySchema),
 	});
 
 	useEffect(() => {

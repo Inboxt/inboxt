@@ -1,8 +1,7 @@
 import { useMutation } from '@apollo/client';
 import { Button, Card, Stack, Textarea, TextInput } from '@mantine/core';
-import { useForm } from '@mantine/form';
+import { useForm, schemaResolver } from '@mantine/form';
 import { ContextModalProps } from '@mantine/modals';
-import { zod4Resolver } from 'mantine-form-zod-resolver';
 
 import { updateSavedItemMetadataSchema } from '@inboxt/common';
 
@@ -35,7 +34,7 @@ export const EditInfoModal = ({
 			description: item.description ?? '',
 			author: item.author ?? '',
 		},
-		validate: zod4Resolver(updateSavedItemMetadataSchema),
+		validate: schemaResolver(updateSavedItemMetadataSchema),
 	});
 
 	const handleSave = async (values: typeof form.values) => {

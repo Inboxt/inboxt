@@ -1,8 +1,7 @@
 import { useMutation, useQuery } from '@apollo/client';
 import { Button, Card, Stack, TextInput } from '@mantine/core';
-import { useForm } from '@mantine/form';
+import { useForm, schemaResolver } from '@mantine/form';
 import { ContextModalProps } from '@mantine/modals';
-import { zod4Resolver } from 'mantine-form-zod-resolver';
 
 import { addItemFromUrlSchema } from '@inboxt/common';
 import { LabelsMultiSelect } from '@inboxt/ui';
@@ -25,7 +24,7 @@ export const AddContentModal = ({ id, context }: ContextModalProps) => {
 			url: '',
 			labels: [] as string[],
 		},
-		validate: zod4Resolver(addItemFromUrlSchema),
+		validate: schemaResolver(addItemFromUrlSchema),
 	});
 
 	const handleAddContent = async (values: typeof form.values) => {

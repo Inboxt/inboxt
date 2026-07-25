@@ -1,10 +1,9 @@
 import { useMutation } from '@apollo/client';
 import { ActionIcon, Button, Group, PasswordInput, Stack, TextInput } from '@mantine/core';
-import { useForm } from '@mantine/form';
+import { useForm, schemaResolver } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { IconAt, IconEye, IconEyeOff, IconLock } from '@tabler/icons-react';
 import { useLocation, useNavigate } from '@tanstack/react-router';
-import { zod4Resolver } from 'mantine-form-zod-resolver';
 
 import { signInSchema } from '@inboxt/common';
 
@@ -27,7 +26,7 @@ export const FormLogin = ({ handleChangeAuthMode }: AuthViewProps) => {
 			emailAddress: state?.emailAddress || '',
 			password: '',
 		},
-		validate: zod4Resolver(signInSchema),
+		validate: schemaResolver(signInSchema),
 	});
 
 	const handleSubmit = async (values: typeof form.values) => {

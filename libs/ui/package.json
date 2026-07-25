@@ -8,11 +8,11 @@
 		".": "./src/index.ts"
 	},
 	"peerDependencies": {
-		"react": "19.2.0",
-		"react-dom": "19.2.0",
-		"@mantine/core": "8.3.9"
+		"react": "19.2.8",
+		"react-dom": "19.2.8",
+		"@mantine/core": "9.4.2"
 	},
 	"dependencies": {
-		"@tabler/icons-react": "3.35.0"
+		"@tabler/icons-react": "3.45.0"
 	}
 }

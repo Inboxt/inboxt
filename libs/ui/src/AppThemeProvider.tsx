@@ -1,4 +1,4 @@
-import { MantineProvider, useMantineColorScheme } from '@mantine/core';
+import { MantineProvider, useMantineColorScheme, v8CssVariablesResolver } from '@mantine/core';
 import { ReactNode, useEffect } from 'react';
 
 import { theme } from './theme';
@@ -18,7 +18,11 @@ function ThemeColorUpdater() {
 
 export function AppThemeProvider({ children }: { children: ReactNode }) {
 	return (
-		<MantineProvider theme={theme} defaultColorScheme="light">
+		<MantineProvider
+			theme={theme}
+			defaultColorScheme="light"
+			cssVariablesResolver={v8CssVariablesResolver}
+		>
 			<ThemeColorUpdater />
 
 			{children}

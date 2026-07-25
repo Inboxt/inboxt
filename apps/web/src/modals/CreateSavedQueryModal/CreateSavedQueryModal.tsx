@@ -1,8 +1,7 @@
 import { useMutation } from '@apollo/client';
 import { Stack, TextInput, Button, Card } from '@mantine/core';
-import { useForm } from '@mantine/form';
+import { useForm, schemaResolver } from '@mantine/form';
 import { ContextModalProps } from '@mantine/modals';
-import { zod4Resolver } from 'mantine-form-zod-resolver';
 
 import { createSavedQuerySchema } from '@inboxt/common';
 
@@ -23,7 +22,7 @@ export const CreateSavedQueryModal = ({
 	const form = useForm({
 		mode: 'uncontrolled',
 		initialValues: { name: '', query: innerProps?.query ?? '' },
-		validate: zod4Resolver(createSavedQuerySchema),
+		validate: schemaResolver(createSavedQuerySchema),
 	});
 
 	const handleCreateSavedQuery = async (values: typeof form.values) => {
