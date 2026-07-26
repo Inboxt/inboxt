@@ -9,7 +9,7 @@ export const requireActiveUser = async () => {
 		fetchPolicy: 'network-only',
 	});
 
-	if (!data.me) {
+	if (!data?.me) {
 		throw redirect({ to: '/auth' });
 	}
 

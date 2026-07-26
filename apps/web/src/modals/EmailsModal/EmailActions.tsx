@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client/react';
 import { ActionIcon, Button, CopyButton, Group, Stack, Tooltip } from '@mantine/core';
 import { IconCheck, IconCopy, IconTrash } from '@tabler/icons-react';
 

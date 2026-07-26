@@ -1,3 +1,4 @@
+import { useMantineColorScheme } from '@mantine/core';
 import { useColorScheme, useLocalStorage } from '@mantine/hooks';
 import { useMemo } from 'react';
 
@@ -8,7 +9,6 @@ import {
 	ReaderThemeName,
 	ReaderThemeTokens,
 } from '@inboxt/common';
-import { useMantineColorScheme } from '@mantine/core';
 
 function mapFontFamily(font: ReaderContentSettings['font']) {
 	if (font === 'Serif') {

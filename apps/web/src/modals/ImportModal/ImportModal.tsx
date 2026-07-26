@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client/react';
 import { Alert, Button, Card, Flex, FileInput, Stack, Text, Title } from '@mantine/core';
 import { ContextModalProps } from '@mantine/modals';
 import { IconCsv, IconZip } from '@tabler/icons-react';

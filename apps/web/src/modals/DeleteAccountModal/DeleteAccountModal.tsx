@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client/react';
 import { Button, Text, Stack, TextInput, Card, Alert, Box } from '@mantine/core';
 import { useForm, schemaResolver } from '@mantine/form';
 import { ContextModalProps } from '@mantine/modals';

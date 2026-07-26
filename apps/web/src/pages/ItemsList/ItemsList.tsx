@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client/react';
 import { Alert, Box, Button, Center, Group, Loader, Text } from '@mantine/core';
 import { useSearch } from '@tanstack/react-router';
 import { useVirtualizer } from '@tanstack/react-virtual';

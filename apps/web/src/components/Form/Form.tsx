@@ -1,7 +1,6 @@
-import { ApolloError } from '@apollo/client';
 import { Alert, Box, BoxProps, ElementProps } from '@mantine/core';
 import { IconAlertTriangleFilled } from '@tabler/icons-react';
-import { ReactNode, FormEvent, useEffect } from 'react';
+import { SubmitEvent, ReactNode, useEffect } from 'react';
 
 import { parseError } from '~utils/parse-error';
 
@@ -9,27 +8,33 @@ import classes from './Form.module.css';
 
 type FormProps = {
 	children: (({ error }: { error: ReactNode | null }) => ReactNode) | ReactNode;
-	onSubmit: (e: FormEvent<HTMLFormElement>) => void;
-	error?: ApolloError | string;
+	onSubmit: (e: SubmitEvent<HTMLFormElement>) => void;
+	error?: unknown;
 	setErrors?: (errors: Record<string, string>) => void;
 } & Omit<BoxProps, 'children'> &
 	Omit<ElementProps<'form', 'onSubmit'>, 'children' | 'onSubmit'>;
 
 export const Form = ({ children, onSubmit, error, setErrors, ...others }: FormProps) => {
 	useEffect(() => {
-		if (error && setErrors) {
-			const parsed = parseError(error);
-			if (parsed?.fieldErrors) {
-				const fieldErrors = parsed.fieldErrors.reduce(
-					(acc, fieldError) => ({
-						...acc,
-						[fieldError.path]: fieldError.message,
-					}),
-					{},
-				);
-				setErrors(fieldErrors);
-			}
+		if (!error || !setErrors) {
+			return;
 		}
+
+		const parsed = parseError(error);
+
+		if (!parsed?.fieldErrors) {
+			return;
+		}
+
+		const fieldErrors = parsed.fieldErrors.reduce<Record<string, string>>(
+			(acc, fieldError) => ({
+				...acc,
+				[fieldError.path]: fieldError.message,
+			}),
+			{},
+		);
+
+		setErrors(fieldErrors);
 	}, [error, setErrors]);
 
 	const renderError = () => {
@@ -38,6 +43,7 @@ export const Form = ({ children, onSubmit, error, setErrors, ...others }: FormPr
 		}
 
 		const parsed = parseError(error);
+
 		if (!parsed?.message || parsed.message === 'Invalid input provided') {
 			return null;
 		}

@@ -3,7 +3,7 @@ import { createContext, useContext } from 'react';
 import { SavedItem, Highlight } from '~lib/graphql';
 
 export type SelectableHighlight = Omit<Highlight, 'savedItem'> & {
-	savedItem?: Pick<SavedItem, 'id' | 'title' | 'createdAt'> | null;
+	savedItem?: Pick<SavedItem, 'id' | 'createdAt'> | null;
 };
 
 export type SelectableItem = SavedItem | SelectableHighlight;

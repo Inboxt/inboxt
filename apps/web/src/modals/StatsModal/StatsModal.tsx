@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client/react';
 import { Box, Card, Group, Loader, SimpleGrid, Stack, Text } from '@mantine/core';
 import { ContextModalProps } from '@mantine/modals';
 import {

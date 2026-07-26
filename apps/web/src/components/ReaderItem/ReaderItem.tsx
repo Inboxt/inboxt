@@ -38,13 +38,11 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 	const longPressHandlers = useLongPress(handleLongPress, { threshold: 800 });
 
 	return (
-		<Box
-			component={Link}
-			to={`/r/${item.id}`}
-			search={(prev: any) => prev}
-			p="md"
+		<Link
+			to="/r/$id"
+			params={{ id: item.id }}
+			search={(prev) => prev}
 			className={classes.item}
-			ref={ref}
 			onClick={(e: React.MouseEvent) => {
 				if (selectedItems.length > 0) {
 					e.preventDefault();
@@ -53,6 +51,7 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 			}}
 			style={{ color: 'inherit', textDecoration: 'none' }}
 			{...longPressHandlers}
+			ref={ref}
 		>
 			<Group wrap="nowrap" maw="100%">
 				{display === 'gallery' ? (
@@ -170,6 +169,6 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 					)}
 				</Stack>
 			</Group>
-		</Box>
+		</Link>
 	);
 };

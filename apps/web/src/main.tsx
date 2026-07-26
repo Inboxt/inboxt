@@ -1,7 +1,7 @@
 import '@mantine/core/styles.css';
 import './main.css';
 
-import { ApolloProvider } from '@apollo/client';
+import { ApolloProvider } from '@apollo/client/react';
 import { ModalsProvider } from '@mantine/modals';
 import * as Sentry from '@sentry/react';
 import { RouterProvider } from '@tanstack/react-router';

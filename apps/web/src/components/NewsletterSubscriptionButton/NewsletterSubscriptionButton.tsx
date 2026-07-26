@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client/react';
 import { Button } from '@mantine/core';
 
 import { ConfirmWithAlert } from '~components/ConfirmWithAlert';

@@ -5,6 +5,7 @@
 	border: 0 solid var(--mantine-color-gray-4);
 	border-bottom-width: 1px;
 	cursor: pointer;
+	padding: var(--mantine-spacing-md);
 
 	@mixin dark {
 		border-color: var(--mantine-color-dark-4);

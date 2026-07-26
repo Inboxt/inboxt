@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client/react';
 import { Box, Skeleton } from '@mantine/core';
 import { useLongPress } from '@mantine/hooks';
 import { IconHighlight } from '@tabler/icons-react';
@@ -8,7 +8,7 @@ import { HighlightPopover } from '~components/HighlightPopover';
 import { toastError, toastInfo } from '~components/Toast';
 import { useScreenQuery } from '~hooks/useScreenQuery';
 import { useTextHighlighting } from '~hooks/useTextSelection';
-import { ADD_ARTICLE_FROM_URL, ENTRIES, SavedItem } from '~lib/graphql';
+import { ADD_ARTICLE_FROM_URL, SavedItem } from '~lib/graphql';
 import { applyHighlightsToDOM } from '~utils/highlightsDOM.ts';
 
 import { ReaderImageLightbox, ReaderLightboxImage } from './ReaderImageLightbox';
