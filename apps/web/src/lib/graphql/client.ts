@@ -9,14 +9,7 @@ export const client = new ApolloClient({
 			Query: {
 				fields: {
 					entries: {
-						keyArgs: (args) => {
-							const q = args?.query?.q ?? null;
-							const sort = args?.query?.sort ?? null;
-							const field = sort?.field ?? null;
-							const direction = sort?.direction ?? null;
-
-							return `entries:${q}:${field}:${direction}`;
-						},
+						keyArgs: ['query', ['q', 'sort', ['field', 'direction']]],
 						merge(existing, incoming, { args }) {
 							if (!args?.query?.after) {
 								const incomingEdges: any[] = incoming.edges ?? [];

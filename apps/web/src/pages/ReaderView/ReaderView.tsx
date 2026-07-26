@@ -37,7 +37,14 @@ import { useReaderSettings, makeReaderResolver } from '~hooks/useReaderSettings.
 import { useReaderSwipeNavigation } from '~hooks/useReaderSwipeNavigation';
 import { useScreenQuery } from '~hooks/useScreenQuery';
 import { useTextHighlighting } from '~hooks/useTextSelection';
-import { SAVED_ITEM, SavedItemType, UPDATE_READING_PROGRESS, SavedItem } from '~lib/graphql';
+import {
+	SAVED_ITEM,
+	SavedItemType,
+	UPDATE_READING_PROGRESS,
+	SavedItem,
+	GET_USER_STATS,
+} from '~lib/graphql';
+import { updateEntriesCacheForReadStatus } from '~lib/graphql/cache';
 import { Route } from '~routes/_auth._main.r.$id';
 
 import classes from './ReaderView.module.css';
@@ -55,7 +62,15 @@ export const ReaderView = () => {
 		variables: { query: { id } },
 		fetchPolicy: 'cache-and-network',
 	});
-	const [updateReadingProgress] = useMutation(UPDATE_READING_PROGRESS);
+	const [updateReadingProgress] = useMutation(UPDATE_READING_PROGRESS, {
+		update(cache, { data }) {
+			const updated = data?.updateReadingProgress;
+			if (updated) {
+				updateEntriesCacheForReadStatus(cache, [updated as SavedItem]);
+			}
+		},
+		refetchQueries: [GET_USER_STATS],
+	});
 	const { nextId, prevId } = useAdjacentItems(id);
 
 	const [lastResumedId, setLastResumedId] = useState<string | null>(null);
