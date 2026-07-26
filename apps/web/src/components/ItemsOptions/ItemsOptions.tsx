@@ -30,7 +30,10 @@ import {
 	UPDATE_SAVED_ITEMS_READ_STATUS,
 	DELETE_HIGHLIGHTS,
 	ACTIVE_USER,
+	GET_USER_STATS,
+	ENTRIES,
 } from '~lib/graphql';
+import { updateEntriesCacheForReadStatus } from '~lib/graphql/cache';
 import { SavedItem, SavedItemStatus, Highlight } from '~lib/graphql';
 import { modals } from '~modals/modals';
 
@@ -107,6 +110,7 @@ export const ItemsOptions = ({
 			});
 			cache.gc();
 		},
+		refetchQueries: [GET_USER_STATS],
 	});
 	const [deleteHighlights, { loading: deleteLoading }] = useMutation(DELETE_HIGHLIGHTS, {
 		update(cache, { data }, { variables }) {
@@ -149,7 +153,7 @@ export const ItemsOptions = ({
 
 			cache.gc();
 		},
-		refetchQueries: [ACTIVE_USER],
+		refetchQueries: [ACTIVE_USER, GET_USER_STATS],
 	});
 	const [permanentlyDeleteSavedItems] = useMutation(PERMANENTLY_DELETE_SAVED_ITEMS, {
 		update(cache, { data }, { variables }) {
@@ -185,10 +189,17 @@ export const ItemsOptions = ({
 				cache.gc();
 			}
 		},
-		refetchQueries: [ACTIVE_USER],
+		refetchQueries: [ACTIVE_USER, GET_USER_STATS],
 	});
 	const [updateReadStatus, { loading: readStatusLoading }] = useMutation(
 		UPDATE_SAVED_ITEMS_READ_STATUS,
+		{
+			update(cache, { data }) {
+				const updated = (data?.updateSavedItemsReadStatus || []) as SavedItem[];
+				updateEntriesCacheForReadStatus(cache, updated);
+			},
+			refetchQueries: [GET_USER_STATS, ENTRIES],
+		},
 	);
 
 	const { setSelectedItems } = useContentSelection();
