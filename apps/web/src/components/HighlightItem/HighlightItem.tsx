@@ -59,8 +59,8 @@ export const HighlightItem = ({ highlight }: HighlightItemProps) => {
 					px={3}
 				/>
 
-				<Stack gap="xxs" flex={1}>
-					<Group wrap="nowrap" gap="md" pos="relative">
+				<Stack gap="xxs" flex={1} miw={0}>
+					<Group wrap="nowrap" gap="md" pos="relative" miw={0}>
 						<Breadcrumbs separator="•" className={classes.breadcrumb}>
 							<Text fz="sm" lh="sm" className={classes.text}>
 								{sourceTitle}
