@@ -25,7 +25,7 @@
 		"@aws-sdk/s3-request-presigner": "3.1095.0",
 		"@inboxt/common": "1.1.0",
 		"@mozilla/readability": "0.6.0",
-		"@nestjs/apollo":f "13.4.2",
+		"@nestjs/apollo": "13.4.2",
 		"@nestjs/bullmq": "11.0.4",
 		"@nestjs/common": "11.1.28",
 		"@nestjs/config": "4.0.4",
