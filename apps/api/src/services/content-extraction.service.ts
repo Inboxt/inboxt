@@ -92,6 +92,66 @@ export class ContentExtractionService {
 		});
 	}
 
+	private preExtractNewsletterCleanup(doc: Document) {
+		// 1. Strip tracking pixels and layout images before stripping attributes
+		doc.querySelectorAll('img').forEach((img) => {
+			const width = img.getAttribute('width');
+			const height = img.getAttribute('height');
+			// Common tracking pixel or spacer patterns
+			if (
+				(width === '1' && height === '1') ||
+				width === '0' ||
+				height === '0' ||
+				!img.getAttribute('src')
+			) {
+				img.remove();
+			}
+		});
+
+		// 2. Remove all style tags and attributes
+		doc.querySelectorAll('style').forEach((s) => s.remove());
+
+		const allElements = doc.querySelectorAll('*');
+		allElements.forEach((el) => {
+			el.removeAttribute('style');
+			if (el.tagName !== 'IMG') {
+				el.removeAttribute('width');
+				el.removeAttribute('height');
+			}
+			el.removeAttribute('bgcolor');
+			el.removeAttribute('background');
+			el.removeAttribute('align');
+			el.removeAttribute('valign');
+			el.removeAttribute('cellpadding');
+			el.removeAttribute('cellspacing');
+			el.removeAttribute('border');
+		});
+
+		// 3. Remove comments
+		const iterator = doc.createNodeIterator(doc.documentElement, 128); // NodeFilter.SHOW_COMMENT
+		let node: Node | null;
+		const comments: Node[] = [];
+		while ((node = iterator.nextNode())) {
+			comments.push(node);
+		}
+		comments.forEach((c) => c.parentNode?.removeChild(c));
+	}
+
+	private postExtractNewsletterCleanup(html: string): string {
+		const { doc } = this.prepareDom(html);
+		const tagsToReplace = ['table', 'tbody', 'thead', 'tfoot', 'tr', 'td', 'th', 'center'];
+		tagsToReplace.forEach((tagName) => {
+			Array.from(doc.querySelectorAll(tagName)).forEach((el) => {
+				const div = doc.createElement('div');
+				while (el.firstChild) {
+					div.appendChild(el.firstChild);
+				}
+				el.parentNode?.replaceChild(div, el);
+			});
+		});
+		return doc.body.innerHTML;
+	}
+
 	private prepareDom(html: string, url?: string) {
 		const virtualConsole = new VirtualConsole();
 		const dom = new JSDOM(html, { url, virtualConsole });
@@ -161,6 +221,7 @@ export class ContentExtractionService {
 			url?: string;
 			maxWords?: number;
 			minWords?: number;
+			isNewsletter?: boolean;
 		} = {},
 	) {
 		const { window, doc } = this.prepareDom(html, options.url);
@@ -183,8 +244,13 @@ export class ContentExtractionService {
 			);
 		}
 
+		if (options.isNewsletter) {
+			this.preExtractNewsletterCleanup(doc);
+		}
+
 		const readabilityResult = new Readability(doc).parse();
-		if (!readabilityResult?.content || !readabilityResult?.textContent?.trim()) {
+
+		if (!readabilityResult?.content) {
 			throw new AppException(
 				'We were unable to extract the readable portion of this content. \n The page or document may not contain structured text, or it may be unsupported. \n\n Please check the source and try again. If the issue persists, contact support for assistance.',
 				HttpStatus.BAD_REQUEST,
@@ -192,10 +258,14 @@ export class ContentExtractionService {
 			);
 		}
 
-		const sanitizedHtml = this.purifyAndSanitizeHtml(
-			(readabilityResult?.content as string) || html,
-			window,
-		);
+		let rawContent = readabilityResult.content;
+		if (options.isNewsletter) {
+			rawContent = this.postExtractNewsletterCleanup(rawContent);
+		}
+
+		const sanitizedHtml = this.purifyAndSanitizeHtml(rawContent || html, window);
+
+		const contentHtml = sanitizedHtml;
 
 		const fallbackBaseText = readabilityResult?.textContent || allText?.trim() || '';
 		const description =
@@ -205,7 +275,7 @@ export class ContentExtractionService {
 
 		return {
 			title: readabilityResult?.title || DEFAULT_PROCESSED_ITEM_TITLE,
-			contentHtml: sanitizedHtml,
+			contentHtml,
 			contentText: readabilityResult?.textContent || null,
 			description,
 			author: readabilityResult?.byline || null,
