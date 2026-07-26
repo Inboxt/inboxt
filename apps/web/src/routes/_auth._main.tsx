@@ -13,14 +13,18 @@ export type RouteSearchParams = {
 	modal?: 'api-tokens';
 };
 
+const isSortOption = (value: unknown): value is SortOption =>
+	typeof value === 'string' && SORT_VALUES.includes(value as SortOption);
+
 export const Route = createFileRoute('/_auth/_main')({
 	validateSearch: (search: Record<string, unknown>): RouteSearchParams => {
 		let sort = search.sort as SortOption | undefined;
 
 		if (!sort && typeof window !== 'undefined') {
-			const storedSort: SortOption = readLocalStorageValue({ key: 'sort' });
-			if (SORT_VALUES.includes(storedSort)) {
-				sort = storedSort as RouteSearchParams['sort'];
+			const storedSort = readLocalStorageValue({ key: 'sort' });
+
+			if (isSortOption(storedSort)) {
+				sort = storedSort;
 			}
 		}
 
@@ -28,12 +32,12 @@ export const Route = createFileRoute('/_auth/_main')({
 			localStorage.setItem('sort', sort);
 		}
 
-		if (!sort || !SORT_VALUES.includes(sort)) {
+		if (!sort || !isSortOption(sort)) {
 			sort = 'date_desc';
 		}
 
 		return {
-			q: (search.q as string) || 'in:inbox type:article',
+			q: (search.q as string) || 'in:inbox type:article is:unread',
 			sort,
 			modal: search.modal === 'api-tokens' ? 'api-tokens' : undefined,
 		};

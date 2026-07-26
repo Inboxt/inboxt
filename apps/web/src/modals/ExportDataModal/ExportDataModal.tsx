@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client/react';
 import { Button, Card, SegmentedControl, Skeleton, Stack, Text, TextInput } from '@mantine/core';
 import { ContextModalProps } from '@mantine/modals';
 import { useState } from 'react';

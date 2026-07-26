@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client/react';
 import { Avatar } from '@mantine/core';
 import {
 	IconCloudUpload,

@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client/react';
 import { useTextSelection } from '@mantine/hooks';
 import { RefObject, useMemo, useState, useEffect, useRef } from 'react';
 

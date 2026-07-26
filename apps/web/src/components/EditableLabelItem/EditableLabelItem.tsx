@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client/react';
 import { Group, Text, TextInput, ActionIcon, Flex, Stack, Button } from '@mantine/core';
 import { useForm, schemaResolver } from '@mantine/form';
 import {
@@ -13,8 +13,7 @@ import { useEffect } from 'react';
 import { updateLabelSchema } from '@inboxt/common';
 
 import { useScreenQuery } from '~hooks/useScreenQuery';
-import { DELETE_LABEL, UPDATE_LABEL } from '~lib/graphql';
-import { Label } from '~lib/graphql';
+import { DELETE_LABEL, UPDATE_LABEL, Label } from '~lib/graphql';
 
 import { Form } from '../Form';
 import { LabelsColorInput } from '../LabelsColorInput';

@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client/react';
 import { ActionIcon, Tooltip } from '@mantine/core';
 import {
 	IconArchive,
@@ -23,6 +23,7 @@ import { ConfirmWithAlert } from '~components/ConfirmWithAlert';
 import { toastSuccess } from '~components/Toast';
 import { ToastProps } from '~components/Toast/type.ts';
 import { SelectableItem, useContentSelection } from '~context/content-selection';
+import { useScreenQuery } from '~hooks/useScreenQuery.tsx';
 import {
 	PERMANENTLY_DELETE_SAVED_ITEMS,
 	UPDATE_SAVED_ITEMS_STATUS,
@@ -35,15 +36,9 @@ import { modals } from '~modals/modals';
 
 import { MenuDrawer } from '../MenuDrawer';
 import { ReaderSettingsPopover } from '../ReaderSettingsPopover';
-import { useScreenQuery } from '~hooks/useScreenQuery.tsx';
 
 export type ItemsOptionsMode =
-	| 'single'
-	| 'bulk'
-	| 'reader'
-	| 'reader-menu'
-	| 'reader-toolbar'
-	| 'highlights';
+	'single' | 'bulk' | 'reader' | 'reader-menu' | 'reader-toolbar' | 'highlights';
 
 type ItemsOptionsProps = {
 	items: SelectableItem[];
@@ -115,37 +110,44 @@ export const ItemsOptions = ({
 	});
 	const [deleteHighlights, { loading: deleteLoading }] = useMutation(DELETE_HIGHLIGHTS, {
 		update(cache, { data }, { variables }) {
-			if (data?.deleteHighlights?.success) {
-				const ids = (variables?.data?.ids || []) as string[];
-
-				cache.modify({
-					fields: {
-						entries(existing: any, { readField }: any) {
-							if (!existing || !existing.edges) {
-								return existing;
-							}
-
-							const newEdges = existing.edges.filter((edge: any) => {
-								const node = readField('node', edge);
-								if (!node) {
-									return false;
-								}
-								const nodeId = readField('id', node);
-								return !ids.includes(nodeId as string);
-							});
-
-							return newEdges.length === existing.edges.length
-								? existing
-								: { ...existing, edges: newEdges };
-						},
-					},
-				});
-
-				ids.forEach((id) => {
-					cache.evict({ id: cache.identify({ __typename: 'Highlight', id }) });
-				});
-				cache.gc();
+			if (!data?.deleteHighlights?.success) {
+				return;
 			}
+
+			const ids = (variables?.data.items || []).map((item) => item.id);
+
+			cache.modify({
+				fields: {
+					entries(existing: any, { readField }: any) {
+						if (!existing?.edges) {
+							return existing;
+						}
+
+						const filteredEdges = existing.edges.filter((edge: any) => {
+							const node = readField('node', edge);
+							const id = readField('id', node as any);
+
+							return !ids.includes(id as string);
+						});
+
+						return {
+							...existing,
+							edges: filteredEdges,
+						};
+					},
+				},
+			});
+
+			ids.forEach((id) => {
+				cache.evict({
+					id: cache.identify({
+						__typename: 'Highlight',
+						id,
+					}),
+				});
+			});
+
+			cache.gc();
 		},
 		refetchQueries: [ACTIVE_USER],
 	});

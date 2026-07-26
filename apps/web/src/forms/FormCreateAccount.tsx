@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client/react';
 import { Button, PasswordInput, Stack, TextInput } from '@mantine/core';
 import { useForm, schemaResolver } from '@mantine/form';
 import { IconAt, IconLock, IconMail } from '@tabler/icons-react';

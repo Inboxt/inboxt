@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client/react';
 import { Center, Loader, Stack, Text } from '@mantine/core';
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import { useEffect, useRef } from 'react';

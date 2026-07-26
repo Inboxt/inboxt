@@ -23,7 +23,7 @@ export const Route = createFileRoute('/auth')({
 			fetchPolicy: 'network-only',
 		});
 
-		if (data.me) {
+		if (data?.me) {
 			throw redirect({
 				to: '/',
 			});

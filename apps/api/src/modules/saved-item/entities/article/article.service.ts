@@ -10,9 +10,7 @@ import { PrismaService } from '~modules/prisma/prisma.service';
 import { ContentExtractionService } from '~services/content-extraction.service';
 
 export type ProcessArticleInput =
-	| { url: string; html?: string }
-	| { url?: string; html: string }
-	| { url: string; html: string };
+	{ url: string; html?: string } | { url?: string; html: string } | { url: string; html: string };
 
 @Injectable()
 export class ArticleService {
