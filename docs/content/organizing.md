@@ -74,6 +74,13 @@ Labels appear in the app’s navigation. Selecting a label shows all items with 
 
 ## Searching
 
-You can search items by title, content, or description.
+To search for items by title, content, or description, see [Search](/search).
 
-For advanced filters and operators such as `in:archive` or `in:trash`, see [Search](/search).
+## Editing item details
+
+You can edit the metadata of any item in your library to correct errors or add missing information.
+
+Available fields for editing:
+- Title
+- Description
+- Author

@@ -1,6 +1,6 @@
 {
 	"name": "api",
-	"version": "1.1.2",
+	"version": "1.2.0",
 	"description": "",
 	"author": "",
 	"private": true,
@@ -23,7 +23,7 @@
 		"@apollo/server": "5.5.1",
 		"@aws-sdk/client-s3": "3.1095.0",
 		"@aws-sdk/s3-request-presigner": "3.1095.0",
-		"@inboxt/common": "1.1.0",
+		"@inboxt/common": "1.2.0",
 		"@mozilla/readability": "0.6.0",
 		"@nestjs/apollo": "13.4.2",
 		"@nestjs/bullmq": "11.0.4",

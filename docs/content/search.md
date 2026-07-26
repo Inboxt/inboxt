@@ -118,6 +118,35 @@ type:highlight
 has:highlights label:Books
 ```
 
+## Filtering by read status
+
+Use the `is:read` or `is:unread` filter to find items based on whether you have read them.
+
+Available options:
+- `is:read`
+- `is:unread`
+
+Example:
+
+```
+is:unread
+```
+
+## Filtering by parsing status
+
+Use the `is:failed` or `is:parsed` filter to find items based on their content extraction results. This is useful for identifying items that might need manual attention or have failed to process correctly.
+
+Available options:
+- `is:parsed`
+- `is:failed`
+- `is:processing`
+
+Example:
+
+```
+is:failed
+```
+
 ## Filtering by website
 
 Use the `site:` filter to search by the source website.

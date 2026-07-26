@@ -68,6 +68,19 @@ Once confirmed:
 
 Deletion typically completes within seconds.
 
+## Reading statistics
+
+Inboxt provides insights into your reading habits through the **Statistics** view.
+
+You can view:
+- Total articles and newsletters read
+- Articles read this week, this month, and all time
+- Estimated reading time completed
+- Average article length and reading speed
+- Unread vs. read items distribution
+
+To access your statistics, open the profile menu and select **Statistics**.
+
 Your instance may retain some operational logs temporarily for reliability and security purposes. These logs are not used to reconstruct deleted accounts and do not contain readable saved content unless specifically logged for debugging (e.g., SMTP failures).
 
 If you need help with account-related issues, see [Getting Help](/help).

@@ -24,9 +24,12 @@ The reader view provides a focused environment for your content with several key
 
 - **Clean Layout**: Centers content and removes ads, navigation, and other visual noise.
 - **Consistency**: Works seamlessly for both articles and newsletters.
-- **Swipe Navigation**: On touch devices, you can swipe left or right to quickly navigate between articles.
+- **Navigation**: Quickly move between articles using the navigation buttons on desktop or by swiping on touch devices.
 - **Image Lightbox**: Click on any image within an article to view it in full screen.
 - **Link Actions**: Click on links within the article to access quick actions, such as saving the link to Inboxt, opening it in a new tab, or copying the URL.
+- **Reader Toolbar**: On mobile devices, a bottom toolbar provides quick access to common actions like archiving, deleting, or editing the item.
+- **Reading Progress**: Inboxt tracks your reading progress for each article and newsletter, showing a progress bar at the top and automatically restoring your scroll position when you return.
+- **Immersive Header**: The reader view header automatically hides as you scroll down on mobile, providing a distraction-free experience.
 
 ### Reading settings
 
