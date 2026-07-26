@@ -5,6 +5,7 @@ import dayjs from 'dayjs';
 import { Prisma } from '@inboxt/prisma';
 
 import { AppException } from '~common/utils/app-exception';
+import { decodeMimeHeader } from '~common/utils/decodeMimeHeader';
 import { Config } from '~config/index';
 import { PrismaService } from '~modules/prisma/prisma.service';
 import { ContentExtractionService } from '~services/content-extraction.service';
@@ -60,14 +61,15 @@ export class NewsletterService {
 	}
 
 	extractSubject(payload: any): string | null {
-		return (
+		const subject =
 			payload.subject ||
 			payload.Subject ||
 			payload.items?.[0]?.Subject ||
 			payload.msys?.relay_message?.content?.subject ||
 			payload.headers?.Subject?.[0] ||
-			null
-		);
+			null;
+
+		return decodeMimeHeader(subject);
 	}
 
 	extractMessageId(payload: any): string | null {
@@ -161,56 +163,40 @@ export class NewsletterService {
 	}
 
 	extractAuthor(payload: any): string {
+		let from: string | null = null;
 		if (payload.from) {
-			return payload.from;
+			from = payload.from;
+		} else if (payload.FromName) {
+			from = payload.FromName;
+		} else if (payload.FromFull?.Name) {
+			from = payload.FromFull.Name;
+		} else if (payload.FromFull?.Email) {
+			from = payload.FromFull.Email;
+		} else if (payload.Sender) {
+			from = payload.Sender;
+		} else if (payload.msg_from) {
+			from = payload.msg_from;
+		} else if (payload.items?.[0]?.From) {
+			const brevoFrom = payload.items[0].From;
+			from = brevoFrom.Name || brevoFrom.Address || 'Unknown sender';
+		} else if (payload.msys?.relay_message?.friendly_from) {
+			from = payload.msys.relay_message.friendly_from;
+		} else if (payload.msys?.relay_message?.msg_from) {
+			from = payload.msys.relay_message.msg_from;
+		} else {
+			const fromHeader = payload.headers?.From?.[0]?.trim() || payload.From?.trim();
+			const envelopeSender = payload.envelope_sender?.trim();
+
+			if (fromHeader) {
+				// Remove any surrounding quotes and whitespace
+				from = fromHeader.replace(/\s{2,}/g, ' ').replace(/^"|"$/g, '');
+			} else if (envelopeSender) {
+				// Fallback to envelope sender if From header is missing or empty
+				from = envelopeSender;
+			}
 		}
 
-		if (payload.FromName) {
-			return payload.FromName;
-		}
-
-		if (payload.FromFull?.Name) {
-			return payload.FromFull.Name;
-		}
-
-		if (payload.FromFull?.Email) {
-			return payload.FromFull.Email;
-		}
-
-		if (payload.Sender) {
-			return payload.Sender;
-		}
-
-		if (payload.msg_from) {
-			return payload.msg_from;
-		}
-
-		const brevoFrom = payload.items?.[0]?.From;
-		if (brevoFrom) {
-			return brevoFrom.Name || brevoFrom.Address || 'Unknown sender';
-		}
-
-		if (payload.msys?.relay_message?.friendly_from) {
-			return payload.msys.relay_message.friendly_from;
-		}
-		if (payload.msys?.relay_message?.msg_from) {
-			return payload.msys.relay_message.msg_from;
-		}
-
-		const fromHeader = payload.headers?.From?.[0]?.trim() || payload.From?.trim();
-		const envelopeSender = payload.envelope_sender?.trim();
-
-		if (fromHeader) {
-			// Remove any surrounding quotes and whitespace
-			return fromHeader.replace(/\s{2,}/g, ' ').replace(/^"|"$/g, '');
-		}
-
-		// Fallback to envelope sender if From header is missing or empty
-		if (envelopeSender) {
-			return envelopeSender;
-		}
-
-		return 'Unknown sender';
+		return decodeMimeHeader(from) || 'Unknown sender';
 	}
 
 	async get(userId: string, query: Prisma.newsletterFindFirstArgs) {
@@ -333,6 +319,7 @@ export class NewsletterService {
 		const result = this.contentExtractionService.extractReadableContent(input.html, {
 			maxWords: this.configService.get('content.newsletterMaxWordCount', { infer: true }),
 			minWords: this.configService.get('content.newsletterMinWordCount', { infer: true }),
+			isNewsletter: true,
 		});
 
 		const contentHtml = result?.contentHtml || input.html || null;
