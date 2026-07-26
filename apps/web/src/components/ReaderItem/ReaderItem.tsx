@@ -91,7 +91,7 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 					/>
 				)}
 
-				<Stack gap="xs" flex={1}>
+				<Stack gap="xs" flex={1} miw={0}>
 					<Breadcrumbs separator="•" mb="-xxs" style={{ flexWrap: 'nowrap' }}>
 						<Text fz="sm" className={classes.text}>
 							{dayjs(item.createdAt).isSame(new Date(), 'year')
@@ -111,7 +111,7 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 						)}
 					</Breadcrumbs>
 
-					<Group wrap="nowrap" gap="md" justify="space-between" pos="relative">
+					<Group wrap="nowrap" gap="md" justify="space-between" pos="relative" miw={0}>
 						<Text
 							fw={item.readAt ? '400' : '700'}
 							lineClamp={1}
@@ -142,6 +142,7 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 							align="center"
 							justify={item.labels?.length ? 'space-between' : 'flex-start'}
 							wrap="nowrap"
+							miw={0}
 						>
 							{item.labels?.length && (
 								<Group wrap="nowrap" gap="xxxs">
