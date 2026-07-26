@@ -67,8 +67,13 @@ export class MailService {
 		});
 	}
 
-	private renderTemplate<T>(template: (args: T) => string, args: T): string {
-		return mjml2html(template(args), { validationLevel: 'soft', keepComments: false }).html;
+	private async renderTemplate<T>(template: (args: T) => string, args: T): Promise<string> {
+		const result = await mjml2html(template(args), {
+			validationLevel: 'soft',
+			keepComments: false,
+		});
+
+		return result.html;
 	}
 
 	async sendTemplate<TData>(options: {
