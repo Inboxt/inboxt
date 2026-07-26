@@ -86,7 +86,7 @@ export class MailService {
 		await this.mailQueue.add('send', {
 			to: options.to,
 			subject: options.subject,
-			html: this.renderTemplate(options.template, options.templateData),
+			html: await this.renderTemplate(options.template, options.templateData),
 			headers: options.headers,
 		});
 	}
