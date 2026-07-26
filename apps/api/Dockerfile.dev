@@ -6,6 +6,7 @@ WORKDIR /usr/src/app
 
 # Copy package.json and other necessary files
 COPY package.json .
+COPY package-lock.json .
 COPY tsconfig*.json .
 COPY .env .
 

@@ -1,6 +1,6 @@
 import { InjectQueue } from '@nestjs/bullmq';
 import { Injectable } from '@nestjs/common';
-import archiver from 'archiver';
+import { ZipArchive } from 'archiver';
 import { Queue } from 'bullmq';
 import dayjs from 'dayjs';
 import { PassThrough } from 'stream';
@@ -242,7 +242,7 @@ export class ExportService {
 			generated_at: dayjs().toISOString(),
 		};
 
-		const archive = archiver('zip', { zlib: { level: 9 } });
+		const archive = new ZipArchive({ zlib: { level: 9 } });
 		const out = new PassThrough();
 		const chunks: Buffer[] = [];
 		out.on('data', (c) => chunks.push(c));
