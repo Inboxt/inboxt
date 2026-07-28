@@ -10,15 +10,10 @@ const ADD_ARTICLE_FROM_HTML_SNAPSHOT = `
 const SET_SAVED_ITEM_LABELS = `
   mutation SetSavedItemLabels($data: SetSavedItemLabelsInput!) {
     setSavedItemLabels(data: $data) {
-      success
+      id
     }
   }
 `;
-
-type SaveJobResponse =
-	| { ok: true; jobId: string }
-	| { ok: true; job: ReturnType<typeof serializeJob> }
-	| { ok: false; error: { message: string } };
 
 const jobs = new Map<string, SaveJob>();
 
@@ -230,7 +225,7 @@ export default defineBackground(() => {
 				(async () => {
 					try {
 						const data = await graphqlFetch<{
-							setSavedItemLabels: { success: boolean };
+							setSavedItemLabels: { id: string }[];
 						}>(SET_SAVED_ITEM_LABELS, {
 							data: {
 								id: job.itemId!,
@@ -238,7 +233,7 @@ export default defineBackground(() => {
 							},
 						});
 
-						if (!data.setSavedItemLabels.success) {
+						if (!data.setSavedItemLabels) {
 							throw new Error('Failed to set labels');
 						}
 
