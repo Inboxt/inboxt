@@ -15,6 +15,7 @@ import {
 	IconTrashX,
 	IconWorld,
 	IconPencil,
+	IconHighlight,
 } from '@tabler/icons-react';
 import { useNavigate } from '@tanstack/react-router';
 import React, { useMemo, useState } from 'react';
@@ -33,8 +34,8 @@ import {
 	GET_USER_STATS,
 	ENTRIES,
 } from '~lib/graphql';
-import { updateEntriesCacheForReadStatus } from '~lib/graphql/cache';
 import { SavedItem, SavedItemStatus, Highlight } from '~lib/graphql';
+import { updateEntriesCacheForReadStatus } from '~lib/graphql/cache';
 import { modals } from '~modals/modals';
 
 import { MenuDrawer } from '../MenuDrawer';
@@ -49,6 +50,7 @@ type ItemsOptionsProps = {
 	size?: 'sm' | 'md';
 	onActionComplete?: () => void | Promise<void>;
 	onLoadingChange?: (loading: boolean) => void;
+	onHighlightSelection?: () => void | Promise<void>;
 };
 
 type SuccessToastOptions = Partial<Omit<ToastProps, 'id' | 'variant'>>;
@@ -73,6 +75,7 @@ export const ItemsOptions = ({
 	size = 'md',
 	onActionComplete,
 	onLoadingChange,
+	onHighlightSelection,
 }: ItemsOptionsProps) => {
 	const isSmall = size === 'sm';
 	const isBelowMdScreen = useScreenQuery('md', 'below');
@@ -294,17 +297,14 @@ export const ItemsOptions = ({
 
 	const OPTIONS: Option[] = [
 		{
-			label: 'Edit Item',
-			icon: IconPencil,
-			modes: ['single', 'reader', 'reader-toolbar'],
+			label: 'Highlight',
+			icon: IconHighlight,
+			modes: ['reader-toolbar'],
 			clearsSelection: false,
 			runsOnActionComplete: false,
-			visible: () => savedItems.length === 1,
-			onClick: () => {
-				const [item] = savedItems;
-				if (item) {
-					modals.openEditInfoModal({ item });
-				}
+			visible: () => savedItems.length === 1 && Boolean(onHighlightSelection),
+			onClick: async () => {
+				await onHighlightSelection?.();
 				return undefined;
 			},
 		},
@@ -374,6 +374,21 @@ export const ItemsOptions = ({
 							? `${ids.length} items marked as unread.`
 							: 'Item marked as unread.',
 				});
+			},
+		},
+		{
+			label: 'Edit Item',
+			icon: IconPencil,
+			modes: ['single', 'reader', 'reader-toolbar'],
+			clearsSelection: false,
+			runsOnActionComplete: false,
+			visible: () => savedItems.length === 1,
+			onClick: () => {
+				const [item] = savedItems;
+				if (item) {
+					modals.openEditInfoModal({ item });
+				}
+				return undefined;
 			},
 		},
 		{

@@ -493,6 +493,11 @@ export const ReaderView = () => {
 									mode="reader-toolbar"
 									onActionComplete={handleActionComplete}
 									onLoadingChange={setIsActionsLoading}
+									onHighlightSelection={
+										selectedText && rangeRect && hasValidSelection
+											? highlightSelection
+											: undefined
+									}
 								/>
 							</Box>
 						)}
