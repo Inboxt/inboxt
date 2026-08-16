@@ -188,10 +188,35 @@
 .readerContent code {
 	max-width: 100%;
 	overflow-x: auto;
+	background-color: var(--reader-code-bg);
+	padding: 0.2em 0.4em;
+	border-radius: var(--mantine-radius-sm);
 }
 
 .readerContent pre {
 	white-space: pre-wrap;
+	padding: var(--mantine-spacing-xs);
+}
+
+.readerContent pre code {
+	background-color: transparent;
+	padding: 0;
+}
+
+.readerContent blockquote {
+	margin: var(--mantine-spacing-md) 0;
+	padding: var(--mantine-spacing-xs) var(--mantine-spacing-md);
+	background-color: var(--reader-blockquote-bg);
+	border-left: 4px solid var(--reader-border-color);
+	border-radius: 0 var(--mantine-radius-sm) var(--mantine-radius-sm) 0;
+}
+
+.readerContent blockquote p:first-of-type {
+	margin-top: 0;
+}
+
+.readerContent blockquote p:last-of-type {
+	margin-bottom: 0;
 }
 
 .readerContent iframe {

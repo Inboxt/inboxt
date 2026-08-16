@@ -44,6 +44,8 @@ export function makeReaderResolver(
 			'--reader-border-color': themeTokens.border,
 			'--reader-link-color': themeTokens.link || 'var(--mantine-color-anchor)',
 			'--reader-highlight-color': themeTokens.highlight,
+			'--reader-code-bg': themeTokens.codeBackground,
+			'--reader-blockquote-bg': themeTokens.blockquoteBackground,
 			'--reader-font-size': `${settings.textSize}px`,
 			'--reader-line-height': String(settings.lineHeight),
 			'--reader-letter-spacing': `${settings.letterSpacing}em`,
