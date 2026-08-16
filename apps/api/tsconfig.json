@@ -15,7 +15,8 @@
 		"esModuleInterop": true,
 		"baseUrl": ".",
 		"paths": {
-			"@inboxt/common": ["libs/common/src/index.ts"],
+			"@inboxt/common": ["../../libs/common/src/index.ts"],
+			"@inboxt/ui": ["../../libs/ui/src/index.ts"],
 			"@inboxt/prisma": ["./prisma/client"],
 			"~common/*": ["./src/common/*"],
 			"~config/*": ["./src/config/*"],

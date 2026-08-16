@@ -41,6 +41,8 @@ services:
     volumes:
       - ./apps/api/src:/usr/src/app/apps/api/src:cached
       - ./apps/api/prisma:/usr/src/app/apps/api/prisma:cached
+      - ./libs/common:/usr/src/app/libs/common:cached
+      - ./libs/ui:/usr/src/app/libs/ui:cached
       - ./.env:/usr/src/app/.env:cached
       - ./apps/api/migrations:/usr/src/app/apps/api/migrations:cached
     environment:
