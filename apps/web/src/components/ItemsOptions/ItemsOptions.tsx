@@ -236,7 +236,7 @@ export const ItemsOptions = ({
 			return opts;
 		}
 
-		toastSuccess({ ...opts, position: isBelowMdScreen ? 'top-center' : undefined });
+		toastSuccess(opts);
 		return undefined;
 	};
 
@@ -345,12 +345,7 @@ export const ItemsOptions = ({
 					variables: { data: { ids, isRead: true } },
 				});
 
-				return showSuccessToast({
-					title:
-						ids.length > 1
-							? `${ids.length} items marked as read.`
-							: 'Item marked as read.',
-				});
+				return undefined;
 			},
 		},
 		{
@@ -368,12 +363,7 @@ export const ItemsOptions = ({
 					variables: { data: { ids, isRead: false } },
 				});
 
-				return showSuccessToast({
-					title:
-						ids.length > 1
-							? `${ids.length} items marked as unread.`
-							: 'Item marked as unread.',
-				});
+				return undefined;
 			},
 		},
 		{
@@ -414,12 +404,7 @@ export const ItemsOptions = ({
 					},
 				});
 
-				return showSuccessToast({
-					title:
-						savedItems.length > 1
-							? `${savedItems.length} items were restored.`
-							: 'Item was restored.',
-				});
+				return undefined;
 			},
 		},
 		{
@@ -447,13 +432,14 @@ export const ItemsOptions = ({
 					},
 				});
 
-				return showSuccessToast({
-					title:
-						savedItems.length > 1
-							? `${savedItems.length} items were archived.`
-							: 'Item was archived.',
-					action: createUndoAction(savedItemIds, previousById),
-				});
+				if (savedItems.length > 1) {
+					return showSuccessToast({
+						title: `${savedItems.length} items were archived.`,
+						action: createUndoAction(savedItemIds, previousById),
+					});
+				}
+
+				return undefined;
 			},
 		},
 		{
@@ -481,13 +467,14 @@ export const ItemsOptions = ({
 					},
 				});
 
-				return showSuccessToast({
-					title:
-						savedItems.length > 1
-							? `${savedItems.length} items were moved to trash.`
-							: 'Item was moved to trash.',
-					action: createUndoAction(savedItemIds, previousById),
-				});
+				if (savedItems.length > 1) {
+					return showSuccessToast({
+						title: `${savedItems.length} items were moved to trash.`,
+						action: createUndoAction(savedItemIds, previousById),
+					});
+				}
+
+				return undefined;
 			},
 		},
 		{
@@ -524,14 +511,7 @@ export const ItemsOptions = ({
 					variables: { data: { ids: savedItemIds } },
 				});
 
-				return (
-					showSuccessToast({
-						title:
-							count > 1
-								? `${count} items were deleted permanently`
-								: 'Item was deleted permanently',
-					}) ?? true
-				);
+				return true;
 			},
 		},
 		{
@@ -605,14 +585,7 @@ export const ItemsOptions = ({
 					},
 				});
 
-				return (
-					showSuccessToast({
-						title:
-							count > 1
-								? `${count} highlights were deleted permanently`
-								: 'Highlight was deleted permanently',
-					}) ?? true
-				);
+				return true;
 			},
 		},
 		{
@@ -651,14 +624,7 @@ export const ItemsOptions = ({
 			}
 
 			if (result && typeof result === 'object') {
-				window.setTimeout(
-					() =>
-						toastSuccess({
-							...result,
-							position: isBelowMdScreen ? 'top-center' : undefined,
-						}),
-					350,
-				);
+				window.setTimeout(() => toastSuccess(result), 350);
 			}
 		} finally {
 			setActiveOptionLabel(null);

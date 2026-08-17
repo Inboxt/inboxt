@@ -25,22 +25,32 @@ export function toastSuccess(opts: Partial<Omit<ToastProps, 'id' | 'variant'>>) 
 		...opts,
 		title: opts.title || 'Success',
 		variant: 'success',
-		duration: opts?.action ? 5000 : opts?.duration,
+		duration: opts?.action ? 5000 : (opts?.duration ?? 4000),
 	});
 }
 export function toastError(opts: Partial<Omit<ToastProps, 'id' | 'variant'>>) {
-	return toast({ ...opts, title: opts.title || 'Error', variant: 'error' });
+	return toast({
+		...opts,
+		title: opts.title || 'Error',
+		variant: 'error',
+		duration: opts?.duration ?? 5000,
+	});
 }
 export function toastInfo(opts: Partial<Omit<ToastProps, 'id' | 'variant'>>) {
 	return toast({
 		...opts,
 		title: opts.title || 'Info',
 		variant: 'info',
-		duration: opts?.duration || 5000,
+		duration: opts?.duration ?? 4000,
 	});
 }
 export function toastWarning(opts: Partial<Omit<ToastProps, 'id' | 'variant'>>) {
-	return toast({ ...opts, title: opts.title || 'Warning', variant: 'warning' });
+	return toast({
+		...opts,
+		title: opts.title || 'Warning',
+		variant: 'warning',
+		duration: opts?.duration ?? 5000,
+	});
 }
 export function toastLoading(opts: Partial<Omit<ToastProps, 'id' | 'variant'>>) {
 	return toast({ ...opts, title: opts.title || 'Loading', variant: 'loading' });
