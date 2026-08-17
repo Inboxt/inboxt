@@ -110,7 +110,7 @@ export const Header = ({ opened, toggle }: HeaderProps) => {
 				<AppSearch variant="default" />
 
 				<Box display="flex">
-					<Group w="100%" justify="space-between" mih={40}>
+					<Group w="100%" justify="space-between" mih={40} wrap="nowrap">
 						<ReaderCheckbox
 							label="Select all"
 							onChange={toggleSelectAll}
@@ -119,7 +119,7 @@ export const Header = ({ opened, toggle }: HeaderProps) => {
 							size="header"
 						/>
 
-						<Group gap={0} ml="auto">
+						<Group gap={0} ml="auto" wrap="nowrap">
 							<ItemsOptions
 								mode={
 									selectedItems.length > 0 &&
