@@ -24,7 +24,7 @@ import { ConfirmWithAlert } from '~components/ConfirmWithAlert';
 import { toastSuccess } from '~components/Toast';
 import { ToastProps } from '~components/Toast/type.ts';
 import { SelectableItem, useContentSelection } from '~context/content-selection';
-import { useScreenQuery } from '~hooks/useScreenQuery.tsx';
+import { useScreenQuery } from '~hooks/useScreenQuery';
 import {
 	PERMANENTLY_DELETE_SAVED_ITEMS,
 	UPDATE_SAVED_ITEMS_STATUS,
@@ -48,6 +48,7 @@ type ItemsOptionsProps = {
 	items: SelectableItem[];
 	mode: ItemsOptionsMode;
 	size?: 'sm' | 'md';
+	maxVisible?: number;
 	onActionComplete?: () => void | Promise<void>;
 	onLoadingChange?: (loading: boolean) => void;
 	onHighlightSelection?: () => void | Promise<void>;
@@ -73,12 +74,13 @@ export const ItemsOptions = ({
 	items,
 	mode,
 	size = 'md',
+	maxVisible,
 	onActionComplete,
 	onLoadingChange,
 	onHighlightSelection,
 }: ItemsOptionsProps) => {
 	const isSmall = size === 'sm';
-	const isBelowMdScreen = useScreenQuery('md', 'below');
+	const isBelowXsScreen = useScreenQuery('xs', 'below');
 
 	const [updateStatus, { loading: updateLoading }] = useMutation(UPDATE_SAVED_ITEMS_STATUS, {
 		update(cache, { data }) {
@@ -689,9 +691,17 @@ export const ItemsOptions = ({
 		);
 	}
 
+	const effectiveMaxVisible = maxVisible ?? (isBelowXsScreen ? 3 : undefined);
+	const visibleOptions =
+		effectiveMaxVisible !== undefined
+			? filteredOptions.slice(0, effectiveMaxVisible)
+			: filteredOptions;
+	const overflowOptions =
+		effectiveMaxVisible !== undefined ? filteredOptions.slice(effectiveMaxVisible) : [];
+
 	return (
 		<>
-			{filteredOptions.map((option) => (
+			{visibleOptions.map((option) => (
 				<Tooltip key={option.label} label={option.label} openDelay={600} withArrow>
 					<ActionIcon
 						variant="subtle"
@@ -705,6 +715,31 @@ export const ItemsOptions = ({
 					</ActionIcon>
 				</Tooltip>
 			))}
+
+			{overflowOptions.length > 0 && (
+				<MenuDrawer
+					items={overflowOptions.map((option) => ({
+						icon: <option.icon />,
+						label: option.label,
+						disabled: loading,
+						action: () => handleOptionClick(option),
+					}))}
+					label="More options"
+					height={Math.max(200, overflowOptions.length * 56 + 70)}
+					disabled={loading}
+				>
+					<ActionIcon
+						variant="subtle"
+						color="text"
+						size={isSmall ? 'md' : 38}
+						radius="xl"
+						disabled={loading}
+						aria-label="More options"
+					>
+						<IconDots size={isSmall ? 18 : undefined} />
+					</ActionIcon>
+				</MenuDrawer>
+			)}
 		</>
 	);
 };
