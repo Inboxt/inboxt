@@ -7,6 +7,7 @@ import { Void } from '~common/models/void.model';
 
 import { CreateLabelInput } from './dto/create-label.input';
 import { DeleteLabelInput } from './dto/delete-label.input';
+import { ReorderLabelsInput } from './dto/reorder-labels.input';
 import { UpdateLabelInput } from './dto/update-label.input';
 import { Label } from './label.model';
 import { LabelService } from './label.service';
@@ -41,6 +42,14 @@ export class LabelResolver {
 	) {
 		await this.labelService.delete(activeUser.id, data.id);
 		return VOID_RESPONSE;
+	}
+
+	@Mutation(() => [Label])
+	async reorderLabels(
+		@ActiveUserMeta() activeUser: ActiveUserMetaType,
+		@Args('data') data: ReorderLabelsInput,
+	) {
+		return this.labelService.reorder(activeUser.id, data.ids);
 	}
 
 	@ApiTokenAllowed()

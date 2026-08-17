@@ -7,6 +7,7 @@ import { Void } from '~common/models/void.model';
 
 import { CreateSavedQueryInput } from './dto/create-saved-query.input';
 import { DeleteSavedQueryInput } from './dto/delete-saved-query.input';
+import { ReorderSavedQueriesInput } from './dto/reorder-saved-queries.input';
 import { UpdateSavedQueryInput } from './dto/update-saved-query.input';
 import { SavedQuery } from './saved-query.model';
 import { SavedQueryService } from './saved-query.service';
@@ -41,6 +42,14 @@ export class SavedQueryResolver {
 	) {
 		await this.savedQueryService.delete(activeUser.id, data.id);
 		return VOID_RESPONSE;
+	}
+
+	@Mutation(() => [SavedQuery])
+	async reorderSavedQueries(
+		@ActiveUserMeta() activeUser: ActiveUserMetaType,
+		@Args('data') data: ReorderSavedQueriesInput,
+	) {
+		return this.savedQueryService.reorder(activeUser.id, data.ids);
 	}
 
 	@ApiTokenAllowed()

@@ -17,17 +17,26 @@ export class LabelService {
 	async getMany(userId: string, query: Prisma.labelFindManyArgs) {
 		return this.prisma.label.findMany({
 			...query,
-			orderBy: { createdAt: 'asc' },
+			orderBy: [{ order: 'asc' }, { createdAt: 'asc' }],
 			where: { ...query.where, userId },
 		});
 	}
 
 	async create(userId: string, data: Omit<Prisma.labelCreateInput, 'user' | 'userId'>) {
 		await createLabelSchema.parseAsync(data);
+
+		const lastLabel = await this.prisma.label.findFirst({
+			where: { userId },
+			orderBy: { order: 'desc' },
+		});
+
+		const order = lastLabel ? lastLabel.order + 1 : 0;
+
 		return this.prisma.label.create({
 			data: {
 				...data,
 				userId,
+				order,
 			},
 		});
 	}
@@ -62,5 +71,16 @@ export class LabelService {
 		return this.prisma.label.delete({
 			where: { id, userId },
 		});
+	}
+
+	async reorder(userId: string, ids: string[]) {
+		return this.prisma.$transaction(
+			ids.map((id, index) =>
+				this.prisma.label.update({
+					where: { id, userId },
+					data: { order: index },
+				}),
+			),
+		);
 	}
 }
