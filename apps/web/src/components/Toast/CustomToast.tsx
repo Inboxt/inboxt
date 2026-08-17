@@ -45,15 +45,7 @@ export const CustomToast = (props: ToastProps) => {
 	})();
 
 	return (
-		<Paper
-			p="sm"
-			radius="sm"
-			withBorder
-			className={classes.container}
-			miw={356}
-			display="flex"
-			mih={54}
-		>
+		<Paper p="sm" radius="sm" withBorder className={classes.container} display="flex" mih={54}>
 			<Group gap="xs" wrap="nowrap" align="center" justify="center" flex={1}>
 				{icon}
 				<Stack flex={1} gap={2}>

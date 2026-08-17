@@ -7,7 +7,6 @@ import { updateSavedItemMetadataSchema } from '@inboxt/common';
 
 import { ButtonContainer } from '~components/ButtonContainer';
 import { Form } from '~components/Form';
-import { toastSuccess } from '~components/Toast';
 import { ENTRIES, SAVED_ITEM, UPDATE_SAVED_ITEM_METADATA } from '~lib/graphql';
 import { SavedItem } from '~lib/graphql';
 
@@ -48,8 +47,6 @@ export const EditInfoModal = ({
 				},
 			},
 		});
-
-		toastSuccess({ title: 'Item updated.' });
 
 		context.closeModal(id);
 	};
