@@ -1,5 +1,7 @@
 import { useMutation } from '@apollo/client/react';
-import { Group, Text, TextInput, ActionIcon, Flex, Stack, Button } from '@mantine/core';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { Group, Text, TextInput, ActionIcon, Stack, Box, Paper } from '@mantine/core';
 import { useForm, schemaResolver } from '@mantine/form';
 import {
 	IconLabelImportantFilled,
@@ -7,18 +9,16 @@ import {
 	IconTrash,
 	IconCheck,
 	IconX,
+	IconGripVertical,
 } from '@tabler/icons-react';
 import { useEffect } from 'react';
 
 import { updateLabelSchema } from '@inboxt/common';
 
-import { useScreenQuery } from '~hooks/useScreenQuery';
-import { DELETE_LABEL, UPDATE_LABEL, Label } from '~lib/graphql';
+import { DELETE_LABEL, UPDATE_LABEL, SavedItemLabelFragmentFragment as Label } from '~lib/graphql';
 
 import { Form } from '../Form';
 import { LabelsColorInput } from '../LabelsColorInput';
-
-import classes from './EditableLabelItem.module.css';
 
 type EditableLabelItemProps = {
 	label: Label;
@@ -27,7 +27,18 @@ type EditableLabelItemProps = {
 };
 
 export const EditableLabelItem = ({ label, isEditing, setIsEditing }: EditableLabelItemProps) => {
-	const isBelowXsScreen = useScreenQuery('xs', 'below');
+	const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+		id: label.id,
+		disabled: isEditing,
+	});
+
+	const style = {
+		transform: CSS.Translate.toString(transform),
+		transition,
+		opacity: isDragging ? 0.5 : 1,
+		position: 'relative' as const,
+		zIndex: isDragging ? 1 : 0,
+	};
 
 	const [updateLabel, { loading: updateLabelLoading, error: updateLabelError }] = useMutation(
 		UPDATE_LABEL,
@@ -69,119 +80,114 @@ export const EditableLabelItem = ({ label, isEditing, setIsEditing }: EditableLa
 	};
 
 	return (
-		<Flex gap="sm" w="100%" direction="row" align="center">
-			{isEditing ? (
-				<Form onSubmit={form.onSubmit(handleSave)} error={updateLabelError}>
-					{({ error }) => (
-						<Stack gap="xs">
-							<Flex
-								gap="xs"
-								flex={1}
-								direction={{ base: 'column', sm: 'row' }}
-								align={{ base: 'stretch', sm: 'flex-start' }}
-							>
+		<Paper
+			withBorder
+			p="sm"
+			radius="md"
+			ref={setNodeRef}
+			style={style}
+			shadow={isDragging ? 'md' : 'none'}
+		>
+			<Group wrap="nowrap" align="center" gap="sm">
+				{!isEditing && (
+					<Box
+						{...attributes}
+						{...listeners}
+						style={{ cursor: 'grab', display: 'flex', alignItems: 'center' }}
+						c="dimmed"
+					>
+						<IconGripVertical size={18} />
+					</Box>
+				)}
+
+				{isEditing ? (
+					<Form
+						onSubmit={form.onSubmit(handleSave)}
+						error={updateLabelError}
+						flex={1}
+						miw={0}
+					>
+						{({ error }) => (
+							<Stack gap="xs">
 								<TextInput
 									{...form.getInputProps('name')}
 									key={form.key('name')}
 									placeholder="Label name"
-									flex={1}
-									w="100%"
+									label="Name"
 									maxLength={30}
 								/>
 
-								<Flex
-									gap="xs"
-									w={{ base: '100%', sm: 'auto' }}
-									direction={{ base: 'column', xs: 'row' }}
-									align={{ base: 'stretch', xs: 'flex-start' }}
-								>
-									<LabelsColorInput
-										{...form.getInputProps('color')}
-										key={form.key('color')}
-										className={classes.editableLabelColorInput}
-									/>
+								<LabelsColorInput
+									{...form.getInputProps('color')}
+									key={form.key('color')}
+									label="Color"
+								/>
 
-									{isBelowXsScreen ? (
-										<Flex gap="xs" w="100%">
-											<Button
-												type="submit"
-												flex={1}
-												loading={updateLabelLoading}
-											>
-												Save
-											</Button>
+								<Group justify="flex-end" gap="xs">
+									<ActionIcon
+										type="submit"
+										size={36}
+										loading={updateLabelLoading}
+									>
+										<IconCheck size={18} />
+									</ActionIcon>
 
-											<Button
-												variant="default"
-												flex={1}
-												onClick={() => setIsEditing(false)}
-												loading={updateLabelLoading}
-											>
-												Cancel
-											</Button>
-										</Flex>
-									) : (
-										<Group gap="xs" wrap="nowrap" justify="flex-end">
-											<ActionIcon
-												type="submit"
-												size={36}
-												loading={updateLabelLoading}
-											>
-												<IconCheck size={18} />
-											</ActionIcon>
+									<ActionIcon
+										variant="default"
+										onClick={() => setIsEditing(false)}
+										size={36}
+										loading={updateLabelLoading}
+									>
+										<IconX size={18} />
+									</ActionIcon>
+								</Group>
 
-											<ActionIcon
-												variant="default"
-												onClick={() => setIsEditing(false)}
-												size={36}
-												loading={updateLabelLoading}
-											>
-												<IconX size={18} />
-											</ActionIcon>
-										</Group>
-									)}
-								</Flex>
-							</Flex>
+								{error}
+							</Stack>
+						)}
+					</Form>
+				) : (
+					<>
+						<Box>
+							<IconLabelImportantFilled
+								size={18}
+								style={{
+									color: label.color,
+								}}
+							/>
+						</Box>
 
-							{error}
+						<Stack gap={0} flex={1} miw={0}>
+							<Text size="sm" fw={600} style={{ wordBreak: 'break-word' }}>
+								{label.name}
+							</Text>
 						</Stack>
-					)}
-				</Form>
-			) : (
-				<>
-					<Group gap="xs" wrap="nowrap" flex={1} miw={0}>
-						<IconLabelImportantFilled
-							size={18}
-							style={{
-								color: label.color,
-								flexShrink: 0,
-							}}
-						/>
 
-						<Text size="lg" className={classes.editableLabelText}>
-							{label.name}
-						</Text>
-					</Group>
+						<Group gap={4} wrap="nowrap" style={{ flexShrink: 0 }}>
+							<ActionIcon
+								variant="subtle"
+								onClick={() => setIsEditing(true)}
+								size={32}
+								c="dimmed"
+							>
+								<IconEdit size={16} />
+							</ActionIcon>
 
-					<Group gap="xs" justify="flex-end" wrap="nowrap">
-						<ActionIcon variant="light" onClick={() => setIsEditing(true)} size={36}>
-							<IconEdit size={18} />
-						</ActionIcon>
-
-						<ActionIcon
-							variant="light"
-							color="red"
-							loading={deleteLabelLoading}
-							onClick={() =>
-								void deleteLabel({ variables: { data: { id: label.id } } })
-							}
-							size={36}
-						>
-							<IconTrash size={18} />
-						</ActionIcon>
-					</Group>
-				</>
-			)}
-		</Flex>
+							<ActionIcon
+								variant="subtle"
+								color="red"
+								loading={deleteLabelLoading}
+								onClick={() =>
+									void deleteLabel({ variables: { data: { id: label.id } } })
+								}
+								size={32}
+							>
+								<IconTrash size={16} />
+							</ActionIcon>
+						</Group>
+					</>
+				)}
+			</Group>
+		</Paper>
 	);
 };

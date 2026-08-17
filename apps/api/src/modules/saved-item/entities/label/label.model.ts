@@ -9,4 +9,7 @@ export class Label extends BaseModel {
 
 	@Field()
 	color: string;
+
+	@Field()
+	order: number;
 }

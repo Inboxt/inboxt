@@ -9,4 +9,7 @@ export class SavedQuery extends BaseModel {
 
 	@Field()
 	query: string;
+
+	@Field()
+	order: number;
 }

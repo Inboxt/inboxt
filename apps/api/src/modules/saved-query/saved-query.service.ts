@@ -17,17 +17,26 @@ export class SavedQueryService {
 	async getMany(userId: string, query: Prisma.saved_queryFindManyArgs) {
 		return this.prisma.saved_query.findMany({
 			...query,
-			orderBy: { createdAt: 'asc' },
+			orderBy: [{ order: 'asc' }, { createdAt: 'asc' }],
 			where: { ...query.where, userId },
 		});
 	}
 
 	async create(userId: string, data: Omit<Prisma.saved_queryCreateInput, 'user' | 'userId'>) {
 		await createSavedQuerySchema.parseAsync(data);
+
+		const lastQuery = await this.prisma.saved_query.findFirst({
+			where: { userId },
+			orderBy: { order: 'desc' },
+		});
+
+		const order = lastQuery ? lastQuery.order + 1 : 0;
+
 		return this.prisma.saved_query.create({
 			data: {
 				...data,
 				userId,
+				order,
 			},
 		});
 	}
@@ -54,5 +63,16 @@ export class SavedQueryService {
 		return this.prisma.saved_query.delete({
 			where: { id, userId },
 		});
+	}
+
+	async reorder(userId: string, ids: string[]) {
+		return this.prisma.$transaction(
+			ids.map((id, index) =>
+				this.prisma.saved_query.update({
+					where: { id, userId },
+					data: { order: index },
+				}),
+			),
+		);
 	}
 }

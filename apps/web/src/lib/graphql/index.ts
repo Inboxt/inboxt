@@ -42,6 +42,7 @@ export const SAVED_ITEM_LABEL_FRAGMENT = gql(`
 		id
 		name
 		color
+		order
 	}
 `);
 
@@ -124,6 +125,7 @@ export const SAVED_QUERY_FRAGMENT = gql(`
 		createdAt
 		name
 		query
+		order
 	}
 `);
 
@@ -397,6 +399,14 @@ export const DELETE_LABEL = gql(`
 	}
 `);
 
+export const REORDER_LABELS = gql(`
+	mutation reorderLabels($data: ReorderLabelsInput!) {
+		reorderLabels(data: $data) {
+			...SavedItemLabelFragment
+		}
+	}
+`);
+
 export const CREATE_INBOUND_EMAIL_ADDRESS = gql(`
 	mutation createInboundEmailAddress {
 		createInboundEmailAddress {
@@ -488,6 +498,14 @@ export const CREATE_SAVED_QUERY = gql(`
 export const UPDATE_SAVED_QUERY = gql(`
 	mutation updateSavedQuery($data: UpdateSavedQueryInput!) {
 		updateSavedQuery(data: $data) {
+			...SavedQueryFragment
+		}
+	}
+`);
+
+export const REORDER_SAVED_QUERIES = gql(`
+	mutation reorderSavedQueries($data: ReorderSavedQueriesInput!) {
+		reorderSavedQueries(data: $data) {
 			...SavedQueryFragment
 		}
 	}
