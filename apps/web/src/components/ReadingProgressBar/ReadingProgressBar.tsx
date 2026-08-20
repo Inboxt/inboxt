@@ -18,7 +18,10 @@ export const ReadingProgressBar = ({ progress, className, style }: ReadingProgre
 			radius={0}
 			className={clsx(classes.progressBar, className)}
 			color="var(--mantine-primary-color-filled)"
-			style={style}
+			style={{
+				backgroundColor: 'var(--reader-border-color)',
+				...style,
+			}}
 		/>
 	);
 };
