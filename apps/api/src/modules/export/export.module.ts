@@ -9,6 +9,7 @@ import { NewsletterModule } from '~modules/saved-item/entities/newsletter/newsle
 import { SavedItemModule } from '~modules/saved-item/saved-item.module';
 import { StorageModule } from '~modules/storage/storage.module';
 import { UserModule } from '~modules/user/user.module';
+import { UserStatsModule } from '~modules/user-stats/user-stats.module';
 
 import { ExportProcessor } from './export.processor';
 import { ExportResolver } from './export.resolver';
@@ -33,6 +34,7 @@ import { ExportService } from './export.service';
 		NewsletterModule,
 		MailModule,
 		StorageModule,
+		UserStatsModule,
 	],
 	providers: [ExportService, ExportResolver, ExportProcessor],
 	exports: [ExportService],

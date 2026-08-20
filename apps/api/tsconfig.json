@@ -27,5 +27,5 @@
 		}
 	},
 	"include": ["src", "prisma/client/**/*"],
-	"exclude": ["node_modules", "dist", "**/*.spec.ts"]
+	"exclude": ["node_modules", "dist"]
 }

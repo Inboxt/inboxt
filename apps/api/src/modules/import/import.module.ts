@@ -4,6 +4,7 @@ import { Module } from '@nestjs/common';
 import { SavedItemManagerModule } from '~managers/saved-item-manager/saved-item-manager.module';
 import { LabelModule } from '~modules/saved-item/entities/label/label.module';
 import { UserModule } from '~modules/user/user.module';
+import { UserStatsModule } from '~modules/user-stats/user-stats.module';
 import { ContentExtractionService } from '~services/content-extraction.service';
 
 import { ImportController } from './import.controller';
@@ -24,6 +25,7 @@ import { ImportService } from './import.service';
 		LabelModule,
 		UserModule,
 		SavedItemManagerModule,
+		UserStatsModule,
 	],
 	providers: [ImportService, ImportProcessor, ContentExtractionService],
 	controllers: [ImportController],

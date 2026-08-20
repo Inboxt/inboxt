@@ -9,7 +9,7 @@ import { Prisma } from '@inboxt/prisma';
 
 import { ExportHighlightsFormat } from '~common/enums/export-highlights-format.enum';
 import { ExportType } from '~common/enums/export-type.enum';
-import { SavedItemExportJson } from '~common/types';
+import { SavedItemExportJson, UserReadingLogExportJson } from '~common/types';
 import { renderHighlightsHtml } from '~common/utils/renderHighlightsHtml';
 import { HighlightService } from '~modules/highlight/highlight.service';
 import { InboundEmailAddressService } from '~modules/inbound-email-address/inbound-email-address.service';
@@ -17,6 +17,7 @@ import { LabelService } from '~modules/saved-item/entities/label/label.service';
 import { NewsletterSubscriptionService } from '~modules/saved-item/entities/newsletter/newsletter-subscription/newsletter-subscription.service';
 import { SavedItemService } from '~modules/saved-item/saved-item.service';
 import { UserService } from '~modules/user/user.service';
+import { UserStatsService } from '~modules/user-stats/user-stats.service';
 
 import { RequestExportInput } from './dto/request-export.input';
 
@@ -43,11 +44,20 @@ export class ExportService {
 		private readonly labelService: LabelService,
 		private readonly inboundEmailAddressService: InboundEmailAddressService,
 		private readonly newsletterSubscriptionService: NewsletterSubscriptionService,
+		private readonly userStatsService: UserStatsService,
 		@InjectQueue('export') private readonly exportQueue: Queue,
 	) {}
 
 	private async getData(userId: string) {
-		const [user, savedItems, labels, inboundAddresses, subscriptions] = await Promise.all([
+		const [
+			user,
+			savedItems,
+			labels,
+			inboundAddresses,
+			subscriptions,
+			userReadingLogs,
+			highlights,
+		] = await Promise.all([
 			this.userService.get({ where: { id: userId } }),
 			this.savedItemService.getMany(userId, {
 				include: {
@@ -59,10 +69,10 @@ export class ExportService {
 			this.labelService.getMany(userId, {}),
 			this.inboundEmailAddressService.getMany(userId, {}),
 			this.newsletterSubscriptionService.getMany(userId, {}),
-			this.highlightService.getMany(userId, {}),
+			this.userStatsService.getReadingLogs(userId),
+			this.getHighlights(userId),
 		]);
 
-		const highlights = await this.getHighlights(userId);
 		const userJson = user
 			? {
 					id: user.id,
@@ -89,6 +99,9 @@ export class ExportService {
 			type: savedItem.type,
 			status: savedItem.status,
 			deletedSince: savedItem.deletedSince ?? null,
+			readAt: savedItem.readAt ?? null,
+			readingProgress: savedItem.readingProgress ?? null,
+			isReadManual: savedItem.isReadManual ?? null,
 			labels: savedItem.saved_item_label.map(({ label }) => ({
 				id: label.id,
 				createdAt: label.createdAt,
@@ -130,6 +143,15 @@ export class ExportService {
 			inboundEmailAddressId: subscription.inboundEmailAddressId,
 		}));
 
+		const userReadingLogsJson: UserReadingLogExportJson[] = userReadingLogs.map((log) => ({
+			id: log.id,
+			createdAt: log.createdAt,
+			savedItemId: log.savedItemId ?? null,
+			wordCount: log.wordCount,
+			savedItemCreatedAt: log.savedItemCreatedAt,
+			readAt: log.readAt,
+		}));
+
 		return {
 			userJson,
 			savedItems,
@@ -139,6 +161,7 @@ export class ExportService {
 			labelsJson,
 			inboundAddressesJson,
 			subscriptionsJson,
+			userReadingLogsJson,
 			highlights,
 		};
 	}
@@ -234,6 +257,7 @@ export class ExportService {
 			highlights: data.highlights.length,
 			inbound_email_addresses: data.inboundAddressesJson.length,
 			newsletter_subscriptions: data.subscriptionsJson.length,
+			user_reading_logs: data.userReadingLogsJson.length,
 		};
 
 		const metadata = {
@@ -267,6 +291,10 @@ export class ExportService {
 
 		archive.append(JSON.stringify(data.subscriptionsJson, null, 2), {
 			name: 'json/newsletter_subscriptions.json',
+		});
+
+		archive.append(JSON.stringify(data.userReadingLogsJson, null, 2), {
+			name: 'json/user_reading_logs.json',
 		});
 
 		// all saved_items
@@ -305,7 +333,7 @@ export class ExportService {
 		// saved_items/<id>/*
 		for (const savedItem of data.savedItems) {
 			const dir = `saved_items/${savedItem.id}`;
-			const itemJson = {
+			const itemJson: SavedItemExportJson = {
 				id: savedItem.id,
 				createdAt: savedItem.createdAt,
 				title: savedItem.title,
@@ -318,6 +346,9 @@ export class ExportService {
 				type: savedItem.type,
 				status: savedItem.status,
 				deletedSince: savedItem.deletedSince ?? null,
+				readAt: savedItem.readAt ?? null,
+				readingProgress: savedItem.readingProgress ?? null,
+				isReadManual: savedItem.isReadManual ?? null,
 				labels: savedItem.saved_item_label.map(({ label }) => ({
 					id: label.id,
 					createdAt: label.createdAt,

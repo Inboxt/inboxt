@@ -7,6 +7,7 @@ import { Prisma } from '@inboxt/prisma';
 import { GetSavedItemsQuery } from '~common/types';
 import { AppException } from '~common/utils/app-exception';
 import { PrismaService } from '~modules/prisma/prisma.service';
+import { UserStatsService } from '~modules/user-stats/user-stats.service';
 
 import { LabelService } from './entities/label/label.service';
 
@@ -15,6 +16,7 @@ export class SavedItemService {
 	constructor(
 		private readonly prisma: PrismaService,
 		private readonly labelService: LabelService,
+		private readonly userStatsService: UserStatsService,
 	) {}
 
 	async count(userId: string, query: Prisma.saved_itemCountArgs) {
@@ -213,9 +215,20 @@ export class SavedItemService {
 		userId: string,
 		data: Omit<Prisma.saved_itemCreateArgs['data'], 'userId' | 'user'>,
 	) {
-		return this.prisma.saved_item.create({
+		const created = await this.prisma.saved_item.create({
 			data: { ...data, userId },
 		});
+
+		if (created.readAt) {
+			await this.userStatsService.logReadingEvent(userId, {
+				savedItemId: created.id,
+				wordCount: created.wordCount || 0,
+				savedItemCreatedAt: created.createdAt,
+				readAt: created.readAt,
+			});
+		}
+
+		return created;
 	}
 
 	async update(
@@ -230,12 +243,23 @@ export class SavedItemService {
 				throw new AppException('Item not found', HttpStatus.NOT_FOUND);
 			}
 
-			return client.saved_item.update({
+			const updated = await client.saved_item.update({
 				where: { id, userId },
 				data: {
 					...data,
 				},
 			});
+
+			if (data.wordCount !== undefined && typeof data.wordCount === 'number') {
+				await this.userStatsService.syncReadingLogWordCount(
+					userId,
+					id,
+					data.wordCount,
+					client,
+				);
+			}
+
+			return updated;
 		};
 
 		if (tx) {
@@ -270,24 +294,58 @@ export class SavedItemService {
 			readingProgress,
 		};
 
+		let readAtDate: Date | null = null;
 		if (readingProgress > 0.95 && !existingItem.isReadManual && !existingItem.readAt) {
-			data.readAt = dayjs().toDate();
+			readAtDate = dayjs().toDate();
+			data.readAt = readAtDate;
 		}
 
-		return this.prisma.saved_item.update({
+		const updated = await this.prisma.saved_item.update({
 			where: { id, userId },
 			data,
 		});
+
+		if (readAtDate) {
+			await this.userStatsService.logReadingEvent(userId, {
+				savedItemId: id,
+				wordCount: existingItem.wordCount || 0,
+				savedItemCreatedAt: existingItem.createdAt,
+				readAt: readAtDate,
+			});
+		}
+
+		return updated;
 	}
 
 	async updateManyReadStatus(userId: string, ids: string[], isRead: boolean) {
+		const items = await this.getMany(userId, {
+			where: { id: { in: ids } },
+			select: { id: true, wordCount: true, createdAt: true },
+		});
+
+		const readAtDate = isRead ? dayjs().toDate() : null;
+
 		await this.prisma.saved_item.updateMany({
 			where: { id: { in: ids }, userId },
 			data: {
-				readAt: isRead ? dayjs().toDate() : null,
+				readAt: readAtDate,
 				isReadManual: true,
 			},
 		});
+
+		if (isRead && readAtDate && items.length > 0) {
+			await this.userStatsService.logManyReadingEvents(
+				userId,
+				items.map((item) => ({
+					savedItemId: item.id,
+					wordCount: item.wordCount || 0,
+					savedItemCreatedAt: item.createdAt,
+					readAt: readAtDate,
+				})),
+			);
+		} else {
+			await this.userStatsService.removeReadingLogsForItems(userId, ids);
+		}
 
 		return this.getMany(userId, { where: { id: { in: ids } } });
 	}
