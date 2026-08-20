@@ -68,6 +68,9 @@ export type SavedItemExportJson = {
 	type: 'ARTICLE' | 'NEWSLETTER';
 	status: string;
 	deletedSince: Date | string | null;
+	readAt?: Date | string | null;
+	readingProgress?: number | null;
+	isReadManual?: boolean | null;
 	labels: Array<{
 		id: string;
 		createdAt: Date | string;
@@ -79,4 +82,13 @@ export type SavedItemExportJson = {
 	messageId: string | null;
 	inboundEmailAddressId: string | null;
 	subscription: string | null;
+};
+
+export type UserReadingLogExportJson = {
+	id: string;
+	createdAt: Date | string;
+	savedItemId: string | null;
+	wordCount: number;
+	savedItemCreatedAt: Date | string;
+	readAt: Date | string;
 };

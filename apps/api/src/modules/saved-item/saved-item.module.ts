@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 
 import { StorageModule } from '~modules/storage/storage.module';
+import { UserStatsModule } from '~modules/user-stats/user-stats.module';
 
 import { ArticleModule } from './entities/article/article.module';
 import { LabelModule } from './entities/label/label.module';
@@ -9,7 +10,7 @@ import { SavedItemResolver } from './saved-item.resolver';
 import { SavedItemService } from './saved-item.service';
 
 @Module({
-	imports: [ArticleModule, LabelModule, NewsletterModule, StorageModule],
+	imports: [ArticleModule, LabelModule, NewsletterModule, StorageModule, UserStatsModule],
 	providers: [SavedItemService, SavedItemResolver],
 	exports: [SavedItemService],
 })

@@ -457,6 +457,8 @@ export class SavedItemManagerService {
 				backoff: { type: 'fixed', delay: 30000 },
 			},
 		);
+
+		return created.id;
 	}
 
 	async addNewsletterFromEmail(payload: any) {

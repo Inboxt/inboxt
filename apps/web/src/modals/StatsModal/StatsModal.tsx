@@ -132,6 +132,11 @@ export const StatsModal = ({ id: _id, context: _context }: ContextModalProps) =>
 					description="Average time from saving to reading"
 				/>
 			</SimpleGrid>
+
+			<Text size="xs" c="dimmed" ta="center">
+				Stats reflect items automatically completed in the reader or manually marked as
+				read. Moving items directly to archive or trash does not count toward reading stats.
+			</Text>
 		</Stack>
 	);
 };

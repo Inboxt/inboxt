@@ -16,6 +16,7 @@ import { SavedItemExportJson } from '~common/types';
 import { SavedItemManagerService } from '~managers/saved-item-manager/saved-item-manager.service';
 import { LabelService } from '~modules/saved-item/entities/label/label.service';
 import { UserService } from '~modules/user/user.service';
+import { UserStatsService } from '~modules/user-stats/user-stats.service';
 
 type DiskSource = {
 	kind: 'disk';
@@ -32,6 +33,7 @@ export class ImportService {
 		private readonly userService: UserService,
 		private readonly labelService: LabelService,
 		private readonly savedItemManagerService: SavedItemManagerService,
+		private readonly userStatsService: UserStatsService,
 		@InjectQueue('import') private readonly importQueue: Queue,
 	) {}
 
@@ -138,7 +140,7 @@ export class ImportService {
 		itemJson: SavedItemExportJson;
 		labelNameToId: Map<string, string>;
 		selectedLabelIds?: string[];
-	}) {
+	}): Promise<{ created: boolean; id?: string }> {
 		const { userId, itemDir, itemJson, labelNameToId, selectedLabelIds } = params;
 
 		const type = itemJson?.type as 'ARTICLE' | 'NEWSLETTER';
@@ -172,28 +174,45 @@ export class ImportService {
 			return { created: false };
 		}
 
+		const readAt = itemJson.readAt ? new Date(itemJson.readAt) : undefined;
+		const readingProgress =
+			typeof itemJson.readingProgress === 'number' ? itemJson.readingProgress : undefined;
+		const isReadManual =
+			typeof itemJson.isReadManual === 'boolean' ? itemJson.isReadManual : undefined;
+
 		if (type === 'ARTICLE') {
 			const articleStatus = Object.values(saved_item_status).includes(itemJson.status as any)
 				? (itemJson.status as saved_item_status)
 				: undefined;
 
-			await this.savedItemManagerService.processAndCreateArticle(userId, { html }, labelIds, {
-				title: itemJson.title ?? undefined,
-				originalUrl: itemJson.originalUrl ?? undefined,
-				sourceDomain: itemJson.sourceDomain ?? undefined,
-				description: itemJson.description ?? undefined,
-				leadImage: itemJson.leadImage ?? undefined,
-				wordCount: typeof itemJson.wordCount === 'number' ? itemJson.wordCount : undefined,
-				author: itemJson.author ?? undefined,
-				status: articleStatus,
-				deletedSince:
-					articleStatus === 'DELETED'
-						? itemJson.deletedSince
-							? new Date(itemJson.deletedSince)
-							: new Date()
-						: undefined,
-				createdAt: itemJson.createdAt ? new Date(itemJson.createdAt) : undefined,
-			});
+			const id = await this.savedItemManagerService.processAndCreateArticle(
+				userId,
+				{ html },
+				labelIds,
+				{
+					title: itemJson.title ?? undefined,
+					originalUrl: itemJson.originalUrl ?? undefined,
+					sourceDomain: itemJson.sourceDomain ?? undefined,
+					description: itemJson.description ?? undefined,
+					leadImage: itemJson.leadImage ?? undefined,
+					wordCount:
+						typeof itemJson.wordCount === 'number' ? itemJson.wordCount : undefined,
+					author: itemJson.author ?? undefined,
+					status: articleStatus,
+					deletedSince:
+						articleStatus === 'DELETED'
+							? itemJson.deletedSince
+								? new Date(itemJson.deletedSince)
+								: new Date()
+							: undefined,
+					createdAt: itemJson.createdAt ? new Date(itemJson.createdAt) : undefined,
+					readAt,
+					readingProgress,
+					isReadManual,
+				},
+			);
+
+			return { created: true, id: typeof id === 'string' ? id : undefined };
 		} else {
 			const newsletterStatus = Object.values(saved_item_status).includes(
 				itemJson?.status as any,
@@ -201,7 +220,7 @@ export class ImportService {
 				? (itemJson.status as saved_item_status)
 				: undefined;
 
-			await this.savedItemManagerService.processAndCreateNewsletter(
+			const id = await this.savedItemManagerService.processAndCreateNewsletter(
 				userId,
 				null,
 				null,
@@ -222,8 +241,14 @@ export class ImportService {
 								? new Date(itemJson.deletedSince)
 								: new Date()
 							: undefined,
+					createdAt: itemJson?.createdAt ? new Date(itemJson.createdAt) : undefined,
+					readAt,
+					readingProgress,
+					isReadManual,
 				},
 			);
+
+			return { created: true, id: typeof id === 'string' ? id : undefined };
 		}
 	}
 
@@ -389,6 +414,8 @@ export class ImportService {
 					}>
 				>(baseDir, 'saved_items/saved_items.json')) || [];
 
+			const oldIdToNewId = new Map<string, string>();
+
 			for (const listing of itemsList) {
 				const oldId = listing.id;
 				const itemDir = `${baseDir}/saved_items/${oldId}`;
@@ -400,15 +427,67 @@ export class ImportService {
 				}
 
 				try {
-					await this.importSingleSavedItem({
+					const res = await this.importSingleSavedItem({
 						userId: data.userId,
 						itemDir,
 						itemJson,
 						labelNameToId,
 						selectedLabelIds: data.labelIds,
 					});
+
+					if (res.created && res.id) {
+						oldIdToNewId.set(oldId, res.id);
+					}
 				} catch (e: any) {
 					this.logger.error(`Failed to import item ${oldId}: ${e?.message || e}`);
+				}
+			}
+
+			// Reading logs (import standalone historical reading logs for deleted items)
+			const userReadingLogsJson =
+				(await this.readJson<
+					Array<{
+						id?: string;
+						createdAt?: string | Date;
+						savedItemId?: string | null;
+						wordCount?: number;
+						savedItemCreatedAt?: string | Date;
+						readAt?: string | Date;
+					}>
+				>(baseDir, 'json/user_reading_logs.json')) ||
+				(await this.readJson<
+					Array<{
+						id?: string;
+						createdAt?: string | Date;
+						savedItemId?: string | null;
+						wordCount?: number;
+						savedItemCreatedAt?: string | Date;
+						readAt?: string | Date;
+					}>
+				>(baseDir, 'json/user_reading_log.json')) ||
+				[];
+
+			if (Array.isArray(userReadingLogsJson) && userReadingLogsJson.length > 0) {
+				const standaloneReadingLogs = userReadingLogsJson
+					.filter(
+						(log) =>
+							log.readAt && (!log.savedItemId || !oldIdToNewId.has(log.savedItemId)),
+					)
+					.map((log) => ({
+						savedItemId: null,
+						wordCount: typeof log.wordCount === 'number' ? log.wordCount : 0,
+						savedItemCreatedAt: log.savedItemCreatedAt
+							? new Date(log.savedItemCreatedAt)
+							: new Date(log.readAt!),
+						readAt: new Date(log.readAt!),
+						createdAt: log.createdAt ? new Date(log.createdAt) : new Date(log.readAt!),
+					}));
+
+				if (standaloneReadingLogs.length > 0) {
+					await this.userStatsService.createReadingLogs(
+						data.userId,
+						standaloneReadingLogs,
+					);
 				}
 			}
 

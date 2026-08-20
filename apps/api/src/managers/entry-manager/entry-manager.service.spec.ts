@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { EntryManagerService } from './entry-manager.service';
+
 import { EntrySortField } from './dto/entry-sort.input';
+import { EntryManagerService } from './entry-manager.service';
 
 describe('EntryManagerService', () => {
 	const mockSavedItemService = {
@@ -25,6 +26,7 @@ describe('EntryManagerService', () => {
 			mockHighlightService.getPaginated.mockResolvedValue({ edges: [] });
 
 			await service.getMany('user1', {
+				first: 20,
 				q: 'in:archive type:article label:Research sort:date_desc',
 			});
 
@@ -47,6 +49,7 @@ describe('EntryManagerService', () => {
 			mockSavedItemService.getPaginated.mockResolvedValue({ edges: [] });
 
 			await service.getMany('user1', {
+				first: 20,
 				q: 'sort:title_asc',
 				sort: { field: EntrySortField.createdAt, direction: 'asc' as any } as any,
 			});
@@ -61,7 +64,7 @@ describe('EntryManagerService', () => {
 
 		it('should throw error if text search is too long', async () => {
 			const longText = 'a'.repeat(201);
-			await expect(service.getMany('user1', { q: longText })).rejects.toThrow(
+			await expect(service.getMany('user1', { first: 20, q: longText })).rejects.toThrow(
 				'Free text search is limited to 200 characters.',
 			);
 		});
@@ -69,7 +72,7 @@ describe('EntryManagerService', () => {
 		it('should call highlight service when type is highlight', async () => {
 			mockHighlightService.getPaginated.mockResolvedValue({ edges: [] });
 
-			await service.getMany('user1', { q: 'type:highlight' });
+			await service.getMany('user1', { first: 20, q: 'type:highlight' });
 
 			expect(mockHighlightService.getPaginated).toHaveBeenCalledWith(
 				'user1',
