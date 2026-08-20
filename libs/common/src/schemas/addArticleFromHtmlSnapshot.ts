@@ -6,7 +6,7 @@ export const addArticleFromHtmlSnapshotSchema = z.object({
 		.string()
 		.min(200, 'HTML content is too short to process. Please try saving a different page.')
 		.max(
-			1_000_000,
+			5_000_000,
 			'HTML content is too large to process from the extension. Try saving the link directly from the website instead.',
 		),
 });
