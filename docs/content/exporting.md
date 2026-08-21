@@ -35,6 +35,7 @@ The export is provided as a ZIP archive and includes:
 - Highlights (both per item and globally)
 - Inbound email addresses
 - Newsletter subscriptions
+- Reading history and statistics (reading logs)
 
 The archive is structured in a human-readable way, making it suitable for backups, migrations, or custom tooling.
 

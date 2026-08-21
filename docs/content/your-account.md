@@ -81,6 +81,10 @@ You can view:
 
 To access your statistics, open the profile menu and select **Statistics**.
 
+::: info
+Statistics reflect items that were automatically completed in the reader or manually marked as read. Moving items directly to the archive or trash does not count toward your reading stats.
+:::
+
 Your instance may retain some operational logs temporarily for reliability and security purposes. These logs are not used to reconstruct deleted accounts and do not contain readable saved content unless specifically logged for debugging (e.g., SMTP failures).
 
 If you need help with account-related issues, see [Getting Help](/help).
