@@ -61,6 +61,7 @@ When importing a ZIP archive, Inboxt will attempt to restore:
 - Content (HTML and extracted text)
 - Labels and label assignments
 - Highlights
+- Reading history and statistics (reading logs)
 
 Item identifiers are regenerated during import, but the original content and metadata are preserved.
 

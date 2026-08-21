@@ -87,6 +87,13 @@ To save a search:
 2. Click the "Save search" button (bookmark icon) inside that search bar.
 3. Give your search a name and save it.
 
+### Managing saved searches
+
+To manage or reorder your saved searches:
+1. Open the user menu (click your avatar) and select **Saved Queries**.
+2. Drag and drop your saved searches to reorder them.
+3. Use the edit or delete icons next to a saved search to rename or remove it.
+
 ## Filtering by item type
 
 Use the `type:` filter to narrow results by content type.

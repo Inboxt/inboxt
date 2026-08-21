@@ -70,7 +70,12 @@ To add or remove labels:
 2. Choose the **Label** action
 3. Select existing labels or create a new one
 
-Labels appear in the app’s navigation. Selecting a label shows all items with that label applied.
+### Managing labels
+
+To manage or reorder your labels:
+1. Open the user menu (click your avatar) and select **Labels**.
+2. Drag and drop your labels to reorder them.
+3. Use the edit or delete icons next to a label to rename, recolor, or remove it.
 
 ## Searching
 
