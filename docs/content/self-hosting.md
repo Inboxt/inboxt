@@ -236,9 +236,9 @@ Notes:
 
 | Variable | Description | Type | Default | Required |
 | --- | --- | --- | --- | --- |
-| `ARTICLE_MAX_WORD_COUNT` | Maximum word count for articles before they're considered too large. | number | `15000` | No |
+| `ARTICLE_MAX_WORD_COUNT` | Maximum word count for articles before they're considered too large. | number | `100000` | No |
 | `NEWSLETTER_MIN_WORD_COUNT` | Minimum word count for newsletters to be considered valid content. | number | `100` | No |
-| `NEWSLETTER_MAX_WORD_COUNT` | Maximum word count for newsletters before they're considered too large. | number | `15000` | No |
+| `NEWSLETTER_MAX_WORD_COUNT` | Maximum word count for newsletters before they're considered too large. | number | `100000` | No |
 
 ::: warning
 It is recommended to leave the default values unless you know what you are doing. Increasing these limits can make the app less safe and if they are increased too much, it can use too many resources (CPU/Memory) and slow down the app or the whole system.
