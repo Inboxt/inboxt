@@ -21,10 +21,10 @@ Using the browser extension can improve parsing reliability. When saving content
 
 To ensure stability and performance, Inboxt has default limits on the length of content it processes:
 
-- **Articles**: Max 15,000 words
-- **Newsletters**: Min 100 words, Max 15,000 words
+- **Articles**: Max 100,000 words
+- **Newsletters**: Min 100 words, Max 100,000 words
 
-If a document exceeds these limits, it may be truncated or marked as failed. These limits can be adjusted via environment variables. See [Self-hosting](/self-hosting#content-limits) for more information.
+If a document exceeds these limits, it may be truncated or marked as failed. These default limits can be adjusted via environment variables. See [Self-hosting](/self-hosting#content-limits) for more information.
 
 ## Newsletters and email
 
