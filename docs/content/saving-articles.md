@@ -43,6 +43,15 @@ In addition to adding links manually, you can save articles using your browserâ€
 
 This is often the quickest way to save articles while browsing on mobile.
 
+## Save via URL path
+
+You can save articles to Inboxt by simply appending the article URL to your Inboxt instance URL in your browser's address bar.
+
+1. Go to your browser's address bar.
+2. Prefix the article URL with your Inboxt instance URL (e.g., `https://inboxt.app/https://example.com/article`).
+3. Press **Enter**.
+4. Inboxt will automatically process the URL and add the article to your library.
+
 ## Reading saved articles
 
 Once processing completes, saved articles open in a distraction-free reader view where you can adjust reading settings and add highlights.
