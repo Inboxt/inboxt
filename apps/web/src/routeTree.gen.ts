@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as AuthRouteRouteImport } from './routes/auth.route'
+import { Route as AuthSplatRouteImport } from './routes/_auth.$'
 import { Route as AuthMainRouteImport } from './routes/_auth._main'
 import { Route as AuthShareTargetRouteImport } from './routes/_auth.share-target'
 import { Route as AuthMainIndexRouteImport } from './routes/_auth._main.index'
@@ -24,6 +25,11 @@ const AuthRouteRoute = AuthRouteRouteImport.update({
   id: '/auth',
   path: '/auth',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthSplatRoute = AuthSplatRouteImport.update({
+  id: '/$',
+  path: '/$',
+  getParentRoute: () => AuthRoute,
 } as any)
 const AuthMainRoute = AuthMainRouteImport.update({
   id: '/_main',
@@ -48,12 +54,14 @@ const AuthMainRIdRoute = AuthMainRIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/auth': typeof AuthRouteRoute
   '/': typeof AuthMainIndexRoute
+  '/$': typeof AuthSplatRoute
   '/share-target': typeof AuthShareTargetRoute
   '/r/$id': typeof AuthMainRIdRoute
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRouteRoute
   '/': typeof AuthMainIndexRoute
+  '/$': typeof AuthSplatRoute
   '/share-target': typeof AuthShareTargetRoute
   '/r/$id': typeof AuthMainRIdRoute
 }
@@ -61,6 +69,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/auth': typeof AuthRouteRoute
   '/_auth': typeof AuthRouteWithChildren
+  '/_auth/$': typeof AuthSplatRoute
   '/_auth/_main': typeof AuthMainRouteWithChildren
   '/_auth/share-target': typeof AuthShareTargetRoute
   '/_auth/_main/': typeof AuthMainIndexRoute
@@ -68,13 +77,14 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/auth' | '/' | '/share-target' | '/r/$id'
+  fullPaths: '/auth' | '/' | '/$' | '/share-target' | '/r/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/auth' | '/' | '/share-target' | '/r/$id'
+  to: '/auth' | '/' | '/$' | '/share-target' | '/r/$id'
   id:
     | '__root__'
     | '/auth'
     | '/_auth'
+    | '/_auth/$'
     | '/_auth/_main'
     | '/_auth/share-target'
     | '/_auth/_main/'
@@ -101,6 +111,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_auth/$': {
+      id: '/_auth/$'
+      path: '/$'
+      fullPath: '/$'
+      preLoaderRoute: typeof AuthSplatRouteImport
+      parentRoute: typeof AuthRoute
     }
     '/_auth/_main': {
       id: '/_auth/_main'
@@ -148,11 +165,13 @@ const AuthMainRouteWithChildren = AuthMainRoute._addFileChildren(
 )
 
 interface AuthRouteChildren {
+  AuthSplatRoute: typeof AuthSplatRoute
   AuthMainRoute: typeof AuthMainRouteWithChildren
   AuthShareTargetRoute: typeof AuthShareTargetRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
+  AuthSplatRoute: AuthSplatRoute,
   AuthMainRoute: AuthMainRouteWithChildren,
   AuthShareTargetRoute: AuthShareTargetRoute,
 }
