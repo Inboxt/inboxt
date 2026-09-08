@@ -27,8 +27,8 @@ export class SavedItem implements Entry {
 	@Field({ nullable: true })
 	leadImage?: string;
 
-	@Field()
-	wordCount: number;
+	@Field({ nullable: true })
+	wordCount?: number;
 
 	@Field({ nullable: true })
 	author?: string;

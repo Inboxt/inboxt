@@ -500,7 +500,7 @@ export type SavedItem = Entry & {
   status: SavedItemStatus;
   title: Scalars['String']['output'];
   type: SavedItemType;
-  wordCount: Scalars['Float']['output'];
+  wordCount?: Maybe<Scalars['Float']['output']>;
 };
 
 export type SavedQuery = {
@@ -632,7 +632,7 @@ export enum SavedItemType {
 
 export type UserFragmentFragment = { __typename?: 'User', id: string, createdAt: string, emailAddress: string, isEmailVerified: boolean, username: string, pendingEmailAddress?: string | null, labelsCount: number, inboundEmailAddressesCount: number };
 
-export type SavedItemFragmentFragment = { __typename?: 'SavedItem', id: string, createdAt: string, title: string, originalUrl?: string | null, sourceDomain?: string | null, description?: string | null, leadImage?: string | null, wordCount: number, author?: string | null, type: SavedItemType, status: SavedItemStatus, readingProgress?: number | null, readAt?: string | null, isReadManual: boolean };
+export type SavedItemFragmentFragment = { __typename?: 'SavedItem', id: string, createdAt: string, title: string, originalUrl?: string | null, sourceDomain?: string | null, description?: string | null, leadImage?: string | null, wordCount?: number | null, author?: string | null, type: SavedItemType, status: SavedItemStatus, readingProgress?: number | null, readAt?: string | null, isReadManual: boolean };
 
 export type SavedItemLabelFragmentFragment = { __typename?: 'Label', createdAt: string, id: string, name: string, color: string, order: number };
 
@@ -644,7 +644,7 @@ export type HighlightFragmentFragment = { __typename?: 'Highlight', id: string, 
 
 type EntryFragment_Highlight_Fragment = { __typename: 'Highlight', id: string, createdAt: string, savedItemTitle?: string | null, savedItemOriginalUrl?: string | null, savedItem?: { __typename?: 'SavedItem', id: string, createdAt: string } | null, segments?: Array<{ __typename?: 'HighlightSegment', id: string, xpath: string, beforeText: string, startOffset: number, endOffset: number, afterText: string, text?: string | null }> | null };
 
-type EntryFragment_SavedItem_Fragment = { __typename: 'SavedItem', id: string, createdAt: string, title: string, originalUrl?: string | null, sourceDomain?: string | null, description?: string | null, leadImage?: string | null, wordCount: number, author?: string | null, type: SavedItemType, status: SavedItemStatus, readingProgress?: number | null, readAt?: string | null, isReadManual: boolean, labels?: Array<{ __typename?: 'Label', createdAt: string, id: string, name: string, color: string, order: number }> | null };
+type EntryFragment_SavedItem_Fragment = { __typename: 'SavedItem', id: string, createdAt: string, title: string, originalUrl?: string | null, sourceDomain?: string | null, description?: string | null, leadImage?: string | null, wordCount?: number | null, author?: string | null, type: SavedItemType, status: SavedItemStatus, readingProgress?: number | null, readAt?: string | null, isReadManual: boolean, labels?: Array<{ __typename?: 'Label', createdAt: string, id: string, name: string, color: string, order: number }> | null };
 
 export type EntryFragmentFragment =
   | EntryFragment_Highlight_Fragment
@@ -675,7 +675,7 @@ export type SavedItemQueryVariables = Exact<{
 }>;
 
 
-export type SavedItemQuery = { __typename?: 'Query', savedItem?: { __typename?: 'SavedItem', id: string, createdAt: string, title: string, originalUrl?: string | null, sourceDomain?: string | null, description?: string | null, leadImage?: string | null, wordCount: number, author?: string | null, type: SavedItemType, status: SavedItemStatus, readingProgress?: number | null, readAt?: string | null, isReadManual: boolean, labels?: Array<{ __typename?: 'Label', id: string, createdAt: string, name: string, color: string, order: number }> | null, article?: { __typename?: 'Article', contentHtml: string, contentText: string } | null, newsletter?: { __typename?: 'Newsletter', contentHtml: string, contentText: string, subscription?: { __typename?: 'NewsletterSubscription', id: string, createdAt: string, name: string, status: NewsletterSubscriptionStatus, lastReceivedAt?: string | null, unsubscribeUrl?: string | null, unsubscribeAttemptedAt?: string | null } | null } | null, highlights?: Array<{ __typename?: 'Highlight', id: string, createdAt: string, savedItemTitle?: string | null, savedItemOriginalUrl?: string | null, savedItem?: { __typename?: 'SavedItem', id: string, createdAt: string } | null, segments?: Array<{ __typename?: 'HighlightSegment', id: string, xpath: string, beforeText: string, startOffset: number, endOffset: number, afterText: string, text?: string | null }> | null }> | null } | null };
+export type SavedItemQuery = { __typename?: 'Query', savedItem?: { __typename?: 'SavedItem', id: string, createdAt: string, title: string, originalUrl?: string | null, sourceDomain?: string | null, description?: string | null, leadImage?: string | null, wordCount?: number | null, author?: string | null, type: SavedItemType, status: SavedItemStatus, readingProgress?: number | null, readAt?: string | null, isReadManual: boolean, labels?: Array<{ __typename?: 'Label', id: string, createdAt: string, name: string, color: string, order: number }> | null, article?: { __typename?: 'Article', contentHtml: string, contentText: string } | null, newsletter?: { __typename?: 'Newsletter', contentHtml: string, contentText: string, subscription?: { __typename?: 'NewsletterSubscription', id: string, createdAt: string, name: string, status: NewsletterSubscriptionStatus, lastReceivedAt?: string | null, unsubscribeUrl?: string | null, unsubscribeAttemptedAt?: string | null } | null } | null, highlights?: Array<{ __typename?: 'Highlight', id: string, createdAt: string, savedItemTitle?: string | null, savedItemOriginalUrl?: string | null, savedItem?: { __typename?: 'SavedItem', id: string, createdAt: string } | null, segments?: Array<{ __typename?: 'HighlightSegment', id: string, xpath: string, beforeText: string, startOffset: number, endOffset: number, afterText: string, text?: string | null }> | null }> | null } | null };
 
 export type InboundEmailAddressesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -689,7 +689,7 @@ export type EntriesQueryVariables = Exact<{
 
 export type EntriesQuery = { __typename?: 'Query', entries: { __typename?: 'EntryConnection', edges: Array<{ __typename?: 'EntryEdge', cursor: string, node:
         | { __typename: 'Highlight', id: string, createdAt: string, savedItemTitle?: string | null, savedItemOriginalUrl?: string | null, savedItem?: { __typename?: 'SavedItem', id: string, createdAt: string } | null, segments?: Array<{ __typename?: 'HighlightSegment', id: string, xpath: string, beforeText: string, startOffset: number, endOffset: number, afterText: string, text?: string | null }> | null }
-        | { __typename: 'SavedItem', id: string, createdAt: string, title: string, originalUrl?: string | null, sourceDomain?: string | null, description?: string | null, leadImage?: string | null, wordCount: number, author?: string | null, type: SavedItemType, status: SavedItemStatus, readingProgress?: number | null, readAt?: string | null, isReadManual: boolean, labels?: Array<{ __typename?: 'Label', createdAt: string, id: string, name: string, color: string, order: number }> | null }
+        | { __typename: 'SavedItem', id: string, createdAt: string, title: string, originalUrl?: string | null, sourceDomain?: string | null, description?: string | null, leadImage?: string | null, wordCount?: number | null, author?: string | null, type: SavedItemType, status: SavedItemStatus, readingProgress?: number | null, readAt?: string | null, isReadManual: boolean, labels?: Array<{ __typename?: 'Label', createdAt: string, id: string, name: string, color: string, order: number }> | null }
        }>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } };
 
 export type ApiTokensQueryVariables = Exact<{ [key: string]: never; }>;
@@ -766,7 +766,7 @@ export type UpdateSavedItemsReadStatusMutationVariables = Exact<{
 }>;
 
 
-export type UpdateSavedItemsReadStatusMutation = { __typename?: 'Mutation', updateSavedItemsReadStatus: Array<{ __typename?: 'SavedItem', id: string, createdAt: string, title: string, originalUrl?: string | null, sourceDomain?: string | null, description?: string | null, leadImage?: string | null, wordCount: number, author?: string | null, type: SavedItemType, status: SavedItemStatus, readingProgress?: number | null, readAt?: string | null, isReadManual: boolean }> };
+export type UpdateSavedItemsReadStatusMutation = { __typename?: 'Mutation', updateSavedItemsReadStatus: Array<{ __typename?: 'SavedItem', id: string, createdAt: string, title: string, originalUrl?: string | null, sourceDomain?: string | null, description?: string | null, leadImage?: string | null, wordCount?: number | null, author?: string | null, type: SavedItemType, status: SavedItemStatus, readingProgress?: number | null, readAt?: string | null, isReadManual: boolean }> };
 
 export type SetSavedItemLabelsMutationVariables = Exact<{
   data: SetSavedItemLabelsInput;
@@ -780,21 +780,21 @@ export type UpdateSavedItemsStatusMutationVariables = Exact<{
 }>;
 
 
-export type UpdateSavedItemsStatusMutation = { __typename?: 'Mutation', updateSavedItemsStatus: Array<{ __typename?: 'SavedItem', id: string, createdAt: string, title: string, originalUrl?: string | null, sourceDomain?: string | null, description?: string | null, leadImage?: string | null, wordCount: number, author?: string | null, type: SavedItemType, status: SavedItemStatus, readingProgress?: number | null, readAt?: string | null, isReadManual: boolean }> };
+export type UpdateSavedItemsStatusMutation = { __typename?: 'Mutation', updateSavedItemsStatus: Array<{ __typename?: 'SavedItem', id: string, createdAt: string, title: string, originalUrl?: string | null, sourceDomain?: string | null, description?: string | null, leadImage?: string | null, wordCount?: number | null, author?: string | null, type: SavedItemType, status: SavedItemStatus, readingProgress?: number | null, readAt?: string | null, isReadManual: boolean }> };
 
 export type UpdateSavedItemMetadataMutationVariables = Exact<{
   data: UpdateSavedItemMetadataInput;
 }>;
 
 
-export type UpdateSavedItemMetadataMutation = { __typename?: 'Mutation', updateSavedItemMetadata: { __typename?: 'SavedItem', id: string, createdAt: string, title: string, originalUrl?: string | null, sourceDomain?: string | null, description?: string | null, leadImage?: string | null, wordCount: number, author?: string | null, type: SavedItemType, status: SavedItemStatus, readingProgress?: number | null, readAt?: string | null, isReadManual: boolean, labels?: Array<{ __typename?: 'Label', createdAt: string, id: string, name: string, color: string, order: number }> | null } };
+export type UpdateSavedItemMetadataMutation = { __typename?: 'Mutation', updateSavedItemMetadata: { __typename?: 'SavedItem', id: string, createdAt: string, title: string, originalUrl?: string | null, sourceDomain?: string | null, description?: string | null, leadImage?: string | null, wordCount?: number | null, author?: string | null, type: SavedItemType, status: SavedItemStatus, readingProgress?: number | null, readAt?: string | null, isReadManual: boolean, labels?: Array<{ __typename?: 'Label', createdAt: string, id: string, name: string, color: string, order: number }> | null } };
 
 export type UpdateReadingProgressMutationVariables = Exact<{
   data: UpdateReadingProgressInput;
 }>;
 
 
-export type UpdateReadingProgressMutation = { __typename?: 'Mutation', updateReadingProgress: { __typename?: 'SavedItem', id: string, createdAt: string, title: string, originalUrl?: string | null, sourceDomain?: string | null, description?: string | null, leadImage?: string | null, wordCount: number, author?: string | null, type: SavedItemType, status: SavedItemStatus, readingProgress?: number | null, readAt?: string | null, isReadManual: boolean } };
+export type UpdateReadingProgressMutation = { __typename?: 'Mutation', updateReadingProgress: { __typename?: 'SavedItem', id: string, createdAt: string, title: string, originalUrl?: string | null, sourceDomain?: string | null, description?: string | null, leadImage?: string | null, wordCount?: number | null, author?: string | null, type: SavedItemType, status: SavedItemStatus, readingProgress?: number | null, readAt?: string | null, isReadManual: boolean } };
 
 export type PermanentlyDeleteSavedItemsMutationVariables = Exact<{
   data: PermanentlyDeleteSavedItemsInput;
