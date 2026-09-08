@@ -1,15 +1,15 @@
 {
-  "name": "docs.inboxt.app",
-  "version": "1.2.2",
-  "license": "MIT",
-  "type": "module",
-  "scripts": {
-    "dev": "vitepress dev",
-    "build": "vitepress build",
-    "preview": "vitepress preview"
-  },
-  "devDependencies": {
-    "@types/node": "^25.0.10",
-    "vitepress": "2.0.0-alpha.15"
-  }
+	"name": "docs.inboxt.app",
+	"version": "1.2.3",
+	"license": "MIT",
+	"type": "module",
+	"scripts": {
+		"dev": "vitepress dev",
+		"build": "vitepress build",
+		"preview": "vitepress preview"
+	},
+	"devDependencies": {
+		"@types/node": "^25.0.10",
+		"vitepress": "2.0.0-alpha.15"
+	}
 }

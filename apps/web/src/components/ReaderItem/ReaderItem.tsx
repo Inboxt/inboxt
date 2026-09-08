@@ -101,7 +101,7 @@ export const ReaderItem = ({ item }: ReaderItemProps) => {
 						<Text
 							fz="sm"
 							className={classes.text}
-						>{`${Math.ceil(item.wordCount / 240)} min`}</Text>
+						>{`${Math.ceil((item.wordCount || 0) / 240)} min`}</Text>
 
 						{typeof item.readingProgress === 'number' && item.readingProgress > 0 && (
 							<Text fz="sm" className={classes.text}>
