@@ -44,7 +44,7 @@ model saved_item {
   sourceDomain     String?
   description      String?
   leadImage        String?
-  wordCount        Int?
+  wordCount        Int?                      @default(0)
   author           String?
   type             saved_item_type
   status           saved_item_status         @default(ACTIVE)

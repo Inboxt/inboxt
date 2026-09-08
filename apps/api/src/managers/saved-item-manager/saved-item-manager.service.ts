@@ -177,6 +177,7 @@ export class SavedItemManagerService {
 			title,
 			description: message,
 			parsingStatus: SavedItemParsingStatus.FAILED,
+			wordCount: existing.wordCount ?? 0,
 		});
 
 		if (existing.type === SavedItemType.ARTICLE) {
@@ -319,6 +320,7 @@ export class SavedItemManagerService {
 			parsingStatus: SavedItemParsingStatus.PROCESSING,
 			title: prismaData?.title ?? NEWSLETTER_PROCESSING_TITLE,
 			description: prismaData?.description ?? NEWSLETTER_PROCESSING_CONTENT,
+			wordCount: prismaData?.wordCount ?? 0,
 			...prismaData,
 		});
 
