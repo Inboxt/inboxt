@@ -43,6 +43,7 @@ export function makeReaderResolver(
 			'--mantine-color-text': themeTokens.text,
 			'--reader-border-color': themeTokens.border,
 			'--reader-link-color': themeTokens.link || 'var(--mantine-color-anchor)',
+			'--reader-visited-link-color': themeTokens.visitedLink || 'var(--mantine-color-anchor)',
 			'--reader-highlight-color': themeTokens.highlight,
 			'--reader-code-bg': themeTokens.codeBackground,
 			'--reader-blockquote-bg': themeTokens.blockquoteBackground,

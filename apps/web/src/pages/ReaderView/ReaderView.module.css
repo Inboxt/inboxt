@@ -139,12 +139,26 @@
 	height: auto;
 }
 
+.readerContent a {
+	color: var(--reader-link-color);
+}
+
+.readerContent a:visited {
+	color: var(--reader-visited-link-color);
+}
+
 .readerContent h1 a,
 .readerContent h2 a,
 .readerContent h3 a,
 .readerContent h4 a,
 .readerContent h5 a,
-.readerContent h6 a {
+.readerContent h6 a,
+.readerContent h1 a:visited,
+.readerContent h2 a:visited,
+.readerContent h3 a:visited,
+.readerContent h4 a:visited,
+.readerContent h5 a:visited,
+.readerContent h6 a:visited {
 	color: inherit;
 	text-decoration: none;
 }

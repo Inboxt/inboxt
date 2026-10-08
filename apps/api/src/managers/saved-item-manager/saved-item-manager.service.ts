@@ -475,28 +475,42 @@ export class SavedItemManagerService {
 		}
 	}
 
+	private describeInboundPayload(payload: any): string {
+		const subject = this.newsletterService.extractSubject(payload);
+		const from = this.newsletterService.extractAuthor(payload);
+		return `Subject: "${subject ?? 'unknown'}", From: "${from || 'unknown'}"`;
+	}
+
 	private async processSingleInboundEmail(payload: any) {
 		const recipient = this.newsletterService.extractRecipient(payload);
 		if (!recipient) {
-			this.logger.warn('No recipient addresses found in payload.');
+			this.logger.warn(
+				`No recipient addresses found in payload. ${this.describeInboundPayload(payload)}`,
+			);
 			return;
 		}
 
 		const inboundEmailAddress = await this.inboundEmailAddressService.verify(recipient);
 		if (!inboundEmailAddress || !inboundEmailAddress?.userId) {
-			this.logger.warn(`Recipient ${recipient} is not a valid or active inbox address.`);
+			this.logger.warn(
+				`Recipient ${recipient} is not a valid or active inbox address. ${this.describeInboundPayload(payload)}`,
+			);
 			return;
 		}
 
 		const messageId = this.newsletterService.extractMessageId(payload);
 		if (!messageId) {
-			this.logger.warn('No messageId found in payload.');
+			this.logger.warn(
+				`No messageId found in payload. ${this.describeInboundPayload(payload)}`,
+			);
 			return;
 		}
 
 		const html = this.newsletterService.extractHtml(payload) || undefined;
 		if (html && html.length > 5_000_000) {
-			this.logger.warn('HTML payload too large, skipping heavy processing');
+			this.logger.warn(
+				`HTML payload too large, skipping heavy processing. ${this.describeInboundPayload(payload)}`,
+			);
 			return this.forwardNewsletter(inboundEmailAddress.userId, payload);
 		}
 
@@ -545,8 +559,10 @@ export class SavedItemManagerService {
 		unsubscribeUrl?: string;
 		rawPayload: any;
 	}) {
+		const newsletterTag = `Subject: "${data.subject ?? 'unknown'}", From: "${data.from || 'unknown'}"`;
+
 		this.logger.log(
-			`Starting to process incoming newsletter email with messageId: ${data.messageId}`,
+			`Starting to process incoming newsletter email with messageId: ${data.messageId}. ${newsletterTag}`,
 		);
 
 		const isDuplicate = await this.newsletterService.get(data.inboundEmailAddress.userId!, {
@@ -556,12 +572,12 @@ export class SavedItemManagerService {
 		});
 
 		if (isDuplicate) {
-			this.logger.log(`Duplicate message ID: ${data.messageId}. Skipping.`);
+			this.logger.log(`Duplicate message ID: ${data.messageId}. Skipping. ${newsletterTag}`);
 			return;
 		}
 
 		if (!data.html) {
-			this.logger.warn('No HTML content found. Forwarding to user.');
+			this.logger.warn(`No HTML content found. Forwarding to user. ${newsletterTag}`);
 			return this.forwardNewsletter(data.inboundEmailAddress.userId!, data.rawPayload);
 		}
 
@@ -580,7 +596,7 @@ export class SavedItemManagerService {
 				data.rawPayload,
 			);
 		} catch (error) {
-			this.logger.error(`Error processing incoming newsletter: ${error}`);
+			this.logger.error(`Error processing incoming newsletter: ${error}. ${newsletterTag}`);
 		}
 	}
 

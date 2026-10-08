@@ -36,6 +36,7 @@ export type ReaderThemeTokens = {
 	text: string;
 	border: string;
 	link: string | null;
+	visitedLink: string | null;
 	highlight: string;
 	codeBackground: string;
 	blockquoteBackground: string;
@@ -46,7 +47,8 @@ export const READER_THEMES: Record<ReaderThemeName, ReaderThemeTokens> = {
 		background: '#ffffff',
 		text: '#000000',
 		border: 'var(--mantine-color-gray-4)',
-		link: null,
+		link: '#3366cc',
+		visitedLink: '#795cb2',
 		highlight: '#FFF9B0',
 		codeBackground: 'var(--mantine-color-gray-0)',
 		blockquoteBackground: 'var(--mantine-color-gray-0)',
@@ -55,7 +57,8 @@ export const READER_THEMES: Record<ReaderThemeName, ReaderThemeTokens> = {
 		background: '#1A1B1E',
 		text: '#C1C2C5',
 		border: '#373A40',
-		link: null,
+		link: '#2899ff',
+		visitedLink: '#b388d9',
 		highlight: '#FFF9B0',
 		codeBackground: 'var(--mantine-color-dark-6)',
 		blockquoteBackground: 'var(--mantine-color-dark-6)',
@@ -64,7 +67,8 @@ export const READER_THEMES: Record<ReaderThemeName, ReaderThemeTokens> = {
 		background: '#f4ecd8',
 		text: '#3b3a36',
 		border: '#e3d7b9',
-		link: null,
+		link: '#3366cc',
+		visitedLink: '#795cb2',
 		highlight: '#ffec99',
 		codeBackground: '#efead4',
 		blockquoteBackground: '#efead4',

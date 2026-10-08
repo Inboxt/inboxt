@@ -1,4 +1,18 @@
-import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client';
+import { ApolloClient, ApolloLink, InMemoryCache, HttpLink } from '@apollo/client';
+import { RetryLink } from '@apollo/client/link/retry';
+
+// Retries network errors (e.g. a dead connection right after resuming from background on mobile).
+const retryLink = new RetryLink({
+	delay: {
+		initial: 300,
+		max: 5000,
+		jitter: true,
+	},
+	attempts: {
+		max: 4,
+		retryIf: (error) => !!error,
+	},
+});
 
 export const client = new ApolloClient({
 	cache: new InMemoryCache({
@@ -14,10 +28,14 @@ export const client = new ApolloClient({
 							if (!args?.query?.after) {
 								const incomingEdges: any[] = incoming.edges ?? [];
 
-								// No existing cache, or the server returned an empty page —
-								// store incoming directly without preserving anything.
-								if (!existing?.edges?.length || !incomingEdges.length) {
+								// No existing cache — store incoming directly.
+								if (!existing?.edges?.length) {
 									return incoming;
+								}
+
+								// Don't let a flaky background refetch wipe a populated list with an empty page 1.
+								if (!incomingEdges.length) {
+									return existing;
 								}
 
 								// Cursors present in the new page-1 response.
@@ -83,8 +101,11 @@ export const client = new ApolloClient({
 		enabled: false,
 	},
 
-	link: new HttpLink({
-		uri: '/api/graphql',
-		credentials: 'include',
-	}),
+	link: ApolloLink.from([
+		retryLink,
+		new HttpLink({
+			uri: '/api/graphql',
+			credentials: 'include',
+		}),
+	]),
 });
