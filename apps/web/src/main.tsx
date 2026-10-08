@@ -33,8 +33,18 @@ import { VerifyEmailModal } from '~modals/VerifyEmailModal';
 
 import { router } from './router';
 
+// Re-syncs queries left stale/errored after the app resumes from the background.
+function registerVisibilityRefetch() {
+	document.addEventListener('visibilitychange', () => {
+		if (document.visibilityState === 'visible') {
+			void client.refetchObservableQueries();
+		}
+	});
+}
+
 async function init() {
 	await fetchRuntimeConfig();
+	registerVisibilityRefetch();
 
 	if (import.meta.env.PROD && runtimeConfig.webErrorsDsn) {
 		Sentry.init({
