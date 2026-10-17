@@ -33,11 +33,15 @@ import { VerifyEmailModal } from '~modals/VerifyEmailModal';
 
 import { router } from './router';
 
-// Re-syncs queries left stale/errored after the app resumes from the background.
+// Only refetches queries actually left in an error state after the app resumes from the background.
 function registerVisibilityRefetch() {
 	document.addEventListener('visibilitychange', () => {
-		if (document.visibilityState === 'visible') {
-			void client.refetchObservableQueries();
+		if (document.visibilityState !== 'visible') return;
+
+		for (const observableQuery of client.getObservableQueries()) {
+			if (observableQuery.getCurrentResult().error) {
+				void observableQuery.refetch();
+			}
 		}
 	});
 }

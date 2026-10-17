@@ -5,6 +5,7 @@ import {
 	Badge,
 	Box,
 	Breadcrumbs,
+	Button,
 	Center,
 	Divider,
 	Flex,
@@ -58,7 +59,7 @@ export const ReaderView = () => {
 	const { effectiveTheme, contentSettings } = useReaderSettings();
 
 	const { id } = useParams({ from: Route.id });
-	const { data, loading, error } = useQuery(SAVED_ITEM, {
+	const { data, loading, error, refetch } = useQuery(SAVED_ITEM, {
 		variables: { query: { id } },
 		fetchPolicy: 'cache-and-network',
 	});
@@ -468,11 +469,20 @@ export const ReaderView = () => {
 											)}
 
 											{(error || !savedItem) && (
-												<Text ta="center">
-													Something went wrong, and the article content
-													couldn't be loaded. Please try again or contact
-													support.
-												</Text>
+												<Stack align="center" gap="xs">
+													<Text ta="center">
+														Something went wrong, and the article
+														couldn't be loaded.
+													</Text>
+
+													<Button
+														variant="light"
+														loading={loading}
+														onClick={() => void refetch()}
+													>
+														Try again
+													</Button>
+												</Stack>
 											)}
 										</Stack>
 									</Box>
