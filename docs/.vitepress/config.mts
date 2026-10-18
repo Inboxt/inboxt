@@ -5,7 +5,7 @@ const statsConfig: HeadConfig = [
 	'script',
 	{
 		defer: 'true',
-		src: 'https://stats.duckybox.mytymon.com/script.js',
+		src: 'https://stats.datguyducky.com/script.js',
 		'data-website-id': '967a0bcd-de9c-4e0b-9f78-b0782da18998',
 	},
 ];
